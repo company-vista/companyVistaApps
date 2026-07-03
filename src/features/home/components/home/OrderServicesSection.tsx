@@ -11,14 +11,14 @@ type OrderServicesSectionProps = {
 
 const serviceItems = [
   {
-    title: 'File Tax',
+    title: 'State Filing',
     subtitle: 'Delaware - Resolve overdue status',
     tag: 'Urgent',
     icon: 'file-text-o',
     tone: 'red',
   },
   {
-    title: 'IRS Filing',
+    title: 'Federal Filing',
     subtitle: 'Form 1120 / 5472 preparation',
     tag: 'Due_Jul_15',
     icon: 'file-text',
@@ -109,11 +109,10 @@ function OrderServicesSection({
           const tone = getToneStyles(item.tone);
 
           return (
-            <Pressable 
+              <Pressable 
               key={item.title} 
               style={styles.gridItem}
-              // यहाँ आप अपनी आईडी पास कर सकते हैं (उदा: item.id या जो भी स्ट्रक्चर हो)
-              onPress={() => console.log(item.title)} 
+              onPress={item.title === 'Federal Filing' ? () => onQuickAccessItemPress('federalFiling') : () => console.log(item.title)} 
             >
               <View style={styles.iconWrapper}>
                 {/* 1. स्क्वायर आइकॉन बॉक्स */}

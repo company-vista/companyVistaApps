@@ -6,7 +6,7 @@ const deadlineItems = [
   {
     day: '15',
     month: 'Jul',
-    title: 'IRS Form 1120 - Federal Tax Return',
+    title: 'Annual Report',
     subtitle: 'C-Corp - Extended deadline',
     badge: '35 days',
     tone: 'soon',
@@ -14,7 +14,7 @@ const deadlineItems = [
   {
     day: '31',
     month: 'Jul',
-    title: 'Annual Report - Secretary of State',
+    title: 'Franchise Tax',
     subtitle: 'Delaware - Good Standing',
     badge: '51 days',
     tone: 'soon',
@@ -43,6 +43,7 @@ function UpcomingDeadlinesSection() {
         {deadlineItems.map(item => (
           <View key={item.title} style={[styles.deadlineRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.deadlineDate}>
+              <Text style={[styles.deadlineDueLabel, { color: colors.muted }]}>Due</Text>
               <Text style={[styles.deadlineDay, { color: colors.danger }]}>{item.day}</Text>
               <Text style={[styles.deadlineMonth, { color: colors.muted }]}>{item.month}</Text>
             </View>
@@ -112,6 +113,13 @@ const styles = StyleSheet.create({
   deadlineDate: {
     width: 36,
     alignItems: 'center',
+  },
+  deadlineDueLabel: {
+    fontSize: 8,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
   },
   deadlineDay: {
     fontSize: 16,

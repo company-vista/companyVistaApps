@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   greeting: {
     flex: 1,
     color: '#111827',
-    fontSize: 21,
+    fontSize: 19,
     fontWeight: '500',
   },
   headerIcon: {

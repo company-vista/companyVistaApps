@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
@@ -254,6 +254,30 @@ function ComplianceStatusSection({
   const [dueDatesByTitle, setDueDatesByTitle] = useState<Record<string, string>>({});
   const [statusesByTitle, setStatusesByTitle] = useState<Record<string, string>>({});
   const [isLoadingDueDates, setIsLoadingDueDates] = useState(false);
+  const borderGlowAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (colors.mode === 'dark') {
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(borderGlowAnim, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(borderGlowAnim, {
+            toValue: 0,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      animation.start();
+      return () => animation.stop();
+    } else {
+      borderGlowAnim.setValue(0);
+    }
+  }, [colors.mode, borderGlowAnim]);
 
   useEffect(() => {
     if (!companyId) {
@@ -358,23 +382,40 @@ function ComplianceStatusSection({
           const tone = getToneStyles(item.tone, colors);
 
           return (
-            <View key={item.title} style={[styles.complianceTile, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <View style={styles.complianceTileHeader}>
-                <View style={[styles.statusIcon, tone.icon]}>
-                  <FontAwesome
-                    name={item.icon}
-                    size={14}
-                    style={tone.iconText}
-                  />
+            <View key={item.title} style={styles.tileWrapper}>
+              <View style={[styles.complianceTile, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.complianceTileHeader}>
+                  <View style={[styles.statusIcon, tone.icon]}>
+                    <FontAwesome
+                      name={item.icon}
+                      size={14}
+                      style={tone.iconText}
+                    />
+                  </View>
+                  <View style={[styles.tag, tone.tag]}>
+                    <Text style={[styles.tagText, tone.tagText]}>{item.tag}</Text>
+                  </View>
                 </View>
-                <View style={[styles.tag, tone.tag]}>
-                  <Text style={[styles.tagText, tone.tagText]}>{item.tag}</Text>
-                </View>
+                <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
+                <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
+                  Due date: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
+                </Text>
               </View>
-              <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
-              <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                Due date: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
-              </Text>
+              {colors.mode === 'dark' && (
+                <Animated.View
+                  pointerEvents="none"
+                  style={[
+                    styles.tileBorderOverlay,
+                    {
+                      borderColor: colors.primary,
+                      opacity: borderGlowAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.3, 1],
+                      }),
+                    },
+                  ]}
+                />
+              )}
             </View>
           );
         })}
@@ -408,12 +449,21 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
-  complianceTile: {
+  tileWrapper: {
     width: '48.8%',
+    position: 'relative',
+  },
+  complianceTile: {
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 11,
+  },
+  tileBorderOverlay: {
+    position: 'absolute',
+    inset: 0,
+    borderWidth: 1,
+    borderRadius: 12,
   },
   complianceTileHeader: {
     flexDirection: 'row',

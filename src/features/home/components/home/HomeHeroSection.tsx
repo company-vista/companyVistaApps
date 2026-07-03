@@ -3,6 +3,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import type { CompanyCardItem } from '../../screens/quickAccess/CompanyCard';
 
+const BORDER_COLOR = '#4e46e5c2';
+
 type HomeHeroSectionProps = {
   isLoadingCompanies?: boolean;
   onCompanyInfoPress: () => void;
@@ -33,7 +35,7 @@ function HomeHeroSection({
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
 
   return (
-    <View style={styles.hero}>
+    <View style={[styles.hero, { borderColor: BORDER_COLOR }]}>
       <View style={styles.heroDeco} />
       <View style={styles.heroDecoSmall}>
         <FontAwesome name="flag" size={20} color="rgba(255,255,255,0.25)" />
@@ -82,7 +84,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
     backgroundColor: '#0D2137',
     paddingHorizontal: 16,
     paddingTop: 16,

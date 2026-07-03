@@ -68,7 +68,9 @@ type HomeScreenProps = {
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
   onQuickAccessViewAllPress: () => void;
   onCompanyChange?: (companyId: string | null) => void;
+  selectedCompanyId?: string | null;
   onOpenRenewPage?: (action: RenewActionData) => void;
+  onOpenComplianceHistory?: (action: RenewActionData) => void;
 };
 
 export default function HomeScreen({
@@ -82,12 +84,17 @@ export default function HomeScreen({
   onQuickAccessItemPress,
   onQuickAccessViewAllPress,
   onCompanyChange,
+  selectedCompanyId,
   onOpenRenewPage,
+  onOpenComplianceHistory,
 }: HomeScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const user = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
+  const userId = useAppSelector(
+    state => state.auth.user?._id ?? state.auth.user?.id ?? null,
+  );
   const userCompanies = useAppSelector(
     state => state.auth.user?.companies ?? emptyCompanies,
   );
@@ -206,7 +213,7 @@ export default function HomeScreen({
 
     setIsLoadingCompanies(true);
 
-    fetchClientCompanies({ token })
+    fetchClientCompanies({ token, userId })
       .then(result => {
         if (!isMounted) {
           return;
@@ -218,9 +225,21 @@ export default function HomeScreen({
 
         setCompanyOptions(mappedCompanies);
 
-        setSelectedCompany(
-          currentCompany => currentCompany ?? mappedCompanies[0] ?? null,
-        );
+        setSelectedCompany(currentCompany => {
+          if (currentCompany) {
+            return currentCompany;
+          }
+
+          if (selectedCompanyId) {
+            return (
+              mappedCompanies.find(company => company.id === selectedCompanyId) ??
+              mappedCompanies[0] ??
+              null
+            );
+          }
+
+          return mappedCompanies[0] ?? null;
+        });
       })
       .finally(() => {
         if (isMounted) {
@@ -231,7 +250,7 @@ export default function HomeScreen({
     return () => {
       isMounted = false;
     };
-  }, [token, userCompanies]);
+  }, [token, userCompanies, userId]);
 
   useEffect(() => {
     if (!selectedCompany?.id) {
@@ -502,7 +521,7 @@ export default function HomeScreen({
         {activeTab === 'home' ? (
           <HomeTabContent
             isLoadingCompanies={isLoadingCompanies}
-            selectedCompany={selectedCompany}
+            selectedCompany={selectedCompany ?? companyOptions[0] ?? null}
             onCompanyInfoPress={() => setActiveCompanySection('menu')}
             onCompanySwitcherPress={openCompanySwitcher}
             onManagePress={() => setIsManageScreenOpen(true)}
@@ -518,7 +537,11 @@ export default function HomeScreen({
           />
         ) : null}
         {activeTab === 'reports' ? (
-          <ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={onOpenRenewPage} />
+          <ReportsTabContent
+            selectedCompany={selectedCompany}
+            onOpenRenewPage={onOpenRenewPage}
+            onOpenComplianceHistory={onOpenComplianceHistory}
+          />
         ) : null}
         {activeTab === 'billing' ? (
           <BillingTabContent

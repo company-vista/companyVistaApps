@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,17 +15,11 @@ import {
 import axios from 'axios'; // Ensure axios is installed
 import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
-import {API_BASE_URL} from '../../../../config/api'; // Ensure this path is correct
+import {API_BASE_URL} from '../../../../config/api';
+import { useAppSelector } from '../../../../store/hooks';
+import Toast from 'react-native-toast-message';
 
-// Dummy/Placeholder for toast if you haven't configured one. 
-// Replace this with your actual toast library (e.g., react-native-toast-message)
-const toast = {
-  error: (msg: string) => console.log("Toast Error:", msg),
-  success: (msg: string) => console.log("Toast Success:", msg),
-};
 
-// API Base URL Constant (Replace with your actual config or env variable)
-// const API_BASE_URL = 'https://your-api-url.com';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -69,6 +63,7 @@ interface FormValues {
   intro: string;
   addr: string;
   rep: string;
+  message: string;
   sh: ShareholderForm;
 }
 
@@ -118,6 +113,7 @@ const INITIAL_FORM: FormValues = {
   intro: '',
   addr: '',
   rep: '',
+  message: '',
   sh: { ...INITIAL_SHAREHOLDER },
 };
 
@@ -209,14 +205,33 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
   selectedCategory
 }) => {
   const colors = useThemeColors();
-  const [selected, setSelected] = useState<Set<FieldKey>>(new Set());
+  const token = useAppSelector(state => state.auth.token);
+
+  const CATEGORY_FIELDS: Record<string, FieldKey[]> = {
+    'Company info': ['name', 'web', 'act', 'intro'],
+    'ShareHolder/Director': ['sh'],
+    'Local address': ['addr'],
+    'Local representative': ['rep'],
+  };
+
+  const initialFields = selectedCategory ? CATEGORY_FIELDS[selectedCategory] : undefined;
+  const [selected, setSelected] = useState<Set<FieldKey>>(
+    () => initialFields ? new Set(initialFields) : new Set()
+  );
   const [formValues, setFormValues] = useState<FormValues>(INITIAL_FORM);
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false); // Added for loader state
+  const [submitting, setSubmitting] = useState(false);
 
   const totalCount = FIELDS.length;
   const selectedCount = selected.size;
   const allSelected = selectedCount === totalCount;
+
+  useEffect(() => {
+    const fields = selectedCategory ? CATEGORY_FIELDS[selectedCategory] : undefined;
+    if (fields) {
+      setSelected(new Set(fields));
+    }
+  }, [selectedCategory]);
 
   const toggleField = (key: FieldKey) => {
     setSelected(prev => {
@@ -249,26 +264,62 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
   const handleSubmit = async () => {
     // 1. Validation check for selected fields
     if (selected.size === 0) {
-      toast.error("Please select at least one field to change.");
+      Toast.show({ type: 'error', text1: `Please select at least one field to update${selectedCategory ? ` for ${selectedCategory}` : ''}.` });
+      return;
+    }
+
+    // Required field validation
+    const fieldsArray = Array.from(selected);
+    const missing: string[] = [];
+    for (const key of fieldsArray) {
+      if (key === 'sh') {
+        const sh = formValues.sh;
+        const shMissing = [];
+        if (!sh.firstName.trim()) shMissing.push('First name');
+        if (!sh.lastName.trim()) shMissing.push('Last name');
+        if (!sh.designation.trim()) shMissing.push('Designation');
+        if (!sh.phone.trim()) shMissing.push('Phone');
+        if (!sh.sharePercent.trim()) shMissing.push('Share %');
+        if (!sh.address1.trim()) shMissing.push('Address line 1');
+        if (!sh.city.trim()) shMissing.push('City');
+        if (!sh.state.trim()) shMissing.push('State');
+        if (!sh.postalCode.trim()) shMissing.push('Postal code');
+        if (!sh.country.trim()) shMissing.push('Country');
+        if (shMissing.length) missing.push(`Shareholder/Director: ${shMissing.join(', ')}`);
+      } else if (!(formValues as any)[key]?.toString().trim()) {
+        const label = FIELDS.find(f => f.key === key)?.label || key;
+        missing.push(label);
+      }
+    }
+    if (missing.length) {
+      Toast.show({ type: 'error', text1: `Please fill in required fields: ${missing.join('; ')}` });
+      setSubmitting(false);
       return;
     }
 
     try {
       setSubmitting(true);
-      
-      // Preparing payload according to selected values
-      const fieldsArray = Array.from(selected);
-      
+    
       await axios.post(`${API_BASE_URL}/api/change-requests`, {
         companyId,
         clientId,
-        type: 'basic_info',
+        urgency,
+        selectedCategory,
+        type: selectedCategory ,
         fields: fieldsArray,
-        requestedChanges: formValues, // Sending form values inside requested changes
+        requestedChanges: formValues,
         shareholderData: selected.has('sh') ? formValues.sh : undefined,
-      }, { withCredentials: true });
-      console.log(fieldsArray, formValues); // Debugging log
-      toast.success("Request submitted successfully");
+        message: formValues.message,
+      }, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-auth-token': token,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      Toast.show({ type: 'success', text1: 'Request submitted successfully' });
       
       // Reset state on successful submission
       setFormValues(INITIAL_FORM);
@@ -277,7 +328,7 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
       
      
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to submit your request.");
+      Toast.show({ type: 'error', text1: err.response?.data?.message || 'Failed to submit your request.' });
     } finally { 
       setSubmitting(false); 
     }
@@ -330,38 +381,43 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <BackButton onPress={onBackPress} />
               <Text style={styles(colors).headerTitle} numberOfLines={1}>
-                Select fields to update
+                {selectedCategory ? `Update ${selectedCategory}` : 'Select fields to update'}
               </Text>
             </View>
-            <TouchableOpacity onPress={toggleAll}>
-              <Text style={styles(colors).selectAllBtn}>
-                {allSelected ? 'Deselect all' : 'Select all'}
-              </Text>
-            </TouchableOpacity>
+            {!selectedCategory && (
+              <TouchableOpacity onPress={toggleAll}>
+                <Text style={styles(colors).selectAllBtn}>
+                  {allSelected ? 'Deselect all' : 'Select all'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
-          {/* 3-Column Buttons Layout */}
-          <View style={styles(colors).chipsGrid}>
-            {FIELDS.map(field => (
-              <Chip
-                key={field.key}
-                field={field}
-                selected={selected.has(field.key)}
-                onPress={() => toggleField(field.key)}
-                colors={colors}
-              />
-            ))}
-          </View>
+          {/* 3-Column Buttons Layout - only show when no category pre-selected */}
+          {!selectedCategory && (
+            <>
+              <View style={styles(colors).chipsGrid}>
+                {FIELDS.map(field => (
+                  <Chip
+                    key={field.key}
+                    field={field}
+                    selected={selected.has(field.key)}
+                    onPress={() => toggleField(field.key)}
+                    colors={colors}
+                  />
+                ))}
+              </View>
 
-          {/* Counter */}
-          <View style={styles(colors).footBar}>
-            <Text style={styles(colors).countText}>
-              {selectedCount} of {totalCount} selected
-            </Text>
-          </View>
+              <View style={styles(colors).footBar}>
+                <Text style={styles(colors).countText}>
+                  {selectedCount} of {totalCount} selected
+                </Text>
+              </View>
+            </>
+          )}
 
           {/* Dynamic Form */}
-          {selectedCount > 0 && (
+          {(selectedCount > 0 || !!selectedCategory) && (
             <View style={styles(colors).formArea}>
 
               {selected.has('name') && (
@@ -560,6 +616,23 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
                 </View>
               )}
 
+              {/* Message to admin team */}
+              <View style={styles(colors).messageBlock}>
+                <Text style={styles(colors).messageLabel}>
+                  Message to admin team
+                </Text>
+                <TextInput
+                  style={[styles(colors).fieldInput, styles(colors).messageInput]}
+                  value={formValues.message}
+                  onChangeText={v => setField('message', v)}
+                  placeholder="Write your message here..."
+                  placeholderTextColor={colors.muted}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
               <TouchableOpacity
                 style={styles(colors).submitBtn}
                 onPress={handleSubmit}
@@ -592,7 +665,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   },
   scrollContent: {
     padding: 14,
-    paddingBottom: 40,
+    paddingBottom: 100,
     marginTop: 40
   },
 
@@ -631,8 +704,8 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderColor: colors.mode === 'dark' ? '#475569' : colors.border,
     backgroundColor: colors.surface,
     shadowColor: colors.text,
     shadowOffset: { width: 0, height: 1 },
@@ -642,6 +715,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   },
   chipSelected: {
     borderColor: colors.primary,
+    borderWidth: 2,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -675,7 +749,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   },
   fieldBlock: {
     rowGap: 6,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   fieldLabel: {
     fontSize: 13,
@@ -685,14 +759,13 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     letterSpacing: 0.4,
   },
   fieldInput: {
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 11,
     fontSize: 13,
     color: colors.text,
-    opacity: 0.5,
     backgroundColor: colors.surface,
   },
   fieldInputMulti: {
@@ -733,7 +806,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     width: '100%',
-    marginTop: 14,
+    marginTop: 3,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -788,6 +861,22 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.3,
+  },
+
+  // Message to admin
+  messageBlock: {
+    marginTop: 16,
+  },
+  messageLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  messageInput: {
+    minHeight: 100,
+    paddingTop: 12,
+    opacity: 1,
   },
 });
 

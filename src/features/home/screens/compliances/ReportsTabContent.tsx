@@ -16,15 +16,18 @@ type RenewActionData = {
 type ReportsTabContentProps = {
   selectedCompany?: CompanyCardItem | null;
   onOpenRenewPage?: (action: RenewActionData) => void;
+  onOpenComplianceHistory?: (action: RenewActionData) => void;
 };
 
-function ReportsTabContent({ selectedCompany, onOpenRenewPage }: ReportsTabContentProps) {
+function ReportsTabContent({ selectedCompany, onOpenRenewPage, onOpenComplianceHistory }: ReportsTabContentProps) {
   return (
     <TabPlaceholder
       title="Compliances"
       icon="check-square-o"
       companyId={selectedCompany?.id}
+      selectedCompanyName={selectedCompany?.name ?? null}
       onOpenRenewPage={onOpenRenewPage}
+      onOpenComplianceHistory={onOpenComplianceHistory}
     />
   );
 }

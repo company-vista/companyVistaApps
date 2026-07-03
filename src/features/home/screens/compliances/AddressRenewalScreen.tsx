@@ -15,6 +15,8 @@ import BackButton from '../../../../components/buttons/BackButton';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useThemeColors } from '../../../../theme/colors';
+import Toast from 'react-native-toast-message';
 
 interface Service {
   id: number;
@@ -90,12 +92,15 @@ const getIconName = (icon?: string): string => {
   return iconMap[normalized] ?? iconMap[normalized.replace(/[-_]/g, '')] ?? 'info-circle';
 };
 
-const BreakdownRow: React.FC<BreakdownRowProps> = ({ label, value, isTotal = false }) => (
-  <View style={[styles.breakdownRow, isTotal && styles.breakdownRowTotal]}>
-    <Text style={[styles.breakdownLabel, isTotal && styles.breakdownLabelTotal]}>{label}</Text>
-    <Text style={[styles.breakdownValue, isTotal && styles.breakdownValueTotal]}>{value}</Text>
-  </View>
-);
+const BreakdownRow: React.FC<BreakdownRowProps> = ({ label, value, isTotal = false }) => {
+  const colors = useThemeColors();
+  return (
+    <View style={[styles.breakdownRow, isTotal && { borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 6, marginTop: 4 }]}>
+      <Text style={[{ fontSize: 12, color: isTotal ? colors.text : colors.muted }, isTotal && { fontWeight: '600' }]}>{label}</Text>
+      <Text style={[{ fontSize: 12, color: colors.text }, isTotal && { fontWeight: '600' }]}>{value}</Text>
+    </View>
+  );
+};
 
 const buildAddressServices = (apiData: any, action?: RenewActionData | null): Service[] => {
   const breakdown = Array.isArray(apiData?.breakdown) ? apiData.breakdown : [];
@@ -135,6 +140,7 @@ const buildAddressServices = (apiData: any, action?: RenewActionData | null): Se
 };
 
 const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress, selectedAction }) => {
+  const colors = useThemeColors();
   const authUser = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
   const resolvedCompanyId = selectedAction?.companyId ?? authUser?._id ?? authUser?.id ?? authUser?.company ?? authUser?.companyName ?? authUser?.businessName ?? authUser?.legalName ?? null;
@@ -164,10 +170,11 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
             },
           },
         );
+        
 
         setServices(buildAddressServices(response?.data, selectedAction));
       } catch (error) {
-        console.error('Error fetching renewal data:', error);
+        Toast.show({text1: 'Failed to fetch renewal data' });
         setServices(buildAddressServices(null, selectedAction));
       } finally {
         setLoading(false);
@@ -188,7 +195,6 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
   const selectedServices = services.filter(service => service.isSelected);
   const totalDue = selectedServices.reduce((sum, service) => sum + service.price * service.years, 0);
 
-  // ============== Payment Handling Function ==============
   const handlePay = async () => {
     if (selectedServices.length === 0) {
       Alert.alert('Payment', 'Please select at least one service to continue.');
@@ -243,14 +249,14 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
 
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <BackButton onPress={onBackPress} />
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>{selectedAction?.title ?? 'Address Renewal'}</Text>
-          <Text style={styles.headerSubtitle}>{selectedAction?.subtitle ?? 'Company · 1 renewable service'}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? 'Address Renewal'}</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>{selectedAction?.subtitle ?? 'Company · 1 renewable service'}</Text>
         </View>
         <View style={styles.headerRightPlaceholder} />
       </View>
@@ -258,23 +264,23 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.yearHeader}>
           <View style={styles.yearLabel}>
-            <View style={styles.yearIconBox}>
+            <View style={[styles.yearIconBox, { backgroundColor: colors.border }]}>
               <Text style={styles.yearIconText}>📅</Text>
             </View>
             <View>
-              <Text style={styles.yearTitle}>{selectedAction?.date ?? '2026'}</Text>
-              <Text style={styles.yearSubtitle}>{services.length} service available for renewal</Text>
+              <Text style={[styles.yearTitle, { color: colors.text }]}>{selectedAction?.date ?? '2026'}</Text>
+              <Text style={[styles.yearSubtitle, { color: colors.muted }]}>{services.length} service available for renewal</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.deselectBtn} onPress={deselectAll}>
-            <Text style={styles.deselectBtnText}>Deselect all</Text>
+          <TouchableOpacity style={[styles.deselectBtn, { backgroundColor: `${colors.accent}20` }]} onPress={deselectAll}>
+            <Text style={[styles.deselectBtnText, { color: colors.accent }]}>Deselect all</Text>
           </TouchableOpacity>
         </View>
 
         {loading && services.length === 0 ? (
-          <View style={styles.checkoutSection}>
-            <Text style={styles.checkoutTitle}>Loading renewal options...</Text>
-            <Text style={styles.checkoutDesc}>Fetching the latest company compliance details.</Text>
+          <View style={[styles.checkoutSection, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.checkoutTitle, { color: colors.text }]}>Loading renewal options...</Text>
+            <Text style={[styles.checkoutDesc, { color: colors.muted }]}>Fetching the latest company compliance details.</Text>
           </View>
         ) : (
           services.map(service => (
@@ -283,7 +289,8 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
               style={[
                 styles.serviceCard,
                 {
-                  borderColor: service.isSelected ? '#534AB7' : '#e0e0e0',
+                  backgroundColor: colors.surface,
+                  borderColor: service.isSelected ? colors.accent : colors.border,
                   borderWidth: service.isSelected ? 1.5 : 0.5,
                 },
               ]}
@@ -293,9 +300,9 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
                 style={[
                   styles.checkbox,
                   {
-                    backgroundColor: service.isSelected ? '#534AB7' : 'transparent',
+                    backgroundColor: service.isSelected ? colors.accent : 'transparent',
                     borderWidth: service.isSelected ? 0 : 1.5,
-                    borderColor: '#ccc',
+                    borderColor: colors.border,
                   },
                 ]}
                 onPress={() => toggleService(service.id)}
@@ -303,31 +310,31 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
                 {service.isSelected && <Text style={styles.checkboxTick}>✓</Text>}
               </TouchableOpacity>
 
-              <View style={styles.cardIcon}>
+              <View style={[styles.cardIcon, { backgroundColor: `${colors.primary}20` }]}>
                 <FontAwesome
                   name={service.name.toLowerCase().includes('address') ? 'home' : 'file-text-o'}
                   size={18}
-                  color="#534AB7"
+                  color={colors.accent}
                 />
               </View>
 
               <View style={styles.cardInfo}>
-                <Text style={styles.cardName}>{service.name}</Text>
+                <Text style={[styles.cardName, { color: colors.text }]}>{service.name}</Text>
                 {service.isExpired && (
-                  <View style={styles.expiredBadge}>
-                    <Text style={styles.expiredBadgeText}>⚠ {selectedAction?.status ?? 'Expired'}</Text>
+                  <View style={[styles.expiredBadge, { backgroundColor: `${colors.danger}20` }]}>
+                    <Text style={[styles.expiredBadgeText, { color: colors.danger }]}>⚠ {selectedAction?.status ?? 'Expired'}</Text>
                   </View>
                 )}
-                <Text style={styles.cardDates}>
-                  Last: {service.lastDate} · <Text style={styles.dueDateText}>Due: {service.dueDate}</Text>
+                <Text style={[styles.cardDates, { color: colors.muted }]}>
+                  Last: {service.lastDate} · <Text style={[styles.dueDateText, { color: colors.danger }]}>Due: {service.dueDate}</Text>
                 </Text>
               </View>
             </View>
 
-            <Text style={styles.cardPrice}>${service.isSelected ? service.price.toFixed(2) : '0.00'}</Text>
-            <Text style={styles.cardSubLabel}>{selectedAction?.subtitle ?? '1 year from backend'}</Text>
+            <Text style={[styles.cardPrice, { color: colors.accent }]}>${service.isSelected ? service.price.toFixed(2) : '0.00'}</Text>
+            <Text style={[styles.cardSubLabel, { color: colors.muted }]}>{selectedAction?.subtitle ?? '1 year from backend'}</Text>
 
-            <View style={styles.breakdown}>
+            <View style={[styles.breakdown, { backgroundColor: colors.background }]}>
               <BreakdownRow label="Years" value={String(service.isSelected ? service.years : 0)} />
               <BreakdownRow label="Base total" value={`$${service.isSelected ? service.price.toFixed(2) : '0.00'}`} />
               <BreakdownRow label="Total" value={`$${service.isSelected ? (service.price * service.years).toFixed(2) : '0.00'}`} isTotal />
@@ -337,18 +344,18 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
         )}
 
         {selectedAction?.details?.length ? (
-          <View style={styles.checkoutSection}>
-            <Text style={styles.checkoutEyebrow}>SELECTED ACTION</Text>
-            <Text style={styles.checkoutTitle}>Details</Text>
+          <View style={[styles.checkoutSection, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.checkoutEyebrow, { color: colors.muted }]}>SELECTED ACTION</Text>
+            <Text style={[styles.checkoutTitle, { color: colors.text }]}>Details</Text>
             <View style={styles.detailList}>
               {selectedAction.details.map((detail, index) => (
-                <View key={`${detail.label}-${index}`} style={styles.detailCard}>
-                  <View style={styles.detailIconBox}>
-                    <FontAwesome name={getIconName(detail.icon)} size={16} color="#534AB7" />
+                <View key={`${detail.label}-${index}`} style={[styles.detailCard, { backgroundColor: colors.background }]}>
+                  <View style={[styles.detailIconBox, { backgroundColor: `${colors.accent}20` }]}>
+                    <FontAwesome name={getIconName(detail.icon)} size={16} color={colors.accent} />
                   </View>
                   <View style={styles.detailContent}>
-                    <Text style={styles.detailLabel}>{detail.label}</Text>
-                    <Text style={styles.detailValue}>{detail.value}</Text>
+                    <Text style={[styles.detailLabel, { color: colors.muted }]}>{detail.label}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detail.value}</Text>
                   </View>
                 </View>
               ))}
@@ -356,54 +363,54 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
           </View>
         ) : null}
 
-        <View style={styles.checkoutSection}>
-          <Text style={styles.checkoutEyebrow}>CHECKOUT</Text>
-          <Text style={styles.checkoutTitle}>Stripe payment</Text>
-          <Text style={styles.checkoutDesc}>Review the services you selected and continue to secure checkout.</Text>
+        <View style={[styles.checkoutSection, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.checkoutEyebrow, { color: colors.muted }]}>CHECKOUT</Text>
+          <Text style={[styles.checkoutTitle, { color: colors.text }]}>Stripe payment</Text>
+          <Text style={[styles.checkoutDesc, { color: colors.muted }]}>Review the services you selected and continue to secure checkout.</Text>
 
-          <View style={styles.selectedServices}>
+          <View style={[styles.selectedServices, { backgroundColor: colors.background }]}>
             <View style={styles.ssHeader}>
-              <Text style={styles.ssHeaderLabel}>Selected services</Text>
-              <View style={styles.ssCount}>
+              <Text style={[styles.ssHeaderLabel, { color: colors.text }]}>Selected services</Text>
+              <View style={[styles.ssCount, { backgroundColor: colors.accent }]}>
                 <Text style={styles.ssCountText}>{selectedServices.length}</Text>
               </View>
             </View>
 
             {selectedServices.length > 0 ? (
               selectedServices.map(service => (
-                <View key={service.id} style={styles.ssItem}>
-                  <View style={styles.ssItemIcon}>
+                <View key={service.id} style={[styles.ssItem, { backgroundColor: colors.surface }]}>
+                  <View style={[styles.ssItemIcon, { backgroundColor: `${colors.primary}20` }]}>
                     <Text style={styles.ssItemIconText}>🏠</Text>
                   </View>
                   <View style={styles.ssItemInfo}>
-                    <Text style={styles.ssItemName}>{service.name}</Text>
-                    <Text style={styles.ssItemMeta}>2026 · {service.years} year</Text>
+                    <Text style={[styles.ssItemName, { color: colors.text }]}>{service.name}</Text>
+                    <Text style={[styles.ssItemMeta, { color: colors.muted }]}>2026 · {service.years} year</Text>
                   </View>
                   <View style={styles.ssItemPriceBox}>
-                    <Text style={styles.ssItemPrice}>${service.price.toFixed(2)}</Text>
-                    <Text style={styles.ssItemBase}>Base ${service.price.toFixed(2)}</Text>
+                    <Text style={[styles.ssItemPrice, { color: colors.text }]}>${service.price.toFixed(2)}</Text>
+                    <Text style={[styles.ssItemBase, { color: colors.muted }]}>Base ${service.price.toFixed(2)}</Text>
                   </View>
                 </View>
               ))
             ) : (
-              <View style={styles.ssItem}>
+              <View style={[styles.ssItem, { backgroundColor: colors.surface }]}>
                 <View style={styles.ssItemInfo}>
-                  <Text style={styles.ssItemName}>No service selected</Text>
-                  <Text style={styles.ssItemMeta}>Select a service to see its amount</Text>
+                  <Text style={[styles.ssItemName, { color: colors.text }]}>No service selected</Text>
+                  <Text style={[styles.ssItemMeta, { color: colors.muted }]}>Select a service to see its amount</Text>
                 </View>
               </View>
             )}
           </View>
 
-          <View style={styles.totalDue}>
+          <View style={[styles.totalDue, { backgroundColor: colors.background }]}>
             <View style={styles.totalDueRow}>
               <View style={styles.totalDueLabel}>
-                <Text style={styles.totalDueDollar}>$</Text>
-                <Text style={styles.totalDueLabelText}>Total due</Text>
+                <Text style={[styles.totalDueDollar, { color: colors.text }]}>$</Text>
+                <Text style={[styles.totalDueLabelText, { color: colors.text }]}>Total due</Text>
               </View>
-              <Text style={styles.totalDueAmount}>${totalDue.toFixed(2)}</Text>
+              <Text style={[styles.totalDueAmount, { color: colors.accent }]}>${totalDue.toFixed(2)}</Text>
             </View>
-            <Text style={styles.totalNote}>
+            <Text style={[styles.totalNote, { color: colors.muted }]}>
               {selectedServices.length > 0
                 ? 'Selected services will be charged through Stripe checkout.'
                 : 'No service selected. Amount will remain $0.00 until you choose one.'}
@@ -411,7 +418,13 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
           </View>
 
           <TouchableOpacity
-            style={[styles.payBtn, selectedServices.length === 0 && styles.payBtnDisabled]}
+            style={[
+              styles.payBtn,
+              {
+                backgroundColor: selectedServices.length === 0 ? `${colors.accent}40` : colors.accent,
+              },
+              selectedServices.length === 0 && styles.payBtnDisabled,
+            ]}
             onPress={handlePay}
             activeOpacity={0.85}
             disabled={selectedServices.length === 0}
@@ -419,7 +432,7 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
             <Text style={styles.payBtnText}>🔒  Pay ${totalDue.toFixed(2)} with Stripe  →</Text>
           </TouchableOpacity>
 
-          <Text style={styles.secureNote}>Secured by Stripe · Card and wallet checkout</Text>
+          <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe · Card and wallet checkout</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -427,59 +440,50 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f4f4f8' },
+  safeArea: { flex: 1 },
   header: {
-    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#e8e8e8',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     marginTop: 40,
   },
   headerText: { flex: 1 },
-  headerTitle: { fontSize: 15, fontWeight: '500', color: '#1a1a1a' },
-  headerSubtitle: { fontSize: 12, color: '#6b6b6b', marginTop: 1 },
+  headerTitle: { fontSize: 15, fontWeight: '500' },
+  headerSubtitle: { fontSize: 12, marginTop: 1 },
   headerRightPlaceholder: { width: 40 },
   content: { flex: 1 },
   contentContainer: { padding: 16, gap: 14 },
   yearHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   yearLabel: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  yearIconBox: { width: 28, height: 28, borderRadius: 8, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' },
+  yearIconBox: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   yearIconText: { fontSize: 14 },
-  yearTitle: { fontSize: 14, fontWeight: '500', color: '#1a1a1a' },
-  yearSubtitle: { fontSize: 11, color: '#6b6b6b' },
-  deselectBtn: { backgroundColor: '#EEEDFE', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
-  deselectBtnText: { fontSize: 11, fontWeight: '500', color: '#534AB7' },
-  serviceCard: { backgroundColor: '#ffffff', borderRadius: 12, borderStyle: 'solid', padding: 14 },
+  yearTitle: { fontSize: 14, fontWeight: '500' },
+  yearSubtitle: { fontSize: 11 },
+  deselectBtn: { borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
+  deselectBtnText: { fontSize: 11, fontWeight: '500' },
+  serviceCard: { borderRadius: 12, borderStyle: 'solid', padding: 14 },
   cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   checkbox: { width: 20, height: 20, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   checkboxTick: { color: 'white', fontSize: 12 },
-  cardIcon: { width: 32, height: 32, borderRadius: 8, backgroundColor: '#EAF3DE', alignItems: 'center', justifyContent: 'center' },
-  cardIconText: { fontSize: 16 },
+  cardIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   cardInfo: { flex: 1 },
-  cardName: { fontSize: 13, fontWeight: '500', color: '#1a1a1a' },
-  expiredBadge: { backgroundColor: '#FCEBEB', borderRadius: 20, paddingHorizontal: 7, paddingVertical: 2, alignSelf: 'flex-start', marginTop: 3 },
-  expiredBadgeText: { color: '#A32D2D', fontSize: 10, fontWeight: '500' },
-  cardDates: { fontSize: 11, color: '#6b6b6b', marginTop: 4 },
-  dueDateText: { color: '#A32D2D', fontWeight: '500' },
-  cardPrice: { fontSize: 18, fontWeight: '500', color: '#534AB7', marginTop: 10 },
-  cardSubLabel: { fontSize: 11, color: '#6b6b6b' },
-  breakdown: { backgroundColor: '#f6f6f8', borderRadius: 8, padding: 12, marginTop: 10, gap: 4 },
+  cardName: { fontSize: 13, fontWeight: '500' },
+  expiredBadge: { borderRadius: 20, paddingHorizontal: 7, paddingVertical: 2, alignSelf: 'flex-start', marginTop: 3 },
+  expiredBadgeText: { fontSize: 10, fontWeight: '500' },
+  cardDates: { fontSize: 11, marginTop: 4 },
+  dueDateText: { fontWeight: '500' },
+  cardPrice: { fontSize: 18, fontWeight: '500', marginTop: 10 },
+  cardSubLabel: { fontSize: 11 },
+  breakdown: { borderRadius: 8, padding: 12, marginTop: 10, gap: 4 },
   breakdownRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  breakdownRowTotal: { borderTopWidth: 0.5, borderTopColor: '#e0e0e0', paddingTop: 6, marginTop: 4 },
-  breakdownLabel: { fontSize: 12, color: '#6b6b6b' },
-  breakdownLabelTotal: { fontSize: 12, color: '#1a1a1a', fontWeight: '600' },
-  breakdownValue: { fontSize: 12, color: '#1a1a1a' },
-  breakdownValueTotal: { fontSize: 12, color: '#1a1a1a', fontWeight: '600' },
-  checkoutSection: { backgroundColor: '#ffffff', borderRadius: 12, padding: 14, gap: 10 },
+  checkoutSection: { borderRadius: 12, padding: 14, gap: 10 },
   detailList: { gap: 8 },
   detailCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f7f7f9',
     borderRadius: 10,
     padding: 10,
     gap: 10,
@@ -488,12 +492,8 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#EEEDFE',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  detailIconText: {
-    fontSize: 14,
   },
   detailContent: {
     flex: 1,
@@ -501,43 +501,41 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#6b6b6b',
     textTransform: 'uppercase',
     marginBottom: 2,
   },
   detailValue: {
     fontSize: 13,
-    color: '#1a1a1a',
     fontWeight: '500',
   },
-  checkoutEyebrow: { fontSize: 11, color: '#6b6b6b', fontWeight: '600', letterSpacing: 0.8 },
-  checkoutTitle: { fontSize: 16, fontWeight: '600', color: '#1a1a1a' },
-  checkoutDesc: { fontSize: 12, color: '#6b6b6b' },
-  selectedServices: { backgroundColor: '#f7f7f9', borderRadius: 10, padding: 10, gap: 8 },
+  checkoutEyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 0.8 },
+  checkoutTitle: { fontSize: 16, fontWeight: '600' },
+  checkoutDesc: { fontSize: 12 },
+  selectedServices: { borderRadius: 10, padding: 10, gap: 8 },
   ssHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  ssHeaderLabel: { fontSize: 12, color: '#1a1a1a', fontWeight: '500' },
-  ssCount: { backgroundColor: '#534AB7', borderRadius: 999, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
+  ssHeaderLabel: { fontSize: 12, fontWeight: '500' },
+  ssCount: { borderRadius: 999, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
   ssCountText: { color: '#ffffff', fontSize: 12, fontWeight: '600' },
-  ssItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#ffffff', borderRadius: 8, padding: 10 },
-  ssItemIcon: { width: 30, height: 30, borderRadius: 8, backgroundColor: '#EAF3DE', alignItems: 'center', justifyContent: 'center' },
+  ssItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 8, padding: 10 },
+  ssItemIcon: { width: 30, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   ssItemIconText: { fontSize: 14 },
   ssItemInfo: { flex: 1, marginLeft: 8 },
-  ssItemName: { fontSize: 12, color: '#1a1a1a', fontWeight: '500' },
-  ssItemMeta: { fontSize: 11, color: '#6b6b6b', marginTop: 2 },
+  ssItemName: { fontSize: 12, fontWeight: '500' },
+  ssItemMeta: { fontSize: 11, marginTop: 2 },
   ssItemPriceBox: { alignItems: 'flex-end' },
-  ssItemPrice: { fontSize: 12, color: '#1a1a1a', fontWeight: '600' },
-  ssItemBase: { fontSize: 10, color: '#6b6b6b', marginTop: 2 },
-  totalDue: { backgroundColor: '#f7f7f9', borderRadius: 10, padding: 12, gap: 6 },
+  ssItemPrice: { fontSize: 12, fontWeight: '600' },
+  ssItemBase: { fontSize: 10, marginTop: 2 },
+  totalDue: { borderRadius: 10, padding: 12, gap: 6 },
   totalDueRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   totalDueLabel: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  totalDueDollar: { fontSize: 14, color: '#1a1a1a', fontWeight: '600' },
-  totalDueLabelText: { fontSize: 13, color: '#1a1a1a', fontWeight: '600' },
-  totalDueAmount: { fontSize: 16, color: '#534AB7', fontWeight: '700' },
-  totalNote: { fontSize: 11, color: '#6b6b6b' },
-  payBtn: { backgroundColor: '#534AB7', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
-  payBtnDisabled: { backgroundColor: '#d8d4f3' },
+  totalDueDollar: { fontSize: 14, fontWeight: '600' },
+  totalDueLabelText: { fontSize: 13, fontWeight: '600' },
+  totalDueAmount: { fontSize: 16, fontWeight: '700' },
+  totalNote: { fontSize: 11 },
+  payBtn: { borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+  payBtnDisabled: { opacity: 0.6 },
   payBtnText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
-  secureNote: { fontSize: 11, color: '#6b6b6b', textAlign: 'center' },
+  secureNote: { fontSize: 11, textAlign: 'center' },
 });
 
 export default AddressRenewalScreen;

@@ -8,12 +8,14 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  InteractionManager,
 } from "react-native";
 import { Linking } from "react-native";
 import axios from "axios";
 import BackButton from "../../../../components/buttons/BackButton";
 import { API_BASE_URL } from "../../../../config/api";
 import { useAppSelector } from "../../../../store/hooks";
+import { useThemeColors } from '../../../../theme/colors';
 
 interface Service {
   id: number;
@@ -30,14 +32,15 @@ interface BreakdownRowProps {
   label: string;
   value: string;
   isTotal?: boolean;
+  colors: { text: string; muted: string; border: string };
 }
 
-const BreakdownRow: React.FC<BreakdownRowProps> = ({ label, value, isTotal = false }) => (
-  <View style={[styles.breakdownRow, isTotal && styles.breakdownRowTotal]}>
-    <Text style={[styles.breakdownLabel, isTotal && styles.breakdownLabelTotal]}>
+const BreakdownRow: React.FC<BreakdownRowProps> = ({ label, value, isTotal = false, colors }) => (
+  <View style={[styles.breakdownRow, isTotal && [styles.breakdownRowTotal, { borderTopColor: colors.border }]]}>
+    <Text style={[styles.breakdownLabel, { color: isTotal ? colors.text : colors.muted, fontWeight: isTotal ? '500' : undefined }]}>
       {label}
     </Text>
-    <Text style={[styles.breakdownValue, isTotal && styles.breakdownValueTotal]}>
+    <Text style={[styles.breakdownValue, { color: isTotal ? colors.text : colors.muted, fontWeight: isTotal ? '500' : undefined }]}>
       {value}
     </Text>
   </View>
@@ -60,7 +63,14 @@ type RenewComplianceProps = {
   selectedAction?: RenewActionData | null;
 };
 
+const showAlert = (title: string, message: string) => {
+  InteractionManager.runAfterInteractions(() => {
+    Alert.alert(title, message);
+  });
+};
+
 const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selectedAction }) => {
+  const colors = useThemeColors();
   const authUser = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
   const companyId = selectedAction?.companyId ?? authUser?._id ?? authUser?.id ?? authUser?.company ?? authUser?.companyName ?? authUser?.businessName ?? authUser?.legalName ?? null;
@@ -107,26 +117,24 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
 //   console.log("Selected services:", selectedServices);
   const handlePay = async () => {
     if (selectedServices.length === 0) {
-      Alert.alert("Payment", "Please select at least one service to continue.");
+      showAlert("Payment", "Please select at least one service to continue.");
       return;
     }
 
     if (!token) {
-      Alert.alert("Payment", "Your session has expired. Please sign in again.");
+      showAlert("Payment", "Your session has expired. Please sign in again.");
       return;
     }
 
     try {
-      const payload = {
-        companyId: companyId ?? "",
-        services: selectedServices.map((service) => ({
-          service: service.name.toLowerCase().includes("address") ? "address" : "resident",
-          years: service.years,
-          base: service.price,
-          penalty: 0,
-          total: service.price * service.years,
-        })),
-      };
+     const payload = {
+  companyId: companyId ?? "",
+  services: selectedServices.map((service) =>
+    service.name.toLowerCase().includes("address")
+      ? "address"
+      : "resident"
+  ),
+};
 
       const response = await axios.post(
         `${API_BASE_URL}/api/payment/painility/compliance-renewal/create-checkout`,
@@ -139,29 +147,30 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
           },
         },
       );
-
+      console.log(response);
       const checkoutUrl = response?.data?.url;
       if (checkoutUrl) {
         await Linking.openURL(checkoutUrl);
       } else {
-        Alert.alert("Payment", "Checkout URL not returned by server.");
+        showAlert("Payment", "Checkout URL not returned by server.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Checkout error", error);
-      Alert.alert("Payment", "Unable to start Stripe checkout right now.");
+      const message = error?.response?.data?.message || error?.message || "Unable to start Stripe checkout right now.";
+      showAlert("Payment", message);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <BackButton onPress={onBackPress} />
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>{selectedAction?.title ?? "Renew compliance"}</Text>
-          <Text style={styles.headerSubtitle}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? "Renew compliance"}</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
             {selectedAction?.subtitle ?? "Company · 1 renewable service"}
           </Text>
         </View>
@@ -177,18 +186,18 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
         {/* Year Section Header */}
         <View style={styles.yearHeader}>
           <View style={styles.yearLabel}>
-            <View style={styles.yearIconBox}>
+            <View style={[styles.yearIconBox, { backgroundColor: colors.surface }]}>
               <Text style={styles.yearIconText}>📅</Text>
             </View>
             <View>
-              <Text style={styles.yearTitle}>{selectedAction?.date ?? "2026"}</Text>
-              <Text style={styles.yearSubtitle}>
+              <Text style={[styles.yearTitle, { color: colors.text }]}>{selectedAction?.date ?? "2026"}</Text>
+              <Text style={[styles.yearSubtitle, { color: colors.muted }]}>
                 {services.length} service available for renewal
               </Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.deselectBtn} onPress={deselectAll}>
-            <Text style={styles.deselectBtnText}>Deselect all</Text>
+          <TouchableOpacity style={[styles.deselectBtn, { backgroundColor: colors.surfaceAlt }]} onPress={deselectAll}>
+            <Text style={[styles.deselectBtnText, { color: colors.accent }]}>Deselect all</Text>
           </TouchableOpacity>
         </View>
 
@@ -198,8 +207,9 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
             key={service.id}
             style={[
               styles.serviceCard,
+              { backgroundColor: colors.surface },
               {
-                borderColor: service.isSelected ? "#534AB7" : "#e0e0e0",
+                borderColor: service.isSelected ? colors.accent : colors.border,
                 borderWidth: service.isSelected ? 1.5 : 0.5,
               },
             ]}
@@ -210,9 +220,9 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
                 style={[
                   styles.checkbox,
                   {
-                    backgroundColor: service.isSelected ? "#534AB7" : "transparent",
+                    backgroundColor: service.isSelected ? colors.accent : "transparent",
                     borderWidth: service.isSelected ? 0 : 1.5,
-                    borderColor: "#ccc",
+                    borderColor: colors.border,
                   },
                 ]}
                 onPress={() => toggleService(service.id)}
@@ -223,32 +233,33 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
               </TouchableOpacity>
 
               {/* Card Icon */}
-              <View style={styles.cardIcon}>
+              <View style={[styles.cardIcon, { backgroundColor: colors.surfaceAlt }]}>
                 <Text style={styles.cardIconText}>🏠</Text>
               </View>
 
               {/* Card Info */}
               <View style={styles.cardInfo}>
-                <Text style={styles.cardName}>{service.name}</Text>
+                <Text style={[styles.cardName, { color: colors.text }]}>{service.name}</Text>
                 {service.isExpired && (
-                  <View style={styles.expiredBadge}>
-                    <Text style={styles.expiredBadgeText}>⚠ {selectedAction?.status ?? "Expired"}</Text>
+                  <View style={[styles.expiredBadge, { backgroundColor: colors.danger + '26' }]}>
+                    <Text style={[styles.expiredBadgeText, { color: colors.danger }]}>⚠ {selectedAction?.status ?? "Expired"}</Text>
                   </View>
                 )}
-                <Text style={styles.cardDates}>
+                <Text style={[styles.cardDates, { color: colors.muted }]}>
                   Last: {service.lastDate} ·{" "}
-                  <Text style={styles.dueDateText}>Due: {service.dueDate}</Text>
+                  <Text style={[styles.dueDateText, { color: colors.danger }]}>Due: {service.dueDate}</Text>
                 </Text>
               </View>
             </View>
 
-            <Text style={styles.cardPrice}>${service.isSelected ? service.price.toFixed(2) : '0.00'}</Text>
-            <Text style={styles.cardSubLabel}>{selectedAction?.subtitle ?? "1 year from backend"}</Text>
+            <Text style={[styles.cardPrice, { color: colors.accent }]}>${service.isSelected ? service.price.toFixed(2) : '0.00'}</Text>
+            <Text style={[styles.cardSubLabel, { color: colors.muted }]}>{selectedAction?.subtitle ?? "1 year from backend"}</Text>
 
-            <View style={styles.breakdown}>
-              <BreakdownRow label="Years" value={String(service.isSelected ? service.years : 0)} />
-              <BreakdownRow label="Base total" value={`$${service.isSelected ? service.price.toFixed(2) : '0.00'}`} />
+            <View style={[styles.breakdown, { backgroundColor: colors.background }]}>
+              <BreakdownRow colors={colors} label="Years" value={String(service.isSelected ? service.years : 0)} />
+              <BreakdownRow colors={colors} label="Base total" value={`$${service.isSelected ? service.price.toFixed(2) : '0.00'}`} />
               <BreakdownRow
+                colors={colors}
                 label="Total"
                 value={`$${service.isSelected ? (service.price * service.years).toFixed(2) : '0.00'}`}
                 isTotal
@@ -258,14 +269,14 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
         ))}
 
         {selectedAction?.details?.length ? (
-          <View style={styles.checkoutSection}>
-            <Text style={styles.checkoutEyebrow}>SELECTED ACTION</Text>
-            <Text style={styles.checkoutTitle}>Details</Text>
+          <View style={[styles.checkoutSection, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.checkoutEyebrow, { color: colors.muted }]}>SELECTED ACTION</Text>
+            <Text style={[styles.checkoutTitle, { color: colors.text }]}>Details</Text>
             {selectedAction.details.map((detail, index) => (
               <View key={`${detail.label}-${index}`} style={styles.ssItem}>
                 <View style={styles.ssItemInfo}>
-                  <Text style={styles.ssItemName}>{detail.label}</Text>
-                  <Text style={styles.ssItemMeta}>{detail.value}</Text>
+                  <Text style={[styles.ssItemName, { color: colors.text }]}>{detail.label}</Text>
+                  <Text style={[styles.ssItemMeta, { color: colors.muted }]}>{detail.value}</Text>
                 </View>
               </View>
             ))}
@@ -273,58 +284,58 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
         ) : null}
 
         {/* Checkout Section */}
-        <View style={styles.checkoutSection}>
-          <Text style={styles.checkoutEyebrow}>CHECKOUT</Text>
-          <Text style={styles.checkoutTitle}>Stripe payment</Text>
-          <Text style={styles.checkoutDesc}>
+        <View style={[styles.checkoutSection, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.checkoutEyebrow, { color: colors.muted }]}>CHECKOUT</Text>
+          <Text style={[styles.checkoutTitle, { color: colors.text }]}>Stripe payment</Text>
+          <Text style={[styles.checkoutDesc, { color: colors.muted }]}>
             Review the services you selected and continue to secure checkout.
           </Text>
 
           {/* Selected Services */}
-          <View style={styles.selectedServices}>
+          <View style={[styles.selectedServices, { backgroundColor: colors.background }]}>
             <View style={styles.ssHeader}>
-              <Text style={styles.ssHeaderLabel}>Selected services</Text>
-              <View style={styles.ssCount}>
-                <Text style={styles.ssCountText}>{selectedServices.length}</Text>
+              <Text style={[styles.ssHeaderLabel, { color: colors.muted }]}>Selected services</Text>
+              <View style={[styles.ssCount, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.ssCountText, { color: colors.text }]}>{selectedServices.length}</Text>
               </View>
             </View>
 
             {selectedServices.length > 0 ? (
               selectedServices.map((s) => (
                 <View key={s.id} style={styles.ssItem}>
-                  <View style={styles.ssItemIcon}>
+                  <View style={[styles.ssItemIcon, { backgroundColor: colors.surfaceAlt }]}>
                     <Text style={styles.ssItemIconText}>🏠</Text>
                   </View>
                   <View style={styles.ssItemInfo}>
-                    <Text style={styles.ssItemName}>{s.name}</Text>
-                    <Text style={styles.ssItemMeta}>2026 · {s.years} year</Text>
+                    <Text style={[styles.ssItemName, { color: colors.text }]}>{s.name}</Text>
+                    <Text style={[styles.ssItemMeta, { color: colors.muted }]}>2026 · {s.years} year</Text>
                   </View>
                   <View style={styles.ssItemPriceBox}>
-                    <Text style={styles.ssItemPrice}>${s.price.toFixed(2)}</Text>
-                    <Text style={styles.ssItemBase}>Base ${s.price.toFixed(2)}</Text>
+                    <Text style={[styles.ssItemPrice, { color: colors.text }]}>${s.price.toFixed(2)}</Text>
+                    <Text style={[styles.ssItemBase, { color: colors.muted }]}>Base ${s.price.toFixed(2)}</Text>
                   </View>
                 </View>
               ))
             ) : (
               <View style={styles.ssItem}>
                 <View style={styles.ssItemInfo}>
-                  <Text style={styles.ssItemName}>No service selected</Text>
-                  <Text style={styles.ssItemMeta}>Select a service to see its amount</Text>
+                  <Text style={[styles.ssItemName, { color: colors.text }]}>No service selected</Text>
+                  <Text style={[styles.ssItemMeta, { color: colors.muted }]}>Select a service to see its amount</Text>
                 </View>
               </View>
             )}
           </View>
 
           {/* Total Due */}
-          <View style={styles.totalDue}>
+          <View style={[styles.totalDue, { backgroundColor: colors.surfaceAlt }]}>
             <View style={styles.totalDueRow}>
               <View style={styles.totalDueLabel}>
-                <Text style={styles.totalDueDollar}>$</Text>
-                <Text style={styles.totalDueLabelText}>Total due</Text>
+                <Text style={[styles.totalDueDollar, { color: colors.accent }]}>$</Text>
+                <Text style={[styles.totalDueLabelText, { color: colors.muted }]}>Total due</Text>
               </View>
-              <Text style={styles.totalDueAmount}>${totalDue.toFixed(2)}</Text>
+              <Text style={[styles.totalDueAmount, { color: colors.accent }]}>${totalDue.toFixed(2)}</Text>
             </View>
-            <Text style={styles.totalNote}>
+            <Text style={[styles.totalNote, { color: colors.muted }]}>
               {selectedServices.length > 0
                 ? 'Selected services will be charged through Stripe checkout.'
                 : 'No service selected. Amount will remain $0.00 until you choose one.'}
@@ -333,7 +344,10 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
 
           {/* Pay Button */}
           <TouchableOpacity
-            style={[styles.payBtn, selectedServices.length === 0 && styles.payBtnDisabled]}
+            style={[
+              styles.payBtn,
+              { backgroundColor: selectedServices.length === 0 ? colors.muted : colors.accent, opacity: selectedServices.length === 0 ? 0.8 : 1 },
+            ]}
             onPress={handlePay}
             activeOpacity={0.85}
             disabled={selectedServices.length === 0}
@@ -341,7 +355,7 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
             <Text style={styles.payBtnText}>🔒  Pay ${totalDue.toFixed(2)} with Stripe  →</Text>
           </TouchableOpacity>
 
-          <Text style={styles.secureNote}>Secured by Stripe · Card and wallet checkout</Text>
+          <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe · Card and wallet checkout</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -351,14 +365,11 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f4f4f8",
   },
   header: {
-    backgroundColor: "#ffffff",
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#e8e8e8",
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -370,11 +381,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 15,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   headerSubtitle: {
     fontSize: 12,
-    color: "#6b6b6b",
     marginTop: 1,
   },
   headerRightPlaceholder: {
@@ -401,7 +410,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: "#f0f0f0",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -411,14 +419,11 @@ const styles = StyleSheet.create({
   yearTitle: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   yearSubtitle: {
     fontSize: 11,
-    color: "#6b6b6b",
   },
   deselectBtn: {
-    backgroundColor: "#EEEDFE",
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 5,
@@ -426,10 +431,8 @@ const styles = StyleSheet.create({
   deselectBtnText: {
     fontSize: 11,
     fontWeight: "500",
-    color: "#534AB7",
   },
   serviceCard: {
-    backgroundColor: "#ffffff",
     borderRadius: 12,
     borderStyle: "solid",
     padding: 14,
@@ -455,7 +458,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: "#EAF3DE",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -468,10 +470,8 @@ const styles = StyleSheet.create({
   cardName: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   expiredBadge: {
-    backgroundColor: "#FCEBEB",
     borderRadius: 20,
     paddingHorizontal: 7,
     paddingVertical: 2,
@@ -479,31 +479,25 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   expiredBadgeText: {
-    color: "#A32D2D",
     fontSize: 10,
     fontWeight: "500",
   },
   cardDates: {
     fontSize: 11,
-    color: "#6b6b6b",
     marginTop: 4,
   },
   dueDateText: {
-    color: "#A32D2D",
     fontWeight: "500",
   },
   cardPrice: {
     fontSize: 18,
     fontWeight: "500",
-    color: "#534AB7",
     marginTop: 10,
   },
   cardSubLabel: {
     fontSize: 11,
-    color: "#6b6b6b",
   },
   breakdown: {
-    backgroundColor: "#f6f6f8",
     borderRadius: 8,
     padding: 12,
     marginTop: 10,
@@ -515,53 +509,36 @@ const styles = StyleSheet.create({
   },
   breakdownRowTotal: {
     borderTopWidth: 0.5,
-    borderTopColor: "#e0e0e0",
     paddingTop: 6,
     marginTop: 4,
   },
   breakdownLabel: {
     fontSize: 12,
-    color: "#6b6b6b",
-  },
-  breakdownLabelTotal: {
-    color: "#1a1a1a",
-    fontWeight: "500",
   },
   breakdownValue: {
     fontSize: 12,
-    color: "#6b6b6b",
-  },
-  breakdownValueTotal: {
-    color: "#1a1a1a",
-    fontWeight: "500",
   },
   checkoutSection: {
-    backgroundColor: "#ffffff",
     borderRadius: 12,
     borderWidth: 0.5,
-    borderColor: "#e8e8e8",
     padding: 14,
   },
   checkoutEyebrow: {
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.6,
-    color: "#6b6b6b",
     marginBottom: 4,
   },
   checkoutTitle: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#1a1a1a",
     marginBottom: 4,
   },
   checkoutDesc: {
     fontSize: 12,
-    color: "#6b6b6b",
     lineHeight: 18,
   },
   selectedServices: {
-    backgroundColor: "#f6f6f8",
     borderRadius: 8,
     padding: 12,
     marginTop: 12,
@@ -574,12 +551,9 @@ const styles = StyleSheet.create({
   },
   ssHeaderLabel: {
     fontSize: 12,
-    color: "#6b6b6b",
   },
   ssCount: {
-    backgroundColor: "#ffffff",
     borderWidth: 0.5,
-    borderColor: "#e0e0e0",
     borderRadius: 9,
     width: 18,
     height: 18,
@@ -589,7 +563,6 @@ const styles = StyleSheet.create({
   ssCountText: {
     fontSize: 11,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   ssItem: {
     flexDirection: "row",
@@ -599,7 +572,6 @@ const styles = StyleSheet.create({
   ssItemIcon: {
     width: 26,
     height: 26,
-    backgroundColor: "#EAF3DE",
     borderRadius: 7,
     alignItems: "center",
     justifyContent: "center",
@@ -613,11 +585,9 @@ const styles = StyleSheet.create({
   ssItemName: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   ssItemMeta: {
     fontSize: 11,
-    color: "#6b6b6b",
   },
   ssItemPriceBox: {
     alignItems: "flex-end",
@@ -625,14 +595,11 @@ const styles = StyleSheet.create({
   ssItemPrice: {
     fontSize: 13,
     fontWeight: "500",
-    color: "#1a1a1a",
   },
   ssItemBase: {
     fontSize: 11,
-    color: "#6b6b6b",
   },
   totalDue: {
-    backgroundColor: "#F0F0FD",
     borderRadius: 8,
     padding: 14,
     marginTop: 10,
@@ -649,34 +616,25 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   totalDueDollar: {
-    color: "#534AB7",
     fontSize: 15,
   },
   totalDueLabelText: {
     fontSize: 13,
-    color: "#6b6b6b",
   },
   totalDueAmount: {
     fontSize: 22,
     fontWeight: "500",
-    color: "#534AB7",
   },
   totalNote: {
     fontSize: 11,
-    color: "#6b6b6b",
     lineHeight: 16,
   },
   payBtn: {
-    backgroundColor: "#534AB7",
     borderRadius: 14,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 12,
-  },
-  payBtnDisabled: {
-    backgroundColor: "#c9c6df",
-    opacity: 0.8,
   },
   payBtnText: {
     color: "white",
@@ -686,7 +644,6 @@ const styles = StyleSheet.create({
   secureNote: {
     textAlign: "center",
     fontSize: 11,
-    color: "#6b6b6b",
     marginTop: 8,
   },
 });

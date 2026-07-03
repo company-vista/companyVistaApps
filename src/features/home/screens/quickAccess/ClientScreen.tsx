@@ -40,6 +40,9 @@ function ClientScreen({
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
+  const userId = useAppSelector(
+    state => state.auth.user?._id ?? state.auth.user?.id ?? null,
+  );
   const userCompanies = useAppSelector(
     state => state.auth.user?.companies ?? emptyCompanies,
   );
@@ -53,7 +56,7 @@ function ClientScreen({
     setIsLoading(true);
     setApiError('');
 
-    const result = await fetchClientCompanies({ token });
+    const result = await fetchClientCompanies({ token, userId });
     const loadedCompanies =
       result.companies.length > 0 ? result.companies : userCompanies;
 

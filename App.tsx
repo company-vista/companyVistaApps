@@ -26,6 +26,8 @@ import NotificationScreen from './src/features/notifications/screens/Notificatio
 import RenewComplianceScreen from './src/features/home/screens/compliances/RenewComplianceScreen';
 import AddressRenewalScreen from './src/features/home/screens/compliances/AddressRenewalScreen';
 import FederalFilingScreen from './src/features/home/screens/compliances/FederalFilingScreen';
+import AnnualStateFilingScreen from './src/features/home/screens/compliances/AnnualFilingScreen';
+import ComplianceHistoryScreen from './src/features/home/screens/compliances/ComplianceHistoryScreen';
 import EditProfileScreen from './src/features/profile/screens/EditProfileScreen';
 import ProfileAddressScreen from './src/features/profile/screens/ProfileAddressScreen';
 import ProfileScreen from './src/features/profile/screens/ProfileScreen';
@@ -64,6 +66,7 @@ type AppScreen =
   | 'auth'
   | 'editProfile'
   | 'federalFiling'
+  | 'annualFiling'
   | 'followUs'
   | 'helpFeedback'
   | 'home'
@@ -72,6 +75,7 @@ type AppScreen =
   | 'notifications'
   | 'addressRenewal'
   | 'renewCompliance'
+  | 'complianceHistory'
   | 'profile'
   | 'profileAddress'
   | `quickAccess:${QuickAccessItemId}`
@@ -114,6 +118,8 @@ function AppContent() {
   const [selectedInvoice, setSelectedInvoice] =
     useState<Record<string, unknown> | null>(null);
   const [renewComplianceAction, setRenewComplianceAction] =
+    useState<RenewActionData | null>(null);
+  const [selectedComplianceAction, setSelectedComplianceAction] =
     useState<RenewActionData | null>(null);
   const [quickAccessBackScreen, setQuickAccessBackScreen] =
     useState<'home' | 'quickAccess'>('home');
@@ -196,6 +202,7 @@ function AppContent() {
           onQuickAccessItemPress={itemId => openQuickAccessItem(itemId, 'home')}
           onQuickAccessViewAllPress={() => setAppScreen('quickAccess')}
           onGoHome={() => setHomeInitialTab('home')}
+          selectedCompanyId={selectedCompanyId}
           onCompanyChange={setSelectedCompanyId}
           onOpenRenewPage={(action) => {
             setRenewComplianceAction(action);
@@ -203,9 +210,15 @@ function AppContent() {
               setAppScreen('federalFiling');
             } else if (action.id === 'address') {
               setAppScreen('addressRenewal');
+            } else if (action.id === 'annual_filing') {
+              setAppScreen('annualFiling');
             } else {
               setAppScreen('renewCompliance');
             }
+          }}
+          onOpenComplianceHistory={(action) => {
+            setSelectedComplianceAction(action);
+            setAppScreen('complianceHistory');
           }}
         />
       ) : isAuthenticated && appScreen === 'invoiceDetail' && selectedInvoice ? (
@@ -249,12 +262,34 @@ function AppContent() {
         <BusinessReportsScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
       ) : isAuthenticated && appScreen === 'quickAccess:helpDesk' ? (
         <HelpDeskScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
+      ) : isAuthenticated && appScreen === 'quickAccess:federalFiling' ? (
+        <FederalFilingScreen
+          selectedAction={null}
+          onBackPress={() => setAppScreen(quickAccessBackScreen)}
+        />
       ) : isAuthenticated && appScreen === 'federalFiling' ? (
         <FederalFilingScreen
           selectedAction={renewComplianceAction}
           onBackPress={() => {
             setHomeInitialTab('reports');
             setAppScreen('home');
+          }}
+        />
+      ) : isAuthenticated && appScreen === 'annualFiling' ? (
+        <AnnualStateFilingScreen
+          onBackPress={() => {
+            setHomeInitialTab('reports');
+            setAppScreen('home');
+          }}
+          selectedCompanyId={selectedCompanyId}
+        />
+      ) : isAuthenticated && appScreen === 'complianceHistory' && selectedComplianceAction ? (
+        <ComplianceHistoryScreen
+          selectedAction={selectedComplianceAction}
+          onBackPress={() => {
+            setHomeInitialTab('reports');
+            setAppScreen('home');
+            setSelectedComplianceAction(null);
           }}
         />
       ) : isAuthenticated && appScreen === 'renewCompliance' ? (

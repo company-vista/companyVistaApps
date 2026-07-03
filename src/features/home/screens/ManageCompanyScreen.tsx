@@ -6,7 +6,6 @@ import {
   Text,
   View,
   Pressable,
-  TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../theme/colors';
@@ -15,6 +14,7 @@ import type { CompanyCardItem } from './quickAccess/CompanyCard';
 import BackButton from '../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BasicInfoScreen from './changeCategories/BasicInfoScreen';
+import MyRequestsScreen from './changeCategories/MyRequestsScreen';
 
 type ManageCompanyScreenProps = {
   selectedCompany: CompanyCardItem | null;
@@ -48,7 +48,7 @@ const categories: CategoryOption[] = [
   {
     id: 'basic',
     label: 'Company info',
-    fields: 2,
+    fields: 4,
     description: 'Company name, date',
     icon: 'file-text',
     color: '#4F46E5',
@@ -56,7 +56,7 @@ const categories: CategoryOption[] = [
   {
     id: 'shareholder-director',
     label: 'ShareHolder/Director',
-    fields: 8,
+    fields: 11,
     description: 'List, term, change leads',
     icon: 'percent',
     color: '#3B82F6',
@@ -64,7 +64,7 @@ const categories: CategoryOption[] = [
   {
     id: 'local-address',
     label: 'Local address',
-    fields: 25,
+    fields: 1,
     description: 'Resources, uplift',
     icon: 'address-book',
     color: '#F97316',
@@ -98,9 +98,9 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
   const [selectedCategories, setSelectedCategories] = useState<
     ChangeCategory[]
   >([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [openCategoryScreen, setOpenCategoryScreen] =
     useState<ChangeCategory | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const toggleCategory = (categoryId: ChangeCategory) => {
     setSelectedCategories(prev =>
@@ -111,7 +111,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
   };
 
   const handleCategoryPress = (categoryId: ChangeCategory) => {
-    setOpenCategoryScreen('basic');
+    setOpenCategoryScreen(categoryId);
   };
 
   const handleCloseCategoryScreen = () => {
@@ -119,9 +119,10 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
   };
 
   // If a category screen is open, render it
- if (openCategoryScreen === 'basic') {
+ if (openCategoryScreen) {
     const companyData = selectedCompany as any;
     const userData = user as any;
+    const selectedCat = categories.find(c => c.id === openCategoryScreen);
 
     const companyClientId = companyData?.shareholders?.[0]?.clientId || userData?._id || userData?.id || "";
     const finalCompanyId = companyData?.id || companyData?._id || "";
@@ -132,7 +133,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
         companyId={finalCompanyId}
         clientId={companyClientId}
         urgency={selectedUrgency}
-        selectedCategory={openCategoryScreen}
+        selectedCategory={selectedCat?.label || openCategoryScreen}
       />
     );
   }
@@ -250,28 +251,6 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
             </View>
           </View>
 
-          {/* Search Section */}
-          <View style={styles.section}>
-            <View
-              style={[
-                styles.searchBox,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <FontAwesome name="search" size={14} color={colors.muted} />
-              <TextInput
-                placeholder="Search for a specific change..."
-                placeholderTextColor={colors.inputPlaceholder}
-                style={[styles.searchInput, { color: colors.text }]}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-          </View>
-
           {/* Change Categories Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -325,11 +304,11 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
           {/* Share Transfer Form Section */}
           <View>
             {/* Share Transfer Form Section */}
-            <View style={styles.section}>
+            {/* <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
                 Share transfer
               </Text>
-            </View>
+            </View> */}
 
             {/* Live Inquiry Feedback */}
             <View
@@ -367,6 +346,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
                 </Text>
                 <Pressable
                   style={[styles.refreshBtn, { borderColor: colors.primary }]}
+                  onPress={() => setRefreshKey(k => k + 1)}
                 >
                   <FontAwesome
                     name="refresh"
@@ -383,102 +363,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
                 Each card shows exactly where your request stands.
               </Text>
 
-              {/* Status Badges */}
-              <View style={styles.statusBadges}>
-                <View
-                  style={[
-                    styles.badge,
-                    {
-                      backgroundColor: '#F59E0B' + '20',
-                      borderColor: '#F59E0B',
-                    },
-                  ]}
-                >
-                  <FontAwesome name="circle" size={6} color="#F59E0B" />
-                  <Text style={[styles.badgeText, { color: '#F59E0B' }]}>
-                    Pending
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.badge,
-                    {
-                      backgroundColor: '#3B82F6' + '20',
-                      borderColor: '#3B82F6',
-                    },
-                  ]}
-                >
-                  <FontAwesome name="circle" size={6} color="#3B82F6" />
-                  <Text style={[styles.badgeText, { color: '#3B82F6' }]}>
-                    In progress
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.badge,
-                    {
-                      backgroundColor: '#EF4444' + '20',
-                      borderColor: '#EF4444',
-                    },
-                  ]}
-                >
-                  <FontAwesome name="circle" size={6} color="#EF4444" />
-                  <Text style={[styles.badgeText, { color: '#EF4444' }]}>
-                    Rejected
-                  </Text>
-                </View>
-              </View>
-
-              {/* Timeline Items */}
-              <View style={styles.timelineItems}>
-                {[
-                  {
-                    name: 'Name change',
-                    status: 'Completed',
-                    statusColor: '#10B981',
-                  },
-                  {
-                    name: 'Address',
-                    status: 'Completed',
-                    statusColor: '#10B981',
-                  },
-                  {
-                    name: 'Number',
-                    status: 'Completed',
-                    statusColor: '#10B981',
-                  },
-                ].map((item, idx) => (
-                  <View
-                    key={idx}
-                    style={[
-                      styles.timelineItem,
-                      { borderColor: colors.border },
-                    ]}
-                  >
-                    <FontAwesome name="flag" size={14} color={colors.muted} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.itemName, { color: colors.text }]}>
-                        {item.name}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor: item.statusColor + '20',
-                          borderColor: item.statusColor,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.statusText, { color: item.statusColor }]}
-                      >
-                        {item.status}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
+              <MyRequestsScreen companyId={selectedCompany?.id} refreshKey={refreshKey} />
             </View>
           </View>
 
@@ -587,19 +472,6 @@ const styles = StyleSheet.create({
   urgencyLabel: {
     fontSize: 12,
     fontWeight: '600',
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 12,
   },
   categoriesGrid: {
     flexDirection: 'row',

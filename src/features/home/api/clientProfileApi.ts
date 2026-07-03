@@ -306,10 +306,12 @@ function getErrorMessage(error: unknown) {
 
 type FetchClientCompaniesParams = {
   token?: string | null;
+  userId?: string | null;
 };
 
 export async function fetchClientCompanies({
   token,
+  userId,
 }: FetchClientCompaniesParams) {
   if (!token) {
     console.log('Client profile API skipped: auth token missing');
@@ -326,12 +328,14 @@ export async function fetchClientCompanies({
     let lastError = '';
 
     try {
+      const params = userId ? { userId, clientId: userId } : undefined;
       const response = await axios.get<ClientProfileResponse>(CLIENT_PROFILE_ROUTE, {
         headers: {
           Authorization: `Bearer ${token}`,
           'x-auth-token': token,
         },
         timeout: API_REQUEST_TIMEOUT_MS,
+        params,
       });
       const companies = getResponseCompanies(response.data);
 

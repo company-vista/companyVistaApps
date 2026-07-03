@@ -35,7 +35,9 @@ type TabPlaceholderProps = {
   icon?: string;
   title?: string;
   companyId?: string;
+  selectedCompanyName?: string | null;
   onOpenRenewPage?: (action: RenewActionData) => void;
+  onOpenComplianceHistory?: (action: RenewActionData) => void;
 };
 
 // Typescript Structure for Actions
@@ -55,12 +57,13 @@ function TabPlaceholder({
   icon = 'exclamation-circle',
   title = 'Address Compliance',
   companyId,
+  selectedCompanyName,
   onOpenRenewPage,
+  onOpenComplianceHistory,
 }: TabPlaceholderProps) {
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
 
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const effectiveCompanyId = companyId ?? null;
@@ -93,25 +96,22 @@ function TabPlaceholder({
     fetchComplianceData();
   }, [effectiveCompanyId, token]);
 
-  // सभी नए स्टेटस के लिए कलर्स थीम कॉन्फिगरेशन
   const getStatusTheme = (status: ComplianceActionItem['status']) => {
+    const isDark = colors.mode === 'dark';
+
     switch (status) {
       case 'Expired':
-        return { text: '#DE3730', bg: '#FCE8E6' }; // Red
+        return { text: isDark ? '#FCA5A5' : '#DE3730', bg: isDark ? '#3D1717' : '#FCE8E6' };
       case 'Pending':
-        return { text: '#E28704', bg: '#FEF3D6' }; // Yellow/Orange
+        return { text: isDark ? '#FCD34D' : '#E28704', bg: isDark ? '#3A2A15' : '#FEF3D6' };
       case 'Active':
       case 'Completed':
-        return { text: '#256F46', bg: '#E6F4EA' }; // Green
+        return { text: isDark ? '#6EE7B7' : '#256F46', bg: isDark ? '#15352A' : '#E6F4EA' };
       case 'Client Managed':
-        return { text: '#4A5568', bg: '#EDF2F7' }; // Grey
+        return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
       default:
-        return { text: '#4A5568', bg: '#EDF2F7' };
+        return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
     }
-  };
-
-  const toggleExpand = (id: string) => {
-    setExpandedCardId(prevId => (prevId === id ? null : id));
   };
 
   // 1. Agent और Address के लिए स्टेटस मैपिंग
@@ -150,6 +150,20 @@ function TabPlaceholder({
 
   const handleRenewPress = (action: ComplianceActionItem) => {
     onOpenRenewPage?.({
+      id: action.id as RenewActionData['id'],
+      title: action.title,
+      subtitle: action.subtitle,
+      status: action.status,
+      date: action.date,
+      details: action.details,
+      companyId: effectiveCompanyId,
+      price: action.price,
+      years: action.years,
+    });
+  };
+
+  const handleOpenHistory = (action: ComplianceActionItem) => {
+    onOpenComplianceHistory?.({
       id: action.id as RenewActionData['id'],
       title: action.title,
       subtitle: action.subtitle,
@@ -249,7 +263,9 @@ function TabPlaceholder({
             <View style={styles.activeDot} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}>{residentData?.name || 'Not set'}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}> 
+              {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
+            </Text>
             <Text style={[styles.userEmail, { color: colors.muted }]}>{residentData?.email || 'Not set'}</Text>
           </View>
         </View>
@@ -296,7 +312,6 @@ function TabPlaceholder({
         <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
       ) : (
         derivedActions.map((action: ComplianceActionItem) => {
-          const isCurrentCardExpanded = expandedCardId === action.id;
           const theme = getStatusTheme(action.status);
 
           return (
@@ -310,7 +325,7 @@ function TabPlaceholder({
                   marginBottom: 12,
                 },
               ]}
-              onPress={() => toggleExpand(action.id)}
+              onPress={() => handleOpenHistory(action)}
             >
               <View style={styles.headerRow}>
 
@@ -335,49 +350,22 @@ function TabPlaceholder({
 
                 <View style={styles.rightBadgeWrapper}>
                   <View style={styles.statusRow}>
-                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}> 
-                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
-                    </View>
+                    
                     {shouldShowRenewButton(action) ? (
                       <Pressable
                         onPress={() => handleRenewPress(action)}
-                        style={[styles.renewButton, { backgroundColor: colors.accent, marginLeft: 8 }]}
+                        style={[styles.renewButton, { backgroundColor: colors.mode === 'dark' ? '#0f766e' : colors.accent }]}
                       >
-                        <Text style={[styles.renewButtonText, { color: '#ffffff' }]}>Renew Now</Text>
+                        <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
                       </Pressable>
                     ) : null}
+                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}> 
+                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                    </View>
                   </View>
-                  <FontAwesome
-                    name={isCurrentCardExpanded ? "chevron-up" : "chevron-down"}
-                    size={12}
-                    color={colors.muted}
-                    style={{ marginTop: 6 }}
-                  />
                 </View>
               </View>
 
-              {/* --- EXPANDABLE DETAILS BLOCK --- */}
-              {isCurrentCardExpanded && (
-                <View style={styles.expandedDetails}>
-                  <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
-                    {action.details?.map((detail, idx) => (
-                      <View key={idx} style={{ width: '50%', marginBottom: 16, paddingRight: 8 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                          {detail.icon && <FontAwesome name={detail.icon} size={11} color={colors.muted} style={{ marginRight: 6 }} />}
-                          <Text style={[styles.detailLabel, { color: colors.muted, fontSize: 11, textTransform: 'uppercase' }]}>
-                            {detail.label}
-                          </Text>
-                        </View>
-                        <Text style={[styles.detailValue, { color: colors.text, fontSize: 14, fontWeight: '500' }]} numberOfLines={2}>
-                          {detail.value}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
             </Pressable>
           );
         })

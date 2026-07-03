@@ -121,7 +121,7 @@ export default StyleSheet.create({
   },
   mainCard: {
     borderRadius: 12,
-    padding: 8,
+    padding: 14,
     borderWidth: 1,
   },
   headerRow: {
@@ -157,7 +157,10 @@ export default StyleSheet.create({
     marginLeft: 4,
   },
   rightBadgeWrapper: {
-    alignItems: 'flex-end',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   badgeWrap: {
     paddingHorizontal: 8,
@@ -169,13 +172,13 @@ export default StyleSheet.create({
     fontWeight: '600',
   },
   renewButton: {
-    marginTop: 4,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
     minWidth: 84,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 4,
   },
   renewButtonText: {
     fontSize: 10,
@@ -183,8 +186,9 @@ export default StyleSheet.create({
     textTransform: 'uppercase',
   },
   statusRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
+    gap: 2,
   },
   expandedDetails: {
     marginTop: 12,
