@@ -7,11 +7,13 @@ import { useThemeColors } from '../../../../theme/colors';
 
 type RecentActivityAndPaymentOverviewSectionProps = {
   onPress?: () => void;
+  onServicesPress?: () => void;
   selectedCompany?: CompanyCardItem | null;
 };
 
 function RecentActivityAndPaymentOverviewSection({
   onPress,
+  onServicesPress,
   selectedCompany,
 }: RecentActivityAndPaymentOverviewSectionProps) {
   const colors = useThemeColors();
@@ -19,7 +21,8 @@ function RecentActivityAndPaymentOverviewSection({
   const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
 
   const recentActivities = [
-    { title: 'Transaction History', subtitle: companySubtitle },
+    { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress },
+    { title: 'Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress },
   ];
 
   return (
@@ -47,10 +50,10 @@ function RecentActivityAndPaymentOverviewSection({
                   paddingVertical: 10,
                 },
               ]}
-              onPress={onPress}
+              onPress={item.onItemPress}
             >
               <View style={styles.iconContainer}>
-                <FontAwesome name="history" size={16} color={colors.accent || '#F97316'} />
+                <FontAwesome name={item.icon} size={16} color={colors.accent || '#F97316'} />
               </View>
               <View style={styles.activityCopy}>
                 <Text style={[styles.activityTitle, { color: colors.text }]}>{item.title}</Text>

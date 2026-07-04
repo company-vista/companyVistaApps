@@ -17,6 +17,7 @@ type HomeTabContentProps = {
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
   onQuickAccessViewAllPress: () => void;
   onTransactionsPress?: () => void;
+  onServicesPress?: () => void;
   selectedCompany?: CompanyCardItem | null;
 };
 
@@ -28,6 +29,7 @@ function HomeTabContent({
   onQuickAccessItemPress,
   onQuickAccessViewAllPress,
   onTransactionsPress,
+  onServicesPress,
   selectedCompany,
 }: HomeTabContentProps) {
   return (
@@ -60,6 +62,7 @@ function HomeTabContent({
       <OrderServicesSection onQuickAccessItemPress={onQuickAccessItemPress} />
       <RecentActivityAndPaymentOverviewSection
         onPress={onTransactionsPress}
+        onServicesPress={onServicesPress}
         selectedCompany={selectedCompany}
       />
       <UpcomingDeadlinesSection />

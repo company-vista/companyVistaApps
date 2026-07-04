@@ -21,11 +21,13 @@ const INVITE_MESSAGE = [
 type MoreTabContentProps = {
   onFollowUsPress: () => void;
   onHelpFeedbackPress: () => void;
+  onSupportPress?: () => void;
 };
 
 function MoreTabContent({
   onFollowUsPress,
   onHelpFeedbackPress,
+  onSupportPress,
 }: MoreTabContentProps) {
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -105,7 +107,24 @@ function MoreTabContent({
         <View style={styles.copy}>
           <Text style={[styles.title, { color: colors.text }]}>Help and feedback</Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Help center, Contact us, Privacy policy
+            Support, Contact us, Privacy policy
+          </Text>
+        </View>
+
+        <FontAwesome name="angle-right" size={22} color={colors.subtle} />
+      </Pressable>
+
+      <Pressable
+        onPress={onSupportPress}
+        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+          <FontAwesome name="headphones" size={17} color={colors.accent} />
+        </View>
+
+        <View style={styles.copy}>
+          <Text style={[styles.title, { color: colors.text }]}>Support</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Get help, contact support
           </Text>
         </View>
 

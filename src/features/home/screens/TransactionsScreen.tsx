@@ -217,6 +217,7 @@ export default function TransactionsScreen({
   const [activeFilter, setActiveFilter] = useState<
     'All' | 'Success' | 'Pending' | 'Failed'
   >('All');
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [selectedTransaction, setSelectedTransaction] =
@@ -271,6 +272,13 @@ export default function TransactionsScreen({
     selectedCompany?.id,
     transactions,
   ]);
+
+  const currencyFilteredTransactions = useMemo(() => {
+    if (!selectedCurrency) return filteredTransactions;
+    return filteredTransactions.filter(
+      item => item.details?.currency === selectedCurrency,
+    );
+  }, [filteredTransactions, selectedCurrency]);
 
   // UI समरी कार्ड्स के लिए डायनामिक करेंसी रेंडरिंग लॉजिक
   const summaryDOM = useMemo(() => {
@@ -352,41 +360,54 @@ export default function TransactionsScreen({
 
       {/* Summary Cards (one per currency) */}
       <View style={styles.summaryContainer}>
-        {summaryDOM.keys.map(currency => (
-          <View
-            key={currency}
-            style={[
-              styles.summaryCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.summaryLabel, { color: colors.muted }]}>
-              Total Spent ({currency})
-            </Text>
-            <Text
-              style={[styles.summaryValue, { color: colors.text }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {formatCurrency(summaryDOM.totals[currency].total, currency)}
-            </Text>
-            <Text
+        {summaryDOM.keys.map(currency => {
+          const isActive = selectedCurrency === currency;
+          return (
+            <Pressable
+              key={currency}
+              onPress={() =>
+                setSelectedCurrency(isActive ? null : currency)
+              }
               style={[
-                styles.summaryLabel,
-                { color: colors.muted, marginTop: 8 },
+                styles.summaryCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+                isActive && {
+                  borderColor: colors.accent,
+                  backgroundColor: colors.accentSoft,
+                },
               ]}
             >
-              Pending ({currency})
-            </Text>
-            <Text
-              style={[styles.summaryValue, { color: '#ca8a04' }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {formatCurrency(summaryDOM.totals[currency].pending, currency)}
-            </Text>
-          </View>
-        ))}
+              <Text style={[styles.summaryLabel, { color: colors.muted }]}>
+                Total Spent ({currency})
+              </Text>
+              <Text
+                style={[styles.summaryValue, { color: colors.text }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {formatCurrency(summaryDOM.totals[currency].total, currency)}
+              </Text>
+              <Text
+                style={[
+                  styles.summaryLabel,
+                  { color: colors.muted, marginTop: 8 },
+                ]}
+              >
+                Pending ({currency})
+              </Text>
+              <Text
+                style={[styles.summaryValue, { color: '#ca8a04' }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {formatCurrency(summaryDOM.totals[currency].pending, currency)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {/* Search */}
@@ -470,7 +491,7 @@ export default function TransactionsScreen({
         </View>
       ) : (
         <FlatList
-          data={filteredTransactions}
+          data={currencyFilteredTransactions}
           keyExtractor={item => item.id}
           contentContainerStyle={{
             paddingHorizontal: 20,

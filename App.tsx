@@ -13,6 +13,7 @@ import styles from './App.styles';
 
 import LoginScreen from './src/features/auth/screens/LoginScreen';
 import HelpFeedbackScreen from './src/features/help/screens/HelpFeedbackScreen';
+import SupportScreen from './src/features/support/screens/SupportScreen';
 import FollowUsScreen from './src/features/home/screens/FollowUsScreen';
 import HomeScreen from './src/features/home/screens/HomeScreen';
 import QuickAccessScreen from './src/features/home/screens/QuickAccessScreen';
@@ -78,6 +79,7 @@ type AppScreen =
   | 'complianceHistory'
   | 'profile'
   | 'profileAddress'
+  | 'support'
   | `quickAccess:${QuickAccessItemId}`
   | 'quickAccess';
 
@@ -196,6 +198,7 @@ function AppContent() {
           initialTab={homeInitialTab}
           onFollowUsPress={() => setAppScreen('followUs')}
           onHelpFeedbackPress={() => setAppScreen('helpFeedback')}
+          onSupportPress={() => setAppScreen('support')}
           onInvoicePress={openInvoiceDetail}
           onNotificationPress={() => setAppScreen('notifications')}
           onProfilePress={() => setAppScreen('profile')}
@@ -236,6 +239,8 @@ function AppContent() {
         />
       ) : isAuthenticated && appScreen === 'helpFeedback' ? (
         <HelpFeedbackScreen onBackPress={() => setAppScreen('home')} />
+      ) : isAuthenticated && appScreen === 'support' ? (
+        <SupportScreen onBackPress={() => setAppScreen('home')} />
       ) : isAuthenticated && appScreen === 'followUs' ? (
         <FollowUsScreen onBackPress={() => setAppScreen('home')} />
       ) : isAuthenticated && appScreen === 'notifications' ? (

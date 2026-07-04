@@ -38,6 +38,8 @@ import DocumentViewScreen from './documents/DocumentViewScreen';
 import type { DocumentItem } from '../api/clientDocumentApi';
 import ManageCompanyScreen from './ManageCompanyScreen';
 import TransactionsScreen from './TransactionsScreen';
+import ServicesScreen from './ServicesScreen';
+import SubscriptionScreen from './SubscriptionScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
@@ -61,6 +63,7 @@ type HomeScreenProps = {
   initialTab?: TabId;
   onFollowUsPress: () => void;
   onHelpFeedbackPress: () => void;
+  onSupportPress?: () => void;
   onGoHome: () => void;
   onInvoicePress?: (invoice: Record<string, unknown>) => void;
   onNotificationPress: () => void;
@@ -77,6 +80,7 @@ export default function HomeScreen({
   initialTab,
   onFollowUsPress,
   onHelpFeedbackPress,
+  onSupportPress,
   onGoHome: _onGoHome,
   onInvoicePress,
   onNotificationPress,
@@ -111,6 +115,8 @@ export default function HomeScreen({
   >(null);
   const [isManageScreenOpen, setIsManageScreenOpen] = useState(false);
   const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [companyOptions, setCompanyOptions] = useState<CompanyCardItem[]>([]);
   const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
   const [selectedDocumentForView, setSelectedDocumentForView] =
@@ -355,6 +361,10 @@ export default function HomeScreen({
     closeMoreSheet(onFollowUsPress);
   }
 
+  function openSupport() {
+    closeMoreSheet(onSupportPress);
+  }
+
   function closeSearch() {
     setIsSearchOpen(false);
     setSearchQuery('');
@@ -423,6 +433,25 @@ export default function HomeScreen({
     setIsTransactionsOpen(false);
   }
 
+  function openServicesScreen() {
+    closeFabMenu();
+    setIsServicesOpen(true);
+  }
+
+  function closeServicesScreen() {
+    setIsServicesOpen(false);
+  }
+
+  function openSubscriptionScreen() {
+    setIsServicesOpen(false);
+    setIsSubscriptionOpen(true);
+  }
+
+  function closeSubscriptionScreen() {
+    setIsSubscriptionOpen(false);
+    setIsServicesOpen(true);
+  }
+
   function selectCompanyFromSwitcher(company: CompanyCardItem) {
     setSelectedCompany(company);
     closeCompanySwitcher();
@@ -462,6 +491,24 @@ export default function HomeScreen({
     return (
       <TransactionsScreen
         onBackPress={closeTransactionsScreen}
+        selectedCompany={selectedCompany}
+      />
+    );
+  }
+
+  if (isServicesOpen) {
+    return (
+      <ServicesScreen
+        onBackPress={closeServicesScreen}
+        onSubscriptionPress={openSubscriptionScreen}
+      />
+    );
+  }
+
+  if (isSubscriptionOpen) {
+    return (
+      <SubscriptionScreen
+        onBackPress={closeSubscriptionScreen}
         selectedCompany={selectedCompany}
       />
     );
@@ -528,6 +575,7 @@ export default function HomeScreen({
             onQuickAccessItemPress={onQuickAccessItemPress}
             onQuickAccessViewAllPress={onQuickAccessViewAllPress}
             onTransactionsPress={openTransactionsScreen}
+            onServicesPress={openServicesScreen}
           />
         ) : null}
         {activeTab === 'company' ? (
@@ -615,6 +663,7 @@ export default function HomeScreen({
             <MoreTabContent
               onFollowUsPress={openFollowUs}
               onHelpFeedbackPress={openHelpFeedback}
+              onSupportPress={openSupport}
             />
           </Animated.View>
         </View>
