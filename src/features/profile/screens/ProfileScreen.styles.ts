@@ -43,12 +43,27 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: '#ffffff',
     marginTop: 24,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  coverWrap: {
+    width: '100%',
+    height: 140,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    overflow: 'hidden',
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
   },
   avatarWrap: {
-    position: 'relative',
     width: 104,
     height: 104,
+    marginTop: -52,
+  },
+  avatarWrapNoCover: {
+    marginTop: 0,
   },
   avatar: {
     width: 104,

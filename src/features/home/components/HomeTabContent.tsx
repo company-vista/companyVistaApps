@@ -14,6 +14,7 @@ type HomeTabContentProps = {
   onCompanyInfoPress: () => void;
   onCompanySwitcherPress: () => void;
   onManagePress: () => void;
+  onAddToCompanyPress?: () => void;
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
   onQuickAccessViewAllPress: () => void;
   onTransactionsPress?: () => void;
@@ -26,6 +27,7 @@ function HomeTabContent({
   onCompanyInfoPress,
   onCompanySwitcherPress,
   onManagePress,
+  onAddToCompanyPress,
   onQuickAccessItemPress,
   onQuickAccessViewAllPress,
   onTransactionsPress,
@@ -39,6 +41,7 @@ function HomeTabContent({
         onCompanyInfoPress={onCompanyInfoPress}
         onCompanySwitcherPress={onCompanySwitcherPress}
         onManagePress={onManagePress}
+        onAddToCompanyPress={onAddToCompanyPress}
         selectedCompany={selectedCompany}
       />
 

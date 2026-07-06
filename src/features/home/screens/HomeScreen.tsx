@@ -3,7 +3,6 @@ import {
   Animated,
   Easing,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -28,6 +27,7 @@ import {
   type ClientCompany,
 } from '../api/clientProfileApi';
 import { mapCompanyToListItem } from './quickAccess/companyListItem';
+import PullToRefresh from './homeScreenComponent/PullToRefresh';
 import BillingTabContent from './invoices/InvoicesTabContent';
 import CompanyTabContent from '../components/CompanyTabContent';
 import CompanyDetailScreen, {
@@ -40,6 +40,7 @@ import ManageCompanyScreen from './ManageCompanyScreen';
 import TransactionsScreen from './TransactionsScreen';
 import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';
+import AddCompanyScreen from './addCompany/AddCompanyScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
@@ -114,6 +115,7 @@ export default function HomeScreen({
     CompanyDetailSection | 'menu' | null
   >(null);
   const [isManageScreenOpen, setIsManageScreenOpen] = useState(false);
+  const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
@@ -469,6 +471,14 @@ export default function HomeScreen({
     );
   }
 
+  if (isAddCompanyOpen) {
+    return (
+      <AddCompanyScreen
+        onBackPress={() => setIsAddCompanyOpen(false)}
+      />
+    );
+  }
+
   if (isManageScreenOpen) {
     return (
       <ManageCompanyScreen
@@ -555,7 +565,12 @@ export default function HomeScreen({
         />
       </View>
 
-      <ScrollView
+      <PullToRefresh
+        token={token}
+        selectedCompanyId={selectedCompany?.id}
+        colors={colors}
+        onNotificationCountChange={setNotificationCount}
+        progressViewOffset={safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16}
         contentContainerStyle={[
           styles.content,
           {
@@ -572,6 +587,7 @@ export default function HomeScreen({
             onCompanyInfoPress={() => setActiveCompanySection('menu')}
             onCompanySwitcherPress={openCompanySwitcher}
             onManagePress={() => setIsManageScreenOpen(true)}
+            onAddToCompanyPress={() => setIsAddCompanyOpen(true)}
             onQuickAccessItemPress={onQuickAccessItemPress}
             onQuickAccessViewAllPress={onQuickAccessViewAllPress}
             onTransactionsPress={openTransactionsScreen}
@@ -604,7 +620,7 @@ export default function HomeScreen({
             onDocumentViewPress={doc => setSelectedDocumentForView(doc)}
           />
         ) : null}
-      </ScrollView>
+      </PullToRefresh>
 
       <QuickActionFab
         isFabMenuOpen={isFabMenuOpen}

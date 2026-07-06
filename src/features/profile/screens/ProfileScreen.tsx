@@ -129,7 +129,15 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
       </View>
 
       <View style={[styles.profileCard, { backgroundColor: colors.surface }]}>
-        <View style={styles.avatarWrap}>
+        {profileImage ? (
+          <View style={styles.coverWrap}>
+            <Image
+              source={{ uri: profileImage }}
+              style={styles.coverImage}
+            />
+          </View>
+        ) : null}
+        <View style={[styles.avatarWrap, !profileImage && styles.avatarWrapNoCover]}>
           <View
             style={[
               styles.avatar,
@@ -262,6 +270,7 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
           </Pressable>
         </Pressable>
       </Modal>
+
     </ScrollView>
   );
 }
