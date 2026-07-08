@@ -12,13 +12,14 @@ import styles from './HomeScreen.styles';
 
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
+import Toast from 'react-native-toast-message';
 
 // Import subcomponents
 import { HomeHeader } from './homeScreenComponent/HomeHeader';
 import { BottomNavBar, type TabId } from './homeScreenComponent/BottomNavBar';
 import { QuickActionFab } from './homeScreenComponent/QuickActionFab';
 import { CompanySwitcherModal } from './homeScreenComponent/CompanySwitcherModal';
-import { SearchModal } from './homeScreenComponent/SearchModal';
+import { notifications } from '../../notifications/data/notifications';
 import { fetchNotifications } from '../../notifications/api/notificationsApi';
 import type { CompanyCardItem } from './quickAccess/CompanyCard';
 import {
@@ -41,6 +42,7 @@ import TransactionsScreen from './TransactionsScreen';
 import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';
 import AddCompanyScreen from './addCompany/AddCompanyScreen';
+import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
@@ -68,6 +70,7 @@ type HomeScreenProps = {
   onGoHome: () => void;
   onInvoicePress?: (invoice: Record<string, unknown>) => void;
   onNotificationPress: () => void;
+  onSearchPress: () => void;
   onProfilePress: () => void;
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
   onQuickAccessViewAllPress: () => void;
@@ -75,6 +78,10 @@ type HomeScreenProps = {
   selectedCompanyId?: string | null;
   onOpenRenewPage?: (action: RenewActionData) => void;
   onOpenComplianceHistory?: (action: RenewActionData) => void;
+  pendingCompanySection?: 'companyInfo' | 'shareholders' | 'menu' | null;
+  onClearPendingCompanySection?: () => void;
+  pendingHomeAction?: 'subscription' | 'addCompany' | null;
+  onClearPendingHomeAction?: () => void;
 };
 
 export default function HomeScreen({
@@ -85,6 +92,7 @@ export default function HomeScreen({
   onGoHome: _onGoHome,
   onInvoicePress,
   onNotificationPress,
+  onSearchPress,
   onProfilePress,
   onQuickAccessItemPress,
   onQuickAccessViewAllPress,
@@ -92,6 +100,10 @@ export default function HomeScreen({
   selectedCompanyId,
   onOpenRenewPage,
   onOpenComplianceHistory,
+  pendingCompanySection,
+  onClearPendingCompanySection,
+  pendingHomeAction,
+  onClearPendingHomeAction,
 }: HomeScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
@@ -106,8 +118,7 @@ export default function HomeScreen({
   const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'home');
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [notificationCount, setNotificationCount] = useState(0);
   const [selectedCompany, setSelectedCompany] =
     useState<CompanyCardItem | null>(null);
@@ -119,6 +130,8 @@ export default function HomeScreen({
   const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
+  const prevNotificationCount = useRef(0);
   const [companyOptions, setCompanyOptions] = useState<CompanyCardItem[]>([]);
   const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
   const [selectedDocumentForView, setSelectedDocumentForView] =
@@ -133,6 +146,23 @@ export default function HomeScreen({
   useEffect(() => {
     onCompanyChange?.(selectedCompany?.id ?? null);
   }, [selectedCompany, onCompanyChange]);
+
+  useEffect(() => {
+    if (pendingCompanySection) {
+      setActiveCompanySection(pendingCompanySection);
+      onClearPendingCompanySection?.();
+    }
+  }, [pendingCompanySection, onClearPendingCompanySection]);
+
+  useEffect(() => {
+    if (pendingHomeAction === 'subscription') {
+      setIsSubscriptionOpen(true);
+      onClearPendingHomeAction?.();
+    } else if (pendingHomeAction === 'addCompany') {
+      setIsAddCompanyOpen(true);
+      onClearPendingHomeAction?.();
+    }
+  }, [pendingHomeAction, onClearPendingHomeAction]);
 
   useEffect(() => {
     Animated.loop(
@@ -189,12 +219,6 @@ export default function HomeScreen({
     inputRange: [0, 1],
     outputRange: [-10, 0],
   });
-  const profileImage =
-    user?.profileImage ??
-    user?.profilePicture ??
-    user?.avatar ??
-    user?.image ??
-    user?.photo;
   const displayName =
     user?.name ??
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') ??
@@ -203,10 +227,14 @@ export default function HomeScreen({
   useEffect(() => {
     let isMounted = true;
 
-    fetchNotifications({ token, companyId: selectedCompany?.id }).then(
+    fetchNotifications({ token: token ?? undefined }).then(
       result => {
-        if (isMounted && result.isSuccess) {
-          setNotificationCount(result.notifications.length);
+        if (isMounted) {
+          const allList = result.isSuccess ? result.notifications : notifications;
+          const filtered = selectedCompany?.id
+            ? allList.filter(n => n.companyId === selectedCompany.id)
+            : allList;
+          setNotificationCount(filtered.length);
         }
       },
     );
@@ -214,6 +242,31 @@ export default function HomeScreen({
     return () => {
       isMounted = false;
     };
+  }, [token, selectedCompany?.id]);
+
+  useEffect(() => {
+    prevNotificationCount.current = notificationCount;
+  }, [notificationCount]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNotifications({ token: token ?? undefined }).then(result => {
+        const allList = result.isSuccess ? result.notifications : notifications;
+        const filtered = selectedCompany?.id
+          ? allList.filter(n => n.companyId === selectedCompany.id)
+          : allList;
+        if (filtered.length > prevNotificationCount.current) {
+          Toast.show({
+            type: 'info',
+            text1: 'New Notification',
+            text2: `You have ${filtered.length - prevNotificationCount.current} new notification(s)`,
+          });
+        }
+        setNotificationCount(filtered.length);
+      });
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [token, selectedCompany?.id]);
 
   useEffect(() => {
@@ -367,11 +420,6 @@ export default function HomeScreen({
     closeMoreSheet(onSupportPress);
   }
 
-  function closeSearch() {
-    setIsSearchOpen(false);
-    setSearchQuery('');
-  }
-
   function openFabMenu() {
     setIsFabMenuOpen(true);
     Animated.timing(fabMenuAnim, {
@@ -444,6 +492,15 @@ export default function HomeScreen({
     setIsServicesOpen(false);
   }
 
+  function openRegistrationTrackingScreen() {
+    closeFabMenu();
+    setIsRegistrationTrackingOpen(true);
+  }
+
+  function closeRegistrationTrackingScreen() {
+    setIsRegistrationTrackingOpen(false);
+  }
+
   function openSubscriptionScreen() {
     setIsServicesOpen(false);
     setIsSubscriptionOpen(true);
@@ -475,6 +532,10 @@ export default function HomeScreen({
     return (
       <AddCompanyScreen
         onBackPress={() => setIsAddCompanyOpen(false)}
+        onSubmit={() => {
+          setIsAddCompanyOpen(false);
+          setIsRegistrationTrackingOpen(true);
+        }}
       />
     );
   }
@@ -524,6 +585,14 @@ export default function HomeScreen({
     );
   }
 
+  if (isRegistrationTrackingOpen) {
+    return (
+      <RegistrationTrackingScreen
+        onBackPress={closeRegistrationTrackingScreen}
+      />
+    );
+  }
+
   const HEADER_CONTENT_HEIGHT = 72;
 
   return (
@@ -552,15 +621,10 @@ export default function HomeScreen({
       >
         <HomeHeader
           displayName={displayName}
-          profileImage={profileImage}
           notificationCount={notificationCount}
           bellRotation={bellRotation}
-          onSearchPress={() => {
-            closeFabMenu();
-            setIsSearchOpen(true);
-          }}
+          onSearchPress={onSearchPress}
           onNotificationPress={onNotificationPress}
-          onProfilePress={onProfilePress}
           colors={colors}
         />
       </View>
@@ -622,7 +686,7 @@ export default function HomeScreen({
         ) : null}
       </PullToRefresh>
 
-      <QuickActionFab
+      {activeTab === 'home' ? <QuickActionFab
         isFabMenuOpen={isFabMenuOpen}
         fabMenuOpacity={fabMenuOpacity}
         fabMenuScale={fabMenuScale}
@@ -633,7 +697,12 @@ export default function HomeScreen({
         colors={colors}
         safeAreaInsets={safeAreaInsets}
         onTransactionsPress={openTransactionsScreen}
-      />
+        onAddCompanyPress={() => {
+          closeFabMenu();
+          setIsAddCompanyOpen(true);
+        }}
+        onRegistrationTrackingPress={openRegistrationTrackingScreen}
+      /> : null}
 
       <BottomNavBar
         activeTab={activeTab}
@@ -680,19 +749,11 @@ export default function HomeScreen({
               onFollowUsPress={openFollowUs}
               onHelpFeedbackPress={openHelpFeedback}
               onSupportPress={openSupport}
+              onProfilePress={onProfilePress}
             />
           </Animated.View>
         </View>
       ) : null}
-
-      <SearchModal
-        isOpen={isSearchOpen}
-        searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
-        onClose={closeSearch}
-        colors={colors}
-        safeAreaInsets={safeAreaInsets}
-      />
 
       <CompanySwitcherModal
         isOpen={isCompanySwitcherOpen}

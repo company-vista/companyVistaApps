@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#2C2C2A',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '500',
   },
   sectionLink: {
@@ -137,8 +137,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deadlineTitle: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '400',
   },
   deadlineSubtitle: {
     fontSize: 10,

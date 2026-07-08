@@ -12,8 +12,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
-import type { NotificationItem } from '../data/notifications';
-import { fetchNotifications } from '../api/notificationsApi';
+import { notifications, type NotificationItem } from '../data/notifications';
+import { fetchNotifications, markNotificationAsRead } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 
@@ -70,9 +70,20 @@ function NotificationScreen({
 
     setIsLoadingNotifications(true);
 
-    fetchNotifications({ token, companyId }).then(result => {
-      if (isMounted && result.isSuccess) {
-        setNotificationList(result.notifications);
+    fetchNotifications({ token: token ?? undefined }).then(result => {
+      if (isMounted) {
+        const allNotifications = result.isSuccess ? result.notifications : notifications;
+        const filtered = companyId
+          ? allNotifications.filter(n => n.companyId === companyId)
+          : allNotifications;
+        setNotificationList(filtered);
+      }
+    }).catch(() => {
+      if (isMounted) {
+        const filtered = companyId
+          ? notifications.filter(n => n.companyId === companyId)
+          : notifications;
+        setNotificationList(filtered);
       }
     }).finally(() => {
       if (isMounted) {
@@ -152,6 +163,7 @@ function NotificationScreen({
                               : notification,
                           ),
                         );
+                        markNotificationAsRead({ token, notificationId: item.id });
                       }
                       onNotificationPress(item);
                     }}
@@ -170,7 +182,7 @@ function NotificationScreen({
                     </View>
                     <View style={styles.notificationCopy}>
                       <View style={styles.notificationTitleRow}>
-                        <Text style={[styles.notificationTitle, { color: colors.text }]}>
+                        <Text style={[styles.notificationTitle, { color: item.isRead ? colors.text : colors.danger }]}>
                           {item.title}
                         </Text>
                         {!item.isRead ? <View style={styles.unreadDot} /> : null}

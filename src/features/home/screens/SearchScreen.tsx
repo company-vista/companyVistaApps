@@ -1,0 +1,326 @@
+import { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import { BackButton } from '../../../components/buttons';
+import { useThemeColors } from '../../../theme/colors';
+
+type SearchScreenProps = {
+  onBackPress: () => void;
+  onCompanyInfoPress: () => void;
+  onShareholdersPress: () => void;
+  onManagePress: () => void;
+  onTransactionsPress: () => void;
+  onStateFilingPress: () => void;
+  onFederalFilingPress: () => void;
+  onAddEntityPress: () => void;
+  onChangeAgentPress: () => void;
+  onSubscriptionPress: () => void;
+  onSupportPress: () => void;
+  onInviteFriendsPress: () => void;
+  onFollowUsPress: () => void;
+  onHelpFeedbackPress: () => void;
+  onAgentRenewalPress: () => void;
+  onAddressRenewalPress: () => void;
+  onAnnualFilingPress: () => void;
+  onRegistrationTrackingPress: () => void;
+};
+
+const quickActions = [
+  { id: 'companyInfo', label: 'Company Information', icon: 'building-o', color: '#4F46E5' },
+  { id: 'shareholders', label: 'Shareholders', icon: 'users', color: '#137333' },
+  { id: 'manage', label: 'Manage', icon: 'cog', color: '#dc2626' },
+  { id: 'transactions', label: 'Transactions', icon: 'exchange', color: '#0891b2' },
+  { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
+];
+
+const orderServices = [
+  { id: 'stateFiling', label: 'State Filing', icon: 'file-text-o', color: '#B45309' },
+  { id: 'federalFiling', label: 'Federal Filing', icon: 'file-text', color: '#DC2626' },
+  { id: 'addEntity', label: 'Add Entity', icon: 'building-o', color: '#1D4ED8' },
+  { id: 'changeAgent', label: 'Change Agent', icon: 'exchange', color: '#7C3AED' },
+];
+
+const complianceActions = [
+  { id: 'agentRenewal', label: 'Agent Renewal', icon: 'refresh', color: '#dc2626' },
+  { id: 'addressRenewal', label: 'Address Renewal', icon: 'map-marker', color: '#ea580c' },
+  { id: 'federalFiling', label: 'Federal Filing', icon: 'file-text', color: '#B45309' },
+  { id: 'annualFiling', label: 'Annual Filing', icon: 'calendar', color: '#0891b2' },
+];
+
+const trackingActions = [
+  { id: 'registrationTracking', label: 'Registration Tracking', icon: 'map-marker', color: '#0891b2' },
+];
+
+const helpAndSupport = [
+  { id: 'support', label: 'Support', icon: 'headphones', color: '#0f766e' },
+  { id: 'inviteFriends', label: 'Invite Friends', icon: 'share-alt', color: '#7c3aed' },
+  { id: 'followUs', label: 'Follow Us', icon: 'globe', color: '#2563eb' },
+  { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: '#ca8a04' },
+];
+
+export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareholdersPress, onManagePress, onTransactionsPress, onStateFilingPress, onFederalFilingPress, onAddEntityPress, onChangeAgentPress, onSubscriptionPress, onSupportPress, onInviteFriendsPress, onFollowUsPress, onHelpFeedbackPress, onAgentRenewalPress, onAddressRenewalPress, onAnnualFilingPress, onRegistrationTrackingPress }: SearchScreenProps) {
+  const safeAreaInsets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const [query, setQuery] = useState('');
+
+  const filteredActions = useMemo(() => {
+    if (!query.trim()) return quickActions;
+    const q = query.toLowerCase();
+    return quickActions.filter(a => a.label.toLowerCase().includes(q));
+  }, [query]);
+
+  const filteredServices = useMemo(() => {
+    if (!query.trim()) return orderServices;
+    const q = query.toLowerCase();
+    return orderServices.filter(s => s.label.toLowerCase().includes(q));
+  }, [query]);
+
+  const filteredComplianceActions = useMemo(() => {
+    if (!query.trim()) return complianceActions;
+    const q = query.toLowerCase();
+    return complianceActions.filter(c => c.label.toLowerCase().includes(q));
+  }, [query]);
+
+  const filteredTrackingActions = useMemo(() => {
+    if (!query.trim()) return trackingActions;
+    const q = query.toLowerCase();
+    return trackingActions.filter(t => t.label.toLowerCase().includes(q));
+  }, [query]);
+
+  const filteredHelpAndSupport = useMemo(() => {
+    if (!query.trim()) return helpAndSupport;
+    const q = query.toLowerCase();
+    return helpAndSupport.filter(h => h.label.toLowerCase().includes(q));
+  }, [query]);
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: safeAreaInsets.top }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <BackButton onPress={onBackPress} />
+        <Text style={[styles.title, { color: colors.text }]}>Search</Text>
+      </View>
+      <View style={[styles.searchInputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <FontAwesome name="search" size={18} color={colors.subtle} style={styles.searchIcon} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.text }]}
+          placeholder="Search..."
+          placeholderTextColor={colors.inputPlaceholder}
+          value={query}
+          onChangeText={setQuery}
+          autoFocus
+        />
+      </View>
+
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.listContent}>
+        <View style={styles.sectionWrap}>
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>QUICK ACTIONS</Text>
+          <View style={styles.settingsList}>
+            {filteredActions.map((action, idx) => {
+              const onPress = action.id === 'companyInfo'
+                ? onCompanyInfoPress
+                : action.id === 'shareholders'
+                  ? onShareholdersPress
+                  : action.id === 'manage'
+                    ? onManagePress
+                    : action.id === 'transactions'
+                      ? onTransactionsPress
+                      : onSubscriptionPress;
+              const isLast = idx === quickActions.length - 1;
+              return (
+                <TouchableOpacity
+                  key={action.id}
+                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  onPress={onPress}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${action.color}15` }]}>
+                    <FontAwesome name={action.icon} size={18} color={action.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{action.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>
+          <View style={styles.settingsList}>
+            {filteredServices.map((service, idx) => {
+              const onPress = service.id === 'stateFiling'
+                ? onStateFilingPress
+                : service.id === 'federalFiling'
+                  ? onFederalFilingPress
+                  : service.id === 'addEntity'
+                    ? onAddEntityPress
+                    : onChangeAgentPress;
+              const isLast = idx === orderServices.length - 1;
+              return (
+                <TouchableOpacity
+                  key={service.id}
+                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  onPress={onPress}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
+                    <FontAwesome name={service.icon} size={18} color={service.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{service.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>COMPLIANCE ACTIONS</Text>
+          <View style={styles.settingsList}>
+            {filteredComplianceActions.map((item, idx) => {
+              const onPress = item.id === 'agentRenewal'
+                ? onAgentRenewalPress
+                : item.id === 'addressRenewal'
+                  ? onAddressRenewalPress
+                  : item.id === 'federalFiling'
+                    ? onFederalFilingPress
+                    : onAnnualFilingPress;
+              const isLast = idx === complianceActions.length - 1;
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  onPress={onPress}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>
+          <View style={styles.settingsList}>
+            {filteredTrackingActions.map((item, idx) => {
+              const onPress = onRegistrationTrackingPress;
+              const isLast = idx === trackingActions.length - 1;
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  onPress={onPress}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>HELP & SUPPORT</Text>
+          <View style={styles.settingsList}>
+            {filteredHelpAndSupport.map((item, idx) => {
+              const onPress = item.id === 'support'
+                ? onSupportPress
+                : item.id === 'inviteFriends'
+                  ? onInviteFriendsPress
+                  : item.id === 'followUs'
+                    ? onFollowUsPress
+                    : onHelpFeedbackPress;
+              const isLast = idx === helpAndSupport.length - 1;
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  onPress={onPress}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    gap: 8,
+    borderBottomWidth: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  searchInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    marginBottom: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    // borderWidth: 1,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    height: 44,
+    fontSize: 15,
+  },
+  sectionWrap: {
+    paddingBottom: 4,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
+  },
+  settingsList: {
+    marginHorizontal: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+  },
+  settingsIcon: {
+    width: 33,
+    height: 33,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  settingsLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '400',
+  },
+  listContent: {
+    paddingBottom: 24,
+  },
+});

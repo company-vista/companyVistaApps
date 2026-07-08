@@ -313,10 +313,10 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
-        <View>
+        <View >
           <Text style={styles.title}>Invoices</Text>
           <Text style={styles.companyName}>
-            {selectedCompany?.name ?? 'All companies'}
+            Company name: {selectedCompany?.name ?? 'All companies'}
           </Text>
         </View>
       </View>
@@ -475,20 +475,20 @@ const getStyles = (colors: AppTheme) => {
 
   return StyleSheet.create({
   container: {
-    paddingTop: 18,
+    paddingTop: 2,
   },
   titleRow: {
-    marginBottom: 18,
+    marginBottom: 4,
   },
   title: {
     color: palette.primaryText,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '400',
     letterSpacing: 0,
   },
   companyName: {
     color: palette.accentText,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '500',
     marginTop: 4,
   },
@@ -593,7 +593,7 @@ const getStyles = (colors: AppTheme) => {
     borderWidth: 1,
     elevation: 2,
     flexDirection: 'row',
-    minHeight: 130,
+    minHeight: 120,
     padding: 12,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.07,
@@ -620,13 +620,13 @@ const getStyles = (colors: AppTheme) => {
   },
   invoiceId: {
     color: palette.primaryText,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0,
   },
   invoiceCompany: {
     color: palette.primaryText,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     marginTop: 7,
   },
@@ -649,7 +649,7 @@ const getStyles = (colors: AppTheme) => {
   },
   invoiceRight: {
     alignItems: 'flex-end',
-    paddingRight: 10,
+    paddingRight: 1,
     width: 112,
   },
   amount: {
@@ -677,7 +677,7 @@ const getStyles = (colors: AppTheme) => {
   statusDetail: {
     fontSize: 12,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: 18,
     textAlign: 'right',
   },
   actionButton: {

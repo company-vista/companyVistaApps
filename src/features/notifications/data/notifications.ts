@@ -6,6 +6,7 @@ export const notifications = [
     time: '10 min ago',
     icon: 'file-text-o',
     isRead: false,
+    companyId: 'company_001',
   },
   {
     id: 'compliance-update',
@@ -14,6 +15,7 @@ export const notifications = [
     time: '1 hour ago',
     icon: 'check-square-o',
     isRead: false,
+    companyId: 'company_001',
   },
   {
     id: 'support-reply',
@@ -22,6 +24,34 @@ export const notifications = [
     time: 'Yesterday',
     icon: 'comments-o',
     isRead: true,
+    companyId: 'company_002',
+  },
+  {
+    id: 'ein-progress',
+    title: 'EIN In Progress',
+    message: 'Your EIN application is being processed.',
+    time: '2 days ago',
+    icon: 'gear',
+    isRead: false,
+    companyId: 'company_001',
+  },
+  {
+    id: 'document-uploaded',
+    title: 'Document Uploaded',
+    message: 'Certificate of Incorporation has been uploaded.',
+    time: '3 days ago',
+    icon: 'file-pdf-o',
+    isRead: true,
+    companyId: 'company_003',
+  },
+  {
+    id: 'registration-status',
+    title: 'Registration Update',
+    message: 'Your company registration status has changed.',
+    time: '5 days ago',
+    icon: 'info-circle',
+    isRead: false,
+    companyId: 'company_002',
   },
 ];
 

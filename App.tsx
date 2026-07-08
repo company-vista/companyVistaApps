@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
+  Share,
   StatusBar,
   Text,
   View,
@@ -24,6 +25,7 @@ import InvoiceCenterScreen from './src/features/home/screens/quickAccess/Invoice
 import InvoiceDetailScreen from './src/features/home/screens/invoices/InvoiceDetailScreen';
 import NotificationDetailScreen from './src/features/notifications/screens/NotificationDetailScreen';
 import NotificationScreen from './src/features/notifications/screens/NotificationScreen';
+import SearchScreen from './src/features/home/screens/SearchScreen';
 import RenewComplianceScreen from './src/features/home/screens/compliances/RenewComplianceScreen';
 import AddressRenewalScreen from './src/features/home/screens/compliances/AddressRenewalScreen';
 import FederalFilingScreen from './src/features/home/screens/compliances/FederalFilingScreen';
@@ -79,6 +81,7 @@ type AppScreen =
   | 'complianceHistory'
   | 'profile'
   | 'profileAddress'
+  | 'search'
   | 'support'
   | `quickAccess:${QuickAccessItemId}`
   | 'quickAccess';
@@ -127,6 +130,8 @@ function AppContent() {
     useState<'home' | 'quickAccess'>('home');
   const [homeInitialTab, setHomeInitialTab] = useState<'home' | 'company' | 'reports' | 'billing' | 'more'>('home');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
+  const [pendingCompanySection, setPendingCompanySection] = useState<'companyInfo' | 'shareholders' | 'menu' | null>(null);
+  const [pendingHomeAction, setPendingHomeAction] = useState<'subscription' | 'addCompany' | null>(null);
   const authFadeAnim = useRef(new Animated.Value(1)).current;
   const authSlideAnim = useRef(new Animated.Value(0)).current;
 
@@ -201,12 +206,17 @@ function AppContent() {
           onSupportPress={() => setAppScreen('support')}
           onInvoicePress={openInvoiceDetail}
           onNotificationPress={() => setAppScreen('notifications')}
+          onSearchPress={() => setAppScreen('search')}
           onProfilePress={() => setAppScreen('profile')}
           onQuickAccessItemPress={itemId => openQuickAccessItem(itemId, 'home')}
           onQuickAccessViewAllPress={() => setAppScreen('quickAccess')}
           onGoHome={() => setHomeInitialTab('home')}
           selectedCompanyId={selectedCompanyId}
           onCompanyChange={setSelectedCompanyId}
+          pendingCompanySection={pendingCompanySection}
+          onClearPendingCompanySection={() => setPendingCompanySection(null)}
+          pendingHomeAction={pendingHomeAction}
+          onClearPendingHomeAction={() => setPendingHomeAction(null)}
           onOpenRenewPage={(action) => {
             setRenewComplianceAction(action);
             if (action.id === 'federal_filing') {
@@ -246,8 +256,28 @@ function AppContent() {
       ) : isAuthenticated && appScreen === 'notifications' ? (
         <NotificationScreen
           companyId={selectedCompanyId}
-          onBackPress={() => setAppScreen('home')}
+          onBackPress={() => { setHomeInitialTab('home'); setAppScreen('home'); }}
           onNotificationPress={openNotificationDetail}
+        />
+      ) : isAuthenticated && appScreen === 'search' ? (
+        <SearchScreen
+          onBackPress={() => setAppScreen('home')}
+          onCompanyInfoPress={() => { setPendingCompanySection('companyInfo'); setAppScreen('home'); }}
+          onShareholdersPress={() => { setPendingCompanySection('shareholders'); setAppScreen('home'); }}
+          onManagePress={() => { setPendingCompanySection('menu'); setAppScreen('home'); }}
+          onTransactionsPress={() => { setHomeInitialTab('billing'); setAppScreen('home'); }}
+          onStateFilingPress={() => setAppScreen('annualFiling')}
+          onFederalFilingPress={() => setAppScreen('federalFiling')}
+          onAddEntityPress={() => { setAppScreen('home'); }}
+          onChangeAgentPress={() => setAppScreen('addressRenewal')}
+          onSubscriptionPress={() => { setPendingHomeAction('subscription'); setAppScreen('home'); }}
+          onSupportPress={() => setAppScreen('support')}
+          onInviteFriendsPress={() => { Share.share({ message: 'Join me on Company Vista to manage company work in one place.', title: 'Invite Friends' }); }}
+          onFollowUsPress={() => setAppScreen('followUs')}
+          onHelpFeedbackPress={() => setAppScreen('helpFeedback')}
+          onAgentRenewalPress={() => { setRenewComplianceAction({ id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [] }); setAppScreen('renewCompliance'); }}
+          onAddressRenewalPress={() => { setRenewComplianceAction({ id: 'address', title: 'Address Renewal', subtitle: '', status: '', date: '', details: [] }); setAppScreen('addressRenewal'); }}
+          onAnnualFilingPress={() => setAppScreen('annualFiling')}
         />
       ) : isAuthenticated && appScreen === 'notificationDetail' && selectedNotification ? (
         <NotificationDetailScreen

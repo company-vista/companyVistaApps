@@ -10,8 +10,16 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { useAppSelector } from '../../../../store/hooks';
 import { BackButton } from '../../../../components/buttons';
 import JurisdictionSelectionScreen from './JurisdictionSelectionScreen';
+import EntityDetailScreen from './EntityDetailScreen';
+import OwnershipScreen from './OwnershipScreen';
+import RegisteredAddressScreen from './RegisteredAddressScreen';
+import DirectorsShareholdersScreen from './DirectorsShareholdersScreen';
+import BusinessFormScreen from './BusinessFormScreen';
+import AdditionalDocumentsScreen from './AdditionalDocumentsScreen';
+import ReviewSubmitScreen from './ReviewSubmitScreen';
 
 type ApplicantType = 'owner' | 'representative' | 'partner';
 
@@ -95,22 +103,83 @@ function RadioOption({
 
 type AddCompanyScreenProps = {
   onBackPress: () => void;
+  onSubmit?: () => void;
 };
 
-export default function AddCompanyScreen({ onBackPress }: AddCompanyScreenProps) {
+export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }: AddCompanyScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const user = useAppSelector(state => state.auth.user);
+  const nameParts = (user?.name ?? '').split(' ');
+  const userFirstName = user?.firstName ?? nameParts[0] ?? '';
+  const userLastName = user?.lastName ?? nameParts.slice(1).join(' ') ?? '';
+
   const [step, setStep] = useState(1);
   const [applicantType, setApplicantType] = useState<ApplicantType>('owner');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState(userFirstName);
+  const [lastName, setLastName] = useState(userLastName);
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [phone, setPhone] = useState(user?.phone ?? user?.phoneNumber ?? user?.mobile ?? '');
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState<string | null>(null);
 
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
   if (step === 2) {
-    return <JurisdictionSelectionScreen onBackPress={() => setStep(1)} />;
+    return (
+      <JurisdictionSelectionScreen
+        onBackPress={() => setStep(1)}
+        onContinue={(countryCode: string) => {
+          setSelectedJurisdiction(countryCode);
+          setStep(3);
+        }}
+      />
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <EntityDetailScreen
+        selectedJurisdiction={selectedJurisdiction}
+        onBackPress={() => setStep(2)}
+        onContinue={() => setStep(4)}
+      />
+    );
+  }
+
+  if (step === 4) {
+    return <OwnershipScreen onBackPress={() => setStep(3)} onContinue={() => setStep(5)} />;
+  }
+
+  if (step === 5) {
+    return <RegisteredAddressScreen onBackPress={() => setStep(4)} onContinue={() => setStep(6)} />;
+  }
+
+  if (step === 6) {
+    return <DirectorsShareholdersScreen onBackPress={() => setStep(5)} onContinue={() => setStep(7)} />;
+  }
+
+  if (step === 7) {
+    return <BusinessFormScreen onBackPress={() => setStep(6)} onContinue={() => setStep(8)} />;
+  }
+
+  if (step === 8) {
+    return <AdditionalDocumentsScreen onBackPress={() => setStep(7)} onContinue={() => setStep(9)} />;
+  }
+
+  if (step === 9) {
+    return (
+      <ReviewSubmitScreen
+        onBackPress={() => setStep(8)}
+        onSubmit={onFormSubmit ?? (() => {})}
+        onEditApplicant={() => setStep(1)}
+        onEditJurisdiction={() => setStep(2)}
+        onEditCompanyName={() => setStep(3)}
+        onEditOwnership={() => setStep(4)}
+        onEditAddress={() => setStep(5)}
+        onEditDirectors={() => setStep(6)}
+        onEditBusinessActivity={() => setStep(7)}
+      />
+    );
   }
 
   const handleContinue = () => {
@@ -219,8 +288,8 @@ export default function AddCompanyScreen({ onBackPress }: AddCompanyScreenProps)
           <Text style={[styles.helperText, { color: colors.subtle }]}>with country code</Text>
         </View>
 
-        <View style={styles.footerRow}>
-          <TouchableOpacity style={styles.continueButton} onPress={handleContinue} activeOpacity={0.85}>
+        <View style={styles.footerColumn}>
+          <TouchableOpacity style={styles.continueButtonFull} onPress={handleContinue} activeOpacity={0.85}>
             <Text style={styles.continueButtonText}>Continue →</Text>
           </TouchableOpacity>
         </View>
@@ -236,9 +305,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingBottom: 12,
-    gap: 12,
+    gap: 8,
     borderBottomWidth: 1,
   },
   headerTitle: {
@@ -246,12 +315,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   content: {
-    padding: 16,
+    padding: 18,
   },
   title: {
-    fontSize: 17,
+    fontSize: 24,
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 23,
     marginBottom: 6,
   },
   titleAccent: {
@@ -259,7 +328,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 12,
     lineHeight: 17,
     marginBottom: 18,
   },
@@ -371,22 +440,20 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 12,
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   helperText: {
     fontSize: 9,
     marginTop: 4,
   },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+  footerColumn: {
     marginTop: 6,
   },
-  continueButton: {
+  continueButtonFull: {
     backgroundColor: '#e6a82a',
     borderRadius: 8,
-    paddingVertical: 9,
-    paddingHorizontal: 18,
+    paddingVertical: 12,
+    alignItems: 'center',
   },
   continueButtonText: {
     color: '#1a1204',

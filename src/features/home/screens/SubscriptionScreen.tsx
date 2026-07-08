@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
 
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
+import { API_BASE_URL } from '../../../config/api';
+import { useAppSelector } from '../../../store/hooks';
 import type { CompanyCardItem } from './quickAccess/CompanyCard';
 
 type TimelineStatus = 'overdue' | null;
@@ -126,10 +130,32 @@ type SubscriptionOverviewProps = {
   selectedCompany?: CompanyCardItem | null;
 };
 
-function buildCompanyData(selected?: CompanyCardItem | null): Company[] {
+function formatDateSafe(d: string | undefined | null): string {
+  if (!d) return 'Not set';
+  try {
+    return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return d;
+  }
+}
+
+function toStatus(s: string | undefined | null): TimelineStatus {
+  if (!s) return null;
+  const lower = s.toLowerCase().trim();
+  if (lower === 'expired' || lower === 'overdue') return 'overdue';
+  return null;
+}
+
+function buildCompanyData(selected?: CompanyCardItem | null, apiData?: any): Company[] {
   if (!selected) {
     return [];
   }
+  const data = apiData?.data || {};
+  const fed = data.federalTaxFiling || {};
+  const annual = data.annualFiling || {};
+  const resident = data.resident || {};
+  const address = data.Address || {};
+
   return [
     {
       name: selected.name,
@@ -140,10 +166,10 @@ function buildCompanyData(selected?: CompanyCardItem | null): Company[] {
       expiryLabel: 'No expiry date',
       usagePercent: 0,
       timeline: [
-        { label: 'Federal filing', due: 'Not set', status: null },
-        { label: 'Annual filing', due: 'Not set', status: null },
-        { label: 'Agent renewal', due: 'Not set', status: null },
-        { label: 'Address renewal', due: 'Not set', status: null },
+        { label: 'Federal filing', due: formatDateSafe(fed.dueDate), status: toStatus(fed.status) },
+        { label: 'Annual filing', due: formatDateSafe(annual.dueDate), status: toStatus(annual.status) },
+        { label: 'Agent renewal', due: formatDateSafe(resident.dueDate), status: toStatus(resident.status) },
+        { label: 'Address renewal', due: formatDateSafe(address.dueDate), status: toStatus(address.status) },
       ],
     },
   ];
@@ -151,8 +177,36 @@ function buildCompanyData(selected?: CompanyCardItem | null): Company[] {
 
 export default function SubscriptionOverview({ onBackPress, selectedCompany }: SubscriptionOverviewProps) {
   const colors = useThemeColors();
-  const companies = buildCompanyData(selectedCompany);
+  const token = useAppSelector(state => state.auth.token);
+  const userName = useAppSelector(state => state.auth.user?.name || '');
+  const [complianceData, setComplianceData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchCompliance = async () => {
+      const companyId = selectedCompany?.id;
+      if (!token || !companyId) {
+        setComplianceData(null);
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/company-compliance/${companyId}`, {
+          headers: { Authorization: `Bearer ${token}`, 'x-auth-token': token },
+        });
+        setComplianceData(res?.data);
+      } catch (err) {
+        console.error('Error fetching compliance:', err);
+        setComplianceData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompliance();
+  }, [selectedCompany?.id, token]);
+
+  const companies = buildCompanyData(selectedCompany, complianceData);
+  console.log(companies)
   const summary = {
     activeCompanies: companies.length,
     documentsLeft: 0,
@@ -172,7 +226,7 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }: S
 
       <Text style={[cTitle, { color: colors.text }]}>
         Subscription overview for{' '}
-        <Text style={cTitleAccent}>{selectedCompany?.name || 'subham kumarjha'}</Text>
+        <Text style={cTitleAccent}>{userName || 'subham kumarjha'}</Text>
       </Text>
 
       <Text style={[cSubtitle, { color: colors.muted }]}>
@@ -201,11 +255,15 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }: S
         </View>
       </View>
 
-      <View style={cCardsList}>
-        {companies.map((company) => (
-          <CompanyCard company={company} key={company.name} colors={colors} />
-        ))}
-      </View>
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.muted} style={{ marginTop: 40 }} />
+      ) : (
+        <View style={cCardsList}>
+          {companies.map((company) => (
+            <CompanyCard company={company} key={company.name} colors={colors} />
+          ))}
+        </View>
+      )}
     </ScrollView>
     </View>
   );

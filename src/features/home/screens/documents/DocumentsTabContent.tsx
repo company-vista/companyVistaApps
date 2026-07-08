@@ -58,7 +58,6 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
     const fullUrl = doc.downloadUrl.startsWith('http')
       ? doc.downloadUrl
       : `${API_BASE_URL}${doc.downloadUrl}`;
-
     try {
       await Linking.openURL(fullUrl);
     } catch (error) {

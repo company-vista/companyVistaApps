@@ -10,7 +10,6 @@ type HomeHeroSectionProps = {
   onCompanyInfoPress: () => void;
   onCompanySwitcherPress: () => void;
   onManagePress: () => void;
-  onAddToCompanyPress?: () => void;
   selectedCompany?: CompanyCardItem | null;
 };
 
@@ -19,7 +18,6 @@ function HomeHeroSection({
   onCompanyInfoPress,
   onCompanySwitcherPress,
   onManagePress,
-  onAddToCompanyPress,
   selectedCompany,
 }: HomeHeroSectionProps) {
   const heroCompanyName = selectedCompany?.name ?? (
@@ -46,9 +44,6 @@ function HomeHeroSection({
         <FontAwesome name="map-marker" size={11} color="#85B7EB" />
         <Text style={styles.heroEyebrow}>{heroCompanyCountry}</Text>
         <View style={{ flex: 1 }} />
-        <Pressable onPress={onAddToCompanyPress} style={styles.heroAddBtn}>
-          <Text style={styles.heroAddBtnText}>+ Add New Company</Text>
-        </Pressable>
       </View>
       <Pressable
         onPress={onCompanySwitcherPress}
@@ -131,19 +126,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7,
     textTransform: 'uppercase',
   },
-  heroAddBtn: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  heroAddBtnText: {
-    color: '#85B7EB',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   heroCompany: {
     flex: 1,
     color: '#ffffff',
@@ -212,8 +194,8 @@ const styles = StyleSheet.create({
   },
   heroTileLabel: {
     color: '#85B7EB',
-    fontSize: 10,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 9,
     marginTop: 3,
   },
 });

@@ -677,14 +677,14 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 14,
   },
   headerTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     color: colors.text,
     flexShrink: 1,
     marginRight: 8,
   },
   selectAllBtn: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.primary,
     fontWeight: '500',
   },
@@ -746,6 +746,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   // Form area
   formArea: {
     rowGap: 16,
+    padding: 12
   },
   fieldBlock: {
     rowGap: 6,

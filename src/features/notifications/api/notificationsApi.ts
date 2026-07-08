@@ -9,6 +9,7 @@ const API_REQUEST_TIMEOUT_MS = 8000;
 type NotificationApiItem = Partial<NotificationItem> & {
   _id?: string;
   body?: string;
+  companyId?: string;
   createdAt?: string;
   created_at?: string;
   description?: string;
@@ -28,7 +29,6 @@ type NotificationsResponse = {
 
 type FetchNotificationsParams = {
   token?: string | null;
-  companyId?: string | null;
 };
 
 function asNotificationArray(value: unknown): NotificationApiItem[] {
@@ -87,14 +87,31 @@ function normalizeNotification(item: NotificationApiItem, index: number): Notifi
     time: getNotificationTime(item),
     icon: item.icon ?? 'bell-o',
     isRead: item.isRead ?? item.read ?? item.status === 'read',
+    companyId: item.companyId ?? '',
   };
 }
 
-export async function fetchNotifications({ token, companyId }: FetchNotificationsParams = {}) {
-  const route = companyId ? `${NOTIFICATIONS_ROUTE}/company/${companyId}` : NOTIFICATIONS_ROUTE;
-
+export async function markNotificationAsRead({ token, notificationId }: { token?: string | null; notificationId: string }) {
   try {
-    const response = await axios.get<NotificationsResponse>(route, {
+    await axios.patch(
+      `${NOTIFICATIONS_ROUTE}/${notificationId}/read`,
+      {},
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        timeout: API_REQUEST_TIMEOUT_MS,
+      },
+    );
+    return { isSuccess: true };
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.log('Mark read error', { message: axiosError.message, id: notificationId });
+    return { isSuccess: false };
+  }
+}
+
+export async function fetchNotifications({ token }: FetchNotificationsParams = {}) {
+  try {
+    const response = await axios.get<NotificationsResponse>(NOTIFICATIONS_ROUTE, {
       headers: token
         ? {
           Authorization: `Bearer ${token}`,
@@ -116,7 +133,7 @@ export async function fetchNotifications({ token, companyId }: FetchNotification
       message: axiosError.message,
       response: axiosError.response?.data,
       status: axiosError.response?.status,
-      url: route,
+      url: NOTIFICATIONS_ROUTE,
     });
 
     return {

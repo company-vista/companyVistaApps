@@ -288,12 +288,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 29,
-    backgroundColor: '#f8fafc',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    elevation: 7,
+    backgroundColor: '#f8fbfc',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
     zIndex: 16,
   },
   fabIcon: {
@@ -335,7 +332,7 @@ const styles = StyleSheet.create({
   },
   fabMenuText: {
     color: '#111827',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -364,9 +361,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 3,
     borderRadius: 16,
-    paddingVertical: 10,
+    paddingVertical: 7,
     marginHorizontal: 1,
   },
   activeNavItem: {
@@ -375,12 +372,12 @@ const styles = StyleSheet.create({
   navText: {
     color: '#64748b',
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '500',
     marginTop: 2,
   },
   activeNavText: {
     color: '#ea580c',
-    fontWeight: '800',
+    fontWeight: '600',
   },
   moreOverlay: {
     position: 'absolute',
@@ -420,8 +417,8 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     color: '#111827',
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: 19,
+    fontWeight: '500',
   },
   sheetCloseButton: {
     width: 36,

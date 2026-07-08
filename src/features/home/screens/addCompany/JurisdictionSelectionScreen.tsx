@@ -111,9 +111,10 @@ function CountryRow({
 
 type JurisdictionSelectionScreenProps = {
   onBackPress: () => void;
+  onContinue: (countryCode: string) => void;
 };
 
-export default function JurisdictionSelectionScreen({ onBackPress }: JurisdictionSelectionScreenProps) {
+export default function JurisdictionSelectionScreen({ onBackPress, onContinue }: JurisdictionSelectionScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [search, setSearch] = useState('');
@@ -133,7 +134,9 @@ export default function JurisdictionSelectionScreen({ onBackPress }: Jurisdictio
   }, [activeRegion, search]);
 
   const handleContinue = () => {
-    // Hook up navigation to the next step here
+    if (selectedCountry) {
+      onContinue(selectedCountry.code);
+    }
   };
 
   return (
@@ -205,17 +208,9 @@ export default function JurisdictionSelectionScreen({ onBackPress }: Jurisdictio
           </View>
         ) : null}
 
-        <View style={[styles.footerRow, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
+        <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
           <TouchableOpacity
-            style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={onBackPress}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.backButtonText, { color: colors.muted }]}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={[styles.stepText, { color: colors.subtle }]}>Step 2 of 10</Text>
-          <TouchableOpacity
-            style={[styles.continueButton, !selectedCountry && styles.continueButtonDisabled]}
+            style={[styles.continueButtonFull, !selectedCountry && styles.continueButtonDisabled]}
             onPress={handleContinue}
             activeOpacity={0.85}
             disabled={!selectedCountry}
@@ -363,28 +358,14 @@ const styles = StyleSheet.create({
     color: '#e6a82a',
     fontWeight: '500',
   },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  footerColumn: {
+    gap: 8,
   },
-  backButton: {
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-  },
-  backButtonText: {
-    fontSize: 12,
-  },
-  stepText: {
-    fontSize: 9,
-  },
-  continueButton: {
+  continueButtonFull: {
     backgroundColor: '#e6a82a',
     borderRadius: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 9,
+    paddingVertical: 12,
+    alignItems: 'center',
   },
   continueButtonDisabled: {
     opacity: 0.5,

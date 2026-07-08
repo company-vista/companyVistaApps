@@ -22,12 +22,14 @@ type MoreTabContentProps = {
   onFollowUsPress: () => void;
   onHelpFeedbackPress: () => void;
   onSupportPress?: () => void;
+  onProfilePress?: () => void;
 };
 
 function MoreTabContent({
   onFollowUsPress,
   onHelpFeedbackPress,
   onSupportPress,
+  onProfilePress,
 }: MoreTabContentProps) {
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -54,6 +56,23 @@ function MoreTabContent({
 
   return (
     <View style={styles.container}>
+      <Pressable
+        onPress={onProfilePress}
+        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+          <FontAwesome name="user-circle" size={17} color={colors.accent} />
+        </View>
+
+        <View style={styles.copy}>
+          <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Manage your personal information
+          </Text>
+        </View>
+
+        <FontAwesome name="angle-right" size={22} color={colors.subtle} />
+      </Pressable>
+
       <Pressable
         onPress={handleToggleTheme}
         style={[styles.menuItem, { backgroundColor: colors.surface }]}>

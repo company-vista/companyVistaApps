@@ -26,11 +26,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   subtitle: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: 4,
   },
   socialIcons: {

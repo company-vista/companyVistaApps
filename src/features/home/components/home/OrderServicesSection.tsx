@@ -194,8 +194,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#2C2C2A',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '500',
+    
   },
   moreText: {
     color: '#D85A30',

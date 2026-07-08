@@ -7,29 +7,24 @@ import styles from '../HomeScreen.styles';
 
 type HomeHeaderProps = {
   displayName: string;
-  profileImage?: string | null;
   notificationCount: number;
   bellRotation: any;
   onSearchPress: () => void;
   onNotificationPress: () => void;
-  onProfilePress: () => void;
   colors: any;
 };
 
 export function HomeHeader({
   displayName,
-  profileImage,
   notificationCount,
   bellRotation,
   onSearchPress,
   onNotificationPress,
-  onProfilePress,
   colors,
 }: HomeHeaderProps) {
   return (
     <View style={styles.header}>
       <Image
-        onError={event => console.log('Header avatar failed', event.nativeEvent.error, profileImage)}
         source={logoImage}
         style={styles.avatar}
       />
@@ -56,22 +51,6 @@ export function HomeHeader({
             </Text>
           </View>
         ) : null}
-      </Pressable>
-      <Pressable
-        onPress={onProfilePress}
-        style={[
-          styles.profileButton,
-          { backgroundColor: colors.surface, borderColor: colors.accent },
-        ]}>
-        {profileImage ? (
-          <Image
-            onError={event => console.log('Profile button avatar failed', event.nativeEvent.error, profileImage)}
-            source={{ uri: profileImage }}
-            style={styles.profileImage}
-          />
-        ) : (
-          <FontAwesome name="user" size={18} color={colors.accent} />
-        )}
       </Pressable>
     </View>
   );

@@ -13,6 +13,8 @@ type QuickActionFabProps = {
   onToggleMenu: () => void;
   onCloseMenu: () => void;
   onTransactionsPress: () => void;
+  onAddCompanyPress: () => void;
+  onRegistrationTrackingPress: () => void;
   colors: any;
   safeAreaInsets: any;
 };
@@ -26,6 +28,8 @@ export function QuickActionFab({
   onToggleMenu,
   onCloseMenu,
   onTransactionsPress,
+  onAddCompanyPress,
+  onRegistrationTrackingPress,
   colors,
   safeAreaInsets,
 }: QuickActionFabProps) {
@@ -53,16 +57,26 @@ export function QuickActionFab({
                 ],
               },
             ]}>
-            <Pressable style={styles.fabMenuItem}>
+            <Pressable
+              onPress={() => {
+                onCloseMenu();
+                onAddCompanyPress();
+              }}
+              style={styles.fabMenuItem}>
               <FontAwesome name="building-o" size={19} color="#2563eb" />
               <Text style={[styles.fabMenuText, { color: colors.text }]}>
-                Company
+                Add Company
               </Text>
             </Pressable>
-            <Pressable style={styles.fabMenuItem}>
-              <FontAwesome name="cogs" size={19} color="#0f766e" />
+            <Pressable
+              onPress={() => {
+                onCloseMenu();
+                onRegistrationTrackingPress();
+              }}
+              style={styles.fabMenuItem}>
+              <FontAwesome name="list-alt" size={19} color="#0f766e" />
               <Text style={[styles.fabMenuText, { color: colors.text }]}>
-                Services
+                Registration Tracking
               </Text>
             </Pressable>
             <Pressable
@@ -91,9 +105,7 @@ export function QuickActionFab({
         style={[
           styles.fab,
           {
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: colors.border,
+            backgroundColor: `${colors.accent}90`,
             bottom: safeAreaInsets.bottom + 104,
           },
         ]}>
@@ -101,7 +113,7 @@ export function QuickActionFab({
           <FontAwesome
             name="plus"
             size={24}
-            color={colors.text}
+            color={colors.textOnDark}
             style={styles.fabIcon}
           />
         </Animated.View>

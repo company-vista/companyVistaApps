@@ -43,8 +43,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: '#ffffff',
     marginTop: 24,
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
     paddingBottom: 24,
+    // borderWidth: 0.4
   },
   coverWrap: {
     width: '100%',

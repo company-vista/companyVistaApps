@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
   sectionTitleNoMargin: {
     color: '#111827',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '600',
   },
   viewAll: {
