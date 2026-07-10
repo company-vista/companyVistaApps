@@ -10,7 +10,7 @@ type SearchScreenProps = {
   onBackPress: () => void;
   onCompanyInfoPress: () => void;
   onShareholdersPress: () => void;
-  onManagePress: () => void;
+  onManageCompanyPress: () => void;
   onTransactionsPress: () => void;
   onStateFilingPress: () => void;
   onFederalFilingPress: () => void;
@@ -30,7 +30,8 @@ type SearchScreenProps = {
 const quickActions = [
   { id: 'companyInfo', label: 'Company Information', icon: 'building-o', color: '#4F46E5' },
   { id: 'shareholders', label: 'Shareholders', icon: 'users', color: '#137333' },
-  { id: 'manage', label: 'Manage', icon: 'cog', color: '#dc2626' },
+
+  { id: 'manageCompany', label: 'Manage Company', icon: 'briefcase', color: '#7C3AED' },
   { id: 'transactions', label: 'Transactions', icon: 'exchange', color: '#0891b2' },
   { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
 ];
@@ -60,7 +61,7 @@ const helpAndSupport = [
   { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: '#ca8a04' },
 ];
 
-export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareholdersPress, onManagePress, onTransactionsPress, onStateFilingPress, onFederalFilingPress, onAddEntityPress, onChangeAgentPress, onSubscriptionPress, onSupportPress, onInviteFriendsPress, onFollowUsPress, onHelpFeedbackPress, onAgentRenewalPress, onAddressRenewalPress, onAnnualFilingPress, onRegistrationTrackingPress }: SearchScreenProps) {
+export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareholdersPress, onManageCompanyPress, onTransactionsPress, onStateFilingPress, onFederalFilingPress, onAddEntityPress, onChangeAgentPress, onSubscriptionPress, onSupportPress, onInviteFriendsPress, onFollowUsPress, onHelpFeedbackPress, onAgentRenewalPress, onAddressRenewalPress, onAnnualFilingPress, onRegistrationTrackingPress }: SearchScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [query, setQuery] = useState('');
@@ -122,11 +123,11 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
                 ? onCompanyInfoPress
                 : action.id === 'shareholders'
                   ? onShareholdersPress
-                  : action.id === 'manage'
-                    ? onManagePress
-                    : action.id === 'transactions'
-                      ? onTransactionsPress
-                      : onSubscriptionPress;
+                  : action.id === 'manageCompany'
+                      ? onManageCompanyPress
+                      : action.id === 'transactions'
+                        ? onTransactionsPress
+                        : onSubscriptionPress;
               const isLast = idx === quickActions.length - 1;
               return (
                 <TouchableOpacity
@@ -145,8 +146,8 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
           </View>
 
           <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>
-          <View style={styles.settingsList}>
-            {filteredServices.map((service, idx) => {
+          <View style={styles.servicesList}>
+            {filteredServices.map((service) => {
               const onPress = service.id === 'stateFiling'
                 ? onStateFilingPress
                 : service.id === 'federalFiling'
@@ -154,11 +155,10 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
                   : service.id === 'addEntity'
                     ? onAddEntityPress
                     : onChangeAgentPress;
-              const isLast = idx === orderServices.length - 1;
               return (
                 <TouchableOpacity
                   key={service.id}
-                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  style={[styles.serviceCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
@@ -300,6 +300,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  servicesList: {
+    marginHorizontal: 16,
+    gap: 10,
+  },
+  serviceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderRadius: 12,
   },
   settingsRow: {
     flexDirection: 'row',

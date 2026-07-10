@@ -4,9 +4,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
-import { API_BASE_URL } from '../../../../config/api';
+import { API_BASE } from '../../../../config/api';
+import axios from 'axios';
 import { fetchCompanyDocuments, type DocumentItem } from '../../api/clientDocumentApi';
 import type { CompanyCardItem } from '../quickAccess/CompanyCard';
+import UnlockDocumentModal from './UnlockDocumentModal';
+import ManageSubscriptionModal from './ManageSubscriptionModal';
 
 const HOME_HERO_COLORS = {
   panel: '#0D2137',
@@ -40,13 +43,19 @@ type DocumentsTabContentProps = {
 
 function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: DocumentsTabContentProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'records' | 'mails' | 'locked'>('records');
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [lockedDocCount, setLockedDocCount] = useState(0);
+  const [lockedDocDates, setLockedDocDates] = useState<string[]>([]);
+  const [isLockedLoading, setIsLockedLoading] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const token = useAppSelector(state => state.auth.token);
   const colors = useThemeColors();
   const styles = getStyles(colors);
   const palette = getDocumentPalette(colors);
+  
 
   // --------------- Document Download Handler function -----------------
   const handleDownload = useCallback(async (doc: DocumentItem) => {
@@ -57,7 +66,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
 
     const fullUrl = doc.downloadUrl.startsWith('http')
       ? doc.downloadUrl
-      : `${API_BASE_URL}${doc.downloadUrl}`;
+      : `${API_BASE}${doc.downloadUrl}`;
     try {
       await Linking.openURL(fullUrl);
     } catch (error) {
@@ -86,7 +95,51 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
     };
   }, [selectedCompany?.id, token]);
 
+  useEffect(() => {
+    if (activeTab !== 'locked') return;
+    const companyId = selectedCompany?.id;
+    if (!companyId) return;
+
+    let isMounted = true;
+    setIsLockedLoading(true);
+    const fetchLocked = async () => {
+      try {
+        const { data } = await axios.get(
+          `${API_BASE}/api/locked-documents?companyId=${companyId}`,
+          { headers: { Authorization: `Bearer ${token}`, 'x-auth-token': token, Cookie: `clientToken=${token}` } }
+        );
+      
+        const latest = data.data?.[0];
+        const count = latest ? parseInt(latest.countDocuments, 10) || 0 : 0;
+        // if (isMounted) {
+          setLockedDocCount(count);
+          setLockedDocDates(Array.isArray(latest?.documentDates) ? latest.documentDates : []);
+        // }
+      } catch {
+        if (isMounted) {
+          setLockedDocCount(0);
+          setLockedDocDates([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLockedLoading(false);
+        }
+      }
+    };
+    fetchLocked();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab, selectedCompany?.id]);
+
   const filteredDocuments = documents.filter(doc => {
+    if (activeTab === 'mails') {
+      const src = (doc.sourceGroup ?? '').toLowerCase();
+      const dt = (doc.documentType ?? '').toLowerCase();
+      if (!src.includes('mail') && !dt.includes('mail') && !dt.includes('letter')) return false;
+    }
+
     if (!searchQuery) return true;
     const lowerQuery = searchQuery.toLowerCase();
     const fileName = (doc.originalFileName ?? doc.fileName ?? '').toLowerCase();
@@ -127,9 +180,89 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         />
       </View>
 
+      {/* Tabs */}
+      <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Pressable
+          style={[styles.tab, activeTab === 'records' && { backgroundColor: colors.primary }]}
+          onPress={() => setActiveTab('records')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'records' ? '#fff' : palette.accentText }]}>
+            Records
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.tab, activeTab === 'mails' && { backgroundColor: colors.primary }]}
+          onPress={() => setActiveTab('mails')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'mails' ? '#fff' : palette.accentText }]}>
+            Mails & letters
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.tab, activeTab === 'locked' && { backgroundColor: colors.primary }]}
+          onPress={() => setActiveTab('locked')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'locked' ? '#fff' : palette.accentText }]}>
+            Locked
+          </Text>
+        </Pressable>
+      </View>
+
+      {lockedDocCount > 1 && (
+        <View style={styles.unlockAllRow}>
+          <Pressable
+            style={[styles.unlockAllBtn, { backgroundColor: '#DC2626' }]}
+            onPress={() => setShowSubscriptionModal(true)}
+          >
+            <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.unlockAllBtnText}>Unlock All Documents</Text>
+          </Pressable>
+        </View>
+      )}
+
       {/* Document List */}
       <View style={styles.listContainer}>
-        {isLoading ? (
+        {activeTab === 'locked' ? (
+          isLockedLoading ? (
+            <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
+          ) : lockedDocCount > 0 ? (
+            <View style={styles.lockedCard}>
+              <View style={styles.lockedCardTop}>
+                <View style={[styles.lockedIconWrap, { backgroundColor: '#FEF2F2' }]}>
+                  <FontAwesome name="lock" size={20} color="#DC2626" />
+                </View>
+                <View style={styles.cardInfo}>
+                  <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+                  <Text numberOfLines={1} style={styles.cardSubtitle}>
+                    {lockedDocCount} document{lockedDocCount !== 1 ? 's' : ''} locked
+                  </Text>
+                </View>
+              </View>
+
+              {lockedDocDates.length > 0 && (
+                <>
+                  <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+                  <View style={styles.dateList}>
+                    {lockedDocDates.map((date, i) => (
+                      <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
+                        {new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </Text>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+
+              <Pressable style={[styles.lockedBtn, { backgroundColor: '#DC2626' }]} onPress={() => setShowUnlockModal(true)}>
+                <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.lockedBtnText}>Pay to View Document</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No locked documents found.</Text>
+          )
+        ) : isLoading ? (
           <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
         ) : filteredDocuments.length > 0 ? (
           filteredDocuments.map((doc, index) => (
@@ -170,6 +303,18 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
           <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>
         )}
       </View>
+
+      <UnlockDocumentModal
+        visible={showUnlockModal}
+        onClose={() => setShowUnlockModal(false)}
+        documentName={selectedCompany?.name ?? 'Document'}
+        price="$30"
+      />
+
+      <ManageSubscriptionModal
+        visible={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+      />
 
     </View>
   );
@@ -258,6 +403,42 @@ const getStyles = (colors: AppTheme) => {
     filterTextActive: {
       color: palette.activeText,
     },
+    tabBar: {
+      flexDirection: 'row',
+      borderRadius: 12,
+      padding: 3,
+      marginBottom: 20,
+      borderWidth: 1,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 8,
+      borderRadius: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tabText: {
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    unlockAllRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginBottom: 16,
+    },
+    unlockAllBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      borderRadius: 20,
+    },
+    unlockAllBtnText: {
+      color: '#ffffff',
+      fontSize: 12,
+      fontWeight: '700',
+    },
     listContainer: {
       gap: 16,
     },
@@ -343,6 +524,54 @@ const getStyles = (colors: AppTheme) => {
       fontSize: 12,
       fontWeight: '700',
       color: palette.link,
+    },
+    lockedCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: '#FCA5A5',
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    lockedCardTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    lockedIconWrap: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    lockedDivider: {
+      height: 1,
+      marginBottom: 16,
+    },
+    lockedBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      borderRadius: 24,
+    },
+    lockedBtnText: {
+      color: '#ffffff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    dateList: {
+      marginBottom: 8,
+      gap: 4,
+    },
+    dateText: {
+      fontSize: 13,
     },
   });
 };

@@ -38,6 +38,7 @@ import DocumentsTabContent from './documents/DocumentsTabContent';
 import DocumentViewScreen from './documents/DocumentViewScreen';
 import type { DocumentItem } from '../api/clientDocumentApi';
 import ManageCompanyScreen from './ManageCompanyScreen';
+import ManageOptionsScreen from './ManageOptionsScreen';
 import TransactionsScreen from './TransactionsScreen';
 import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';
@@ -80,7 +81,7 @@ type HomeScreenProps = {
   onOpenComplianceHistory?: (action: RenewActionData) => void;
   pendingCompanySection?: 'companyInfo' | 'shareholders' | 'menu' | null;
   onClearPendingCompanySection?: () => void;
-  pendingHomeAction?: 'subscription' | 'addCompany' | null;
+  pendingHomeAction?: 'subscription' | 'addCompany' | 'manageOptions' | null;
   onClearPendingHomeAction?: () => void;
 };
 
@@ -125,6 +126,7 @@ export default function HomeScreen({
   const [activeCompanySection, setActiveCompanySection] = useState<
     CompanyDetailSection | 'menu' | null
   >(null);
+  const [isManageOptionsOpen, setIsManageOptionsOpen] = useState(false);
   const [isManageScreenOpen, setIsManageScreenOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
@@ -160,6 +162,9 @@ export default function HomeScreen({
       onClearPendingHomeAction?.();
     } else if (pendingHomeAction === 'addCompany') {
       setIsAddCompanyOpen(true);
+      onClearPendingHomeAction?.();
+    } else if (pendingHomeAction === 'manageOptions') {
+      setIsManageOptionsOpen(true);
       onClearPendingHomeAction?.();
     }
   }, [pendingHomeAction, onClearPendingHomeAction]);
@@ -540,11 +545,26 @@ export default function HomeScreen({
     );
   }
 
+  if (isManageOptionsOpen) {
+    return (
+      <ManageOptionsScreen
+        onBackPress={() => setIsManageOptionsOpen(false)}
+        onRequestChangePress={() => {
+          setIsManageOptionsOpen(false);
+          setIsManageScreenOpen(true);
+        }}
+      />
+    );
+  }
+
   if (isManageScreenOpen) {
     return (
       <ManageCompanyScreen
         selectedCompany={selectedCompany}
-        onBackPress={() => setIsManageScreenOpen(false)}
+        onBackPress={() => {
+          setIsManageScreenOpen(false);
+          setIsManageOptionsOpen(true);
+        }}
       />
     );
   }
@@ -650,7 +670,7 @@ export default function HomeScreen({
             selectedCompany={selectedCompany ?? companyOptions[0] ?? null}
             onCompanyInfoPress={() => setActiveCompanySection('menu')}
             onCompanySwitcherPress={openCompanySwitcher}
-            onManagePress={() => setIsManageScreenOpen(true)}
+            onManagePress={() => setIsManageOptionsOpen(true)}
             onAddToCompanyPress={() => setIsAddCompanyOpen(true)}
             onQuickAccessItemPress={onQuickAccessItemPress}
             onQuickAccessViewAllPress={onQuickAccessViewAllPress}

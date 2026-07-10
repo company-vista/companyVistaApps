@@ -22,7 +22,7 @@ function RecentActivityAndPaymentOverviewSection({
 
   const recentActivities = [
     { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress },
-    { title: 'Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress },
+    { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress },
   ];
 
   return (

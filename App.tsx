@@ -131,7 +131,7 @@ function AppContent() {
   const [homeInitialTab, setHomeInitialTab] = useState<'home' | 'company' | 'reports' | 'billing' | 'more'>('home');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [pendingCompanySection, setPendingCompanySection] = useState<'companyInfo' | 'shareholders' | 'menu' | null>(null);
-  const [pendingHomeAction, setPendingHomeAction] = useState<'subscription' | 'addCompany' | null>(null);
+  const [pendingHomeAction, setPendingHomeAction] = useState<'subscription' | 'addCompany' | 'manageOptions' | null>(null);
   const authFadeAnim = useRef(new Animated.Value(1)).current;
   const authSlideAnim = useRef(new Animated.Value(0)).current;
 
@@ -264,7 +264,7 @@ function AppContent() {
           onBackPress={() => setAppScreen('home')}
           onCompanyInfoPress={() => { setPendingCompanySection('companyInfo'); setAppScreen('home'); }}
           onShareholdersPress={() => { setPendingCompanySection('shareholders'); setAppScreen('home'); }}
-          onManagePress={() => { setPendingCompanySection('menu'); setAppScreen('home'); }}
+          onManageCompanyPress={() => { setPendingHomeAction('manageOptions'); setAppScreen('home'); }}
           onTransactionsPress={() => { setHomeInitialTab('billing'); setAppScreen('home'); }}
           onStateFilingPress={() => setAppScreen('annualFiling')}
           onFederalFilingPress={() => setAppScreen('federalFiling')}
