@@ -116,9 +116,9 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.listContent}>
         <View style={styles.sectionWrap}>
-          <Text style={[styles.sectionTitle, { color: colors.muted }]}>QUICK ACTIONS</Text>
+          {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>QUICK ACTIONS</Text>}
           <View style={styles.settingsList}>
-            {filteredActions.map((action, idx) => {
+            {filteredActions.map((action) => {
               const onPress = action.id === 'companyInfo'
                 ? onCompanyInfoPress
                 : action.id === 'shareholders'
@@ -128,11 +128,10 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
                       : action.id === 'transactions'
                         ? onTransactionsPress
                         : onSubscriptionPress;
-              const isLast = idx === quickActions.length - 1;
               return (
                 <TouchableOpacity
                   key={action.id}
-                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  style={styles.settingsRow}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${action.color}15` }]}>
@@ -145,8 +144,8 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
             })}
           </View>
 
-          <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>
-          <View style={styles.servicesList}>
+          {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>}
+          <View style={styles.settingsList}>
             {filteredServices.map((service) => {
               const onPress = service.id === 'stateFiling'
                 ? onStateFilingPress
@@ -158,7 +157,7 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
               return (
                 <TouchableOpacity
                   key={service.id}
-                  style={[styles.serviceCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  style={styles.settingsRow}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
@@ -171,9 +170,9 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
             })}
           </View>
 
-          <Text style={[styles.sectionTitle, { color: colors.muted }]}>COMPLIANCE ACTIONS</Text>
+          {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>COMPLIANCE ACTIONS</Text>}
           <View style={styles.settingsList}>
-            {filteredComplianceActions.map((item, idx) => {
+            {filteredComplianceActions.map((item) => {
               const onPress = item.id === 'agentRenewal'
                 ? onAgentRenewalPress
                 : item.id === 'addressRenewal'
@@ -181,11 +180,10 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
                   : item.id === 'federalFiling'
                     ? onFederalFilingPress
                     : onAnnualFilingPress;
-              const isLast = idx === complianceActions.length - 1;
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  style={styles.settingsRow}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
@@ -198,15 +196,14 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
             })}
           </View>
 
-          <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>
+          {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>}
           <View style={styles.settingsList}>
-            {filteredTrackingActions.map((item, idx) => {
+            {filteredTrackingActions.map((item) => {
               const onPress = onRegistrationTrackingPress;
-              const isLast = idx === trackingActions.length - 1;
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  style={styles.settingsRow}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
@@ -219,9 +216,9 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
             })}
           </View>
 
-          <Text style={[styles.sectionTitle, { color: colors.muted }]}>HELP & SUPPORT</Text>
+          {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>HELP & SUPPORT</Text>}
           <View style={styles.settingsList}>
-            {filteredHelpAndSupport.map((item, idx) => {
+            {filteredHelpAndSupport.map((item) => {
               const onPress = item.id === 'support'
                 ? onSupportPress
                 : item.id === 'inviteFriends'
@@ -229,11 +226,10 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
                   : item.id === 'followUs'
                     ? onFollowUsPress
                     : onHelpFeedbackPress;
-              const isLast = idx === helpAndSupport.length - 1;
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.settingsRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.border }]}
+                  style={styles.settingsRow}
                   onPress={onPress}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
@@ -301,18 +297,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
-  servicesList: {
-    marginHorizontal: 16,
-    gap: 10,
-  },
-  serviceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderRadius: 12,
-  },
+
   settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',

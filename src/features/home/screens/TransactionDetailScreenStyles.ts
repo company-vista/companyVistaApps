@@ -49,6 +49,13 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
+  amountModeGateway: {
+    fontSize: 9,
+    fontWeight: '700',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   amountModeValue: {
     fontSize: 14,
     fontWeight: '700',
@@ -87,5 +94,23 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 0.6,
     textAlign: 'right',
+  },
+  downloadRow: {
+    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  downloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#eef2ff',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  downloadButtonText: {
+    color: '#4f46e5',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

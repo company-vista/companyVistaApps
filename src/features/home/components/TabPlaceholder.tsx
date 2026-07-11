@@ -350,7 +350,10 @@ function TabPlaceholder({
 
                 <View style={styles.rightBadgeWrapper}>
                   <View style={styles.statusRow}>
-                    
+
+                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}> 
+                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                    </View>
                     {shouldShowRenewButton(action) ? (
                       <Pressable
                         onPress={() => handleRenewPress(action)}
@@ -359,9 +362,7 @@ function TabPlaceholder({
                         <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
                       </Pressable>
                     ) : null}
-                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}> 
-                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
-                    </View>
+                    
                   </View>
                 </View>
               </View>

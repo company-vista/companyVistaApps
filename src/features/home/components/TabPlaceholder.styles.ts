@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     paddingTop: 16,
-     padding: 6,
+     padding: 2,
   },
   header: {
     flexDirection: 'row',
@@ -121,7 +121,7 @@ export default StyleSheet.create({
   },
   mainCard: {
     borderRadius: 12,
-    padding: 14,
+    padding: 8,
     borderWidth: 1,
   },
   headerRow: {
@@ -166,6 +166,7 @@ export default StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
+    marginLeft: 14,
   },
   badgeText: {
     fontSize: 11,
@@ -173,12 +174,12 @@ export default StyleSheet.create({
   },
   renewButton: {
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
+    paddingVertical: 8,
+    borderRadius: 24,
     minWidth: 84,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginTop: 8,
   },
   renewButtonText: {
     fontSize: 10,

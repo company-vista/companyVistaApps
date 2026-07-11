@@ -19,7 +19,7 @@ type Invoice = {
   due: string;
   id: string;
   raw: ClientInvoice;
-  status: 'paid' | 'overdue';
+  status: 'paid' | 'partial' | 'unpaid';
   statusText: string;
 };
 
@@ -161,40 +161,19 @@ function getInvoiceAmount(invoice: ClientInvoice) {
 }
 
 function getInvoiceStatus(invoice: ClientInvoice): Invoice['status'] {
-  const status = getStringValue(
-    invoice.status,
+  const paymentStatus = getStringValue(
     invoice.paymentStatus,
-    invoice.invoiceStatus,
   ).toLowerCase();
-  const dueDate = getStringValue(invoice.dueDate, invoice.due, invoice.due_at);
-  const isDueOver = dueDate ? new Date(dueDate).getTime() < Date.now() : false;
 
-  if (status.includes('overdue') || (!status.includes('paid') && isDueOver)) {
-    return 'overdue';
+  if (paymentStatus === 'paid') {
+    return 'paid';
   }
 
-  return 'paid';
-}
-
-function getOverdueText(invoice: ClientInvoice) {
-  const dueDate = getStringValue(invoice.dueDate, invoice.due, invoice.due_at);
-
-  if (!dueDate) {
-    return 'Overdue';
+  if (paymentStatus === 'partial') {
+    return 'partial';
   }
 
-  const dueTime = new Date(dueDate).getTime();
-
-  if (Number.isNaN(dueTime)) {
-    return 'Overdue';
-  }
-
-  const overdueDays = Math.max(
-    1,
-    Math.ceil((Date.now() - dueTime) / (1000 * 60 * 60 * 24)),
-  );
-
-  return `${overdueDays} Day${overdueDays === 1 ? '' : 's'} Overdue`;
+  return 'unpaid';
 }
 
 function mapInvoice(invoice: ClientInvoice): Invoice {
@@ -216,7 +195,7 @@ function mapInvoice(invoice: ClientInvoice): Invoice {
     ) || 'Invoice',
     raw: invoice,
     status,
-    statusText: status === 'paid' ? 'Fully Paid' : getOverdueText(invoice),
+    statusText: status === 'paid' ? 'Fully Paid' : status === 'partial' ? 'Partially Paid' : 'Pay Now',
   };
 }
 
@@ -246,21 +225,7 @@ function invoiceMatchesCompany(
     (companyId && companyId === selectedCompany.id) ||
     (companyName && companyName.toLowerCase() === selectedCompany.name.toLowerCase());
 
-  if (!matchesCompany) {
-    return false;
-  }
-
-  const status = getStringValue(
-    invoice.status,
-    invoice.paymentStatus,
-    invoice.invoiceStatus,
-  ).toLowerCase();
-
-  if (!status.includes('sent')) {
-    return false;
-  }
-
-  return true;
+  return matchesCompany;
 }
 
 function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: BillingTabContentProps) {
@@ -397,9 +362,14 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
           </View>
         ) : null}
         {!isLoading && invoices.map(invoice => {
-          const isOverdue = invoice.status === 'overdue';
-          const statusColor = isOverdue ? '#dc2626' : '#16a34a';
-          const statusBackground = isOverdue ? '#fee2e2' : '#dcfce7';
+          const statusColor =
+            invoice.status === 'paid' ? '#16a34a' :
+            invoice.status === 'partial' ? '#d97706' :
+            '#dc2626';
+          const statusBackground =
+            invoice.status === 'paid' ? '#dcfce7' :
+            invoice.status === 'partial' ? '#fef3c7' :
+            '#fee2e2';
 
           return (
             <View
@@ -434,7 +404,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                     <Text
                       style={[
                         styles.metaText,
-                        isOverdue ? styles.overdueDueText : styles.paidDueText,
+                        invoice.status === 'unpaid' ? styles.overdueDueText : styles.paidDueText,
                       ]}>
                       Due: {invoice.due}
                     </Text>
@@ -446,21 +416,28 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                 <Text style={styles.amount}>
                   {invoice.amount}
                 </Text>
-                <View style={styles.statusActionRow}>
-                  <View style={[styles.statusPill, { backgroundColor: statusBackground }]}>
-                    <Text style={[styles.statusText, { color: statusColor }]}>
-                      {isOverdue ? 'Overdue' : 'Paid'}
-                    </Text>
-                  </View>
+                <View style={[styles.statusActionRow, { marginBottom: 6 }]}>
                   <Pressable
                     onPress={() => onInvoicePress?.(invoice.raw)}
                     style={styles.actionButton}>
                     <FontAwesome name="eye" size={15} color={palette.iconColor} />
                   </Pressable>
                 </View>
-                <Text style={[styles.statusDetail, { color: statusColor }]}>
-                  {invoice.statusText}
-                </Text>
+                {invoice.status === 'unpaid' ? (
+                  <Pressable
+                    onPress={() => onInvoicePress?.(invoice.raw)}
+                    style={[styles.statusPill, { backgroundColor: '#16a34a', alignSelf: 'flex-end' }]}>
+                    <Text style={[styles.statusText, { color: '#ffffff' }]}>
+                      Pay Now
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <View style={[styles.statusPill, { backgroundColor: statusBackground, alignSelf: 'flex-end' }]}>
+                    <Text style={[styles.statusText, { color: statusColor }]}>
+                      {invoice.status === 'paid' ? 'Paid' : 'Partial'}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           );

@@ -5,7 +5,7 @@ import {
   Linking,
   Platform,
   Pressable,
-  StyleSheet,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -22,6 +22,7 @@ import {
 } from '../../../store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
+import EmailVerificationScreen from './EmailVerificationScreen';
 
 type SignupScreenProps = {
   onLoginPress: () => void;
@@ -42,25 +43,31 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
   const { isLoading, signupErrors: errors } = useAppSelector(state => state.auth);
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const nameBorderColor = errors.name ? '#f87171' : colors.inputBorder;
+  const [countryCode, setCountryCode] = useState('+1');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [country, setCountry] = useState('');
+  const [showVerification, setShowVerification] = useState(false);
+  const firstNameBorderColor = errors.firstName ? '#f87171' : colors.inputBorder;
+  const lastNameBorderColor = errors.lastName ? '#f87171' : colors.inputBorder;
   const emailBorderColor = errors.email ? '#f87171' : colors.inputBorder;
-  const passwordBorderColor = errors.password ? '#f87171' : colors.inputBorder;
 
   async function handleSignup() {
     if (isLoading) {
       return;
     }
 
-    const result = await dispatch(signupUser({ name, email, password }));
+    const result = await dispatch(signupUser({ firstName, lastName, email, phoneNumber, countryCode, address }));
 
     if (signupUser.fulfilled.match(result)) {
-      setName(result.payload.name);
       setEmail(result.payload.email);
-      onLoginPress();
+      setShowVerification(true);
     }
   }
 
@@ -71,6 +78,10 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
         styles.screen,
         { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
       ]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <View style={styles.brandMark}>
           <Image source={logoImage} style={styles.brandLogo} />
@@ -82,155 +93,294 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
         </View>
 
         <View style={styles.form}>
-          <View style={styles.field}>
-            <Text style={[styles.label, { color: colors.muted }]}>Full Name</Text>
-            <View
-              style={[
-                styles.inputWrap,
-                {
-                  backgroundColor: colors.inputBackground,
-                  borderColor: nameBorderColor,
-                },
-              ]}>
-              <FontAwesome name="user" size={18} color={colors.inputPlaceholder} />
-              <TextInput
-                autoCapitalize="words"
-                onChangeText={value => {
-                  setName(value);
-                  dispatch(clearSignupError('name'));
-                }}
-                placeholder="Enter full name"
-                placeholderTextColor={colors.inputPlaceholder}
-                style={[styles.input, { color: colors.inputText }]}
-                value={name}
-              />
-            </View>
-            {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
-          </View>
+          {showVerification ? (
+            <EmailVerificationScreen
+              email={email}
+              onEditPress={() => setShowVerification(false)}
+            />
+          ) : (
+            <>
+              <View style={styles.row}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: firstNameBorderColor,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={value => {
+                        setFirstName(value);
+                        dispatch(clearSignupError('firstName'));
+                      }}
+                      placeholder="First name"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={firstName}
+                    />
+                  </View>
+                  {errors.firstName ? <Text style={styles.errorText}>{errors.firstName}</Text> : null}
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: lastNameBorderColor,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={value => {
+                        setLastName(value);
+                        dispatch(clearSignupError('lastName'));
+                      }}
+                      placeholder="Last name"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={lastName}
+                    />
+                  </View>
+                </View>
+              </View>
 
-          <View style={styles.field}>
-            <Text style={[styles.label, { color: colors.muted }]}>Email</Text>
-            <View
-              style={[
-                styles.inputWrap,
-                {
-                  backgroundColor: colors.inputBackground,
-                  borderColor: emailBorderColor,
-                },
-              ]}>
-              <FontAwesome name="envelope" size={16} color={colors.inputPlaceholder} />
-              <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-                onChangeText={value => {
-                  setEmail(value);
-                  dispatch(clearSignupError('email'));
-                }}
-                placeholder="name@example.com"
-                placeholderTextColor={colors.inputPlaceholder}
-                style={[styles.input, { color: colors.inputText }]}
-                value={email}
-              />
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => {
-                  Toast.show({
-                    type: 'success',
-                    text1: 'Email verified',
-                    text2: 'Your email has been verified successfully.',
-                  });
-                }}
-                style={styles.verifyButton}>
-                <Text style={[styles.verifyLabel, { color: colors.text }]}>Verify</Text>
-              </Pressable>
-            </View>
-            {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
-          </View>
+              <View style={styles.field}>
+                <View
+                  style={[
+                    styles.inputWrap,
+                    {
+                      backgroundColor: colors.inputBackground,
+                      borderColor: emailBorderColor,
+                    },
+                  ]}>
+                  <FontAwesome name="envelope" size={16} color={colors.inputPlaceholder} />
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType="email-address"
+                    onChangeText={value => {
+                      setEmail(value);
+                      dispatch(clearSignupError('email'));
+                    }}
+                    placeholder="name@example.com"
+                    placeholderTextColor={colors.inputPlaceholder}
+                    style={[styles.input, { color: colors.inputText }]}
+                    value={email}
+                  />
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => {
+                      Toast.show({
+                        type: 'success',
+                        text1: 'Email verified',
+                        text2: 'Your email has been verified successfully.',
+                      });
+                    }}
+                    style={styles.verifyButton}>
+                    <Text style={[styles.verifyLabel, { color: colors.text }]}>Verify</Text>
+                  </Pressable>
+                </View>
+                {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+              </View>
 
-          <View style={styles.field}>
-            <Text style={[styles.label, { color: colors.muted }]}>Password</Text>
-            <View
-              style={[
-                styles.inputWrap,
-                {
-                  backgroundColor: colors.inputBackground,
-                  borderColor: passwordBorderColor,
-                },
-              ]}>
-              <FontAwesome name="lock" size={20} color={colors.inputPlaceholder} />
-              <TextInput
-                onChangeText={value => {
-                  setPassword(value);
-                  dispatch(clearSignupError('password'));
-                }}
-                placeholder="Create password"
-                placeholderTextColor={colors.inputPlaceholder}
-                secureTextEntry={!isPasswordVisible}
-                style={[styles.input, { color: colors.inputText }]}
-                value={password}
-              />
-              <Pressable
-                accessibilityLabel={isPasswordVisible ? 'Hide password' : 'Show password'}
-                accessibilityRole="button"
-                onPress={() => setIsPasswordVisible(current => !current)}
-                style={styles.passwordToggle}>
-                <FontAwesome
-                  name={isPasswordVisible ? 'eye-slash' : 'eye'}
-                  size={18}
-                  color={colors.subtle}
-                />
-              </Pressable>
-            </View>
-            {errors.password ? (
-              <Text style={styles.errorText}>{errors.password}</Text>
-            ) : null}
-          </View>
+              <View style={styles.field}>
+                <View style={styles.row}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        width: 90,
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="none"
+                      keyboardType="phone-pad"
+                      onChangeText={setCountryCode}
+                      placeholder="+1"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={countryCode}
+                    />
+                  </View>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        flex: 1,
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="none"
+                      keyboardType="phone-pad"
+                      onChangeText={setPhoneNumber}
+                      placeholder="Phone number"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={phoneNumber}
+                    />
+                  </View>
+                </View>
+              </View>
 
-          <Pressable
-            disabled={isLoading}
-            onPress={handleSignup}
-            style={[
-              styles.button,
-              { backgroundColor: colors.primary },
-              isLoading ? styles.buttonDisabled : null,
-            ]}>
-            <Text style={[styles.buttonText, { color: colors.primaryText }]}>
-              {isLoading ? 'Creating...' : 'Sign Up'}
-            </Text>
-          </Pressable>
+              <View style={styles.field}>
+                <View
+                  style={[
+                    styles.inputWrap,
+                    {
+                      backgroundColor: colors.inputBackground,
+                      borderColor: colors.inputBorder,
+                    },
+                  ]}>
+                  <FontAwesome name="home" size={18} color={colors.inputPlaceholder} />
+                  <TextInput
+                    autoCapitalize="words"
+                    onChangeText={setAddress}
+                    placeholder="Address line"
+                    placeholderTextColor={colors.inputPlaceholder}
+                    style={[styles.input, { color: colors.inputText }]}
+                    value={address}
+                  />
+                </View>
+              </View>
 
-          <Pressable onPress={onLoginPress}>
-            <Text style={[styles.authLinkText, { color: colors.subtle }]}>
-              Already have an account?{' '}
-              <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>
-            </Text>
-          </Pressable>
+              <View style={styles.row}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setCity}
+                      placeholder="City"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={city}
+                    />
+                  </View>
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setState}
+                      placeholder="State"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={state}
+                    />
+                  </View>
+                </View>
+              </View>
 
-          <View style={styles.socialSection}>
-            <Text style={[styles.socialTitle, { color: colors.inputPlaceholder }]}>
-              Continue with
-            </Text>
-            <View style={styles.socialRow}>
+              <View style={styles.row}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="none"
+                      keyboardType="numeric"
+                      onChangeText={setPostalCode}
+                      placeholder="Postal code"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={postalCode}
+                    />
+                  </View>
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setCountry}
+                      placeholder="Country"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={country}
+                    />
+                  </View>
+                </View>
+              </View>
+
               <Pressable
-                onPress={() => openSocialLink(socialLinks.facebook)}
-                style={[styles.socialButton, styles.facebookButton]}>
-                <FontAwesome name="facebook" size={15} color="#f8fafc" />
+                disabled={isLoading}
+                onPress={handleSignup}
+                style={[
+                  styles.button,
+                  { backgroundColor: colors.primary },
+                  isLoading ? styles.buttonDisabled : null,
+                ]}>
+                <Text style={[styles.buttonText, { color: colors.primaryText }]}>
+                  {isLoading ? 'Verify...' : 'Continue ->'}
+                </Text>
               </Pressable>
-              <Pressable
-                onPress={() => openSocialLink(socialLinks.instagram)}
-                style={[styles.socialButton, styles.instagramButton]}>
-                <FontAwesome name="instagram" size={15} color="#f8fafc" />
+
+              <Pressable onPress={onLoginPress}>
+                <Text style={[styles.authLinkText, { color: colors.subtle }]}>
+                  Already have an account?{' '}
+                  <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>
+                </Text>
               </Pressable>
-              <Pressable
-                onPress={() => openSocialLink(socialLinks.linkedin)}
-                style={[styles.socialButton, styles.linkedinButton]}>
-                <FontAwesome name="linkedin" size={15} color="#f8fafc" />
-              </Pressable>
-            </View>
-          </View>
+
+              <View style={styles.socialSection}>
+                <Text style={[styles.socialTitle, { color: colors.inputPlaceholder }]}>
+                  Continue with
+                </Text>
+                <View style={styles.socialRow}>
+                  <Pressable
+                    onPress={() => openSocialLink(socialLinks.facebook)}
+                    style={[styles.socialButton, styles.facebookButton]}>
+                    <FontAwesome name="facebook" size={15} color="#f8fafc" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => openSocialLink(socialLinks.instagram)}
+                    style={[styles.socialButton, styles.instagramButton]}>
+                    <FontAwesome name="instagram" size={15} color="#f8fafc" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => openSocialLink(socialLinks.linkedin)}
+                    style={[styles.socialButton, styles.linkedinButton]}>
+                    <FontAwesome name="linkedin" size={15} color="#f8fafc" />
+                  </Pressable>
+                </View>
+              </View>
+            </>
+          )}
         </View>
       </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

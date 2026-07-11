@@ -380,6 +380,7 @@ const MyRequestsScreen = ({ companyId, refreshKey }: MyRequestsScreenProps) => {
         headers: {
           Authorization: `Bearer ${token}`,
           'x-auth-token': token,
+          Cookie: `clientToken=${token}`,
         },
       })
       .then(res => {
@@ -402,7 +403,10 @@ const MyRequestsScreen = ({ companyId, refreshKey }: MyRequestsScreenProps) => {
         }));
         setRequests(mapped);
       })
-      .catch(() => setError('Failed to load requests'))
+      .catch(err => {
+        const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || 'Failed to load requests';
+        setError(msg);
+      })
       .finally(() => setLoading(false));
   }, [companyId, token, refreshKey]);
 

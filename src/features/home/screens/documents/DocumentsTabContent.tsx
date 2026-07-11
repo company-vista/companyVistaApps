@@ -8,6 +8,7 @@ import { API_BASE } from '../../../../config/api';
 import axios from 'axios';
 import { fetchCompanyDocuments, type DocumentItem } from '../../api/clientDocumentApi';
 import type { CompanyCardItem } from '../quickAccess/CompanyCard';
+import { formatDate } from '../../../../constants/dateFormatter';
 import UnlockDocumentModal from './UnlockDocumentModal';
 import ManageSubscriptionModal from './ManageSubscriptionModal';
 
@@ -17,6 +18,7 @@ const HOME_HERO_COLORS = {
   accentYellow: '#FAC775',
   white: '#ffffff',
 };
+const SINGLE_DOCUMENT_UNLOCK_PRICE = 30;
 
 function getDocumentPalette(colors: AppTheme) {
   const isDark = colors.mode === 'dark';
@@ -48,8 +50,10 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
   const [isLoading, setIsLoading] = useState(false);
   const [lockedDocCount, setLockedDocCount] = useState(0);
   const [lockedDocDates, setLockedDocDates] = useState<string[]>([]);
+  const [lockedItems, setLockedItems] = useState<any[]>([]);
   const [isLockedLoading, setIsLockedLoading] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [selectedDocumentIndex, setSelectedDocumentIndex] = useState(0);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const token = useAppSelector(state => state.auth.token);
   const colors = useThemeColors();
@@ -109,16 +113,31 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
           { headers: { Authorization: `Bearer ${token}`, 'x-auth-token': token, Cookie: `clientToken=${token}` } }
         );
       
-        const latest = data.data?.[0];
-        const count = latest ? parseInt(latest.countDocuments, 10) || 0 : 0;
-        // if (isMounted) {
-          setLockedDocCount(count);
-          setLockedDocDates(Array.isArray(latest?.documentDates) ? latest.documentDates : []);
-        // }
+        const items = Array.isArray(data?.data) ? data.data : [];
+        const allDates: string[] = [];
+        let totalCount = 0;
+
+        for (const item of items) {
+          const count = parseInt(item?.countDocuments, 10) || 0;
+          totalCount += count;
+          const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
+          if (dates.length > 0) {
+            allDates.push(...dates);
+          } else {
+            for (let i = 0; i < count; i++) {
+              allDates.push(item?.createdAt || '');
+            }
+          }
+        }
+
+        setLockedDocCount(totalCount);
+        setLockedDocDates(allDates);
+        setLockedItems(items);
       } catch {
         if (isMounted) {
           setLockedDocCount(0);
           setLockedDocDates([]);
+          setLockedItems([]);
         }
       } finally {
         if (isMounted) {
@@ -202,16 +221,16 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
           style={[styles.tab, activeTab === 'locked' && { backgroundColor: colors.primary }]}
           onPress={() => setActiveTab('locked')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'locked' ? '#fff' : palette.accentText }]}>
-            Locked
+          <Text style={[styles.tabText, { color: activeTab === 'locked' ? '#2c1f1fce' : palette.accentText }]}>
+           {lockedItems.length} Locked
           </Text>
         </Pressable>
       </View>
 
-      {lockedDocCount > 1 && (
+      {activeTab === 'locked' && lockedItems.length > 1 && (
         <View style={styles.unlockAllRow}>
           <Pressable
-            style={[styles.unlockAllBtn, { backgroundColor: '#DC2626' }]}
+            style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6' }]}
             onPress={() => setShowSubscriptionModal(true)}
           >
             <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }} />
@@ -225,40 +244,60 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         {activeTab === 'locked' ? (
           isLockedLoading ? (
             <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
-          ) : lockedDocCount > 0 ? (
-            <View style={styles.lockedCard}>
-              <View style={styles.lockedCardTop}>
-                <View style={[styles.lockedIconWrap, { backgroundColor: '#FEF2F2' }]}>
-                  <FontAwesome name="lock" size={20} color="#DC2626" />
-                </View>
-                <View style={styles.cardInfo}>
-                  <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
-                  <Text numberOfLines={1} style={styles.cardSubtitle}>
-                    {lockedDocCount} document{lockedDocCount !== 1 ? 's' : ''} locked
-                  </Text>
-                </View>
-              </View>
-
-              {lockedDocDates.length > 0 && (
-                <>
-                  <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
-                  <View style={styles.dateList}>
-                    {lockedDocDates.map((date, i) => (
-                      <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
-                        {new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          ) : lockedItems.length > 0 ? (
+            lockedItems.map((item, idx) => {
+              const count = parseInt(item?.countDocuments, 10) || 0;
+              const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
+              const createdAt = item?.createdAt || '';
+              const formattedDate = formatDate(createdAt);
+              const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
+              
+              return (
+                <View key={item._id ?? idx} style={[styles.lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
+                  <View style={styles.lockedCardTop}>
+                    <View style={[styles.lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
+                      <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={20} color={isUnlocked ? '#22C55E' : '#DC2626'} />
+                    </View>
+                    <View style={styles.cardInfo}>
+                      <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+                      <Text numberOfLines={1} style={styles.cardSubtitle}>
+                         document{count !== 1 ? 's' : ''} {isUnlocked ? 'unlocked' : 'locked'}
                       </Text>
-                    ))}
+                      {formattedDate ? <Text style={[styles.documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
+                    </View>
                   </View>
-                </>
-              )}
 
-              <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+                  {dates.length > 0 && (
+                    <>
+                      <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+                      <View style={styles.dateList}>
+                        {dates.map((date: string, i: number) => (
+                          <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
+                            {formatDate(date)}
+                          </Text>
+                        ))}
+                      </View>
+                    </>
+                  )}
 
-              <Pressable style={[styles.lockedBtn, { backgroundColor: '#DC2626' }]} onPress={() => setShowUnlockModal(true)}>
-                <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.lockedBtnText}>Pay to View Document</Text>
-              </Pressable>
-            </View>
+                  <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+
+                  {isUnlocked ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#065F46', borderRadius: 12, padding: 12 }}>
+                      <FontAwesome name="clock-o" size={14} color="#6EE7B7" style={{ marginRight: 8 }} />
+                      <Text style={{ flex: 1, fontSize: 12, color: '#D1FAE5', lineHeight: 18 }}>
+                        We will deliver the document within <Text style={{ color: '#ffffff', fontWeight: '600' }}>24–72 hours.</Text>
+                      </Text>
+                    </View>
+                  ) : (
+                    <Pressable style={[styles.lockedBtn, { backgroundColor: '#ef4444c7' }]} onPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}>
+                      <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
+                      <Text style={styles.lockedBtnText}>Pay to View Document</Text>
+                    </Pressable>
+                  )}
+                </View>
+              );
+            })
           ) : (
             <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No locked documents found.</Text>
           )
@@ -291,7 +330,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
 
               <View style={styles.cardBottom}>
                 <Text style={styles.cardDate}>
-                  Uploaded: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
+                    Uploaded: {formatDate(doc.uploadedAt)}
                 </Text>
                 <Pressable onPress={() => onDocumentViewPress?.(doc)}>
                   <Text style={styles.cardLink}>View Details</Text>
@@ -308,7 +347,9 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         visible={showUnlockModal}
         onClose={() => setShowUnlockModal(false)}
         documentName={selectedCompany?.name ?? 'Document'}
-        price="$30"
+        price={SINGLE_DOCUMENT_UNLOCK_PRICE.toString()}
+        companyId={selectedCompany?.id}
+        documentIndex={selectedDocumentIndex}
       />
 
       <ManageSubscriptionModal
@@ -430,7 +471,7 @@ const getStyles = (colors: AppTheme) => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 8,
+      paddingVertical: 10,
       paddingHorizontal: 14,
       borderRadius: 20,
     },

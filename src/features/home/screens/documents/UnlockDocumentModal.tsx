@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, Text, View, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 
 interface UnlockDocumentModalProps {
   visible: boolean;
@@ -8,15 +9,20 @@ interface UnlockDocumentModalProps {
   documentName?: string;
   price?: string;
   onPayPress?: () => void;
+  companyId?: string;
+  documentIndex?: number;
 }
 
 export default function UnlockDocumentModal({
   visible,
   onClose,
   documentName = 'Document 3 - test',
-  price = '$30',
+  price ,
   onPayPress,
+  companyId,
+  documentIndex,
 }: UnlockDocumentModalProps) {
+  console.log('UnlockDocumentModal render, visible:', visible);
   return (
     <Modal
       animationType="fade"
@@ -56,7 +62,7 @@ export default function UnlockDocumentModal({
 
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Price</Text>
-            <Text style={styles.priceValue}>{price}</Text>
+            <Text style={styles.priceValue}>${price}</Text>
           </View>
 
           <Text style={styles.upsellText}>
@@ -68,15 +74,23 @@ export default function UnlockDocumentModal({
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </Pressable>
 
-            <Pressable style={styles.payButton} onPress={onPayPress}>
-              <Text style={styles.payButtonText}>Pay {price} to Unlock</Text>
-            </Pressable>
+            <StripeOneTimePayment
+              invoice={{
+                companyId,
+                documentIndex,
+                amount: price,
+                currency: 'USD',
+              }}
+              paymentType="document_unlock"
+              label={`Pay $${price} to Unlock`}
+              buttonStyle={styles.payButton}
+            />
           </View>
 
           <View style={styles.noticeBox}>
             <FontAwesome name="clock-o" size={14} color="#85B7EB" style={styles.noticeIcon} />
             <Text style={styles.noticeText}>
-              Your document will be uploaded to your portal within <Text style={styles.whiteBoldText}>24–72 hours</Text> after payment.
+              We will deliver the document with in <Text style={styles.whiteBoldText}>24–72 hours.</Text>
             </Text>
           </View>
 
@@ -217,15 +231,10 @@ const styles = StyleSheet.create({
   payButton: {
     flex: 1.3,
     height: 46,
-    backgroundColor: '#FAC775',
+    backgroundColor: '#F59E0B',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  payButtonText: {
-    color: '#1E3A5F',
-    fontSize: 14,
-    fontWeight: '700',
   },
   noticeBox: {
     flexDirection: 'row',

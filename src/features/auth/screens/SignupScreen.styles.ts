@@ -5,11 +5,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0f172a',
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 24,
   },
   brandMark: {
     width: 250,
@@ -18,11 +22,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#0f172a', // 082c3d
+    borderColor: '#0f172a',
     borderRadius: 4,
     padding: 2,
-    // backgroundColor: '#0f766e',
-    marginBottom: 48,
+    marginBottom: 14,
+    marginTop: 8,
   },
   brandLogo: {
      width: '100%',
@@ -32,7 +36,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 16,
   },
   title: {
     color: '#f8fafc',
@@ -49,8 +53,12 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 390,
     gap: 18,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
   },
   field: {
     gap: 8,
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
     color: '#f59e0b',
   },
   inputWrap: {
-    height: 52,
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,

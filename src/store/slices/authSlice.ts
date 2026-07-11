@@ -29,9 +29,12 @@ type LoginPayload = {
 };
 
 type SignupPayload = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string;
+  phoneNumber: string;
+  countryCode: string;
+  address: string;
 };
 
 type LoginSuccess = {
@@ -47,7 +50,8 @@ type LoginFailure = {
 type SignupFailure = {
   errors: SignupErrors;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
 };
 
 const AUTH_STORAGE_KEY = 'vista.auth';
@@ -120,7 +124,7 @@ export const loginUser = createAsyncThunk<
 });
 
 export const signupUser = createAsyncThunk<
-  { email: string; name: string },
+  { email: string; firstName: string; lastName: string },
   SignupPayload,
   { rejectValue: SignupFailure }
 >('auth/signupUser', async (payload, { rejectWithValue }) => {
@@ -130,13 +134,15 @@ export const signupUser = createAsyncThunk<
     return rejectWithValue({
       errors: result.errors,
       email: result.email,
-      name: result.name,
+      firstName: result.firstName,
+      lastName: result.lastName,
     });
   }
 
   return {
     email: result.email,
-    name: result.name,
+    firstName: result.firstName,
+    lastName: result.lastName,
   };
 });
 

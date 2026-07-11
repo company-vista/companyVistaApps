@@ -97,7 +97,7 @@ export async function fetchClientInvoices({ companyId, token }: FetchClientInvoi
         params,
         timeout: API_REQUEST_TIMEOUT_MS,
       },
-    );
+    ); console.log(response)
     const invoices = getInvoicesFromResponse(response.data);
     const responseMeta = Array.isArray(response.data) ? undefined : response.data;
 

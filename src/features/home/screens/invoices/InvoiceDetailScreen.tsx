@@ -9,6 +9,8 @@ import logo from "../../../../assets/images/logoR.png"
 
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
+import { formatDate } from '../../../../constants/dateFormatter';
+import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 import type { ClientInvoice } from '../../api/clientInvoicesApi';
 
 
@@ -39,22 +41,6 @@ function getNumberValue(...values: unknown[]) {
   return 0;
 }
 
-function formatDate(value: unknown) {
-  const raw = getStringValue(value);
-  if (!raw) {
-    return 'N/A';
-  }
-  const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) {
-    return raw;
-  }
-  return date.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
 function formatAmount(value: number, currency = 'USD') {
   return new Intl.NumberFormat('en-US', {
     currency,
@@ -63,76 +49,55 @@ function formatAmount(value: number, currency = 'USD') {
 }
 
 // नंबर को इंग्लिश शब्दों में बदलने का बेसिक हेल्पर (Amount in Words के लिए)
-function numberToWords(num: number): string {
-  if (num === 145) return 'One Hundred Forty Five US Dollars Only';
-  const a = [
-    '',
-    'One ',
-    'Two ',
-    'Three ',
-    'Four ',
-    'Five ',
-    'Six ',
-    'Seven ',
-    'Eight ',
-    'Nine ',
-    'Ten ',
-    'Eleven ',
-    'Twelve ',
-    'Thirteen ',
-    'Fourteen ',
-    'Fifteen ',
-    'Sixteen ',
-    'Seventeen ',
-    'Eighteen ',
-    'Nineteen ',
+function numberToWords(num: number, currency = 'USD'): string {
+  if (num === 0) return currency === 'INR' ? 'Zero Indian Rupees Only' : 'Zero US Dollars Only';
+
+  const ones = [
+    '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+    'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+    'Seventeen', 'Eighteen', 'Nineteen',
   ];
-  const b = [
-    '',
-    '',
-    'Twenty',
-    'Thirty',
-    'Forty',
-    'Fifty',
-    'Sixty',
-    'Seventy',
-    'Eighty',
-    'Ninety',
-  ];
-  const numStr = num.toString();
-  if (numStr.length > 9) return 'Amount Too Large';
-  const n = ('000000000' + numStr)
-    .slice(-9)
-    .match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-  if (!n) return '';
-  let str = '';
-  str +=
-    n[1] != '00'
-      ? (a[Number(n[1])] || b[Number(n[1][0])] + ' ' + a[Number(n[1][1])]) +
-      'Crore '
-      : '';
-  str +=
-    n[2] != '00'
-      ? (a[Number(n[2])] || b[Number(n[2][0])] + ' ' + a[Number(n[2][1])]) +
-      'Lakh '
-      : '';
-  str +=
-    n[3] != '00'
-      ? (a[Number(n[3])] || b[Number(n[3][0])] + ' ' + a[Number(n[3][1])]) +
-      'Thousand '
-      : '';
-  str +=
-    n[4] != '00'
-      ? (a[Number(n[4])] || b[Number(n[4][0])] + ' ' + a[Number(n[4][1])]) +
-      'Hundred '
-      : '';
-  str +=
-    n[5] != '00'
-      ? (str != '' ? 'and ' : '') +
-      (a[Number(n[5])] || b[Number(n[5][0])] + ' ' + a[Number(n[5][1])]) +
-      'Only'
-      : '';
-  return str.trim() ? `${str} US Dollars Only` : 'Zero Dollars';
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  function twoDigits(n: number): string {
+    if (n < 20) return ones[n];
+    const t = Math.floor(n / 10);
+    const o = n % 10;
+    return tens[t] + (o ? ' ' + ones[o] : '');
+  }
+
+  function threeDigits(n: number): string {
+    const h = Math.floor(n / 100);
+    const rem = n % 100;
+    let result = '';
+    if (h > 0) result += ones[h] + ' Hundred';
+    if (rem > 0) result += (result ? ' and ' : '') + twoDigits(rem);
+    return result;
+  }
+
+  const currencyName = currency === 'INR' ? 'Indian Rupees' : 'US Dollars';
+
+  if (currency === 'INR') {
+    const crore = Math.floor(num / 10000000);
+    const lakh = Math.floor((num % 10000000) / 100000);
+    const thousand = Math.floor((num % 100000) / 1000);
+    const hundred = Math.floor(num % 1000);
+    let result = '';
+    if (crore > 0) result += twoDigits(crore) + ' Crore ';
+    if (lakh > 0) result += twoDigits(lakh) + ' Lakh ';
+    if (thousand > 0) result += twoDigits(thousand) + ' Thousand ';
+    if (hundred > 0) result += threeDigits(hundred);
+    return (result.trim() || 'Zero') + ' ' + currencyName + ' Only';
+  }
+
+  const millions = Math.floor(num / 1000000);
+  const thousands = Math.floor((num % 1000000) / 1000);
+  const remainder = Math.floor(num % 1000);
+  let result = '';
+  if (millions > 0) result += twoDigits(millions) + ' Million ';
+  if (thousands > 0) result += twoDigits(thousands) + ' Thousand ';
+  if (remainder > 0) result += threeDigits(remainder);
+  return (result.trim() || 'Zero') + ' ' + currencyName + ' Only';
 }
 
 function InvoiceDetailScreen({
@@ -145,9 +110,9 @@ function InvoiceDetailScreen({
   // डेटा पार्सिंग
   const paymentStatus = getStringValue(
     invoice.paymentStatus,
-    invoice.status,
   ).toLowerCase();
-  const isPaid = paymentStatus.includes('paid');
+  const isPaid = paymentStatus === 'paid';
+  const isPartial = paymentStatus === 'partial';
 
   const companyName =
     getStringValue(invoice.companyName, invoice.businessName) ||
@@ -171,16 +136,14 @@ function InvoiceDetailScreen({
 
   const currency =
     getStringValue(invoice.currency, invoice.currencyCode) || 'USD';
-  const totalAmount = getNumberValue(
-    invoice.totalAmount,
-    invoice.total,
-    invoice.grandTotal,
-    invoice.amount,
-  );
   const subtotal =
-    getNumberValue(invoice.subtotal, invoice.subTotal) || totalAmount;
-  const paidAmount = getNumberValue(invoice.paidAmount, invoice.amountPaid);
-  const balanceDue = totalAmount - paidAmount;
+    getNumberValue(invoice.subtotal, invoice.subTotal) ||
+    getNumberValue(invoice.totalAmount, invoice.total, invoice.grandTotal, invoice.amount);
+  const gstAmount = currency === 'INR' ? subtotal * 0.18 : 0;
+  const totalAmount = subtotal + gstAmount;
+  const rawPaidAmount = getNumberValue(invoice.paidAmount, invoice.amountPaid);
+  const paidAmount = isPaid ? totalAmount : rawPaidAmount;
+  const balanceDue = isPaid ? 0 : totalAmount - rawPaidAmount;
 
   const bankName = getStringValue(invoice.bankName, 'Column N.A.');
   const accountNo = getStringValue(invoice.accountNo, '939612679843912');
@@ -190,8 +153,8 @@ function InvoiceDetailScreen({
   const invoiceNumber =
     getStringValue(invoice.invoiceNumber, invoice.invoiceNo, invoice.number) ||
     'INV-202606-0001';
-  const invDate = formatDate(invoice.invoiceDate ?? invoice.createdAt);
-  const dueDate = formatDate(invoice.dueDate ?? invoice.due);
+  const invDate = formatDate(getStringValue(invoice.invoiceDate, invoice.createdAt) || undefined, currency);
+  const dueDate = formatDate(getStringValue(invoice.dueDate, invoice.due) || undefined, currency);
 
   // PDF डाउनलोड करने का फ़ंक्शन (इमेज के डिज़ाइन जैसा ही HTML आउटपुट)
   async function handleDownload() {
@@ -243,6 +206,7 @@ function InvoiceDetailScreen({
   .logo span { color: #eab308; font-weight: 300; }
   .status-badge { background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 4px 14px; border-radius: 4px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
   .status-paid { background: #22c55e; }
+  .status-partial { background: #d97706; }
   .details-grid { display: flex; justify-content: space-between; padding: 25px; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
   .column { width: 30%; }
   .column h3 { color: #6d28d9; font-size: 11px; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
@@ -269,7 +233,7 @@ function InvoiceDetailScreen({
       <div style="text-align: right;">
         <h1 style="font-size: 26px; font-weight: 900; letter-spacing: 1px;">INVOICE</h1>
         <div style="font-size: 12px; color: #cbd5e1; margin-top: 2px;">${invoiceNumber}</div>
-        <span class="status-badge ${isPaid ? 'status-paid' : ''}">${isPaid ? 'PAID' : 'UNPAID'
+        <span class="status-badge ${isPaid ? 'status-paid' : isPartial ? 'status-partial' : ''}">${isPaid ? 'PAID' : isPartial ? 'PARTIAL' : 'UNPAID'
       }</span>
       </div>
     </div>
@@ -352,6 +316,15 @@ function InvoiceDetailScreen({
         currency,
       )}</span>
           </div>
+          {currency === 'INR' && (
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color:#94a3b8;">GST (18.0%)</span>
+            <span style="font-weight: 600; color:#1e1b4b;">${formatAmount(
+        gstAmount,
+        currency,
+      )}</span>
+          </div>
+          )}
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; color: #1e1b4b;">
             <span>Total</span>
             <span>${formatAmount(totalAmount, currency)}</span>
@@ -376,6 +349,7 @@ function InvoiceDetailScreen({
       <span style="font-weight: bold; color: #4c1d95;">Amount in Words:</span> 
       <span style="color: #6d28d9; font-style: italic; font-weight: 500; margin-left: 5px;">${numberToWords(
         totalAmount,
+        currency,
       )}</span>
     </div>
 
@@ -469,11 +443,11 @@ function InvoiceDetailScreen({
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: isPaid ? '#22c55e' : '#ef4444' },
+                { backgroundColor: isPaid ? '#22c55e' : isPartial ? '#d97706' : '#ef4444' },
               ]}
             >
               <Text style={styles.statusBadgeText}>
-                {isPaid ? 'PAID' : 'UNPAID'}
+                {isPaid ? 'PAID' : isPartial ? 'PARTIAL' : 'UNPAID'}
               </Text>
             </View>
           </View>
@@ -632,6 +606,14 @@ function InvoiceDetailScreen({
                 {formatAmount(subtotal, currency)}
               </Text>
             </View>
+            {currency === 'INR' && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>GST (18.0%)</Text>
+              <Text style={styles.summaryValueText}>
+                {formatAmount(gstAmount, currency)}
+              </Text>
+            </View>
+            )}
             <View
               style={[
                 styles.summaryRow,
@@ -659,9 +641,32 @@ function InvoiceDetailScreen({
           </Text>
         </View>
 
+        {paymentStatus !== 'paid' && (
+          <View style={styles.payButtonsRow}>
+            {currency === 'INR' && (
+              <Pressable style={[styles.payButton, { backgroundColor: '#072654' }]}>
+                <FontAwesome name="credit-card" size={16} color="#ffffff" />
+                <Text style={styles.payButtonText}>Pay with Razorpay</Text>
+              </Pressable>
+            )}
+            <StripeOneTimePayment
+              invoice={{
+                id: invoiceNumber,
+                companyId: getStringValue(invoice.companyId) || undefined,
+                company: invoice.company as { _id?: string } | undefined,
+                amount: balanceDue,
+                currency,
+              }}
+              paymentType="invoice"
+              label="Pay with Stripe"
+              buttonStyle={[styles.payButton, { backgroundColor: '#635BFF' }]}
+            />
+          </View>
+        )}
+
         <View style={styles.wordsStrip}>
           <Text style={styles.wordsLabel}>Amount in Words:</Text>
-          <Text style={styles.wordsValue}>{numberToWords(totalAmount)}</Text>
+          <Text style={styles.wordsValue}>{numberToWords(totalAmount, currency)}</Text>
         </View>
 
         <View style={styles.footerContainer}>
@@ -881,6 +886,27 @@ const styles = StyleSheet.create({
   },
   footerMainText: { fontSize: 12, fontWeight: '600', color: '#1e1b4b' },
   footerSubText: { fontSize: 10, color: '#64748b', marginTop: 2 },
+  payButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: '#ffffff',
+  },
+  payButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+  },
+  payButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
 });
 
 export default InvoiceDetailScreen;
