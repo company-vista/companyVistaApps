@@ -8,8 +8,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    gap: 12,
-    marginBottom: 20,
+    gap: 10,
+    marginBottom: 12,
   },
   title: {
     fontSize: 20,

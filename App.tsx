@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
+  Linking,
   Share,
   StatusBar,
   Text,
@@ -13,6 +14,9 @@ import Toast, { type ToastConfig } from 'react-native-toast-message';
 import styles from './App.styles';
 
 import LoginScreen from './src/features/auth/screens/LoginScreen';
+import ForgotPasswordScreen from './src/features/auth/screens/ForgotPasswordScreen';
+import OtpVerifyScreen from './src/features/auth/screens/OtpVerifyScreen';
+import ResetPasswordScreen from './src/features/auth/screens/ResetPasswordScreen';
 import HelpFeedbackScreen from './src/features/help/screens/HelpFeedbackScreen';
 import SupportScreen from './src/features/support/screens/SupportScreen';
 import FollowUsScreen from './src/features/home/screens/FollowUsScreen';
@@ -43,7 +47,7 @@ import { useThemeColors } from './src/theme/colors';
 import type { QuickAccessItemId } from './src/features/home/data/quickAccessItems';
 import type { NotificationItem } from './src/features/notifications/data/notifications';
 
-type AuthScreen = 'login' | 'signup';
+type AuthScreen = 'login' | 'signup' | 'forgotPassword' | 'otpVerify' | 'resetPassword';
 type RenewActionData = {
   id: 'address' | 'annual_filing' | 'resident' | 'federal_filing';
   title: string;
@@ -118,6 +122,8 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [appScreen, setAppScreen] = useState<AppScreen>('home');
   const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
+  const [resetPasswordToken, setResetPasswordToken] = useState<string | null>(null);
+  const [forgotEmail, setForgotEmail] = useState('');
   const [selectedNotification, setSelectedNotification] =
     useState<NotificationItem | null>(null);
   const [selectedInvoice, setSelectedInvoice] =
@@ -170,6 +176,28 @@ function AppContent() {
       setAppScreen('home');
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    function handleDeepLink(url: string) {
+      if (url.includes('reset-password')) {
+        const tokenMatch = url.match(/token=([^&]+)/);
+        if (tokenMatch) {
+          setResetPasswordToken(tokenMatch[1]);
+          setAuthScreen('resetPassword');
+        }
+      }
+    }
+
+    Linking.getInitialURL().then(url => {
+      if (url) handleDeepLink(url);
+    });
+
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if (showSplash) {
@@ -359,6 +387,29 @@ function AppContent() {
             {authScreen === 'login' ? (
               <LoginScreen
                 onSignupPress={() => setAuthScreen('signup')}
+                onForgotPasswordPress={() => setAuthScreen('forgotPassword')}
+              />
+            ) : authScreen === 'forgotPassword' ? (
+              <ForgotPasswordScreen
+                onBackPress={() => setAuthScreen('login')}
+                onOtpVerifyPress={(email) => {
+                  setForgotEmail(email);
+                  setAuthScreen('otpVerify');
+                }}
+              />
+            ) : authScreen === 'otpVerify' ? (
+              <OtpVerifyScreen
+                email={forgotEmail}
+                onBackPress={() => setAuthScreen('forgotPassword')}
+                onOtpVerified={(token) => {
+                  setResetPasswordToken(token);
+                  setAuthScreen('resetPassword');
+                }}
+              />
+            ) : authScreen === 'resetPassword' ? (
+              <ResetPasswordScreen
+                token={resetPasswordToken ?? undefined}
+                onBackPress={() => setAuthScreen('login')}
               />
             ) : (
               <SignupScreen onLoginPress={() => setAuthScreen('login')} />

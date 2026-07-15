@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
@@ -49,7 +50,6 @@ function getStyles(colors: AppTheme) {
       flexDirection: 'row',
       paddingBottom: 12,
       paddingHorizontal: 16,
-      paddingTop: 50,
       backgroundColor: colors.surface,
     },
     headerTitle: {
@@ -150,6 +150,7 @@ function getStyles(colors: AppTheme) {
 function DocumentViewScreen({ documentItem, onBackPress }: DocumentViewScreenProps) {
   const colors = useThemeColors();
   const styles = getStyles(colors);
+  const insets = useSafeAreaInsets();
 
   const fileSize = formatBytes(documentItem.fileSize);
   const uploadDate = formatDate(documentItem.uploadedAt);
@@ -161,7 +162,7 @@ function DocumentViewScreen({ documentItem, onBackPress }: DocumentViewScreenPro
         backgroundColor={styles.header.backgroundColor as string}
       />
 
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <BackButton onPress={onBackPress} />
         <Text numberOfLines={1} style={styles.headerTitle}>Document Details</Text>
       </View>

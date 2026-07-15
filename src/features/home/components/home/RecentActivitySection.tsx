@@ -18,12 +18,12 @@ function RecentActivitySection() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.horizontalList}>
-        {[1, 2].map(item => (
+        {[1, 2].map((item, index) => (
           <View
             key={item}
             style={[
               styles.skeletonCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
+              { backgroundColor: colors.surface, borderColor: index === 0 ? '#3B82F6' : '#8B5CF6' },
             ]}>
             <View style={[styles.skeletonImage, { backgroundColor: colors.skeleton }]} />
             <View style={styles.skeletonContent}>

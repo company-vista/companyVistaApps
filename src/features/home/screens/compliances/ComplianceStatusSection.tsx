@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
+import { useResponsive } from '../../../../hooks/useResponsive';
 
 type ComplianceStatusSectionProps = {
   companyId?: string | null;
@@ -251,33 +252,30 @@ function ComplianceStatusSection({
 }: ComplianceStatusSectionProps) {
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
+  const { rs } = useResponsive();
   const [dueDatesByTitle, setDueDatesByTitle] = useState<Record<string, string>>({});
   const [statusesByTitle, setStatusesByTitle] = useState<Record<string, string>>({});
   const [isLoadingDueDates, setIsLoadingDueDates] = useState(false);
-  const borderGlowAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const borderColors = [
+    'rgba(59, 130, 246, 0.6)',
+    'rgba(139, 92, 246, 0.6)',
+    'rgba(239, 68, 68, 0.6)',
+    'rgba(245, 158, 11, 0.6)',
+    'rgba(16, 185, 129, 0.6)',
+  ];
 
   useEffect(() => {
-    if (colors.mode === 'dark') {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(borderGlowAnim, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(borderGlowAnim, {
-            toValue: 0,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-      animation.start();
-      return () => animation.stop();
-    } else {
-      borderGlowAnim.setValue(0);
-    }
-  }, [colors.mode, borderGlowAnim]);
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 1500, useNativeDriver: false }),
+        Animated.timing(fadeAnim, { toValue: 0, duration: 1500, useNativeDriver: false }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [fadeAnim]);
 
   useEffect(() => {
     if (!companyId) {
@@ -370,6 +368,12 @@ function ComplianceStatusSection({
     tone: getStatusTone(statusesByTitle[item.title]),
   })), [dueDatesByTitle, isLoadingDueDates, statusesByTitle]);
 
+  const tileWidth = useMemo(() => {
+    const GAP = rs(8);
+    const PADDING = rs(48);
+    return Math.floor((rs(375) - PADDING - GAP) / 2);
+  }, [rs]);
+
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
@@ -382,8 +386,8 @@ function ComplianceStatusSection({
           const tone = getToneStyles(item.tone, colors);
 
           return (
-            <View key={item.title} style={styles.tileWrapper}>
-              <View style={[styles.complianceTile, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View key={item.title} style={[styles.tileWrapper, { width: tileWidth }]}>
+              <View style={[styles.complianceTile, { backgroundColor: colors.surface, borderColor: borderColors[0] }]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
                     <FontAwesome
@@ -401,21 +405,29 @@ function ComplianceStatusSection({
                   Due date: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
               </View>
-              {colors.mode === 'dark' && (
-                <Animated.View
-                  pointerEvents="none"
-                  style={[
-                    styles.tileBorderOverlay,
-                    {
-                      borderColor: colors.primary,
-                      opacity: borderGlowAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.3, 1],
-                      }),
-                    },
-                  ]}
-                />
-              )}
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.tileBorderOverlay,
+                  {
+                    borderColor: borderColors[1],
+                    opacity: fadeAnim,
+                  },
+                ]}
+              />
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.tileBorderOverlay,
+                  {
+                    borderColor: borderColors[2],
+                    opacity: fadeAnim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0, 0, 1],
+                    }),
+                  },
+                ]}
+              />
             </View>
           );
         })}
@@ -450,7 +462,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tileWrapper: {
-    width: '48.8%',
     position: 'relative',
   },
   complianceTile: {

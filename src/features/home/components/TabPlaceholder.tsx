@@ -115,23 +115,27 @@ function TabPlaceholder({
   };
 
   // 1. Agent और Address के लिए स्टेटस मैपिंग
-  const mapAgentAddressStatus = (apiStatus?: string): 'Active' | 'Expired' | 'Pending' | 'Client Managed' => {
-    if (!apiStatus) return 'Pending';
+  const mapAgentAddressStatus = (
+    apiStatus?: string,
+    defaultStatus: 'Pending' | 'Client Managed' = 'Pending'
+  ): 'Active' | 'Expired' | 'Pending' | 'Client Managed' => {
+    if (!apiStatus) return defaultStatus;
     const lower = apiStatus.toLowerCase().trim();
 
     if (lower === 'active' || lower === 'done' || lower === 'completed') return 'Active';
-    if (lower === 'expired' || lower === 'overdue') return 'Expired';
+    if (lower === 'expired' || lower === 'expired_soon' || lower === 'overdue') return 'Expired';
     if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed') return 'Client Managed';
 
-    return 'Pending';
+    return defaultStatus;
   };
 
   // 2. Federal और Annual Filing के लिए स्टेटस मैपिंग
-  const mapFederalAnnualStatus = (apiStatus?: string): 'Client Managed' | 'Pending' | 'Completed' => {
+  const mapFederalAnnualStatus = (apiStatus?: string): 'Completed' | 'Expired' | 'Pending' | 'Client Managed' => {
     if (!apiStatus) return 'Pending';
     const lower = apiStatus.toLowerCase().trim();
 
     if (lower === 'completed' || lower === 'active' || lower === 'done') return 'Completed';
+    if (lower === 'expired' || lower === 'expired_soon') return 'Expired';
     if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed') return 'Client Managed';
 
     return 'Pending';
@@ -198,7 +202,7 @@ function TabPlaceholder({
     id: 'address',
     title: 'Address Renewal',
     subtitle: 'Registered address',
-    status: mapAgentAddressStatus(addressData.status),
+    status: mapAgentAddressStatus(addressData.status, 'Client Managed'),
     date: formatDate(addressData.dueDate),
     icon: 'clock-o',
     details: [

@@ -21,8 +21,8 @@ function RecentActivityAndPaymentOverviewSection({
   const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
 
   const recentActivities = [
-    { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress },
-    { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress },
+    { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)' },
+    { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)' },
   ];
 
   return (
@@ -36,14 +36,14 @@ function RecentActivityAndPaymentOverviewSection({
       >
         <View style={styles.section}>
 
-          {recentActivities.map(item => (
+          {recentActivities.map((item, index) => (
             <Pressable
               key={item.title}
               style={[
                 styles.activityRow,
                 {
                   backgroundColor: colors.surface,
-                  borderColor: colors.border,
+                  borderColor: index === 0 ? 'rgba(59, 130, 246, 0.5)' : 'rgba(139, 92, 246, 0.5)',
                   borderWidth: 1,
                   borderRadius: 12,
                   paddingHorizontal: 10,
@@ -52,8 +52,8 @@ function RecentActivityAndPaymentOverviewSection({
               ]}
               onPress={item.onItemPress}
             >
-              <View style={styles.iconContainer}>
-                <FontAwesome name={item.icon} size={16} color={colors.accent || '#F97316'} />
+              <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
+                <FontAwesome name={item.icon} size={16} color={item.iconColor} />
               </View>
               <View style={styles.activityCopy}>
                 <Text style={[styles.activityTitle, { color: colors.text }]}>{item.title}</Text>

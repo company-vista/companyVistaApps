@@ -367,13 +367,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderBottomWidth: 0.5,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginTop: 40,
+    gap: 10,
   },
   headerText: {
     flex: 1,

@@ -5,6 +5,7 @@ import {
   Linking,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -25,6 +26,7 @@ import logoImage from '../../../assets/images/logoR.png';
 
 type LoginScreenProps = {
   onSignupPress: () => void;
+  onForgotPasswordPress: () => void;
 };
 
 const socialLinks = {
@@ -38,7 +40,7 @@ function openSocialLink(url: string) {
   Linking.openURL(url);
 }
 
-function LoginScreen({ onSignupPress }: LoginScreenProps) {
+function LoginScreen({ onSignupPress, onForgotPasswordPress }: LoginScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -64,6 +66,10 @@ function LoginScreen({ onSignupPress }: LoginScreenProps) {
         styles.screen,
         { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
       ]}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <View style={styles.brandMark}>
           <Image source={logoImage} style={styles.brandLogo} />
@@ -142,6 +148,10 @@ function LoginScreen({ onSignupPress }: LoginScreenProps) {
             ) : null}
           </View>
 
+          <Pressable style={styles.forgotPassword} onPress={onForgotPasswordPress}>
+            <Text style={[styles.forgotPasswordText, { color: '#ef4444' }]}>Forgot Password?</Text>
+          </Pressable>
+
           <Pressable
             disabled={isLoading}
             onPress={handleLogin}
@@ -199,6 +209,7 @@ function LoginScreen({ onSignupPress }: LoginScreenProps) {
           </View>
         </View>
       </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

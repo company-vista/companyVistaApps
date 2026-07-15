@@ -634,7 +634,6 @@ export default function HomeScreen({
           shadowOffset: { width: 0, height: 6 },
           shadowOpacity: 0.03,
           shadowRadius: 12,
-          elevation: 14,
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
         }}

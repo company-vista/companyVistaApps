@@ -284,7 +284,31 @@ function findCurrentCompliance(
 }
 
 function getResponseComplianceHistory(data: CompanyComplianceHistoryResponse) {
-  return mapCurrentComplianceHistory(findCurrentCompliance(data));
+  const fromCurrent = mapCurrentComplianceHistory(findCurrentCompliance(data));
+  if (fromCurrent.length > 0) {
+    return fromCurrent;
+  }
+
+  const dataObj = data.data && typeof data.data === 'object' && !Array.isArray(data.data)
+    ? data.data as Record<string, unknown>
+    : undefined;
+
+  const historyCandidates = [
+    data.history,
+    data.complianceHistory,
+    data.records,
+    dataObj?.history,
+    dataObj?.complianceHistory,
+    dataObj?.records,
+  ];
+
+  for (const candidate of historyCandidates) {
+    if (Array.isArray(candidate) && candidate.length > 0) {
+      return candidate as CompanyComplianceHistoryItem[];
+    }
+  }
+
+  return [];
 }
 
 function getErrorMessage(error: unknown) {

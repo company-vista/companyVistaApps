@@ -69,7 +69,7 @@ const ComplianceHistoryScreen = ({ selectedAction, onBackPress }: ComplianceHist
         companyId: selectedAction.companyId,
         token,
       });
-
+      console.log(result)
       if (!isMounted) {
         return;
       }
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 18,
     paddingBottom: 40,
-    paddingTop: 60,
+    paddingTop: 12,
   },
   headerRow: {
     flexDirection: 'row',

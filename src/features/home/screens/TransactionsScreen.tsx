@@ -348,7 +348,7 @@ export default function TransactionsScreen({
         styles.screen,
         {
           backgroundColor: colors.background,
-          paddingTop: safeAreaInsets.top + 22,
+          paddingTop: safeAreaInsets.top + 8,
         },
       ]}
     >
@@ -576,8 +576,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    gap: 12,
-    marginBottom: 20,
+    gap: 10,
+    marginBottom: 14,
   },
   title: { fontSize: 20, fontWeight: '500' },
   searchContainer: { paddingHorizontal: 20, marginBottom: 16 },

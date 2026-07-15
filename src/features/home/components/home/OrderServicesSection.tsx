@@ -63,24 +63,28 @@ function getToneStyles(tone: Tone) {
       iconText: styles.iconTextAmber,
       tag: styles.tagAmber,
       tagText: styles.tagTextAmber,
+      borderColor: 'rgba(245, 158, 11, 0.5)',
     },
     blue: {
       icon: styles.iconBlue,
       iconText: styles.iconTextBlue,
       tag: styles.tagBlue,
       tagText: styles.tagTextBlue,
+      borderColor: 'rgba(59, 130, 246, 0.5)',
     },
     purple: {
       icon: styles.iconPurple,
       iconText: styles.iconTextPurple,
       tag: styles.tagPurple,
       tagText: styles.tagTextPurple,
+      borderColor: 'rgba(139, 92, 246, 0.5)',
     },
     red: {
       icon: styles.iconRed,
       iconText: styles.iconTextRed,
       tag: styles.tagRed,
       tagText: styles.tagTextRed,
+      borderColor: 'rgba(239, 68, 68, 0.5)',
     },
   };
 
@@ -111,7 +115,7 @@ function OrderServicesSection({
           return (
               <Pressable 
               key={item.title} 
-              style={styles.gridItem}
+              style={[styles.gridItem, { borderColor: tone.borderColor }]}
               onPress={item.title === 'Federal Filing' ? () => onQuickAccessItemPress('federalFiling') : () => console.log(item.title)} 
             >
               <View style={styles.iconWrapper}>
@@ -155,7 +159,7 @@ function OrderServicesSection({
               const tone = getToneStyles(item.tone);
 
               return (
-                <Pressable key={`${item.title}-extra`} style={styles.gridItem} onPress={() => console.log(item.title)}>
+                <Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor }]} onPress={() => console.log(item.title)}>
                   <View style={styles.iconWrapper}>
                     <View style={[styles.serviceIcon, tone.icon]}>
                       <FontAwesome name={item.icon} size={18} style={tone.iconText} />
@@ -209,8 +213,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   gridItem: {
-    width: '23%', // 4 कॉलम ग्रिड के लिए परफेक्ट विड्थ
+    width: '23%',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    aspectRatio: 1,
+    overflow: 'hidden',
   },
   expandedSection: {
     marginTop: 10,
@@ -225,11 +236,11 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     position: 'relative',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   serviceIcon: {
-    width: 54, // image_8ba545.png की तरह परफेक्ट स्क्वायर साइज
-    height: 54,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
@@ -260,18 +271,10 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: '600',
   },
-  iconBlue: {
-    backgroundColor: '#DBEAFE',
-  },
-  iconAmber: {
-    backgroundColor: '#FEF3C7',
-  },
-  iconRed: {
-    backgroundColor: '#FEE2E2',
-  },
-  iconPurple: {
-    backgroundColor: '#EDE9FE',
-  },
+  iconBlue: {},
+  iconAmber: {},
+  iconRed: {},
+  iconPurple: {},
   iconTextBlue: {
     color: '#1D4ED8',
   },

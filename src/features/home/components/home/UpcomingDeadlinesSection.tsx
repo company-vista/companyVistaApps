@@ -40,8 +40,8 @@ function UpcomingDeadlinesSection() {
         </Text>
       </View>
       <View style={styles.deadlineList}>
-        {deadlineItems.map(item => (
-          <View key={item.title} style={[styles.deadlineRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        {deadlineItems.map((item, index) => (
+          <View key={item.title} style={[styles.deadlineRow, { backgroundColor: colors.surface, borderColor: index === 0 ? 'rgba(59, 130, 246, 0.5)' : index === 1 ? 'rgba(139, 92, 246, 0.5)' : 'rgba(245, 158, 11, 0.5)' }]}>
             <View style={styles.deadlineDate}>
               <Text style={[styles.deadlineDueLabel, { color: colors.muted }]}>Due</Text>
               <Text style={[styles.deadlineDay, { color: colors.danger }]}>{item.day}</Text>

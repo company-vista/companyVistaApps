@@ -48,11 +48,11 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
   const [email, setEmail] = useState('');
   const [countryCode, setCountryCode] = useState('+1');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
+  const [registrationCountry, setRegistrationCountry] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const firstNameBorderColor = errors.firstName ? '#f87171' : colors.inputBorder;
   const lastNameBorderColor = errors.lastName ? '#f87171' : colors.inputBorder;
@@ -63,7 +63,7 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
       return;
     }
 
-    const result = await dispatch(signupUser({ firstName, lastName, email, phoneNumber, countryCode, address }));
+    const result = await dispatch(signupUser({ firstName, lastName, email, phoneNumber, countryCode, registrationCountry }));
 
     if (signupUser.fulfilled.match(result)) {
       setEmail(result.payload.email);
@@ -171,18 +171,6 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
                     style={[styles.input, { color: colors.inputText }]}
                     value={email}
                   />
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() => {
-                      Toast.show({
-                        type: 'success',
-                        text1: 'Email verified',
-                        text2: 'Your email has been verified successfully.',
-                      });
-                    }}
-                    style={styles.verifyButton}>
-                    <Text style={[styles.verifyLabel, { color: colors.text }]}>Verify</Text>
-                  </Pressable>
                 </View>
                 {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
               </View>
@@ -239,14 +227,14 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
                       borderColor: colors.inputBorder,
                     },
                   ]}>
-                  <FontAwesome name="home" size={18} color={colors.inputPlaceholder} />
+                  <FontAwesome name="globe" size={18} color={colors.inputPlaceholder} />
                   <TextInput
                     autoCapitalize="words"
-                    onChangeText={setAddress}
-                    placeholder="Address line"
+                    onChangeText={setRegistrationCountry}
+                    placeholder="Registration country"
                     placeholderTextColor={colors.inputPlaceholder}
                     style={[styles.input, { color: colors.inputText }]}
-                    value={address}
+                    value={registrationCountry}
                   />
                 </View>
               </View>

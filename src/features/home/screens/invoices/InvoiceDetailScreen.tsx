@@ -11,6 +11,7 @@ import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { formatDate } from '../../../../constants/dateFormatter';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
+import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
 import type { ClientInvoice } from '../../api/clientInvoicesApi';
 
 
@@ -106,7 +107,7 @@ function InvoiceDetailScreen({
 }: InvoiceDetailScreenProps) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
-  console.log("=== MY INVOICE DATA ===", JSON.stringify(invoice, null, 2));
+  
   // डेटा पार्सिंग
   const paymentStatus = getStringValue(
     invoice.paymentStatus,
@@ -126,11 +127,13 @@ function InvoiceDetailScreen({
   );
 
   const clientName =
-    getStringValue(invoice?.company?.companyName, invoice.companyName, invoice.customerName, invoice.clientName) ||
+    getStringValue((invoice?.company as Record<string, unknown>)?.companyName, invoice.companyName, invoice.customerName, invoice.clientName) ||
     'AARS EXHIBITS LLC';
   const clientAddress =
     getStringValue(invoice.clientAddress, invoice.toAddress) ||
-    (invoice?.company?.countryOfIncorporation ? `Company address not available (${invoice?.company?.countryOfIncorporation})` : 'Company address not available');
+    ((invoice?.company as Record<string, unknown>)?.countryOfIncorporation
+      ? `Company address not available (${(invoice?.company as Record<string, unknown>)?.countryOfIncorporation})`
+      : 'Company address not available');
   const clientCountry =
     getStringValue(invoice.country, invoice.clientCountry, invoice?.company?.countryOfIncorporation) || 'United States';
 
@@ -644,10 +647,18 @@ function InvoiceDetailScreen({
         {paymentStatus !== 'paid' && (
           <View style={styles.payButtonsRow}>
             {currency === 'INR' && (
-              <Pressable style={[styles.payButton, { backgroundColor: '#072654' }]}>
-                <FontAwesome name="credit-card" size={16} color="#ffffff" />
-                <Text style={styles.payButtonText}>Pay with Razorpay</Text>
-              </Pressable>
+              <RazorpayOneTimePayment
+                invoice={{
+                  id: getStringValue(invoice._id as string) || invoiceNumber,
+                  companyId: getStringValue(invoice.companyId) || undefined,
+                  company: invoice.company as { _id?: string } | undefined,
+                  amount: balanceDue,
+                  currency,
+                }}
+                paymentType="invoice"
+                label="Pay with Razorpay"
+                buttonStyle={[styles.payButton, { backgroundColor: '#072654' }]}
+              />
             )}
             <StripeOneTimePayment
               invoice={{

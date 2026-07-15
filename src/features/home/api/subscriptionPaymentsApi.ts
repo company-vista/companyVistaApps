@@ -118,7 +118,7 @@ function getErrorMessage(error: unknown) {
 
 export async function fetchSubscriptionPayments(token?: string): Promise<FetchSubscriptionPaymentsResult> {
   try {
-    console.log(token, 'token');
+    
     const response = await axios.get<SubscriptionPaymentResponse | SubscriptionPaymentApiItem[]>(
       SUBSCRIPTION_PAYMENT_ROUTE,
       {
