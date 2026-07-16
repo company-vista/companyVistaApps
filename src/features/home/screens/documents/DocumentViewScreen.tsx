@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { type DocumentItem } from '../../api/clientDocumentApi';
 
 type DocumentViewScreenProps = {
@@ -55,7 +56,7 @@ function getStyles(colors: AppTheme) {
     headerTitle: {
       color: colors.text,
       flex: 1,
-      fontSize: 16,
+      fontSize: font.xxl,
       fontWeight: '700',
       marginLeft: 12,
     },
@@ -89,19 +90,19 @@ function getStyles(colors: AppTheme) {
       marginBottom: 16,
     },
     filename: {
-      fontSize: 16,
+      fontSize: font.xxl,
       fontWeight: '700',
       color: colors.text,
       textAlign: 'center',
       marginBottom: 8,
     },
     metaText: {
-      fontSize: 12,
+      fontSize: font.base,
       color: colors.subtle,
       textAlign: 'center',
     },
     sectionTitle: {
-      fontSize: 11,
+      fontSize: font.sm,
       fontWeight: '700',
       color: isDark ? colors.muted : '#164066',
       textTransform: 'uppercase',
@@ -119,12 +120,12 @@ function getStyles(colors: AppTheme) {
       borderBottomWidth: 0,
     },
     rowLabel: {
-      fontSize: 13,
+      fontSize: font.md,
       color: colors.muted,
       flex: 1,
     },
     rowValue: {
-      fontSize: 13,
+      fontSize: font.md,
       fontWeight: '600',
       color: colors.text,
       flex: 2,
@@ -136,12 +137,12 @@ function getStyles(colors: AppTheme) {
       borderTopColor: colors.border,
     },
     stackedLabel: {
-      fontSize: 11,
+      fontSize: font.sm,
       color: colors.muted,
       marginBottom: 4,
     },
     stackedValue: {
-      fontSize: 13,
+      fontSize: font.md,
       color: colors.text,
     },
   });
@@ -225,7 +226,7 @@ function DocumentViewScreen({ documentItem, onBackPress }: DocumentViewScreenPro
           
           <View style={styles.stackedRow}>
             <Text style={styles.stackedLabel}>Company ID</Text>
-            <Text style={[styles.stackedValue, { color: colors.muted, fontSize: 12 }]}>
+            <Text style={[styles.stackedValue, { color: colors.muted, fontSize: font.base }]}>
               {documentItem.companyId ?? 'N/A'}
             </Text>
           </View>

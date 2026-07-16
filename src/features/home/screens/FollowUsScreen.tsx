@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 const socialItems = [
   {
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     color: '#111827',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '400',
     marginBottom: 28,
   },
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   },
   socialTitle: {
     color: '#111827',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '400',
     lineHeight: 20,
     marginTop: 10,
@@ -156,12 +157,12 @@ const styles = StyleSheet.create({
   },
   xIconText: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '800',
   },
   infoText: {
     color: '#111827',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '400',
     lineHeight: 22,
     marginTop: 46,

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { font } from "../../../theme/typography";
 
 export const styles = StyleSheet.create({
   screen: {
@@ -12,7 +13,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '500',
   },
   amountCard: {
@@ -23,12 +24,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   amountLabel: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     marginBottom: 8,
   },
   amountValue: {
-    fontSize: 32,
+    fontSize: font.display,
     fontWeight: '800',
     marginBottom: 12,
   },
@@ -45,19 +46,19 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   amountModeLabel: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
     marginBottom: 4,
   },
   amountModeGateway: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontWeight: '700',
     marginBottom: 2,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   amountModeValue: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   statusBadge: {
@@ -66,14 +67,14 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '700',
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
     marginBottom: 12,
   },
@@ -85,12 +86,12 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   detailLabel: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     flex: 0.4,
   },
   detailValue: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     flex: 0.6,
     textAlign: 'right',
@@ -110,7 +111,7 @@ export const styles = StyleSheet.create({
   },
   downloadButtonText: {
     color: '#4f46e5',
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
   },
 });

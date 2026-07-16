@@ -10,6 +10,7 @@ import {
 import { pick, types } from '@react-native-documents/picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 
 type AdditionalDocumentsScreenProps = {
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 21,
     marginBottom: 4,
@@ -165,12 +166,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 20,
     lineHeight: 17,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     letterSpacing: 0.5,
     marginBottom: 10,
@@ -185,18 +186,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   uploadIcon: {
-    fontSize: 18,
+    fontSize: font.heading,
     color: '#e6a82a',
     marginBottom: 10,
   },
   uploadMainText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     marginBottom: 4,
     textAlign: 'center',
   },
   uploadSubText: {
-    fontSize: 10,
+    fontSize: font.sm,
     textAlign: 'center',
   },
   selectedFilesContainer: {
@@ -204,12 +205,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedFileText: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
     marginBottom: 4,
   },
   hintText: {
-    fontSize: 10,
+    fontSize: font.sm,
     marginTop: 8,
     marginBottom: 20,
     lineHeight: 14,
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

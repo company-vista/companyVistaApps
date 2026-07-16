@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   headerIcon: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     bottom: 0,
-    left: 0,
+    left: 0, 
     zIndex: 30,
   },
   searchBackdrop: {

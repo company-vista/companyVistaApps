@@ -2,6 +2,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import type { CompanyCardItem } from '../../screens/quickAccess/CompanyCard';
+import { font } from '../../../../theme/typography';
+import { useThemeColors } from '../../../../theme/colors';
 
 const BORDER_COLOR = '#4e46e5c2';
 
@@ -20,6 +22,8 @@ function HomeHeroSection({
   onManagePress,
   selectedCompany,
 }: HomeHeroSectionProps) {
+  const colors = useThemeColors();
+  const isLight = colors.mode === 'light';
   const heroCompanyName = selectedCompany?.name ?? (
     isLoadingCompanies ? 'Loading company...' : 'No company available'
   );
@@ -34,46 +38,62 @@ function HomeHeroSection({
   );
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
 
+  const dynamicStyles = {
+    borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)',
+    backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)',
+  };
+  const heroDecoStyle = { 
+    borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.07)', 
+    backgroundColor: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)' 
+  }
+  const heroDecoSmallStyle = { borderColor: isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)' }
+  const heroEyebrowStyle = { color: isLight ? colors.accent : '#85B7EB' }
+  const heroCompanySwitcherStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.12)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.06)' }
+  const heroCompanyStyle = { color: isLight ? '#111827' : '#ffffff' }
+  const heroSwitchIconStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.15)', backgroundColor: isLight ? colors.surfaceAlt : 'rgba(255,255,255,0.12)' }
+  const heroMetaStyle = { color: isLight ? '#475569' : '#85B7EB' }
+  const heroTileStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' }
+  const heroTileLabelStyle = { color: isLight ? '#475569' : '#85B7EB' }
   return (
-    <View style={[styles.hero, { borderColor: BORDER_COLOR }]}>
-      <View style={styles.heroDeco} />
-      <View style={styles.heroDecoSmall}>
-        <FontAwesome name="flag" size={20} color="rgba(255,255,255,0.25)" />
+    <View style={[styles.hero, dynamicStyles]}>
+      <View style={[styles.heroDeco, heroDecoStyle]} />
+      <View style={[styles.heroDecoSmall, heroDecoSmallStyle]}>
+        <FontAwesome name="flag" size={20} color={isLight ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.25)'} />
       </View>
       <View style={styles.heroLocationRow}>
-        <FontAwesome name="map-marker" size={11} color="#85B7EB" />
-        <Text style={styles.heroEyebrow}>{heroCompanyCountry}</Text>
+        <FontAwesome name="map-marker" size={11} color={isLight ? colors.accent : '#85B7EB'} />
+        <Text style={[styles.heroEyebrow, heroEyebrowStyle ]}>{heroCompanyCountry}</Text>
         <View style={{ flex: 1 }} />
       </View>
       <Pressable
         onPress={onCompanySwitcherPress}
-        style={styles.heroCompanySwitcher}>
-        <Text numberOfLines={1} style={styles.heroCompany}>
+        style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
+        <Text numberOfLines={1} style={[styles.heroCompany, heroCompanyStyle ]}>
           {heroCompanyName}
         </Text>
-        <View style={styles.heroSwitchIcon}>
-          <FontAwesome name="exchange" size={11} color="#ffffff" />
+        <View style={[styles.heroSwitchIcon, heroSwitchIconStyle]}>
+          <FontAwesome name="exchange" size={11} color={isLight ? colors.text : '#ffffff'} />
         </View>
       </Pressable>
-      <Text style={styles.heroMeta}>
+      <Text style={[styles.heroMeta, heroMetaStyle]}>
         {heroCompanyType}  -  EIN{' '}
         <Text style={styles.heroMetaAccent}>{heroCompanyEin}</Text>  -  Added {heroCompanyDate}
       </Text>
       <View style={styles.heroStats}>
 
-        <View style={styles.heroTile}>
-          <Text style={[styles.heroTileNumber, styles.heroTileWarn]}>
+        <View style={[styles.heroTile, heroTileStyle]}>
+          <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileNumber, styles.heroTileWarn]}>
             {heroCompanyStatus}
           </Text>
-          <Text style={styles.heroTileLabel}>Company status</Text>
+          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Company status</Text>
         </View>
-        <Pressable onPress={onManagePress} style={styles.heroTile}>
-          <FontAwesome name="cog" size={22} color="#85B7EB" style={{ marginBottom: 0 }} />
-          <Text style={styles.heroTileLabel}>Manage</Text>
+        <Pressable onPress={onManagePress} style={[styles.heroTile, { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' }]}>
+          <FontAwesome name="cog" size={22} color={isLight ? colors.accent : '#85B7EB'} style={{ marginBottom: 0 }} />
+          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Manage</Text>
         </Pressable>
-        <Pressable onPress={onCompanyInfoPress} style={styles.heroTile}>
-          <FontAwesome name="info-circle" size={22} color="#F09595" style={{ marginBottom: 0 }} />
-          <Text style={styles.heroTileLabel}>Company Info</Text>
+        <Pressable onPress={onCompanyInfoPress} style={[styles.heroTile, { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' }]}>
+          <FontAwesome name="info-circle" size={22} color={isLight ? '#dc2626' : '#F09595'} style={{ marginBottom: 0 }} />
+          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Company Info</Text>
         </Pressable>
       </View>
     </View>
@@ -121,7 +141,7 @@ const styles = StyleSheet.create({
   },
   heroEyebrow: {
     color: '#85B7EB',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '500',
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -129,7 +149,7 @@ const styles = StyleSheet.create({
   heroCompany: {
     flex: 1,
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '500',
     lineHeight: 23,
   },
@@ -159,7 +179,7 @@ const styles = StyleSheet.create({
   },
   heroMeta: {
     color: '#85B7EB',
-    fontSize: 11,
+    fontSize: font.sm,
     marginTop: 8,
   },
   heroMetaAccent: {
@@ -182,9 +202,9 @@ const styles = StyleSheet.create({
   },
   heroTileNumber: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 23,
   },
   heroTileWarn: {
     color: '#FAC775',
@@ -193,9 +213,8 @@ const styles = StyleSheet.create({
     color: '#F09595',
   },
   heroTileLabel: {
-    color: '#85B7EB',
-    fontSize: 11,
-    lineHeight: 9,
+    fontSize: font.base,
+    lineHeight: 14,
     marginTop: 3,
   },
 });

@@ -11,6 +11,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 const TimelineStep: React.FC<{
   title: string;
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   scrollContent: {
@@ -224,11 +225,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   cardSubtitle: {
-    fontSize: 13,
+    fontSize: font.md,
     marginTop: 2,
   },
   badge: {
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   progressBarBg: {
@@ -251,12 +252,12 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   progressText: {
-    fontSize: 11,
+    fontSize: font.sm,
     textAlign: 'right',
     marginBottom: 8,
   },
   nextStepText: {
-    fontSize: 13,
+    fontSize: font.md,
     marginBottom: 16,
   },
   editButton: {
@@ -265,21 +266,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButtonText: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   metaContainer: {
     marginBottom: 4,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   packageHeader: {
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   packageMainText: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '700',
   },
   timeBadge: {
@@ -298,11 +299,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   timeBadgeText: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   metaDetailText: {
-    fontSize: 13,
+    fontSize: font.md,
     marginVertical: 2,
   },
   detailRow: {
@@ -310,11 +311,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   detailLabel: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
     marginTop: 2,
   },
@@ -354,14 +355,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   stepTime: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   stepDescription: {
-    fontSize: 12,
+    fontSize: font.base,
     marginTop: 4,
   },
   helpCard: {
@@ -370,11 +371,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   helpTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   helpSubtitle: {
-    fontSize: 13,
+    fontSize: font.md,
     marginBottom: 16,
   },
   helpButton: {
@@ -383,7 +384,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   helpButtonText: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
 });

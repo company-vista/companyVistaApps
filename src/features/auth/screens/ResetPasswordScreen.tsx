@@ -17,6 +17,7 @@ import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
 import logoImage from '../../../assets/images/logoR.png';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 type ResetPasswordScreenProps = {
   onBackPress: () => void;

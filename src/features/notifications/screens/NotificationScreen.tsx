@@ -13,9 +13,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { BackButton } from '../../../components/buttons';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
 import { notifications, type NotificationItem } from '../data/notifications';
-import { fetchNotifications, markNotificationAsRead } from '../api/notificationsApi';
+import { fetchNotifications, markNotificationAsRead, deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 const notificationFilters = ['All', 'Unread', 'Read'] as const;
 
@@ -105,7 +106,7 @@ function NotificationScreen({
         ]}
         style={[
           styles.screen,
-          { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+          { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 12 },
         ]}>
         <View style={styles.header}>
           <View style={styles.titleRow}>
@@ -247,8 +248,13 @@ function NotificationScreen({
 
             <View style={styles.modalActions}>
               <Pressable
-                onPress={() => {
+                onPress={async () => {
                   if (selectedNotification) {
+                    await deleteNotification({
+                      token,
+                      notificationId: selectedNotification.id,
+                      companyId,
+                    });
                     setNotificationList(prev =>
                       prev.filter(n => n.id !== selectedNotification.id),
                     );
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#111827',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '400',
   },
   countBadge: {
@@ -309,7 +315,7 @@ const styles = StyleSheet.create({
   },
   countText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
   },
   filterRow: {
@@ -328,7 +334,7 @@ const styles = StyleSheet.create({
   activeFilterButton: {
   },
   filterButtonText: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
   },
   activeFilterButtonText: {
@@ -357,13 +363,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     color: '#111827',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '900',
     marginTop: 18,
   },
   emptyText: {
     color: '#64748b',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
     lineHeight: 20,
     marginTop: 8,
@@ -394,7 +400,7 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     color: '#111827',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '400',
     flex: 1,
   },
@@ -406,14 +412,14 @@ const styles = StyleSheet.create({
   },
   notificationMessage: {
     color: '#64748b',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '400',
     lineHeight: 19,
     marginTop: 4,
   },
   notificationTime: {
     color: '#94a3b8',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '700',
     marginTop: 8,
   },
@@ -448,13 +454,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
   },
   modalSubtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
@@ -474,7 +480,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: 'bold',
   },
   cancelButton: {
@@ -487,7 +493,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
 });

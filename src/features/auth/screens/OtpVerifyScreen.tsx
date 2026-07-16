@@ -16,6 +16,7 @@ import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
 import logoImage from '../../../assets/images/logoR.png';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 type OtpVerifyScreenProps = {
   onBackPress: () => void;
@@ -121,7 +122,7 @@ export default function OtpVerifyScreen({ onBackPress, onOtpVerified, email }: O
                   borderRadius: 10,
                   backgroundColor: colors.inputBackground,
                   color: colors.inputText,
-                  fontSize: 18,
+                  fontSize: font.heading,
                   fontWeight: '700',
                   textAlign: 'center',
                 }}

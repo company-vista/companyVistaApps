@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 
 const usStates = [
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: font.large,
     fontWeight: '500',
     lineHeight: 24,
     marginBottom: 8,
@@ -359,20 +360,20 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 12,
   },
   stepLabel: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 19,
+    fontSize: font.hero,
     fontWeight: '500',
     marginBottom: 4,
   },
   sectionSubtitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     marginBottom: 19,
   },
   labelRow: {
@@ -382,7 +383,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   label: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   required: {
     color: '#e6a82a',
@@ -398,7 +399,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dropdownText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   dropdownList: {
     borderWidth: 0.5,
@@ -411,7 +412,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   dropdownItemText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   banner: {
     flexDirection: 'row',
@@ -423,11 +424,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   bannerIcon: {
-    fontSize: 14,
+    fontSize: font.lg,
   },
   bannerText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.sm,
   },
   bannerHighlight: {
     color: '#e6a82a',
@@ -442,15 +443,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   helperText: {
-    fontSize: 9,
+    fontSize: font.xs,
     marginTop: 4,
   },
   errorText: {
-    fontSize: 10,
+    fontSize: font.sm,
     marginTop: 4,
   },
   divider: {
@@ -470,7 +471,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

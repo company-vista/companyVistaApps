@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { font } from '../theme/typography';
 import { API_BASE_URL, RAZORPAY_KEY_ID } from '../config/api';
 
 type PaymentType = 'invoice' | 'subscription';
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
 });

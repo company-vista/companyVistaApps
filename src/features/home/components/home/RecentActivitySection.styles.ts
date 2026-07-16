@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { font } from '../../../theme/typography';
 
 const styles = StyleSheet.create({
   sectionHeader: {
@@ -10,12 +11,12 @@ const styles = StyleSheet.create({
   },
   sectionTitleNoMargin: {
     color: '#111827',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '600',
   },
   viewAll: {
     color: '#c2410c',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '800',
   },
   horizontalList: {

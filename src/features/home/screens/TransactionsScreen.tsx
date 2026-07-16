@@ -25,6 +25,7 @@ import {
   matchesTransactionSearch,
 } from './transactionsUtils';
 import { formatCurrency } from '../../../constants/currencyConverter';
+import { font } from '../../../theme/typography';
 
 type TransactionItem = {
   id: string;
@@ -579,7 +580,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 14,
   },
-  title: { fontSize: 20, fontWeight: '500' },
+  title: { fontSize: font.hero, fontWeight: '500' },
   searchContainer: { paddingHorizontal: 20, marginBottom: 16 },
   searchInput: {
     height: 50,
@@ -595,8 +596,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   summaryCard: { flex: 1, padding: 16, borderRadius: 16, borderWidth: 1 },
-  summaryLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
-  summaryValue: { fontSize: 16, fontWeight: '800' },
+  summaryLabel: { fontSize: font.base, fontWeight: '600', marginBottom: 6 },
+  summaryValue: { fontSize: font.xxl, fontWeight: '800' },
   filterRow: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -611,7 +612,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  filterText: { fontSize: 12, fontWeight: '500' },
+  filterText: { fontSize: font.base, fontWeight: '500' },
   txCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -629,11 +630,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   middleSection: { flex: 1 },
-  txTitle: { fontSize: 14, fontWeight: '500', marginBottom: 4 },
-  txSubtitle: { fontSize: 11 },
+  txTitle: { fontSize: font.lg, fontWeight: '500', marginBottom: 4 },
+  txSubtitle: { fontSize: font.sm },
   rightSection: { alignItems: 'flex-end' },
   txAmount: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
     marginBottom: 4,
     textAlign: 'right',
@@ -645,12 +646,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  statusText: { fontSize: 9, fontWeight: '800' },
+  statusText: { fontSize: font.xs, fontWeight: '800' },
   emptyContainer: {
     padding: 40,
     borderRadius: 16,
     alignItems: 'center',
     gap: 12,
   },
-  emptyText: { fontSize: 14, fontWeight: '600' },
+  emptyText: { fontSize: font.lg, fontWeight: '600' },
 });

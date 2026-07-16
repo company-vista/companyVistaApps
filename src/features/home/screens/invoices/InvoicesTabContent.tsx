@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import {
   fetchInvoicesForCompany,
   selectHasLoadedInvoicesForCompany,
@@ -302,14 +303,6 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
             style={styles.searchInput}
           />
         </View>
-        <View
-          style={[
-            styles.filterButton,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}>
-          <FontAwesome name="filter" size={17} color={palette.iconColor} />
-          <Text style={styles.filterText}>Filters</Text>
-        </View>
       </View>
 
       <View style={styles.listHeader}>
@@ -452,20 +445,20 @@ const getStyles = (colors: AppTheme) => {
 
   return StyleSheet.create({
   container: {
-    paddingTop: 2,
+    paddingTop: 1,
   },
   titleRow: {
     marginBottom: 4,
   },
   title: {
     color: palette.primaryText,
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '400',
     letterSpacing: 0,
   },
   companyName: {
     color: palette.accentText,
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     marginTop: 4,
   },
@@ -486,25 +479,10 @@ const getStyles = (colors: AppTheme) => {
   searchInput: {
     color: palette.primaryText,
     flex: 1,
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '400',
     marginLeft: 12,
     padding: 0,
-  },
-  filterButton: {
-    alignItems: 'center',
-    borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: 8,
-    height: 50,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  filterText: {
-    color: palette.buttonText,
-    fontSize: 15,
-    fontWeight: '600',
   },
   listHeader: {
     alignItems: 'flex-start',
@@ -513,7 +491,7 @@ const getStyles = (colors: AppTheme) => {
     marginTop: 26,
   },
   foundSubtitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
   },
   sortRow: {
@@ -523,16 +501,16 @@ const getStyles = (colors: AppTheme) => {
     paddingTop: 4,
   },
   sortLabel: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   sortValue: {
     color: palette.link,
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '900',
   },
   stateText: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
     lineHeight: 19,
     paddingVertical: 8,
@@ -597,13 +575,13 @@ const getStyles = (colors: AppTheme) => {
   },
   invoiceId: {
     color: palette.primaryText,
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
     letterSpacing: 0,
   },
   invoiceCompany: {
     color: palette.primaryText,
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
     marginTop: 7,
   },
@@ -614,7 +592,7 @@ const getStyles = (colors: AppTheme) => {
   },
   metaText: {
     color: palette.accentText,
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '400',
     marginLeft: 8,
   },
@@ -631,7 +609,7 @@ const getStyles = (colors: AppTheme) => {
   },
   amount: {
     color: palette.primaryText,
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '600',
     letterSpacing: 0,
     textAlign: 'right',
@@ -648,11 +626,11 @@ const getStyles = (colors: AppTheme) => {
     marginTop: 8,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   statusDetail: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     marginTop: 18,
     textAlign: 'right',

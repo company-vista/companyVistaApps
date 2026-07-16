@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 const deadlineItems = [
   {
@@ -89,12 +90,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#2C2C2A',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '500',
   },
   sectionLink: {
     color: '#D85A30',
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   deadlineList: {
@@ -115,19 +116,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deadlineDueLabel: {
-    fontSize: 8,
+    fontSize: font.xs,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 2,
   },
   deadlineDay: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 18,
   },
   deadlineMonth: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   deadlineDivider: {
     width: 1,
@@ -137,11 +138,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deadlineTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '400',
   },
   deadlineSubtitle: {
-    fontSize: 10,
+    fontSize: font.sm,
     marginTop: 1,
   },
   deadlineBadge: {
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   deadlineBadgeText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   badgeSoon: {

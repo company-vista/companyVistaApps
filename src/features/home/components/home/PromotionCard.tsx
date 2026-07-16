@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 function PromotionCard() {
   const colors = useThemeColors();
@@ -23,7 +24,7 @@ function PromotionCard() {
 const styles = StyleSheet.create({
   sectionTitle: {
     color: '#111827',
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
     marginTop: 32,
     marginBottom: 18,
@@ -39,12 +40,12 @@ const styles = StyleSheet.create({
   },
   promoTitle: {
     color: '#111827',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '800',
   },
   promoText: {
     color: '#6b7280',
-    fontSize: 13,
+    fontSize: font.md,
     marginTop: 5,
   },
 });

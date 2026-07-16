@@ -36,7 +36,7 @@ export function HomeHeader({
         accessibilityLabel="Open search"
         onPress={onSearchPress}
         style={styles.headerIcon}>
-        <FontAwesome name="search" size={22} color={colors.muted} />
+        <FontAwesome name="search" size={20} color={colors.muted} />
       </Pressable>
       <Pressable
         onPress={onNotificationPress}

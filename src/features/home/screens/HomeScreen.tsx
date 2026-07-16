@@ -81,7 +81,7 @@ type HomeScreenProps = {
   onOpenComplianceHistory?: (action: RenewActionData) => void;
   pendingCompanySection?: 'companyInfo' | 'shareholders' | 'menu' | null;
   onClearPendingCompanySection?: () => void;
-  pendingHomeAction?: 'subscription' | 'addCompany' | 'manageOptions' | null;
+  pendingHomeAction?: 'subscription' | 'addCompany' | 'manageOptions' | 'transactions' | null;
   onClearPendingHomeAction?: () => void;
 };
 
@@ -166,6 +166,9 @@ export default function HomeScreen({
     } else if (pendingHomeAction === 'manageOptions') {
       setIsManageOptionsOpen(true);
       onClearPendingHomeAction?.();
+    } else if (pendingHomeAction === 'transactions') {
+      setIsTransactionsOpen(true);
+      onClearPendingHomeAction?.();
     }
   }, [pendingHomeAction, onClearPendingHomeAction]);
 
@@ -230,15 +233,18 @@ export default function HomeScreen({
     'User';
 
   useEffect(() => {
+    if (!selectedCompany?.id) {
+      setNotificationCount(0);
+      return;
+    }
+
     let isMounted = true;
 
     fetchNotifications({ token: token ?? undefined }).then(
       result => {
         if (isMounted) {
           const allList = result.isSuccess ? result.notifications : notifications;
-          const filtered = selectedCompany?.id
-            ? allList.filter(n => n.companyId === selectedCompany.id)
-            : allList;
+          const filtered = allList.filter(n => n.companyId === selectedCompany.id && !n.isRead);
           setNotificationCount(filtered.length);
         }
       },
@@ -254,12 +260,14 @@ export default function HomeScreen({
   }, [notificationCount]);
 
   useEffect(() => {
+    if (!selectedCompany?.id) {
+      return;
+    }
+
     const interval = setInterval(() => {
       fetchNotifications({ token: token ?? undefined }).then(result => {
         const allList = result.isSuccess ? result.notifications : notifications;
-        const filtered = selectedCompany?.id
-          ? allList.filter(n => n.companyId === selectedCompany.id)
-          : allList;
+        const filtered = allList.filter(n => n.companyId === selectedCompany.id && !n.isRead);
         if (filtered.length > prevNotificationCount.current) {
           Toast.show({
             type: 'info',

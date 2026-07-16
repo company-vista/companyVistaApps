@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated,  StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
@@ -248,7 +248,7 @@ function getYearlyFilingStatus(record: Record<string, unknown>) {
 
 function ComplianceStatusSection({
   companyId,
-  onViewAllPress,
+  // onViewAllPress,
 }: ComplianceStatusSectionProps) {
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
@@ -448,12 +448,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#2C2C2A',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '500',
   },
   sectionLink: {
     color: '#D85A30',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
   },
   complianceGrid: {
@@ -483,8 +483,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   statusIcon: {
-    width: 28,
-    height: 28,
+    width: 30,
+    height: 30,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 7,
@@ -535,16 +535,16 @@ const styles = StyleSheet.create({
     color: '#DC2626',
   },
   tileName: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '500',
     lineHeight: 16,
   },
   tileDueDateText: {
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 5,
   },
   tileDueDateValue: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

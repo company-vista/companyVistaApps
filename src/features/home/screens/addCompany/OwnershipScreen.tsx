@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RadioCard from "./components/ownershipRadioCard";
 import { useThemeColors } from "../../../../theme/colors";
+import { font } from '../../../../theme/typography';
 import { BackButton } from "../../../../components/buttons";
 
 type OwnershipScreenProps = {
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 22,
+    fontSize: font.display,
     fontWeight: '500',
     lineHeight: 23,
     marginBottom: 4,
@@ -309,14 +310,14 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 16,
   },
   extraFields: {
     marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
     marginBottom: 10,
     marginTop: 16,
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   row: {
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
   },
   removeText: {
     color: '#ef4444',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   addButton: {
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#e6a82a',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   footerColumn: {
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

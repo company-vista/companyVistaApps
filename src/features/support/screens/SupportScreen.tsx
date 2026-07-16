@@ -18,6 +18,7 @@ import { useThemeColors } from '../../../theme/colors';
 import { BackButton } from '../../../components/buttons';
 import { useAppSelector } from '../../../store/hooks';
 import { API_BASE_URL } from '../../../config/api';
+import { font } from '../../../theme/typography';
 
 interface InfoCardData {
   icon: string;
@@ -316,7 +317,7 @@ export default function ContactSupport({ onBackPress }: ContactSupportProps) {
           {selectedFiles.length > 0 && (
             <View style={{ marginTop: 8, gap: 4 }}>
               {selectedFiles.map((file, index) => (
-                <Text key={index} numberOfLines={1} style={{ fontSize: 11, color: colors.text }}>{'\u2022'} {file.name}</Text>
+                <Text key={index} numberOfLines={1} style={{ fontSize: font.sm, color: colors.text }}>{'\u2022'} {file.name}</Text>
               ))}
             </View>
           )}
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   content: {
@@ -369,13 +370,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   infoIconGlyph: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   infoLabel: {
-    fontSize: 8,
+    fontSize: font.xs,
   },
   infoValue: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   formCard: {
@@ -384,20 +385,20 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   formTitle: {
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '600',
     color: '#e6a82a',
     marginBottom: 4,
   },
   formSubtitle: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginBottom: 16,
   },
   fieldGroup: {
     marginBottom: 12,
   },
   fieldLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginBottom: 6,
   },
   required: {
@@ -417,11 +418,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   inputIcon: {
-    fontSize: 13,
+    fontSize: font.md,
   },
   input: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   dropdown: {
@@ -434,10 +435,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   dropdownText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   chevron: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   modalOverlay: {
     flex: 1,
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   modalOptionText: {
-    fontSize: 13,
+    fontSize: font.md,
   },
   textareaWrapper: {
     borderWidth: 0.5,
@@ -464,12 +465,12 @@ const styles = StyleSheet.create({
   },
   textarea: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.base,
     padding: 10,
     minHeight: 100,
   },
   helperText: {
-    fontSize: 9,
+    fontSize: font.xs,
     marginTop: 4,
   },
   uploadBox: {
@@ -480,17 +481,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   uploadIcon: {
-    fontSize: 18,
+    fontSize: font.heading,
     marginBottom: 6,
   },
   uploadTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#e6a82a',
     marginBottom: 2,
   },
   uploadHint: {
-    fontSize: 9,
+    fontSize: font.xs,
   },
   sendButton: {
     backgroundColor: '#e6a82a',
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: '#1a1204',
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
   },
 });

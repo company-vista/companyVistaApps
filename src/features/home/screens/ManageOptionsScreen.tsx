@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../theme/colors';
 import BackButton from '../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { font } from '../../../theme/typography';
 
 type ManageOptionsScreenProps = {
   onBackPress: () => void;
@@ -45,7 +46,7 @@ const ManageOptionsScreen: React.FC<ManageOptionsScreenProps> = ({
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingTop: insets.top,
+          paddingTop: insets.top + 4,
           paddingBottom: insets.bottom,
         },
       ]}
@@ -66,7 +67,7 @@ const ManageOptionsScreen: React.FC<ManageOptionsScreenProps> = ({
       >
         <BackButton onPress={onBackPress} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Manage
+          Manages
         </Text>
         <View style={{ width: 40 }} />
       </View>
@@ -107,12 +108,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
+    gap: 8,
   },
   headerTitle: {
-    flex: 1,
-    fontSize: 17,
+    fontSize: font.title,
     fontWeight: '600',
-    textAlign: 'center',
   },
   body: {
     flex: 1,
@@ -138,12 +138,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionLabel: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '600',
     marginBottom: 4,
   },
   optionDescription: {
-    fontSize: 13,
+    fontSize: font.md,
     lineHeight: 18,
   },
 });

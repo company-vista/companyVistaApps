@@ -341,11 +341,6 @@ export async function handleLoginApi({
     });
     console.log('Login user saved', loginUser);
     console.log('Login token loaded', Boolean(token));
-    Toast.show({
-      type: 'success',
-      text1: 'Login successful',
-      text2: response.data.message ?? 'Profile loaded successfully.',
-    });
 
     return {
       errors,

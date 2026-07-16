@@ -3,6 +3,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { quickAccessItems, type QuickAccessItemId } from '../../data/quickAccessItems';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 type QuickAccessSectionProps = {
   onItemPress: (itemId: QuickAccessItemId) => void;
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#111827',
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   viewAllButton: {
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     color: '#dc2626',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '900',
   },
   favouritesGrid: {
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   favouriteTitle: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
     lineHeight: 18,
     marginTop: 8,

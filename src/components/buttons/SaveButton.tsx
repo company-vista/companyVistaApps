@@ -1,6 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
 import { useThemeColors } from '../../theme/colors';
+import { font } from '../../theme/typography';
 
 type SaveButtonProps = {
   disabled?: boolean;
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '900',
   },
 });

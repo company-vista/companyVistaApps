@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import type { QuickAccessItemId } from '../../data/quickAccessItems';
 
 type OrderServicesSectionProps = {
@@ -123,7 +124,7 @@ function OrderServicesSection({
                 <View style={[styles.serviceIcon, tone.icon]}>
                   <FontAwesome
                     name={item.icon}
-                    size={18}
+                      size={22}
                     style={tone.iconText}
                   />
                 </View>
@@ -139,7 +140,7 @@ function OrderServicesSection({
               </View>
 
               {/* 3. मुख्य टाइटल (image_8ba545.png के टेक्स्ट स्टाइल में) */}
-              <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2}>
+                  <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
                 {item.title}
               </Text>
               
@@ -172,7 +173,7 @@ function OrderServicesSection({
                       </View>
                     ) : null}
                   </View>
-                  <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2}>
+              <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
                     {item.title}
                   </Text>
                 </Pressable>
@@ -187,8 +188,8 @@ function OrderServicesSection({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 16,
-    paddingHorizontal: 16,
+    marginTop: 14,
+    paddingHorizontal: 8,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -198,13 +199,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#2C2C2A',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '500',
     
   },
   moreText: {
     color: '#D85A30',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   gridContainer: {
@@ -213,14 +214,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   gridItem: {
-    width: '23%',
+    width: '24%',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    aspectRatio: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
     overflow: 'hidden',
   },
   expandedSection: {
@@ -239,21 +239,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   serviceIcon: {
-    width: 44,
-    height: 44,
+    width: 50,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
   },
   serviceTitle: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
     textAlign: 'center',
-    lineHeight: 14,
-    minHeight: 28,
+    lineHeight: font.sm + 5,
+    minHeight: font.sm * 2 + 6,
   },
   serviceSubtitle: {
-    fontSize: 9,
+    fontSize: font.xs,
     textAlign: 'center',
     marginTop: 2,
     opacity: 0.7,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     maxWidth: 45,
   },
   badgeText: {
-    fontSize: 8,
+    fontSize: font.xs,
     fontWeight: '600',
   },
   iconBlue: {},

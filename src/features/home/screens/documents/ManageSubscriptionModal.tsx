@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 const PLANS_DATA = [
   {
@@ -170,11 +171,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '500',
   },
   headerSubtitle: {
-    fontSize: 13,
+    fontSize: font.md,
     marginTop: 4,
   },
   closeBtn: {
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitleText: {
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '600',
   },
   planCard: {
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '700',
   },
   cardMain: {
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   planNameText: {
-    fontSize: 17,
+    fontSize: font.title,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -247,11 +248,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   periodText: {
-    fontSize: 14,
+    fontSize: font.lg,
     marginLeft: 2,
   },
   docsText: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
   },
   cardBottomAction: {
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
   },
   subscribeBtnText: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '700',
   },
   activeLabelRow: {
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
   },
   activeButtonText: {
     color: '#10B981',
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '700',
   },
 });

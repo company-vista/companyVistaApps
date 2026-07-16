@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 type ServiceItem = {
   title: string;
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
   },
-  title: { fontSize: 20, fontWeight: '500' },
+  title: { fontSize: font.hero, fontWeight: '500' },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,8 +175,8 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     maxWidth: 55,
   },
-  badgeText: { fontSize: 8, fontWeight: '600' },
+  badgeText: { fontSize: font.xs, fontWeight: '600' },
   contentSection: { flex: 1 },
-  serviceTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
-  serviceSubtitle: { fontSize: 11 },
+  serviceTitle: { fontSize: font.lg, fontWeight: '600', marginBottom: 2 },
+  serviceSubtitle: { fontSize: font.sm },
 });

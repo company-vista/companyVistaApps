@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
 
 type PaymentType = 'invoice' | 'document_subscription' | 'document_unlock';
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
 });

@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { BackButton } from '../../../../components/buttons';
 import JurisdictionSelectionScreen from './JurisdictionSelectionScreen';
@@ -311,14 +312,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   content: {
     padding: 18,
   },
   title: {
-    fontSize: 24,
+    fontSize: font.large,
     fontWeight: '500',
     lineHeight: 23,
     marginBottom: 6,
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     lineHeight: 17,
     marginBottom: 18,
   },
@@ -346,12 +347,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6a82a',
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '500',
     marginBottom: 4,
   },
   sectionSubtitle: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginBottom: 14,
   },
   labelRow: {
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    fontSize: 11,
+    fontSize: font.sm,
   },
   required: {
     color: '#e6a82a',
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   helpCircleText: {
-    fontSize: 8,
+    fontSize: font.xs,
   },
   radioGroup: {
     gap: 8,
@@ -410,12 +411,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   radioTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     marginBottom: 2,
   },
   radioDescription: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   row: {
     flexDirection: 'row',
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   fieldLabel: {
-    fontSize: 9,
+    fontSize: font.xs,
     letterSpacing: 0.3,
     marginBottom: 6,
   },
@@ -439,11 +440,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 16,
   },
   helperText: {
-    fontSize: 9,
+    fontSize: font.xs,
     marginTop: 4,
   },
   footerColumn: {
@@ -457,7 +458,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#1a1204',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
 });

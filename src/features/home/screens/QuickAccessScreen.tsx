@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { quickAccessItems, type QuickAccessItemId } from '../data/quickAccessItems';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 type QuickAccessScreenProps = {
   onBackPress: () => void;
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#111827',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '500',
   },
   content: {
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   accessTitle: {
     color: '#111827',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '800',
     lineHeight: 19,
     marginTop: 9,

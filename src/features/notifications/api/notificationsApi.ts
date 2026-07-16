@@ -109,6 +109,21 @@ export async function markNotificationAsRead({ token, notificationId }: { token?
   }
 }
 
+export async function deleteNotification({ token, notificationId, companyId }: { token?: string | null; notificationId: string; companyId?: string | null }) {
+  try {
+    await axios.delete(`${NOTIFICATIONS_ROUTE}/${notificationId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      params: companyId ? { companyId } : undefined,
+      timeout: API_REQUEST_TIMEOUT_MS,
+    });
+    return { isSuccess: true };
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message?: string }>;
+    console.log('Delete notification error', { message: axiosError.message, id: notificationId });
+    return { isSuccess: false, error: axiosError.response?.data?.message ?? 'Failed to delete notification.' };
+  }
+}
+
 export async function fetchNotifications({ token }: FetchNotificationsParams = {}) {
   try {
     const response = await axios.get<NotificationsResponse>(NOTIFICATIONS_ROUTE, {

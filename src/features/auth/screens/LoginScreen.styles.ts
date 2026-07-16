@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { s } from "../../../theme/responsive";
+import { font } from "../../../theme/typography";
 
 const styles = StyleSheet.create({
   screen: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#fca5a5',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '700',
   },
   button: {

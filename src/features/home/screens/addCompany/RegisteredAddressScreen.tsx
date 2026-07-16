@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 // import DirectorsShareholdersScreen from './DirectorsShareholdersScreen';
 
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '600',
   },
   body: {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: font.large,
     fontWeight: '500',
     lineHeight: 23,
     marginBottom: 10,
@@ -359,11 +360,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 16,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -401,23 +402,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   radioTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     marginBottom: 2,
   },
   radioDesc: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   formSection: {
     marginTop: 8,
   },
   subHeadingGold: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
     marginBottom: 12,
   },
   fieldLabel: {
-    fontSize: 9,
+    fontSize: font.xs,
     letterSpacing: 0.3,
     marginBottom: 6,
     marginTop: 12,
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   row: {
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   hintText: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontStyle: 'italic',
     marginTop: -6,
     marginBottom: 8,
@@ -459,7 +460,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

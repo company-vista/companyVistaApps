@@ -34,9 +34,12 @@ export default function PullToRefresh({
       dispatch(updateProfileUser(result.user));
     }
 
-    const notifResult = await fetchNotifications({ token, companyId: selectedCompanyId });
+    const notifResult = await fetchNotifications({ token });
     if (notifResult.isSuccess) {
-      onNotificationCountChange?.(notifResult.notifications.length);
+      const filtered = selectedCompanyId
+        ? notifResult.notifications.filter(n => n.companyId === selectedCompanyId && !n.isRead)
+        : notifResult.notifications.filter(n => !n.isRead);
+      onNotificationCountChange?.(filtered.length);
     }
 
     setIsRefreshing(false);

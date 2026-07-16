@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 
 type BusinessFormScreenProps = {
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 21,
     marginBottom: 4,
@@ -256,11 +257,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 16,
   },
   fieldLabel: {
-    fontSize: 10,
+    fontSize: font.sm,
     letterSpacing: 0.3,
     marginBottom: 6,
     marginTop: 12,
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 16,
   },
   textAreaWrapper: {
@@ -286,12 +287,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   textArea: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 10,
     minHeight: 80,
   },
   hintText: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontStyle: 'italic',
     marginBottom: 4,
   },
@@ -306,10 +307,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dropdownText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   dropdownArrow: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   dropdownList: {
     borderWidth: 0.5,
@@ -322,7 +323,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   dropdownItemText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   row: {
     flexDirection: 'row',
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

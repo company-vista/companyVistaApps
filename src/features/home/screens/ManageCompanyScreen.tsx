@@ -13,6 +13,7 @@ import { useAppSelector } from '../../../store/hooks';
 import type { CompanyCardItem } from './quickAccess/CompanyCard';
 import BackButton from '../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { font } from '../../../theme/typography';
 import BasicInfoScreen from './changeCategories/BasicInfoScreen';
 import MyRequestsScreen from './changeCategories/MyRequestsScreen';
 
@@ -143,7 +144,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingTop: insets.top,
+          paddingTop: insets.top + 12,
           paddingBottom: insets.bottom,
         },
       ]}
@@ -163,10 +164,12 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
           },
         ]}
       >
-        <BackButton onPress={onBackPress} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Request changes
-        </Text>
+        <View style={styles.headerLeft}>
+          <BackButton onPress={onBackPress} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Request changes
+          </Text>
+        </View>
         <View
           style={[
             styles.profileCard,
@@ -384,14 +387,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingTop: 8,
+    paddingTop: 0,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    gap: 3,
+    gap: 4,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   headerTitle: {
-    flex: 1,
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '700',
   },
   profileCard: {
@@ -413,10 +420,10 @@ const styles = StyleSheet.create({
   avatarText: {
     color: '#fff',
     fontWeight: '700',
-    fontSize: 11,
+    fontSize: font.sm,
   },
   profileEmail: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -427,7 +434,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   stepLabel: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
     letterSpacing: 0.5,
     textTransform: 'none',
@@ -439,14 +446,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   backLinkText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
     marginBottom: 12,
   },
@@ -470,7 +477,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   urgencyLabel: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   categoriesGrid: {
@@ -494,13 +501,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   categoryTitle: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 2,
   },
   categoryFields: {
-    fontSize: 8,
+    fontSize: font.xs,
     fontWeight: '600',
     marginBottom: 2,
   },
@@ -515,7 +522,7 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   selectedList: {
@@ -531,11 +538,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   selectedItemName: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
   },
   selectedItemMeta: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginTop: 2,
   },
   fieldsList: {
@@ -559,7 +566,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fieldLabel: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
   },
   submitButton: {
@@ -573,14 +580,14 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   formGroup: {
     marginBottom: 14,
   },
   label: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -594,7 +601,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   dropdownText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   input: {
@@ -602,7 +609,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 12,
+    fontSize: font.base,
   },
   dateField: {
     flexDirection: 'row',
@@ -614,7 +621,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   feedbackBox: {
@@ -631,12 +638,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   feedbackTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     marginBottom: 4,
   },
   feedbackText: {
-    fontSize: 11,
+    fontSize: font.sm,
     lineHeight: 15,
   },
   timelineHeader: {
@@ -655,11 +662,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   refreshText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   timelineNote: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginBottom: 12,
     lineHeight: 15,
   },
@@ -679,7 +686,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   timelineItems: {
@@ -695,7 +702,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   itemName: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   statusBadge: {
@@ -705,11 +712,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   auditNote: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginBottom: 12,
     lineHeight: 15,
   },
@@ -724,15 +731,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   auditTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     marginBottom: 2,
   },
   auditDesc: {
-    fontSize: 10,
+    fontSize: font.sm,
   },
   auditFooter: {
-    fontSize: 10,
+    fontSize: font.sm,
     lineHeight: 14,
   },
 });

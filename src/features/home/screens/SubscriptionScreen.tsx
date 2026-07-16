@@ -15,6 +15,7 @@ import { useThemeColors } from '../../../theme/colors';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
 import type { CompanyCardItem } from './quickAccess/CompanyCard';
+import { font } from '../../../theme/typography';
 
 type TimelineStatus = 'overdue' | null;
 
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerTitle: {
-    fontSize: 17,
+    fontSize: font.title,
     fontWeight: '500',
   },
   content: {
@@ -297,13 +298,13 @@ const cEyebrow = {
 
 const cEyebrowText = {
   color: '#e6a82a',
-  fontSize: 10,
+  fontSize: font.sm,
   fontWeight: '500',
   letterSpacing: 0.5,
 } as const;
 
 const cTitle = {
-  fontSize: 17,
+  fontSize: font.title,
   fontWeight: '500',
   lineHeight: 22,
   marginBottom: 6,
@@ -315,7 +316,7 @@ const cTitleAccent = {
 } as const;
 
 const cSubtitle = {
-  fontSize: 12,
+  fontSize: font.base,
   lineHeight: 18,
   marginBottom: 24,
 } as const;
@@ -334,13 +335,13 @@ const cSummaryBox = {
 } as const;
 
 const cSummaryLabel = {
-  fontSize: 9,
+  fontSize: font.xs,
   letterSpacing: 0.3,
   marginBottom: 4,
 } as const;
 
 const cSummaryValue = {
-  fontSize: 20,
+  fontSize: font.hero,
   fontWeight: '500',
 } as const;
 
@@ -378,16 +379,16 @@ const cIconBox = {
 } as const;
 
 const cIconGlyph = {
-  fontSize: 15,
+  fontSize: font.xl,
 } as const;
 
 const cCompanyName = {
-  fontSize: 16,
+  fontSize: font.xxl,
   fontWeight: '500',
 } as const;
 
 const cCompanyPlan = {
-  fontSize: 13,
+  fontSize: font.md,
 } as const;
 
 const cExpiredBadge = {
@@ -398,7 +399,7 @@ const cExpiredBadge = {
 
 const cExpiredBadgeText = {
   color: '#e25c6b',
-  fontSize: 12,
+  fontSize: font.base,
   fontWeight: '500',
 } as const;
 
@@ -419,18 +420,18 @@ const cStatIcon = {
 } as const;
 
 const cStatLabel = {
-  fontSize: 12,
+  fontSize: font.base,
   marginBottom: 3,
   letterSpacing: 0.2,
 } as const;
 
 const cStatValue = {
-  fontSize: 17,
+  fontSize: font.title,
   fontWeight: '500',
 } as const;
 
 const cStatSub = {
-  fontSize: 12,
+  fontSize: font.base,
   marginTop: 2,
 } as const;
 
@@ -441,11 +442,11 @@ const cUsageRow = {
 } as const;
 
 const cUsageLabel = {
-  fontSize: 12,
+  fontSize: font.base,
 } as const;
 
 const cUsageValue = {
-  fontSize: 12,
+  fontSize: font.base,
 } as const;
 
 const cTimelineBlock = {
@@ -454,7 +455,7 @@ const cTimelineBlock = {
 } as const;
 
 const cTimelineTitle = {
-  fontSize: 14,
+  fontSize: font.lg,
   fontWeight: '600',
   marginBottom: 10,
 } as const;
@@ -489,17 +490,17 @@ const cTimelineContent = {
 } as const;
 
 const cTimelineLabel = {
-  fontSize: 12,
+  fontSize: font.base,
   fontWeight: '500',
   marginBottom: 2,
 } as const;
 
 const cTimelineDue = {
-  fontSize: 11,
+  fontSize: font.sm,
 } as const;
 
 const cTimelineDueOverdue = {
-  fontSize: 11,
+  fontSize: font.sm,
   fontWeight: '600',
 } as const;
 

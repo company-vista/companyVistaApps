@@ -9,6 +9,7 @@ import {
 import axios from 'axios';
 import Feather from 'react-native-vector-icons/Feather';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { API_BASE_URL } from '../../../../config/api';
 
@@ -163,7 +164,7 @@ const innerStyles = StyleSheet.create({
     zIndex: 2,
   },
   centerText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '700',
   },
 });
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   statusLabel: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 8,
   },
   statusRow: {
@@ -540,7 +541,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statusRowText: {
-    fontSize: 14,
+    fontSize: font.lg,
   },
   dot: {
     width: 7,
@@ -559,7 +560,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   filterText: {
-    fontSize: 13,
+    fontSize: font.md,
   },
   cards: {
     gap: 14,
@@ -582,14 +583,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   cardTitle: {
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '600',
   },
   cardDate: {
-    fontSize: 11,
+    fontSize: font.sm,
   },
   progressLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     letterSpacing: 0.5,
     marginBottom: 12,
   },
@@ -615,7 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   legendText: {
-    fontSize: 11,
+    fontSize: font.sm,
   },
   divider: {
     height: 0.5,
@@ -632,7 +633,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   detailsText: {
-    fontSize: 13,
+    fontSize: font.md,
   },
   statusPill: {
     flexDirection: 'row',
@@ -644,7 +645,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   statusPillText: {
-    fontSize: 11,
+    fontSize: font.sm,
   },
   avatar: {
     width: 18,
@@ -654,7 +655,7 @@ const styles = StyleSheet.create({
   infoText: {
     textAlign: 'center',
     marginVertical: 32,
-    fontSize: 14,
+    fontSize: font.lg,
     paddingHorizontal: 16,
   },
 });

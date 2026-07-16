@@ -9,6 +9,7 @@ import logo from "../../../../assets/images/logoR.png"
 
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { formatDate } from '../../../../constants/dateFormatter';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
@@ -623,8 +624,8 @@ function InvoiceDetailScreen({
                 { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 6 },
               ]}
             >
-              <Text style={{ fontWeight: '700', fontSize: 12 }}>Total</Text>
-              <Text style={{ fontWeight: '700', fontSize: 12 }}>
+              <Text style={{ fontWeight: '700', fontSize: font.base }}>Total</Text>
+              <Text style={{ fontWeight: '700', fontSize: font.base }}>
                 {formatAmount(totalAmount, currency)}
               </Text>
             </View>
@@ -701,7 +702,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
   },
-  headerTitle: { fontSize: 18, fontWeight: '600' },
+  headerTitle: { fontSize: font.heading, fontWeight: '600' },
   topDownloadBtn: { paddingLeft: 16 , paddingRight: 16, paddingBottom: 10, paddingTop: 10, backgroundColor: '#eef2ff', borderRadius: 8 },
   corporateHeader: {
     backgroundColor: '#1e1b4b',
@@ -712,14 +713,14 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: '#ffffff',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   logoLight: { color: '#eab308', fontWeight: '300' },
   logoSubText: {
     color: '#94a3b8',
-    fontSize: 9,
+    fontSize: font.xs,
     letterSpacing: 2,
     marginTop: 2,
     paddingLeft: 18,
@@ -730,11 +731,11 @@ const styles = StyleSheet.create({
   },
   invoiceTitleText: {
     color: '#ffffff',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '500',
     letterSpacing: 1,
   },
-  invoiceNumText: { color: '#94a3b8', fontSize: 11, marginTop: 2 },
+  invoiceNumText: { color: '#94a3b8', fontSize: font.sm, marginTop: 2 },
   statusBadge: {
     borderRadius: 4,
     paddingHorizontal: 10,
@@ -743,7 +744,7 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     color: '#ffffff',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
@@ -752,19 +753,19 @@ const styles = StyleSheet.create({
   gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: 8, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, backgroundColor: '#fafafa' },
   columnLabel: {
     color: '#6d28d9',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '700',
     letterSpacing: 0.5,
     marginBottom: 6,
   },
   companyNameText: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
     color: '#1e1b4b',
     marginBottom: 4,
   },
-  addressText: { fontSize: 12, color: '#64748b', lineHeight: 16 },
-  emailText: { fontSize: 12, color: '#6d28d9', marginTop: 4 },
+  addressText: { fontSize: font.base, color: '#64748b', lineHeight: 16 },
+  emailText: { fontSize: font.base, color: '#6d28d9', marginTop: 4 },
   metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -772,8 +773,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
   },
-  metaLabel: { fontSize: 12, color: '#94a3b8' },
-  metaValue: { fontSize: 12, fontWeight: '600', color: '#1e1b4b' },
+  metaLabel: { fontSize: font.base, color: '#94a3b8' },
+  metaValue: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
   tableHeaderRow: {
     backgroundColor: '#231f4f',
     paddingVertical: 10,
@@ -781,7 +782,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  tableHeaderText: { color: '#ffffff', fontSize: 10, fontWeight: '700' },
+  tableHeaderText: { color: '#ffffff', fontSize: font.sm, fontWeight: '700' },
   tableBodyRow: {
     flexDirection: 'row',
     paddingVertical: 12,
@@ -795,7 +796,7 @@ const styles = StyleSheet.create({
     width: 24,
     textAlign: 'center',
     color: '#94a3b8',
-    fontSize: 12,
+    fontSize: font.base,
   },
   itemTypeTag: {
     backgroundColor: '#14b8a6',
@@ -804,10 +805,10 @@ const styles = StyleSheet.create({
     paddingVertical: 1.5,
     marginRight: 6,
   },
-  itemTypeTagText: { color: '#ffffff', fontSize: 9, fontWeight: '700' },
-  itemNameText: { fontSize: 12, fontWeight: '700', color: '#1e1b4b', flex: 1 },
+  itemTypeTagText: { color: '#ffffff', fontSize: font.xs, fontWeight: '700' },
+  itemNameText: { fontSize: font.base, fontWeight: '700', color: '#1e1b4b', flex: 1 },
   itemDescText: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#64748b',
     lineHeight: 15,
     marginTop: 2,
@@ -815,21 +816,21 @@ const styles = StyleSheet.create({
   tableRowQty: {
     width: 36,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: font.base,
     color: '#1e1b4b',
     fontWeight: '500',
   },
   tableRowPrice: {
     width: 70,
     textAlign: 'right',
-    fontSize: 12,
+    fontSize: font.base,
     color: '#1e1b4b',
     fontWeight: '500',
   },
   tableRowAmount: {
     width: 75,
     textAlign: 'right',
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#1e1b4b',
   },
@@ -848,22 +849,22 @@ const styles = StyleSheet.create({
   splitRight: { flex: 1, padding: 14, backgroundColor: '#fafafa' },
   boxTitle: {
     color: '#6d28d9',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '700',
     letterSpacing: 0.5,
     marginBottom: 8,
   },
   bankRow: { flexDirection: 'row', marginBottom: 4 },
-  bankLabel: { width: 95, fontSize: 11, color: '#94a3b8' },
-  bankValue: { flex: 1, fontSize: 11, fontWeight: '600', color: '#1e1b4b' },
-  termsText: { fontSize: 10, color: '#64748b', marginBottom: 2 },
+  bankLabel: { width: 95, fontSize: font.sm, color: '#94a3b8' },
+  bankValue: { flex: 1, fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
+  termsText: { fontSize: font.sm, color: '#64748b', marginBottom: 2 },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  summaryLabelText: { fontSize: 11, color: '#94a3b8' },
-  summaryValueText: { fontSize: 11, fontWeight: '600', color: '#1e1b4b' },
+  summaryLabelText: { fontSize: font.sm, color: '#94a3b8' },
+  summaryValueText: { fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
   balanceStrip: {
     backgroundColor: '#1e1b4b',
     paddingVertical: 12,
@@ -872,8 +873,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  balanceStripLabel: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
-  balanceStripValue: { color: '#ffffff', fontSize: 22, fontWeight: '900' },
+  balanceStripLabel: { color: '#ffffff', fontSize: font.lg, fontWeight: '500' },
+  balanceStripValue: { color: '#ffffff', fontSize: font.display, fontWeight: '900' },
   wordsStrip: {
     padding: 12,
     backgroundColor: '#faf5ff',
@@ -881,9 +882,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
   },
-  wordsLabel: { fontSize: 11, fontWeight: '700', color: '#4c1d95' },
+  wordsLabel: { fontSize: font.sm, fontWeight: '700', color: '#4c1d95' },
   wordsValue: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#6d28d9',
     fontStyle: 'italic',
     marginLeft: 4,
@@ -895,8 +896,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
   },
-  footerMainText: { fontSize: 12, fontWeight: '600', color: '#1e1b4b' },
-  footerSubText: { fontSize: 10, color: '#64748b', marginTop: 2 },
+  footerMainText: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
+  footerSubText: { fontSize: font.sm, color: '#64748b', marginTop: 2 },
   payButtonsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -915,7 +916,7 @@ const styles = StyleSheet.create({
   },
   payButtonText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
 });

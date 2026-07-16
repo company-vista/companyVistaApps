@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 
 interface ReviewRow {
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 21,
     marginBottom: 4,
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 16,
   },
   sectionCard: {
@@ -266,11 +267,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardTitle: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
   },
   editButtonText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#e6a82a',
     letterSpacing: 0.5,
@@ -281,11 +282,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   rowLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     flex: 0.4,
   },
   rowValue: {
-    fontSize: 11,
+    fontSize: font.sm,
     textAlign: 'right',
     flex: 0.6,
     fontWeight: '500',
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   declarationText: {
-    fontSize: 10,
+    fontSize: font.sm,
     lineHeight: 14,
     textAlign: 'justify',
   },
@@ -318,11 +319,11 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: '#000000',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: 'bold',
   },
   checkboxLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     flex: 1,
     lineHeight: 15,
   },
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   inputLabel: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontWeight: '600',
     marginBottom: 6,
     letterSpacing: 0.3,
@@ -348,11 +349,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   errorText: {
-    fontSize: 9,
+    fontSize: font.xs,
     color: '#ef4444',
     marginTop: 2,
   },
@@ -370,7 +371,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitButtonText: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
     color: '#1a1204',
   },

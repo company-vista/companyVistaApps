@@ -15,6 +15,7 @@ import {
 import axios from 'axios'; // Ensure axios is installed
 import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import {API_BASE_URL} from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import Toast from 'react-native-toast-message';
@@ -677,14 +678,14 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 14,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '600',
     color: colors.text,
     flexShrink: 1,
     marginRight: 8,
   },
   selectAllBtn: {
-    fontSize: 16,
+    fontSize: font.xxl,
     color: colors.primary,
     fontWeight: '500',
   },
@@ -723,7 +724,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     elevation: 4,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
     color: colors.muted,
     textAlign: 'center',
@@ -739,7 +740,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     marginTop: 18,
   },
   countText: {
-    fontSize: 14,
+    fontSize: font.lg,
     color: colors.muted,
   },
 
@@ -753,7 +754,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     marginBottom: 8,
   },
   fieldLabel: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '500',
     color: colors.text,
     textTransform: 'none',
@@ -765,7 +766,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 11,
-    fontSize: 13,
+    fontSize: font.md,
     color: colors.text,
     backgroundColor: colors.surface,
   },
@@ -785,7 +786,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     gap: 14,
   },
   shCardTitle: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '600',
     color: colors.text,
     marginBottom: 4,
@@ -817,7 +818,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   },
   submitBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
@@ -835,12 +836,12 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     color: '#22C55E',
   },
   successTitle: {
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '600',
     color: colors.text,
   },
   successSub: {
-    fontSize: 14,
+    fontSize: font.lg,
     color: colors.muted,
     textAlign: 'center',
     marginBottom: 16,
@@ -859,7 +860,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   },
   successBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
@@ -869,7 +870,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     marginTop: 16,
   },
   messageLabel: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
     color: colors.text,
     marginBottom: 8,

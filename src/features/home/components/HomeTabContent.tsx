@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import { font } from '../../../theme/typography';
 import type { QuickAccessItemId } from '../data/quickAccessItems';
 import type { CompanyCardItem } from '../screens/quickAccess/CompanyCard';
 import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
@@ -8,6 +9,7 @@ import HomeHeroSection from './home/HomeHeroSection';
 import OrderServicesSection from './home/OrderServicesSection';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
 import UpcomingDeadlinesSection from './home/UpcomingDeadlinesSection';
+import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 type HomeTabContentProps = {
   isLoadingCompanies?: boolean;
@@ -69,6 +71,7 @@ function HomeTabContent({
         selectedCompany={selectedCompany}
       />
       <UpcomingDeadlinesSection />
+      <CompanyVistaReferral />
     </View>
   );
 }
@@ -94,18 +97,18 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     color: '#791F1F',
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   alertText: {
     color: '#501313',
-    fontSize: 11,
+    fontSize: font.sm,
     lineHeight: 16,
     marginTop: 1,
   },
   alertAction: {
     color: '#A32D2D',
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
     marginTop: 1,
   },

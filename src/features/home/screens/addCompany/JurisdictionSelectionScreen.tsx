@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 
 type Region = 'ALL' | 'AMERICAS' | 'EUROPE' | 'MEA' | 'APAC' | 'OFFSHORE';
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 21,
     marginBottom: 4,
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 12,
   },
   searchWrapper: {
@@ -273,11 +274,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   searchIcon: {
-    fontSize: 13,
+    fontSize: font.md,
   },
   searchInput: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   regionScroll: {
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   regionTabText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   countryCard: {
@@ -314,17 +315,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   countryCode: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#6f7480',
     width: 22,
   },
   countryName: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
   },
   countryEntity: {
-    fontSize: 9,
+    fontSize: font.xs,
   },
   checkCircle: {
     width: 16,
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkMark: {
-    fontSize: 10,
+    fontSize: font.sm,
     color: '#1a1204',
   },
   banner: {
@@ -348,11 +349,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   bannerIcon: {
-    fontSize: 14,
+    fontSize: font.lg,
   },
   bannerText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.sm,
   },
   bannerHighlight: {
     color: '#e6a82a',
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },

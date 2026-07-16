@@ -3,6 +3,7 @@ import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable, ActivityIn
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
 import { formatDate } from '../../../../constants/dateFormatter';
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 18,
     paddingBottom: 40,
-    paddingTop: 12,
+    paddingTop: 48,
   },
   headerRow: {
     flexDirection: 'row',
@@ -387,11 +388,11 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginTop: 4,
   },
   card: {
@@ -407,13 +408,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '700',
     flex: 1,
     marginRight: 12,
   },
   cardSubtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 12,
   },
   statusBadge: {
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   statusBadgeText: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
@@ -433,10 +434,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   metaText: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   sectionHeading: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
     marginBottom: 12,
   },
@@ -464,11 +465,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   historyHeading: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   historySubtext: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   historyCard: {
     borderWidth: 1,
@@ -501,11 +502,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   historyItemTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   historyItemStatus: {
-    fontSize: 12,
+    fontSize: font.base,
   },
   historyItemRow: {
     flexDirection: 'row',
@@ -519,11 +520,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   historyItemValue: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   historyEmptyText: {
-    fontSize: 13,
+    fontSize: font.md,
     textAlign: 'center',
     marginTop: 14,
   },
@@ -532,7 +533,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: font.md,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -551,13 +552,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   summaryLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   summaryValue: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   renewButton: {
@@ -567,7 +568,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   renewButtonText: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   detailIcon: {
@@ -583,13 +584,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '700',
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: font.lg,
     lineHeight: 20,
   },
 });

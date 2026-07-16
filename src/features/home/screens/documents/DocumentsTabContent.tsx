@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { API_BASE } from '../../../../config/api';
 import axios from 'axios';
 import { fetchCompanyDocuments, type DocumentItem } from '../../api/clientDocumentApi';
@@ -285,7 +286,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
                   {isUnlocked ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#065F46', borderRadius: 12, padding: 12 }}>
                       <FontAwesome name="clock-o" size={14} color="#6EE7B7" style={{ marginRight: 8 }} />
-                      <Text style={{ flex: 1, fontSize: 12, color: '#D1FAE5', lineHeight: 18 }}>
+                      <Text style={{ flex: 1, fontSize: font.base, color: '#D1FAE5', lineHeight: 18 }}>
                         We will deliver the document within <Text style={{ color: '#ffffff', fontWeight: '600' }}>24–72 hours.</Text>
                       </Text>
                     </View>
@@ -367,7 +368,7 @@ const getStyles = (colors: AppTheme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      paddingTop: 16,
+      paddingTop: 2,
     },
     header: {
       flexDirection: 'row',
@@ -381,12 +382,12 @@ const getStyles = (colors: AppTheme) => {
       gap: 12,
     },
     headerTitle: {
-      fontSize: 18,
+      fontSize: font.heading,
       fontWeight: '600',
       color: palette.primaryText,
     },
     headerSubtitle: {
-      fontSize: 14,
+      fontSize: font.lg,
       color: palette.accentText,
       marginTop: 2,
     },
@@ -399,7 +400,7 @@ const getStyles = (colors: AppTheme) => {
       alignItems: 'center',
     },
     totalBadgeText: {
-      fontSize: 13,
+      fontSize: font.md,
       fontWeight: '700',
       color: HOME_HERO_COLORS.accentBlue,
     },
@@ -417,7 +418,7 @@ const getStyles = (colors: AppTheme) => {
     searchInput: {
       flex: 1,
       marginLeft: 10,
-      fontSize: 14,
+      fontSize: font.lg,
       color: palette.primaryText,
     },
     filtersContainer: {
@@ -437,7 +438,7 @@ const getStyles = (colors: AppTheme) => {
       borderColor: palette.panelButton,
     },
     filterText: {
-      fontSize: 12,
+      fontSize: font.base,
       fontWeight: '600',
       color: palette.accentText,
     },
@@ -459,7 +460,7 @@ const getStyles = (colors: AppTheme) => {
       justifyContent: 'center',
     },
     tabText: {
-      fontSize: 13,
+      fontSize: font.md,
       fontWeight: '600',
     },
     unlockAllRow: {
@@ -477,7 +478,7 @@ const getStyles = (colors: AppTheme) => {
     },
     unlockAllBtnText: {
       color: '#ffffff',
-      fontSize: 12,
+      fontSize: font.base,
       fontWeight: '700',
     },
     listContainer: {
@@ -515,19 +516,19 @@ const getStyles = (colors: AppTheme) => {
       marginRight: 12,
     },
     cardTitle: {
-      fontSize: 13,
+      fontSize: font.md,
       fontWeight: '700',
       color: palette.primaryText,
       marginBottom: 2,
     },
     cardSubtitle: {
-      fontSize: 11,
+      fontSize: font.sm,
       color: palette.accentText,
       fontWeight: '500',
     },
     documentTypeText: {
       color: palette.documentTypeText,
-      fontSize: 12,
+      fontSize: font.base,
       fontWeight: '700',
       lineHeight: 16,
       marginBottom: 2,
@@ -558,11 +559,11 @@ const getStyles = (colors: AppTheme) => {
       alignItems: 'center',
     },
     cardDate: {
-      fontSize: 11,
+      fontSize: font.sm,
       color: palette.accentText,
     },
     cardLink: {
-      fontSize: 12,
+      fontSize: font.base,
       fontWeight: '700',
       color: palette.link,
     },
@@ -604,7 +605,7 @@ const getStyles = (colors: AppTheme) => {
     },
     lockedBtnText: {
       color: '#ffffff',
-      fontSize: 14,
+      fontSize: font.lg,
       fontWeight: '600',
     },
     dateList: {
@@ -612,7 +613,7 @@ const getStyles = (colors: AppTheme) => {
       gap: 4,
     },
     dateText: {
-      fontSize: 13,
+      fontSize: font.md,
     },
   });
 };

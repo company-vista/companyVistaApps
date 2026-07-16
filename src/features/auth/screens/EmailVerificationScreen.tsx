@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Check, Mail, Lock, ShieldCheck, Key, Clock, Edit2 } from 'lucide-react-native';
+import { font } from '../../../theme/typography';
 
 type EmailVerificationScreenProps = {
   email: string;
@@ -134,14 +135,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 17,
+    fontSize: font.title,
     fontWeight: '500',
     color: '#f8fafc',
     textAlign: 'center',
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     color: '#94a3b8',
     textAlign: 'center',
     marginBottom: 24,
@@ -177,12 +178,12 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   stepTextActive: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#f8fafc',
   },
   stepTextInactive: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#64748b',
   },
   stepLineActive: {
@@ -215,12 +216,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   atSymbol: {
-    fontSize: 22,
+    fontSize: font.display,
     color: '#042f2e',
     fontWeight: '600',
   },
   infoText: {
-    fontSize: 13,
+    fontSize: font.md,
     color: '#94a3b8',
     textAlign: 'center',
     lineHeight: 18,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
   },
   emailInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: font.lg,
     color: '#f8fafc',
     fontWeight: '500',
   },
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   timerText: {
-    fontSize: 13,
+    fontSize: font.md,
     color: '#94a3b8',
     marginBottom: 10,
   },
@@ -267,11 +268,11 @@ const styles = StyleSheet.create({
   },
   resendBtnText: {
     color: '#042f2e',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   spamNotice: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#64748b',
     textAlign: 'center',
     lineHeight: 16,
@@ -283,11 +284,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   grayText: {
-    fontSize: 13,
+    fontSize: font.md,
     color: '#94a3b8',
   },
   linkText: {
-    fontSize: 13,
+    fontSize: font.md,
     color: '#14b8a6',
     fontWeight: '600',
     textDecorationLine: 'underline',
@@ -309,13 +310,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#f8fafc',
     marginLeft: 4,
     fontWeight: '500',
   },
   copyrightText: {
-    fontSize: 11,
+    fontSize: font.sm,
     color: '#64748b',
     textAlign: 'center',
   },

@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 type SearchScreenProps = {
   onBackPress: () => void;
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   searchInputWrap: {
@@ -279,13 +280,13 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 44,
-    fontSize: 15,
+    fontSize: font.xl,
   },
   sectionWrap: {
     paddingBottom: 4,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
     letterSpacing: 0.5,
     paddingHorizontal: 16,
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   },
   settingsLabel: {
     flex: 1,
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '400',
   },
   listContent: {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, StyleSheet, Text, View, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
+import { font } from '../../../../theme/typography';
 
 interface UnlockDocumentModalProps {
   visible: boolean;
@@ -143,13 +144,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 199, 117, 0.25)',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '700',
     color: '#ffffff',
     letterSpacing: 0.3,
   },
   headerSubtitle: {
-    fontSize: 13,
+    fontSize: font.md,
     color: '#85B7EB',
     marginTop: 2,
   },
@@ -173,13 +174,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: 15,
+    fontSize: font.xl,
     fontWeight: '700',
     color: '#ffffff',
     marginBottom: 4,
   },
   featureDescription: {
-    fontSize: 13,
+    fontSize: font.md,
     color: 'rgba(255, 255, 255, 0.65)',
     lineHeight: 18,
   },
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   priceLabel: {
-    fontSize: 15,
+    fontSize: font.xl,
     color: 'rgba(255, 255, 255, 0.8)',
     fontWeight: '500',
   },
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     color: '#FAC775',
   },
   upsellText: {
-    fontSize: 12,
+    fontSize: font.base,
     color: 'rgba(255, 255, 255, 0.45)',
     lineHeight: 18,
     marginBottom: 24,
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '600',
   },
   payButton: {
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.sm,
     color: 'rgba(255, 255, 255, 0.5)',
     lineHeight: 16,
   },

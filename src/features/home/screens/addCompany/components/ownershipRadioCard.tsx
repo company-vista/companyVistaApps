@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { useThemeColors } from "../../../../../theme/colors";
+import { font } from "../../../../../theme/typography";
 
 type CardProps = {
   title: string;
@@ -50,10 +51,10 @@ const RadioCard = ({
       </View>
 
       <View style={{ flex: 1 }}>
-        <Text style={{ color: colors.text, fontSize: 12, fontWeight: '500', marginBottom: 2 }}>
+        <Text style={{ color: colors.text, fontSize: font.base, fontWeight: '500', marginBottom: 2 }}>
           {title}
         </Text>
-        <Text style={{ color: colors.subtle, fontSize: 10 }}>
+        <Text style={{ color: colors.subtle, fontSize: font.sm }}>
           {subtitle}
         </Text>
       </View>

@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import type { CompanyCardItem } from '../../screens/quickAccess/CompanyCard';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 
 type RecentActivityAndPaymentOverviewSectionProps = {
   onPress?: () => void;
@@ -83,7 +84,7 @@ section: {
     gap: 10,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
     marginBottom: 4,
     marginLeft: 2,
@@ -111,11 +112,11 @@ section: {
     flex: 1,
   },
   activityTitle: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '600',
   },
   activitySubtitle: {
-    fontSize: 11,
+    fontSize: font.sm,
     marginTop: 1,
   },
   divider: {
@@ -128,11 +129,11 @@ section: {
     alignItems: 'center',
   },
   paymentValue: {
-    fontSize: 13,
+    fontSize: font.md,
     fontWeight: '700',
   },
   paymentLabel: {
-    fontSize: 12,
+    fontSize: font.base,
   },
 });
 

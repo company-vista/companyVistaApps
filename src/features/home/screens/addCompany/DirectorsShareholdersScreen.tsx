@@ -11,6 +11,7 @@ import {
 import { pick, types } from '@react-native-documents/picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
 import { useAppSelector } from '../../../../store/hooks';
 import { formatDate } from '../../../../constants/dateFormatter';
@@ -228,7 +229,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
               </View>
             </View>
 
-            <Text style={[styles.sectionHeadingGold, { color: '#e6a82a', fontSize: 13, marginTop: 16, marginBottom: 12 }]}>
+            <Text style={[styles.sectionHeadingGold, { color: '#e6a82a', fontSize: font.md, marginTop: 16, marginBottom: 12 }]}>
               Residential Address (as on passport)
             </Text>
 
@@ -276,7 +277,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
               </View>
             </View>
 
-            <Text style={[styles.sectionHeadingGold, { color: '#e6a82a', fontSize: 13, marginTop: 16, marginBottom: 12 }]}>
+            <Text style={[styles.sectionHeadingGold, { color: '#e6a82a', fontSize: font.md, marginTop: 16, marginBottom: 12 }]}>
               Identity Documents
             </Text>
 
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.heading,
     fontWeight: '600',
   },
   body: {
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: font.xxl,
     fontWeight: '500',
     lineHeight: 21,
     marginBottom: 4,
@@ -361,11 +362,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 8,
   },
   shareholderIndicator: {
-    fontSize: 12,
+    fontSize: font.base,
     marginBottom: 14,
   },
   formCard: {
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   sectionHeadingGold: {
-    fontSize: 14,
+    fontSize: font.lg,
     fontWeight: '500',
     marginBottom: 12,
   },
@@ -389,12 +390,12 @@ const styles = StyleSheet.create({
   },
   infoIcon: {
     color: '#e6a82a',
-    fontSize: 14,
+    fontSize: font.lg,
     marginRight: 8,
   },
   infoText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.sm,
     lineHeight: 15,
   },
   row: {
@@ -406,7 +407,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fieldLabel: {
-    fontSize: 9,
+    fontSize: font.xs,
     letterSpacing: 0.3,
     marginBottom: 6,
   },
@@ -419,7 +420,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
-    fontSize: 12,
+    fontSize: font.base,
     paddingVertical: 12,
   },
   checkboxContainer: {
@@ -448,16 +449,16 @@ const styles = StyleSheet.create({
   },
   checkMark: {
     color: '#0B111E',
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: 'bold',
     marginTop: -1,
   },
   checkboxLabel: {
-    fontSize: 11,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   addressLabel: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
     marginBottom: 4,
   },
@@ -475,21 +476,21 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   uploadIcon: {
-    fontSize: 20,
+    fontSize: font.hero,
     color: '#e6a82a',
     marginBottom: 6,
   },
   uploadMainText: {
-    fontSize: 10,
+    fontSize: font.sm,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 2,
   },
   uploadSubText: {
-    fontSize: 9,
+    fontSize: font.xs,
   },
   uploadHint: {
-    fontSize: 9,
+    fontSize: font.xs,
     lineHeight: 11,
     marginTop: 4,
   },
@@ -503,12 +504,12 @@ const styles = StyleSheet.create({
   },
   warningIcon: {
     color: '#e6a82a',
-    fontSize: 14,
+    fontSize: font.lg,
     marginRight: 8,
   },
   warningText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.sm,
   },
   footerColumn: {
     gap: 8,
@@ -520,7 +521,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    fontSize: 12,
+    fontSize: font.base,
     fontWeight: '500',
     color: '#1a1204',
   },
