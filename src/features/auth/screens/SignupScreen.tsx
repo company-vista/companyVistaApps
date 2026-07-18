@@ -68,6 +68,7 @@ function SignupScreen({ onLoginPress }: SignupScreenProps) {
     if (signupUser.fulfilled.match(result)) {
       setEmail(result.payload.email);
       setShowVerification(true);
+      Toast.show({ type: 'success', text1: 'Account created', text2: 'OTP sent to your email' });
     }
   }
 

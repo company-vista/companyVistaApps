@@ -12,7 +12,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { useAppDispatch } from '../../../../store/hooks';
+import { setEntityDetails } from '../../../../store/slices/companyRegistrationSlice';
 
 const usStates = [
   '-- Select --', 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
@@ -94,6 +96,7 @@ type EntityDetailScreenProps = {
 export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, onContinue }: EntityDetailScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const entityOptions = selectedJurisdiction
     ? entityOptionsByCountry[selectedJurisdiction] ?? defaultEntityOptions
     : defaultEntityOptions;
@@ -110,6 +113,7 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
   const handleContinue = () => {
     setAttemptedSubmit(true);
     if (companyName && alternateName) {
+      dispatch(setEntityDetails({ stateOfIncorporation: selectedState, entityType: selected, companyName, alternateName }));
       onContinue();
     }
   };
@@ -309,14 +313,7 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={[styles.continueButtonFull, selected === '-- Select --' && styles.continueButtonDisabled]}
-            onPress={handleContinue}
-            activeOpacity={0.85}
-            disabled={selected === '-- Select --'}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton onPress={handleContinue} disabled={selected === '-- Select --'} />
         </View>
       </View>
     </View>
@@ -444,7 +441,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: font.base,
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   helperText: {
     fontSize: font.xs,
@@ -464,7 +461,7 @@ const styles = StyleSheet.create({
   continueButtonFull: {
     backgroundColor: '#e6a82a',
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   continueButtonDisabled: {

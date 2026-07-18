@@ -111,7 +111,7 @@ export default function FederalTaxFiling({ onBackPress, selectedAction }: Federa
         const loadedCompanies = result?.companies?.length > 0 ? result.companies : userCompanies;
         const options = buildCompanyOptions(loadedCompanies as Array<Record<string, any>>);
         setCompanyOptions(options);
-      } catch (error) {
+      } catch {
         if (isMounted) {
           setCompanyOptions(fallbackCompanies);
         }
@@ -272,7 +272,7 @@ export default function FederalTaxFiling({ onBackPress, selectedAction }: Federa
         });
       }
     } catch (error: any) {
-      console.error('Error submitting filing:', error);
+      console.error({type: 'error', text1: `Error submitting filing: ${error}`});
       Toast.show({
         type: 'error',
         text1: error?.response?.data?.message || 'Failed to submit filing',

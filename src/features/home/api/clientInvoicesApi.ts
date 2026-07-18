@@ -1,6 +1,7 @@
 import axios, { type AxiosError } from 'axios';
 
 import { API_BASE_URL } from '../../../config/api';
+import Toast from 'react-native-toast-message';
 
 const CLIENT_INVOICES_ROUTE = `${API_BASE_URL}/api/client/auth/invoices/my`;
 const API_REQUEST_TIMEOUT_MS = 8000;
@@ -71,8 +72,7 @@ type FetchClientInvoicesParams = {
 
 export async function fetchClientInvoices({ companyId, token }: FetchClientInvoicesParams) {
   if (!token) {
-    console.log('Client invoices API skipped: auth token missing');
-
+    Toast.show({type: "Client invoices API skipped: auth token missing"})
     return {
       error: 'Auth token missing. Please login again.',
       invoices: [],
@@ -97,15 +97,11 @@ export async function fetchClientInvoices({ companyId, token }: FetchClientInvoi
         params,
         timeout: API_REQUEST_TIMEOUT_MS,
       },
-    ); console.log(response)
+    ); 
     const invoices = getInvoicesFromResponse(response.data);
     const responseMeta = Array.isArray(response.data) ? undefined : response.data;
 
-    console.log('Client invoices loaded', {
-      invoiceCount: invoices.length,
-      success: responseMeta?.success,
-      url: CLIENT_INVOICES_ROUTE,
-    });
+    
 
     return {
       error: '',
@@ -113,15 +109,7 @@ export async function fetchClientInvoices({ companyId, token }: FetchClientInvoi
       isSuccess: responseMeta?.success ?? true,
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client invoices API error', {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: CLIENT_INVOICES_ROUTE,
-    });
+    Toast.show({ type: 'error', text1: 'Client invoices API error', text2: getErrorMessage(error) });
 
     return {
       error: getErrorMessage(error),

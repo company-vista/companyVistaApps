@@ -10,8 +10,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
-// import DirectorsShareholdersScreen from './DirectorsShareholdersScreen';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { useAppDispatch } from '../../../../store/hooks';
+import { setRegisteredAddress } from '../../../../store/slices/companyRegistrationSlice';
 
 type HasAddressOption = 'yes' | 'no' | null;
 type HasAgentOption = 'yes' | 'no' | null;
@@ -33,6 +34,7 @@ type RegisteredAddressScreenProps = {
 export default function RegisteredAddressScreen({ onBackPress, onContinue }: RegisteredAddressScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
   const [hasAddress, setHasAddress] = useState<HasAddressOption>(null);
@@ -310,13 +312,12 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={styles.continueButtonFull}
-            onPress={onContinue}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton
+            onPress={() => {
+              dispatch(setRegisteredAddress({ hasAddress, localAddress, hasAgent, agentDetails, agentAddress }));
+              onContinue();
+            }}
+          />
         </View>
       </View>
     </View>

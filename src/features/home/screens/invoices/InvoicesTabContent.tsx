@@ -350,7 +350,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
               }}
               style={styles.homeButton}
             >
-              <Text style={styles.text}>Go To Home</Text>
+              <Text style={styles.text}>Go To Home </Text>
             </Pressable>
           </View>
         ) : null}

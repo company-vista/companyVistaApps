@@ -1,9 +1,9 @@
 import { s } from './responsive';
 
 export const font = {
-  xs: s(8),
-  sm: s(9),
-  base: s(12),
+  xs: s(10),
+  sm: s(12),
+  base: s(13),
   md: s(13),
   lg: s(14),
   xl: s(15),

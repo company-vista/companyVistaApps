@@ -11,7 +11,10 @@ import { pick, types } from '@react-native-documents/picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { useAppDispatch } from '../../../../store/hooks';
+import { setAdditionalDocuments } from '../../../../store/slices/companyRegistrationSlice';
+import Toast from 'react-native-toast-message';
 
 type AdditionalDocumentsScreenProps = {
   onBackPress: () => void;
@@ -21,8 +24,10 @@ type AdditionalDocumentsScreenProps = {
 export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: AdditionalDocumentsScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const [holdingFiles, setHoldingFiles] = useState<{ name: string; uri: string }[]>([]);
   const [otherFiles, setOtherFiles] = useState<{ name: string; uri: string }[]>([]);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const handleUploadPress = async (boxType: 'holding' | 'other') => {
     try {
@@ -62,10 +67,10 @@ export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: A
             You've already uploaded each person's passport and proof of address in the previous step. Add anything else here — clear photos or scans are fine (PDF, JPG, PNG, max 10MB per file).
           </Text>
 
-          <Text style={[styles.sectionLabel, { color: colors.muted }]}>HOLDING COMPANY DOCUMENTS</Text>
+          <Text style={[styles.sectionLabel, { color: colors.muted }]}>HOLDING COMPANY DOCUMENTS *</Text>
 
           <TouchableOpacity
-            style={[styles.uploadBox, { borderColor: '#e6a82a', backgroundColor: colors.mode === 'dark' ? 'rgba(13,22,39,1)' : colors.surfaceAlt }]}
+            style={[styles.uploadBox, { borderColor: attemptedSubmit && holdingFiles.length === 0 ? '#ef4444' : '#e6a82a', backgroundColor: colors.mode === 'dark' ? 'rgba(13,22,39,1)' : colors.surfaceAlt }]}
             activeOpacity={0.7}
             onPress={() => handleUploadPress('holding')}
           >
@@ -85,13 +90,13 @@ export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: A
           )}
 
           <Text style={[styles.hintText, { color: colors.subtle }]}>
-            Certificate of incorporation, register of directors/shareholders, etc. (optional)
+            Certificate of incorporation, register of directors/shareholders, etc.
           </Text>
 
-          <Text style={[styles.sectionLabel, { color: colors.muted }]}>OTHER SUPPORTING DOCUMENTS</Text>
+          <Text style={[styles.sectionLabel, { color: colors.muted }]}>OTHER SUPPORTING DOCUMENTS *</Text>
 
           <TouchableOpacity
-            style={[styles.uploadBox, { borderColor: '#e6a82a', backgroundColor: colors.mode === 'dark' ? 'rgba(13,22,39,1)' : colors.surfaceAlt }]}
+            style={[styles.uploadBox, { borderColor: attemptedSubmit && otherFiles.length === 0 ? '#ef4444' : '#e6a82a', backgroundColor: colors.mode === 'dark' ? 'rgba(13,22,39,1)' : colors.surfaceAlt }]}
             activeOpacity={0.7}
             onPress={() => handleUploadPress('other')}
           >
@@ -111,18 +116,30 @@ export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: A
           )}
 
           <Text style={[styles.hintText, { color: colors.subtle }]}>
-            Anything else you'd like to share with us (optional)
+            Anything else you'd like to share with us
           </Text>
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={styles.continueButtonFull}
-            onPress={onContinue}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton
+            onPress={() => {
+              setAttemptedSubmit(true);
+              if (holdingFiles.length === 0 && otherFiles.length === 0) {
+                Toast.show({ type: 'error', text1: 'Required fields missing', text2: 'Please upload at least one document' });
+                return;
+              }
+              if (holdingFiles.length === 0) {
+                Toast.show({ type: 'error', text1: 'Required field missing', text2: 'Holding company documents are required' });
+                return;
+              }
+              if (otherFiles.length === 0) {
+                Toast.show({ type: 'error', text1: 'Required field missing', text2: 'Other supporting documents are required' });
+                return;
+              }
+              dispatch(setAdditionalDocuments({ holdingFiles, otherFiles }));
+              onContinue();
+            }}
+          />
         </View>
       </View>
     </View>

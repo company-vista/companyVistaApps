@@ -211,17 +211,20 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
+    columnGap: 5,
   },
   gridItem: {
     width: '24%',
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
-    paddingVertical: 4,
+    paddingVertical: 10,
     paddingHorizontal: 2,
     overflow: 'hidden',
+    aspectRatio: 1,
   },
   expandedSection: {
     marginTop: 10,
@@ -229,10 +232,8 @@ const styles = StyleSheet.create({
   },
   expandedGridContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
-    rowGap: 16,
+    alignItems: 'stretch',
+    columnGap: 5,
   },
   iconWrapper: {
     position: 'relative',
@@ -246,11 +247,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   serviceTitle: {
-    fontSize: font.sm,
+    fontSize: font.xs,
     fontWeight: '500',
     textAlign: 'center',
-    lineHeight: font.sm + 5,
-    minHeight: font.sm * 2 + 6,
+    lineHeight: font.xs + 4,
+    minHeight: font.xs * 2 + 4,
   },
   serviceSubtitle: {
     fontSize: font.xs,

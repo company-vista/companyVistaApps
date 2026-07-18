@@ -11,7 +11,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RadioCard from "./components/ownershipRadioCard";
 import { useThemeColors } from "../../../../theme/colors";
 import { font } from '../../../../theme/typography';
-import { BackButton } from "../../../../components/buttons";
+import { BackButton, ContinueButton } from "../../../../components/buttons";
+import { useAppDispatch } from "../../../../store/hooks";
+import { setOwnership } from "../../../../store/slices/companyRegistrationSlice";
+import Toast from "react-native-toast-message";
 
 type OwnershipScreenProps = {
   onBackPress: () => void;
@@ -21,6 +24,7 @@ type OwnershipScreenProps = {
 export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
 
   const [ownershipType, setOwnershipType] = useState<
     "individual" | "company" | "branch"
@@ -53,6 +57,7 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
   });
 
   const [holdingCompanies, setHoldingCompanies] = useState<HoldingCompany[]>([createEmptyHolding()]);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const updateHolding = (index: number, field: keyof HoldingCompany, value: string) => {
     setHoldingCompanies((prev) =>
@@ -68,21 +73,80 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
     setHoldingCompanies((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const isAllFieldsEmpty = (h: HoldingCompany) =>
-    !h.legalName && !h.country && !h.registrationNo &&
-    !h.addressLine1 && !h.addressLine2 && !h.city &&
-    !h.state && !h.zip && !h.addressCountry && !h.ownershipPercent;
+  const isPrimaryFieldEmpty = (h: HoldingCompany, field: keyof HoldingCompany) => {
+    if (!h) return false;
+    return !h[field]?.trim();
+  };
+
+  const validate = (): string | null => {
+    if (ownershipType === 'company' || ownershipType === 'branch') {
+      const primary = holdingCompanies[0];
+      if (!primary) return 'Holding company details are required';
+      const requiredFields: (keyof HoldingCompany)[] = [
+        'legalName', 'country', 'registrationNo',
+        'addressLine1', 'city', 'state', 'zip', 'addressCountry', 'ownershipPercent',
+      ];
+      for (const field of requiredFields) {
+        if (!primary[field]?.trim()) {
+          const label = field === 'legalName' ? 'Legal entity name'
+            : field === 'registrationNo' ? 'Registration No.'
+            : field === 'addressLine1' ? 'Address Line 1'
+            : field === 'addressCountry' ? 'Country'
+            : field === 'ownershipPercent' ? 'Ownership %'
+            : field.charAt(0).toUpperCase() + field.slice(1);
+          return `${label} is required in Holding Company`;
+        }
+      }
+    }
+    return null;
+  };
+
+  const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
+
+  const RequiredAsterisk = () => (
+    <Text style={{ color: '#ef4444', fontSize: font.base }}>*</Text>
+  );
+
+  const renderInputField = (
+    placeholder: string,
+    value: string,
+    onChangeText: (v: string) => void,
+    isRequired: boolean = false,
+    options?: { keyboardType?: 'numeric' | 'default'; half?: boolean; noBorder?: boolean }
+  ) => {
+    const hasError = attemptedSubmit && isRequired && !value?.trim();
+    return (
+      <View style={[
+        styles.inputWrapper,
+        options?.half ? styles.halfInput : undefined,
+        { backgroundColor: inputBg, borderColor: hasError ? '#ef4444' : colors.inputBorder }
+      ]}>
+        <TextInput
+          placeholder={placeholder}
+          placeholderTextColor={colors.inputPlaceholder}
+          style={[styles.input, { color: colors.text }]}
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={options?.keyboardType}
+        />
+      </View>
+    );
+  };
 
   const renderHoldingCompanyForm = (h: HoldingCompany, index: number) => {
     const isPrimary = index === 0;
-    const isEmpty = isAllFieldsEmpty(h);
-    const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
+    const isEmpty = !h.legalName && !h.country && !h.registrationNo &&
+      !h.addressLine1 && !h.addressLine2 && !h.city &&
+      !h.state && !h.zip && !h.addressCountry && !h.ownershipPercent;
+
+    const required = attemptedSubmit;
 
     return (
       <View key={index} style={styles.extraFields}>
         <View style={styles.holdingHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text, flex: 1 }]}>
             {isPrimary ? 'Holding Company (Primary)' : `Holding Company #${index + 1}`}
+            {required && <RequiredAsterisk />}
           </Text>
           {!isPrimary && isEmpty && (
             <TouchableOpacity onPress={() => removeHoldingCompany(index)}>
@@ -91,112 +155,34 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
           )}
         </View>
 
-        <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-          <TextInput
-            placeholder="Legal entity name"
-            placeholderTextColor={colors.inputPlaceholder}
-            style={[styles.input, { color: colors.text }]}
-            value={h.legalName}
-            onChangeText={(v) => updateHolding(index, 'legalName', v)}
-          />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {renderInputField('Legal entity name', h.legalName, (v) => updateHolding(index, 'legalName', v), true)}
         </View>
 
         <View style={styles.row}>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="Country"
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.country}
-              onChangeText={(v) => updateHolding(index, 'country', v)}
-            />
-          </View>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="Registration No."
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.registrationNo}
-              onChangeText={(v) => updateHolding(index, 'registrationNo', v)}
-            />
-          </View>
+          {renderInputField('Country', h.country, (v) => updateHolding(index, 'country', v), true, { half: true })}
+          {renderInputField('Registration No.', h.registrationNo, (v) => updateHolding(index, 'registrationNo', v), true, { half: true })}
         </View>
 
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Registered Address
         </Text>
 
-        <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-          <TextInput
-            placeholder="Address Line 1"
-            placeholderTextColor={colors.inputPlaceholder}
-            style={[styles.input, { color: colors.text }]}
-            value={h.addressLine1}
-            onChangeText={(v) => updateHolding(index, 'addressLine1', v)}
-          />
-        </View>
+        {renderInputField('Address Line 1', h.addressLine1, (v) => updateHolding(index, 'addressLine1', v), true)}
+        {renderInputField('Address Line 2', h.addressLine2, (v) => updateHolding(index, 'addressLine2', v), false)}
 
-        <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-          <TextInput
-            placeholder="Address Line 2"
-            placeholderTextColor={colors.inputPlaceholder}
-            style={[styles.input, { color: colors.text }]}
-            value={h.addressLine2}
-            onChangeText={(v) => updateHolding(index, 'addressLine2', v)}
-          />
+        <View style={styles.row}>
+          {renderInputField('City', h.city, (v) => updateHolding(index, 'city', v), true, { half: true })}
+          {renderInputField('State', h.state, (v) => updateHolding(index, 'state', v), true, { half: true })}
         </View>
 
         <View style={styles.row}>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="City"
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.city}
-              onChangeText={(v) => updateHolding(index, 'city', v)}
-            />
-          </View>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="State"
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.state}
-              onChangeText={(v) => updateHolding(index, 'state', v)}
-            />
-          </View>
+          {renderInputField('ZIP', h.zip, (v) => updateHolding(index, 'zip', v), true, { half: true })}
+          {renderInputField('Country', h.addressCountry, (v) => updateHolding(index, 'addressCountry', v), true, { half: true })}
         </View>
 
-        <View style={styles.row}>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="ZIP"
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.zip}
-              onChangeText={(v) => updateHolding(index, 'zip', v)}
-            />
-          </View>
-          <View style={[styles.inputWrapper, styles.halfInput, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-            <TextInput
-              placeholder="Country"
-              placeholderTextColor={colors.inputPlaceholder}
-              style={[styles.input, { color: colors.text }]}
-              value={h.addressCountry}
-              onChangeText={(v) => updateHolding(index, 'addressCountry', v)}
-            />
-          </View>
-        </View>
-
-        <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-          <TextInput
-            placeholder="Ownership %"
-            placeholderTextColor={colors.inputPlaceholder}
-            style={[styles.input, { color: colors.text }]}
-            value={h.ownershipPercent}
-            onChangeText={(v) => updateHolding(index, 'ownershipPercent', v)}
-            keyboardType="numeric"
-          />
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {renderInputField('Ownership %', h.ownershipPercent, (v) => updateHolding(index, 'ownershipPercent', v), true, { keyboardType: 'numeric' })}
         </View>
       </View>
     );
@@ -260,13 +246,18 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={styles.continueButtonFull}
-            onPress={onContinue}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton
+            onPress={() => {
+              setAttemptedSubmit(true);
+              const error = validate();
+              if (error) {
+                Toast.show({ type: 'error', text1: 'Required fields missing', text2: error });
+                return;
+              }
+              dispatch(setOwnership({ ownershipType, holdingCompanies }));
+              onContinue();
+            }}
+          />
         </View>
       </View>
     </View>

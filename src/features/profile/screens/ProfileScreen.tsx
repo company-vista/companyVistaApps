@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -41,6 +41,14 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
   const user = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
   const [isSwitchSheetVisible, setIsSwitchSheetVisible] = useState(false);
+  const [isEmailDropdownOpen, setIsEmailDropdownOpen] = useState(false);
+  const [isAddingEmail, setIsAddingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingEmail, setEditingEmail] = useState('');
+  const [emailList, setEmailList] = useState([
+    { email: user?.email ?? 'N/A', isPrimary: true },
+  ]);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,7 +74,6 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
   const dateOfBirth = formatProfileDate(user?.dateOfBirth ?? user?.dob);
   const passportNumber = user?.passportNumber ?? user?.passportNo ?? 'N/A';
   const profileItems = [
-    { label: 'Email', value: user?.email ?? 'N/A', icon: 'envelope-o' },
     { label: 'Phone', value: phone, icon: 'phone' },
     { label: 'Date of Birth', value: dateOfBirth, icon: 'calendar-o' },
     { label: 'Passport Number', value: passportNumber, icon: 'id-card-o' },
@@ -186,6 +193,127 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
           Contact information
         </Text>
         <View>
+          <Pressable
+            onPress={() => setIsEmailDropdownOpen(prev => !prev)}
+            style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+            <View style={[styles.detailIcon, { backgroundColor: colors.surfaceAlt }]}>
+              <FontAwesome name="envelope-o" size={17} color={colors.accent} />
+            </View>
+            <View style={styles.detailCopy}>
+              <Text style={[styles.detailLabel, { color: colors.subtle }]}>
+                Email
+              </Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{user?.email ?? 'N/A'}</Text>
+            </View>
+            <View style={styles.emailDropdownRight}>
+              <Text style={styles.emailDropdownPrimaryLabel}>Primary</Text>
+              <FontAwesome
+                name={isEmailDropdownOpen ? 'chevron-up' : 'chevron-down'}
+                size={14}
+                color={colors.muted}
+                style={{ marginTop: 6 }}
+              />
+            </View>
+          </Pressable>
+          {isEmailDropdownOpen && (
+            <View style={[styles.emailDropdown, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
+              {emailList.map((item, index) => (
+                <View
+                  key={item.email + index}
+                  style={[styles.emailDropdownItem, index < emailList.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+                  {editingIndex === index ? (
+                    <View style={styles.emailEditRow}>
+                      <TextInput
+                        autoFocus
+                        keyboardType="email-address"
+                        value={editingEmail}
+                        onChangeText={setEditingEmail}
+                        style={[styles.emailInput, { color: colors.text, borderColor: colors.border, flex: 1 }]}
+                        onSubmitEditing={() => {
+                          if (editingEmail.trim()) {
+                            setEmailList(prev => prev.map((e, i) => i === index ? { ...e, email: editingEmail.trim() } : e));
+                            setEditingIndex(null);
+                            setEditingEmail('');
+                          }
+                        }}
+                      />
+                      <Pressable
+                        onPress={() => {
+                          if (editingEmail.trim()) {
+                            setEmailList(prev => prev.map((e, i) => i === index ? { ...e, email: editingEmail.trim() } : e));
+                            setEditingIndex(null);
+                            setEditingEmail('');
+                          }
+                        }}
+                        style={[styles.emailInputSubmit, { backgroundColor: colors.accent }]}>
+                        <FontAwesome name="check" size={14} color="#fff" />
+                      </Pressable>
+                      <Pressable
+                        onPress={() => { setEditingIndex(null); setEditingEmail(''); }}
+                        style={[styles.emailInputClose, { backgroundColor: colors.surface }]}>
+                        <FontAwesome name="times" size={14} color={colors.muted} />
+                      </Pressable>
+                    </View>
+                  ) : (
+                    <>
+                      <View style={styles.emailDropdownLeft}>
+                        <Text style={[styles.emailDropdownValue, { color: colors.text }]}>{item.email}</Text>
+                      </View>
+                      {item.isPrimary ? (
+                        <Pressable
+                          onPress={() => setIsAddingEmail(true)}
+                          style={[styles.emailDropdownAdd, { backgroundColor: colors.accentSoft }]}>
+                          <FontAwesome name="plus" size={12} color={colors.accent} />
+                        </Pressable>
+                      ) : (
+                        <Pressable
+                          onPress={() => { setEditingIndex(index); setEditingEmail(item.email); }}
+                          style={[styles.emailDropdownAdd, { backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border }]}>
+                          <FontAwesome name="pencil" size={11} color={colors.accent} />
+                        </Pressable>
+                      )}
+                    </>
+                  )}
+                </View>
+              ))}
+              {isAddingEmail && (
+                <View style={[styles.emailInputRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                  <TextInput
+                    autoFocus
+                    keyboardType="email-address"
+                    placeholder="Enter email"
+                    placeholderTextColor={colors.muted}
+                    value={newEmail}
+                    onChangeText={setNewEmail}
+                    style={[styles.emailInput, { color: colors.text, borderColor: colors.border }]}
+                    onSubmitEditing={() => {
+                      if (newEmail.trim()) {
+                        setEmailList(prev => [...prev, { email: newEmail.trim(), isPrimary: false }]);
+                        setNewEmail('');
+                        setIsAddingEmail(false);
+                      }
+                    }}
+                  />
+                  <Pressable
+                    onPress={() => {
+                      if (newEmail.trim()) {
+                        setEmailList(prev => [...prev, { email: newEmail.trim(), isPrimary: false }]);
+                        setNewEmail('');
+                        setIsAddingEmail(false);
+                      }
+                    }}
+                    style={[styles.emailInputSubmit, { backgroundColor: colors.accent }]}>
+                    <FontAwesome name="check" size={14} color="#fff" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => { setNewEmail(''); setIsAddingEmail(false); }}
+                    style={[styles.emailInputClose, { backgroundColor: colors.surface }]}>
+                    <FontAwesome name="times" size={14} color={colors.muted} />
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          )}
           {profileItems.map(item => (
             <View key={item.label} style={[styles.detailRow, { borderBottomColor: colors.border }]}>
               <View style={[styles.detailIcon, { backgroundColor: colors.surfaceAlt }]}>

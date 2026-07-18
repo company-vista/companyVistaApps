@@ -14,7 +14,7 @@ function BackButton({ onPress }: BackButtonProps) {
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={styles.button}>
+      style={[styles.button, { backgroundColor: '#ffffff' }]}>
       <FontAwesome name="angle-left" size={34} color={colors.text} />
     </Pressable>
   );
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    borderRadius: 20,
   },
 });
 

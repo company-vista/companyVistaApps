@@ -70,7 +70,6 @@ const ComplianceHistoryScreen = ({ selectedAction, onBackPress }: ComplianceHist
         companyId: selectedAction.companyId,
         token,
       });
-      console.log(result)
       if (!isMounted) {
         return;
       }

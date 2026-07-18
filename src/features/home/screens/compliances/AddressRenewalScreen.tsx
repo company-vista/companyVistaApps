@@ -232,16 +232,16 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
           },
         },
       );
-      console.log(response);
+  
       const checkoutUrl = response?.data?.url;
-      console.log(checkoutUrl);
+  
       if (checkoutUrl) {
         await Linking.openURL(checkoutUrl);
       } else {
         Alert.alert('Payment', 'Checkout URL not returned by server.');
       }
     } catch (error: any) {
-      console.error('Checkout error', error);
+      Toast.show({type: `Checkout error ${error}`});
       const status = error?.response?.status;
       const message = error?.response?.data?.message || 'Unable to start Stripe checkout right now.';
       Alert.alert('Payment', status ? `${message} (Status ${status})` : message);

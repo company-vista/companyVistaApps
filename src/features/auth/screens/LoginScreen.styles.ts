@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     gap: s(14),
   },
   field: {
-    gap: 8,
+    gap: s(14),
   },
   label: {
     color: '#cbd5e1a9',
@@ -62,13 +62,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   inputWrap: {
-    height: s(48),
+    height: s(54),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: s(10),
     borderWidth: 1,
     borderColor: '#334155',
-    borderRadius: s(12),
+    borderRadius: s(20),
     backgroundColor: '#111827',
     paddingHorizontal: s(14),
   },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: s(50),
-    borderRadius: s(14),
+    borderRadius: s(22),
     backgroundColor: '#14b8a6',
     marginTop: 8,
   },
@@ -107,13 +107,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#042f2e',
-    fontSize: s(15),
+    fontSize: s(16),
     fontWeight: '800',
   },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: s(10),
   },
   dividerLine: {
     flex: 1,
@@ -126,13 +126,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   googleAuthButton: {
-    height: s(48),
+    height: s(50),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: s(10),
     borderWidth: 1,
-    borderRadius: s(12),
+    borderRadius: s(22),
     backgroundColor: '#ffffffa2',
   },
   googleAuthText: {
@@ -142,17 +142,18 @@ const styles = StyleSheet.create({
   },
   authLinkText: {
     color: '#94a3b8',
-    fontSize: s(13),
+    fontSize: s(15),
     fontWeight: '600',
     textAlign: 'center',
   },
   authLink: {
     color: '#5eead4',
     fontWeight: '800',
+  
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginTop: -6,
+    marginTop: -2,
   },
   forgotPasswordText: {
     fontSize: s(12),
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   },
   socialSection: {
     alignItems: 'center',
-    gap: 10,
+    gap: s(10) ,
     marginTop: 8,
   },
   socialTitle: {

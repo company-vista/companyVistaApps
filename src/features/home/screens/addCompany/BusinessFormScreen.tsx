@@ -10,7 +10,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { useAppDispatch } from '../../../../store/hooks';
+import { setBusinessInfo } from '../../../../store/slices/companyRegistrationSlice';
 
 type BusinessFormScreenProps = {
   onBackPress: () => void;
@@ -20,6 +22,7 @@ type BusinessFormScreenProps = {
 export default function BusinessFormScreen({ onBackPress, onContinue }: BusinessFormScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
   const [website, setWebsite] = useState('');
@@ -207,13 +210,12 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={styles.continueButtonFull}
-            onPress={onContinue}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton
+            onPress={() => {
+              dispatch(setBusinessInfo({ website, establishReason, principalActivity, briefIntroduction, additionalInfo }));
+              onContinue();
+            }}
+          />
         </View>
       </View>
     </View>

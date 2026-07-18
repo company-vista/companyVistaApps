@@ -6,12 +6,16 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { resetCompanyRegistration } from '../../../../store/slices/companyRegistrationSlice';
+import { submitCompanyRegistration } from '../../api/companyRegistrationApi';
 
 interface ReviewRow {
   label: string;
@@ -25,7 +29,7 @@ interface ReviewSection {
 
 type ReviewSubmitScreenProps = {
   onBackPress: () => void;
-  onSubmit: () => void;
+  onSubmit?: (companyId?: string) => void;
   onEditApplicant?: () => void;
   onEditJurisdiction?: () => void;
   onEditCompanyName?: () => void;
@@ -38,64 +42,151 @@ type ReviewSubmitScreenProps = {
 export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplicant, onEditJurisdiction, onEditCompanyName, onEditOwnership, onEditAddress, onEditDirectors, onEditBusinessActivity }: ReviewSubmitScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [signature, setSignature] = useState<string>('');
-  const [date] = useState<string>('07/06/2026');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const reg = useAppSelector(state => state.companyRegistration);
+  const token = useAppSelector(state => state.auth.token);
+  // const user = useAppSelector(state => state.auth.user);
+  // const clientId = user?._id || user?.id || '';
+
+  const today = new Date();
+  const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
+
+  const holdingSummary = reg.holdingCompanies.length > 0
+    ? reg.holdingCompanies.map((h, i) => `${h.legalName || '—'} (${h.ownershipPercent || '0'}%)`).join(', ')
+    : '—';
+
+  const directorsSummary = reg.directors.length > 0
+    ? reg.directors.map((d, i) => `${d.firstName} ${d.lastName} — ${d.ownership}%`).join(', ')
+    : '—';
+
+  const totalOwnership = reg.directors.reduce((sum, d) => sum + (parseFloat(d.ownership) || 0), 0);
+
+  const localAddressSummary = reg.hasAddress === 'yes'
+    ? [reg.localAddress.line1, reg.localAddress.city, reg.localAddress.state, reg.localAddress.postalCode, reg.localAddress.country].filter(Boolean).join(', ') || '—'
+    : reg.hasAddress === 'no' ? 'CompanyVista arranged' : '—';
+
+  const agentSummary = reg.hasAgent === 'yes'
+    ? `${reg.agentDetails.firstName} ${reg.agentDetails.lastName}`.trim() || '—'
+    : reg.hasAgent === 'no' ? 'CompanyVista arranged' : '—';
 
   const reviewSections: ReviewSection[] = [
     {
       title: 'Applicant',
       rows: [
-        { label: 'I am the', value: 'owner' },
-        { label: 'Contact', value: 'Gautam Kumar (gautamrajanexport@gmail.com)' },
+        { label: 'I am the', value: reg.applicantType },
+        { label: 'Contact', value: `${reg.firstName} ${reg.lastName}`.trim() || '—' },
+        { label: 'Email', value: reg.email || '—' },
+        { label: 'Phone', value: reg.phone || '—' },
       ],
     },
     {
       title: 'Jurisdiction & Entity',
       rows: [
-        { label: 'Country', value: 'Costa Rica' },
-        { label: 'Entity type', value: 'Sociedad Anónima (S.A.)' },
+        { label: 'Country', value: reg.jurisdictionName || reg.jurisdiction || '—' },
+        { label: 'State', value: reg.stateOfIncorporation === '-- Select --' ? '—' : reg.stateOfIncorporation },
+        { label: 'Entity type', value: reg.entityType === '-- Select --' ? '—' : reg.entityType },
       ],
     },
     {
       title: 'Company Name',
       rows: [
-        { label: 'Desired name', value: 'ooo' },
-        { label: 'Alternate name', value: 'kjfksl' },
+        { label: 'Desired name', value: reg.companyName || '—' },
+        { label: 'Alternate name', value: reg.alternateName || '—' },
       ],
     },
     {
       title: 'Ownership',
       rows: [
-        { label: 'Structure', value: 'branch' },
-        { label: 'Holding company 1', value: '— (100.0%)' },
-        { label: 'Holding company 2', value: '— (0%)' },
+        { label: 'Structure', value: reg.ownershipType },
+        { label: 'Holding companies', value: holdingSummary },
       ],
     },
     {
       title: 'Address & Representative',
       rows: [
-        { label: 'Local address', value: 'yes' },
-        { label: 'Local representative', value: 'yes' },
+        { label: 'Local address', value: localAddressSummary },
+        { label: 'Local representative', value: agentSummary },
       ],
     },
     {
       title: 'Directors & Shareholders',
       rows: [
-        { label: '1st person', value: 'Gautam Kumar — 100%' },
-        { label: 'Total shareholding', value: '100%' },
+        { label: 'People', value: directorsSummary },
+        { label: 'Total shareholding', value: `${totalOwnership}%` },
       ],
     },
     {
       title: 'Business Activity',
       rows: [
-        { label: 'Reason', value: 'Expanding an existing business internationally' },
-        { label: 'Activity', value: 'Software Development / SaaS' },
+        { label: 'Website', value: reg.website || '—' },
+        { label: 'Reason', value: reg.establishReason === '-- Select --' ? '—' : reg.establishReason },
+        { label: 'Activity', value: reg.principalActivity === '-- Select --' ? '—' : reg.principalActivity },
+        { label: 'Introduction', value: reg.briefIntroduction ? (reg.briefIntroduction.length > 60 ? reg.briefIntroduction.substring(0, 60) + '...' : reg.briefIntroduction) : '—' },
       ],
     },
   ];
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    const payload: Record<string, any> = {
+      applicantType: reg.applicantType,
+      firstName: reg.firstName,
+      lastName: reg.lastName,
+      email: reg.email,
+      phone: reg.phone,
+      countryOfIncorporation: reg.jurisdictionName || reg.jurisdiction,
+      jurisdictionName: reg.jurisdictionName,
+      stateOfRegistration: reg.stateOfIncorporation,
+      companyType: reg.entityType,
+      companyName: reg.companyName,
+      alternateCompanyName: reg.alternateName,
+      ownershipType: reg.ownershipType,
+      holdingCompanies: reg.holdingCompanies,
+      hasLocalAddress: reg.hasAddress === 'yes',
+      localAddress: reg.localAddress,
+      hasLocalRepresentative: reg.hasAgent === 'yes',
+      agentDetails: reg.agentDetails,
+      agentAddress: reg.agentAddress,
+      directors: reg.directors,
+      companyWebsite: reg.website,
+      establishReason: reg.establishReason,
+      principalActivity: reg.principalActivity,
+      companyIntroduction: reg.briefIntroduction,
+      additionalInfo: reg.additionalInfo,
+      representativePhone: reg.phone,
+    };
+
+    if (reg.holdingFiles && reg.holdingFiles.length > 0) {
+      payload.holdingFiles = reg.holdingFiles;
+    }
+    if (reg.otherFiles && reg.otherFiles.length > 0) {
+      payload.otherFiles = reg.otherFiles;
+    }
+   
+    try {
+      const result = await submitCompanyRegistration(payload, token);
+      
+      if (result.isSuccess) {
+        Toast.show({ type: 'success', text1: 'Registration submitted successfully!' });
+        dispatch(resetCompanyRegistration());
+        const newCompanyId = result.data?._id || result.data?.company?._id || result.data?.data?._id;
+        onSubmit(newCompanyId);
+      } else {
+        Toast.show({ type: 'error', text1: 'Submission failed', text2: result.error });
+      }
+    } catch {
+      
+      Toast.show({ type: 'error', text1: 'Something went wrong', text2: 'Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -110,9 +201,6 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* <Text style={[styles.title, { color: colors.text }]}>
-            Review & <Text style={styles.titleAccent}>submit</Text>
-          </Text> */}
           <Text style={[styles.subtitle, { color: colors.muted }]}>
             Please check your details below. Tap "Edit" next to any section to make changes.
           </Text>
@@ -186,7 +274,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
-                  value={date}
+                  value={dateStr}
                   editable={false}
                 />
               </View>
@@ -195,17 +283,12 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={[styles.submitButtonFull, (!isChecked || !signature) && styles.submitButtonDisabled]}
-            onPress={() => {
-              Toast.show({ type: 'success', text1: 'Registration submitted successfully!' });
-              onSubmit();
-            }}
-            activeOpacity={0.85}
+          <ContinueButton
+            label="SUBMIT REGISTRATION"
+            onPress={handleSubmit}
             disabled={!isChecked || !signature}
-          >
-            <Text style={styles.submitButtonText}>SUBMIT REGISTRATION</Text>
-          </TouchableOpacity>
+            loading={isSubmitting}
+          />
         </View>
       </View>
     </View>
@@ -375,5 +458,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1a1204',
   },
-
 });

@@ -22,49 +22,26 @@ function RecentActivityAndPaymentOverviewSection({
   const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
 
   const recentActivities = [
-    { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)' },
-    { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)' },
+    { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.5)' },
+    { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.5)' },
   ];
 
   return (
     <View style={styles.wrapper}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
-      <View
-        // style={[
-        //   styles.container,
-        //   { backgroundColor: colors.surface, borderColor: colors.border },
-        // ]}
-      >
-        <View style={styles.section}>
-
-          {recentActivities.map((item, index) => (
-            <Pressable
-              key={item.title}
-              style={[
-                styles.activityRow,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: index === 0 ? 'rgba(59, 130, 246, 0.5)' : 'rgba(139, 92, 246, 0.5)',
-                  borderWidth: 1,
-                  borderRadius: 12,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                },
-              ]}
-              onPress={item.onItemPress}
-            >
-              <View style={[styles.iconContainer, { backgroundColor: item.iconBg }]}>
-                <FontAwesome name={item.icon} size={16} color={item.iconColor} />
-              </View>
-              <View style={styles.activityCopy}>
-                <Text style={[styles.activityTitle, { color: colors.text }]}>{item.title}</Text>
-                <Text style={[styles.activitySubtitle, { color: colors.muted }]}>{item.subtitle}</Text>
-              </View>
-              <FontAwesome name="angle-right" size={18} color={colors.muted} />
-            </Pressable>
-          ))}
-        </View>
-
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
+      <View style={styles.grid}>
+        {recentActivities.map(item => (
+          <Pressable
+            key={item.title}
+            style={[styles.card, { backgroundColor: colors.surface, borderColor: item.borderColor }]}
+            onPress={item.onItemPress}
+          >
+            <View style={[styles.iconContainer]}>
+              <FontAwesome name={item.icon} size={20} color={item.iconColor} />
+            </View>
+            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+          </Pressable>
+        ))}
       </View>
     </View>
   );
@@ -75,65 +52,43 @@ const styles = StyleSheet.create({
     marginTop: 19,
     marginBottom: 14,
   },
-  container: {
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 14,
-},
-section: {
-    gap: 10,
-  },
   sectionTitle: {
     fontSize: font.lg,
     fontWeight: '500',
-    marginBottom: 4,
+    marginBottom: 12,
     marginLeft: 2,
   },
-  activityRow: {
+  grid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: 'stretch',
+    columnGap: 5,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFF1E6',
+  card: {
+    width: '24%',
+    aspectRatio: 1,
+    borderWidth: 1,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    overflow: 'hidden',
   },
-  activityCopy: {
-    flex: 1,
-  },
-  activityTitle: {
-    fontSize: font.base,
-    fontWeight: '600',
-  },
-  activitySubtitle: {
-    fontSize: font.sm,
-    marginTop: 1,
-  },
-  divider: {
-    height: 1,
-    marginVertical: 12,
-  },
-  paymentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  iconContainer: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    backgroundColor: 'transparent',
   },
-  paymentValue: {
-    fontSize: font.md,
-    fontWeight: '700',
-  },
-  paymentLabel: {
-    fontSize: font.base,
+  cardTitle: {
+    fontSize: font.xs,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: font.xs + 4,
+    minHeight: font.xs * 2 + 4,
   },
 });
 

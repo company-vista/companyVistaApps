@@ -1,6 +1,7 @@
 import axios, { type AxiosError } from 'axios';
 
 import { API_BASE_URL } from '../../../config/api';
+import Toast from 'react-native-toast-message';
 
 const COMPANY_DOCUMENTS_PATH = '/api/documents/company';
 const API_REQUEST_TIMEOUT_MS = 8000;
@@ -105,7 +106,8 @@ export async function fetchCompanyDocuments({
   token,
 }: FetchCompanyDocumentsParams) {
   if (!token) {
-    console.log('Company documents API skipped: auth token missing');
+    Toast.show({type: "Company documents API skipped: auth token missing"})
+    
 
     return {
       documents: [],
@@ -115,7 +117,7 @@ export async function fetchCompanyDocuments({
   }
 
   if (!companyId) {
-    console.log('Company documents API skipped: company id missing');
+    Toast.show({type: 'Company documents API skipped: company id missing'});
 
     return {
       documents: [],
@@ -137,30 +139,16 @@ export async function fetchCompanyDocuments({
     
     const documents = getResponseDocuments(response.data);
 
-    console.log('Company documents loaded', {
-      companyId,
-      documentCount: documents.length,
-      success: response.data.success,
-      url: documentsRoute,
-    });
-
+  
     return {
       documents,
       error: '',
       isSuccess: response.data.success ?? true,
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+    Toast.show({ type: 'error', text1: 'Company documents API error', text2: getErrorMessage(error) });
 
-    console.log('Company documents API error', {
-      companyId,
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: documentsRoute,
-    });
-
+  
     return {
       documents: [],
       error: getErrorMessage(error),
@@ -181,7 +169,7 @@ export async function fetchDocumentView({
   viewUrl,
 }: FetchDocumentViewParams) {
   if (!token) {
-    console.log('Document view API skipped: auth token missing');
+    Toast.show({type: 'Document view API skipped: auth token missing'});
 
     return {
       data: null as DocumentViewData | null,
@@ -191,7 +179,7 @@ export async function fetchDocumentView({
   }
 
   if (!viewUrl) {
-    console.log('Document view API skipped: view url missing');
+    Toast.show({type: 'Document view API skipped: view url missing'});
 
     return {
       data: null as DocumentViewData | null,
@@ -205,12 +193,6 @@ export async function fetchDocumentView({
     : `${API_BASE_URL}${viewUrl}`;
 
   const contentType = getDocumentContentType(mimeType, viewUrl);
-
-  console.log('Document view prepared', {
-    contentType,
-    tokenLoaded: Boolean(token),
-    url: documentViewRoute,
-  });
 
   return {
     data: {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -44,6 +44,7 @@ import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';
 import AddCompanyScreen from './addCompany/AddCompanyScreen';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
+import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
@@ -133,6 +134,7 @@ export default function HomeScreen({
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
   const prevNotificationCount = useRef(0);
   const [companyOptions, setCompanyOptions] = useState<CompanyCardItem[]>([]);
   const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
@@ -510,8 +512,24 @@ export default function HomeScreen({
     setIsRegistrationTrackingOpen(true);
   }
 
+  const refreshCompanies = useCallback((selectCompanyId?: string) => {
+    fetchClientCompanies({ token, userId }).then(result => {
+      const loadedCompanies = result.companies.length > 0 ? result.companies : userCompanies;
+      const mappedCompanies = loadedCompanies.map(mapCompanyToListItem);
+      setCompanyOptions(mappedCompanies);
+
+      if (selectCompanyId) {
+        const found = mappedCompanies.find(c => c.id === selectCompanyId);
+        if (found) setSelectedCompany(found);
+      } else if (mappedCompanies.length > 0) {
+        setSelectedCompany(mappedCompanies[0]);
+      }
+    });
+  }, [token, userId, userCompanies]);
+
   function closeRegistrationTrackingScreen() {
     setIsRegistrationTrackingOpen(false);
+    refreshCompanies();
   }
 
   function openSubscriptionScreen() {
@@ -545,9 +563,10 @@ export default function HomeScreen({
     return (
       <AddCompanyScreen
         onBackPress={() => setIsAddCompanyOpen(false)}
-        onSubmit={() => {
+        onSubmit={(companyId) => {
           setIsAddCompanyOpen(false);
           setIsRegistrationTrackingOpen(true);
+          refreshCompanies(companyId);
         }}
       />
     );
@@ -617,6 +636,27 @@ export default function HomeScreen({
     return (
       <RegistrationTrackingScreen
         onBackPress={closeRegistrationTrackingScreen}
+        companyId={selectedCompany?.id}
+        onRefreshCompanies={() => refreshCompanies(selectedCompany?.id)}
+        onEditPress={() => {
+          setIsRegistrationTrackingOpen(false);
+          setIsAddCompanyOpen(true);
+        }}
+        onContactSupport={() => {
+          setIsRegistrationTrackingOpen(false);
+          setIsSupportOpen(true);
+        }}
+      />
+    );
+  }
+
+  if (isSupportOpen) {
+    return (
+      <ContactSupport
+        onBackPress={() => {
+          setIsSupportOpen(false);
+          setIsRegistrationTrackingOpen(true);
+        }}
       />
     );
   }

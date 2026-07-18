@@ -6,7 +6,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -21,12 +20,14 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import styles from './LoginScreen.styles';
+import Toast from 'react-native-toast-message';
 
 import logoImage from '../../../assets/images/logoR.png';
 
 type LoginScreenProps = {
   onSignupPress: () => void;
   onForgotPasswordPress: () => void;
+  onLoginSuccess?: () => void;
 };
 
 const socialLinks = {
@@ -40,7 +41,7 @@ function openSocialLink(url: string) {
   Linking.openURL(url);
 }
 
-function LoginScreen({ onSignupPress, onForgotPasswordPress }: LoginScreenProps) {
+function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: LoginScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -56,7 +57,11 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress }: LoginScreenProps)
       return;
     }
 
-    dispatch(loginUser({ email, password }));
+    const result = await dispatch(loginUser({ email, password }));
+    if (loginUser.fulfilled.match(result)) {
+      Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
+      onLoginSuccess?.();
+    }
   }
 
   return (

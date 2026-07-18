@@ -1,4 +1,5 @@
 import axios, { type AxiosError } from 'axios';
+import Toast from 'react-native-toast-message';
 
 import { API_BASE_URL } from '../../../config/api';
 
@@ -338,7 +339,7 @@ export async function fetchClientCompanies({
   userId,
 }: FetchClientCompaniesParams) {
   if (!token) {
-    console.log('Client profile API skipped: auth token missing');
+    Toast.show({ type: 'info', text1: 'Auth token missing. Please login again.' });
 
     return {
       companies: [],
@@ -363,12 +364,6 @@ export async function fetchClientCompanies({
       });
       const companies = getResponseCompanies(response.data);
 
-      console.log('Client profile companies loaded', {
-        companyCount: companies.length,
-        success: response.data.success,
-        url: CLIENT_PROFILE_ROUTE,
-      });
-
       return {
         companies,
         error: '',
@@ -377,15 +372,7 @@ export async function fetchClientCompanies({
       };
     } catch (routeError) {
       lastError = getErrorMessage(routeError);
-      const axiosError = routeError as AxiosError<{ message?: string; error?: string }>;
-
-      console.log('Client profile route failed', {
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-        tokenLoaded: Boolean(token),
-        url: CLIENT_PROFILE_ROUTE,
-      });
+      Toast.show({ type: 'error', text1: 'Profile fetch failed', text2: lastError });
     }
 
     return {
@@ -395,15 +382,7 @@ export async function fetchClientCompanies({
       totalCompanies: 0,
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client profile API error', {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: CLIENT_PROFILE_ROUTE,
-    });
+    Toast.show({ type: 'error', text1: 'Profile API error', text2: getErrorMessage(error) });
 
     return {
       companies: [],
@@ -424,7 +403,7 @@ export async function fetchClientCompanyDetails({
   token,
 }: FetchClientCompanyDetailsParams) {
   if (!token) {
-    console.log('Client company details API skipped: auth token missing');
+    Toast.show({ type: 'info', text1: 'Auth token missing. Please login again.' });
 
     return {
       company: null,
@@ -434,7 +413,7 @@ export async function fetchClientCompanyDetails({
   }
 
   if (!companyId) {
-    console.log('Client company details API skipped: company id missing');
+    Toast.show({ type: 'info', text1: 'Company ID missing.' });
 
     return {
       company: null,
@@ -458,18 +437,7 @@ export async function fetchClientCompanyDetails({
     );
     const company = getResponseCompany(response.data);
 
-    console.log('Client company details loaded', {
-      companyId,
-      einLoaded: Boolean(
-        company?.EIN ??
-        company?.Ein ??
-        company?.ein ??
-        company?.einNumber ??
-        company?.federalTaxId,
-      ),
-      success: response.data.success,
-      url: companyDetailsRoute,
-    });
+   
 
     return {
       company,
@@ -477,16 +445,7 @@ export async function fetchClientCompanyDetails({
       isSuccess: response.data.success ?? Boolean(company),
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client company details API error', {
-      companyId,
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: companyDetailsRoute,
-    });
+    Toast.show({ type: 'error', text1: 'Company details error', text2: getErrorMessage(error) });
 
     return {
       company: null,
@@ -506,7 +465,7 @@ export async function fetchCompanyComplianceHistory({
   token,
 }: FetchCompanyComplianceHistoryParams) {
   if (!token) {
-    console.log('Company compliance history API skipped: auth token missing');
+    Toast.show({ type: 'info', text1: 'Auth token missing. Please login again.' });
 
     return {
       error: 'Auth token missing. Please login again.',
@@ -516,7 +475,7 @@ export async function fetchCompanyComplianceHistory({
   }
 
   if (!companyId) {
-    console.log('Company compliance history API skipped: company id missing');
+    Toast.show({ type: 'info', text1: 'Company ID missing.' });
 
     return {
       error: 'Company id missing.',
@@ -547,8 +506,6 @@ export async function fetchCompanyComplianceHistory({
       isSuccess: response.data.success ?? true,
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
     return {
       error: getErrorMessage(error),
       history: [],

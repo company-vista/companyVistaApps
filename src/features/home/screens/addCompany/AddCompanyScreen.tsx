@@ -11,8 +11,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { useAppSelector } from '../../../../store/hooks';
-import { BackButton } from '../../../../components/buttons';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { setApplicantInfo, setJurisdiction } from '../../../../store/slices/companyRegistrationSlice';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
 import JurisdictionSelectionScreen from './JurisdictionSelectionScreen';
 import EntityDetailScreen from './EntityDetailScreen';
 import OwnershipScreen from './OwnershipScreen';
@@ -104,12 +105,13 @@ function RadioOption({
 
 type AddCompanyScreenProps = {
   onBackPress: () => void;
-  onSubmit?: () => void;
+  onSubmit?: (companyId?: string) => void;
 };
 
 export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }: AddCompanyScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
   const nameParts = (user?.name ?? '').split(' ');
   const userFirstName = user?.firstName ?? nameParts[0] ?? '';
@@ -129,8 +131,9 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
     return (
       <JurisdictionSelectionScreen
         onBackPress={() => setStep(1)}
-        onContinue={(countryCode: string) => {
+        onContinue={(countryCode: string, countryName: string) => {
           setSelectedJurisdiction(countryCode);
+          dispatch(setJurisdiction({ code: countryCode, name: countryName }));
           setStep(3);
         }}
       />
@@ -171,7 +174,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
     return (
       <ReviewSubmitScreen
         onBackPress={() => setStep(8)}
-        onSubmit={onFormSubmit ?? (() => {})}
+        onSubmit={(companyId) => onFormSubmit?.(companyId)}
         onEditApplicant={() => setStep(1)}
         onEditJurisdiction={() => setStep(2)}
         onEditCompanyName={() => setStep(3)}
@@ -184,6 +187,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
   }
 
   const handleContinue = () => {
+    dispatch(setApplicantInfo({ applicantType, firstName, lastName, email, phone }));
     setStep(2);
   };
 
@@ -290,9 +294,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
         </View>
 
         <View style={styles.footerColumn}>
-          <TouchableOpacity style={styles.continueButtonFull} onPress={handleContinue} activeOpacity={0.85}>
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton onPress={handleContinue} />
         </View>
       </ScrollView>
     </View>
@@ -379,7 +381,7 @@ const styles = StyleSheet.create({
     fontSize: font.xs,
   },
   radioGroup: {
-    gap: 8,
+    gap: 12,
     marginBottom: 16,
   },
   radioCard: {
@@ -453,7 +455,7 @@ const styles = StyleSheet.create({
   continueButtonFull: {
     backgroundColor: '#e6a82a',
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   continueButtonText: {

@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Provider } from 'react-redux';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
 import styles from './App.styles';
 
@@ -99,6 +99,12 @@ const toastConfig: ToastConfig = {
   ),
   error: ({ text1, text2 }) => (
     <View style={[styles.toastCard, styles.errorToast]}>
+      <Text style={styles.toastTitle}>{text1}</Text>
+      {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+    </View>
+  ),
+  info: ({ text1, text2 }) => (
+    <View style={[styles.toastCard]}>
       <Text style={styles.toastTitle}>{text1}</Text>
       {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
     </View>
@@ -389,6 +395,7 @@ function AppContent() {
               <LoginScreen
                 onSignupPress={() => setAuthScreen('signup')}
                 onForgotPasswordPress={() => setAuthScreen('forgotPassword')}
+                onLoginSuccess={() => setAppScreen('home')}
               />
             ) : authScreen === 'forgotPassword' ? (
               <ForgotPasswordScreen
@@ -418,7 +425,9 @@ function AppContent() {
           </Animated.View>
         </View>
       )}
-      <Toast config={toastConfig} />
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, elevation: 9999 }}>
+        <Toast config={toastConfig} topOffset={50} />
+      </View>
     </SafeAreaProvider>
   );
 }

@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { BackButton } from '../../../../components/buttons';
+import { BackButton, ContinueButton } from '../../../../components/buttons';
 
 type Region = 'ALL' | 'AMERICAS' | 'EUROPE' | 'MEA' | 'APAC' | 'OFFSHORE';
 
@@ -112,7 +112,7 @@ function CountryRow({
 
 type JurisdictionSelectionScreenProps = {
   onBackPress: () => void;
-  onContinue: (countryCode: string) => void;
+  onContinue: (countryCode: string, countryName: string) => void;
 };
 
 export default function JurisdictionSelectionScreen({ onBackPress, onContinue }: JurisdictionSelectionScreenProps) {
@@ -136,7 +136,7 @@ export default function JurisdictionSelectionScreen({ onBackPress, onContinue }:
 
   const handleContinue = () => {
     if (selectedCountry) {
-      onContinue(selectedCountry.code);
+      onContinue(selectedCountry.code, selectedCountry.name);
     }
   };
 
@@ -144,7 +144,7 @@ export default function JurisdictionSelectionScreen({ onBackPress, onContinue }:
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Add Company</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Register your company</Text>
       </View>
 
       <View style={styles.body}>
@@ -210,14 +210,7 @@ export default function JurisdictionSelectionScreen({ onBackPress, onContinue }:
         ) : null}
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <TouchableOpacity
-            style={[styles.continueButtonFull, !selectedCountry && styles.continueButtonDisabled]}
-            onPress={handleContinue}
-            activeOpacity={0.85}
-            disabled={!selectedCountry}
-          >
-            <Text style={styles.continueButtonText}>Continue →</Text>
-          </TouchableOpacity>
+          <ContinueButton onPress={handleContinue} disabled={!selectedCountry} />
         </View>
       </View>
     </View>

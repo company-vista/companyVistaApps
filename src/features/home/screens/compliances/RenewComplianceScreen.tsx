@@ -147,7 +147,7 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
           },
         },
       );
-      console.log(response);
+    
       const checkoutUrl = response?.data?.url;
       if (checkoutUrl) {
         await Linking.openURL(checkoutUrl);
