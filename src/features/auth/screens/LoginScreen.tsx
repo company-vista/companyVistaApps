@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import {
   clearLoginError,
   loginUser,
+  googleLoginUser,
 } from '../../../store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
@@ -23,6 +25,12 @@ import styles from './LoginScreen.styles';
 import Toast from 'react-native-toast-message';
 
 import logoImage from '../../../assets/images/logoR.png';
+
+GoogleSignin.configure({
+  webClientId: '1080172574320-193qhf74d29aa4b7fuf2f01h70ahjsic.apps.googleusercontent.com',
+  offlineAccess: true,
+  scopes: ['profile', 'email'],
+});
 
 type LoginScreenProps = {
   onSignupPress: () => void;
@@ -32,9 +40,9 @@ type LoginScreenProps = {
 
 const socialLinks = {
   google: 'https://accounts.google.com',
-  facebook: 'https://www.facebook.com',
+  facebook: 'https://www.facebook.com/companyvista',
   instagram: 'https://www.instagram.com',
-  linkedin: 'https://www.linkedin.com',
+  linkedin: 'https://www.linkedin.com/company/companyvista/about',
 };
 
 function openSocialLink(url: string) {
@@ -61,6 +69,48 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
     if (loginUser.fulfilled.match(result)) {
       Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
       onLoginSuccess?.();
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    if (isLoading) {
+      return;
+    }
+
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const response = await GoogleSignin.signIn();
+      console.log('GoogleSignIn response:', JSON.stringify(response, null, 2));
+
+      const idToken =
+        (response as any).idToken ??
+        (response as any).user?.idToken ??
+        (response as any).data?.idToken;
+
+      if (!idToken) {
+        Toast.show({
+          type: 'error',
+          text1: 'Google login failed',
+          text2: 'No ID token received. Check SHA-1 & webClientId.',
+        });
+        return;
+      }
+
+      const result = await dispatch(googleLoginUser({ idToken }));
+      if (googleLoginUser.fulfilled.match(result)) {
+        Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
+        onLoginSuccess?.();
+      }
+    } catch (error: any) {
+      if (error.code === 'SIGN_IN_CANCELLED') {
+        return;
+      }
+      console.log('GoogleSignIn error:', JSON.stringify(error, null, 2));
+      Toast.show({
+        type: 'error',
+        text1: 'Google login failed',
+        text2: error.message || 'Something went wrong.',
+      });
     }
   }
 
@@ -177,10 +227,16 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
           </View>
 
           <Pressable
-            onPress={() => openSocialLink(socialLinks.google)}
-            style={styles.googleAuthButton}>
+            disabled={isLoading}
+            onPress={handleGoogleSignIn}
+            style={[
+              styles.googleAuthButton,
+              isLoading ? { opacity: 0.6 } : null,
+            ]}>
             <FontAwesome name="google" size={16} color="#ea4335" />
-            <Text style={styles.googleAuthText}>Sign in with Google</Text>
+            <Text style={styles.googleAuthText}>
+              {isLoading ? 'Signing in...' : 'Sign in with Google'}
+            </Text>
           </Pressable>
 
           <Pressable onPress={onSignupPress}>

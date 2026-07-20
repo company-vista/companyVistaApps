@@ -68,6 +68,7 @@ type LoginApiResult = {
 };
 
 const CLIENT_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/login`;
+const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google`;
 const API_REQUEST_TIMEOUT_MS = 8000;
 
 function isValidEmail(value: string) {
@@ -380,5 +381,145 @@ export async function handleLoginApi({
     },
     isSuccess: false,
     email: trimmedEmail,
+  };
+}
+
+type GoogleLoginApiResult = {
+  errors: { general?: string };
+  isSuccess: boolean;
+  email: string;
+  token?: string;
+  user?: LoginUser;
+};
+
+export async function handleGoogleLoginApi({
+  idToken,
+}: {
+  idToken: string;
+}): Promise<GoogleLoginApiResult> {
+  if (!idToken) {
+    Toast.show({
+      type: 'error',
+      text1: 'Google login failed',
+      text2: 'No ID token received from Google.',
+    });
+
+    return {
+      errors: { general: 'No ID token received from Google.' },
+      isSuccess: false,
+      email: '',
+    };
+  }
+
+  let lastError: unknown;
+  const requestStartedAt = Date.now();
+
+  try {
+    const response = await axios.post<LoginApiResponse>(
+      GOOGLE_LOGIN_ROUTE,
+      { idToken },
+      {
+        timeout: API_REQUEST_TIMEOUT_MS,
+      },
+    );
+
+    const requestDurationMs = Date.now() - requestStartedAt;
+    const user = getResponseUser(response.data);
+    const token = getResponseToken(response.data) || getHeaderToken(response.headers);
+
+    if (!token) {
+      console.log('Google login response missing token', {
+        data: response?.data,
+        dataKeys: isApiRecord(response.data) ? Object.keys(response.data) : [],
+        headerKeys: Object.keys(response.headers),
+      });
+
+      Toast.show({
+        type: 'error',
+        text1: 'Google login failed',
+        text2: 'Login response did not include an auth token.',
+      });
+
+      return {
+        errors: { general: 'Login response did not include an auth token.' },
+        isSuccess: false,
+        email: user?.email ?? '',
+      };
+    }
+
+    const loginUser: LoginUser = {
+      _id: user?._id,
+      address: user?.address,
+      addressLine1: user?.addressLine1,
+      avatar: getImageUrl(user?.avatar),
+      businessName: user?.businessName,
+      companies: user?.companies,
+      company: getUserCompany(user),
+      companyName: user?.companyName,
+      countryCode: user?.countryCode,
+      country: user?.country,
+      dateOfBirth: user?.dateOfBirth,
+      dob: user?.dob,
+      email: user?.email ?? '',
+      id: user?.id,
+      firstName: user?.firstName,
+      image: getImageUrl(user?.image),
+      lastName: user?.lastName,
+      legalName: user?.legalName,
+      mobile: user?.mobile,
+      name: getUserName(user),
+      passportNo: user?.passportNo,
+      passportNumber: user?.passportNumber,
+      phone: getUserPhone(user),
+      phoneNumber: user?.phoneNumber,
+      photo: getImageUrl(user?.photo),
+      postalCode: user?.postalCode,
+      profileImage: getImageUrl(user?.profileImage),
+      profilePicture: getImageUrl(user?.profilePicture),
+      role: user?.role,
+      state: user?.state,
+      street: user?.street,
+    };
+
+    console.log('Google login API route succeeded', {
+      durationMs: requestDurationMs,
+      url: GOOGLE_LOGIN_ROUTE,
+    });
+
+    return {
+      errors: {},
+      isSuccess: true,
+      email: loginUser.email,
+      token,
+      user: loginUser,
+    };
+  } catch (error) {
+    lastError = error;
+    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+    const requestError = axiosError.request as { _response?: string } | undefined;
+
+    console.log('Google login API route failed', {
+      code: axiosError.code,
+      durationMs: Date.now() - requestStartedAt,
+      message: axiosError.message,
+      response: axiosError.response?.data,
+      status: axiosError.response?.status,
+      requestResponse: requestError?._response,
+      url: GOOGLE_LOGIN_ROUTE,
+    });
+  }
+
+  const message = getErrorMessage(lastError);
+
+  Toast.show({
+    type: 'error',
+    text1: 'Google login failed',
+    text2: message,
+  });
+
+  return {
+    errors: { general: message },
+    isSuccess: false,
+    email: '',
   };
 }

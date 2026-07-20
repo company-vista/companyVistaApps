@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import AnimatedAppear from '../../../../components/AnimatedAppear';
 import { API_BASE } from '../../../../config/api';
 import axios from 'axios';
 import { fetchCompanyDocuments, type DocumentItem } from '../../api/clientDocumentApi';
@@ -254,49 +255,51 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
               const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
               
               return (
-                <View key={item._id ?? idx} style={[styles.lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
-                  <View style={styles.lockedCardTop}>
-                    <View style={[styles.lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
-                      <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={20} color={isUnlocked ? '#22C55E' : '#DC2626'} />
-                    </View>
-                    <View style={styles.cardInfo}>
-                      <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
-                      <Text numberOfLines={1} style={styles.cardSubtitle}>
-                         document{count !== 1 ? 's' : ''} {isUnlocked ? 'unlocked' : 'locked'}
-                      </Text>
-                      {formattedDate ? <Text style={[styles.documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
-                    </View>
-                  </View>
-
-                  {dates.length > 0 && (
-                    <>
-                      <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
-                      <View style={styles.dateList}>
-                        {dates.map((date: string, i: number) => (
-                          <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
-                            {formatDate(date)}
-                          </Text>
-                        ))}
+                <AnimatedAppear key={item._id ?? idx} index={idx}>
+                  <View style={[styles.lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
+                    <View style={styles.lockedCardTop}>
+                      <View style={[styles.lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
+                        <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={20} color={isUnlocked ? '#22C55E' : '#DC2626'} />
                       </View>
-                    </>
-                  )}
-
-                  <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
-
-                  {isUnlocked ? (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#065F46', borderRadius: 12, padding: 12 }}>
-                      <FontAwesome name="clock-o" size={14} color="#6EE7B7" style={{ marginRight: 8 }} />
-                      <Text style={{ flex: 1, fontSize: font.base, color: '#D1FAE5', lineHeight: 18 }}>
-                        We will deliver the document within <Text style={{ color: '#ffffff', fontWeight: '600' }}>24–72 hours.</Text>
-                      </Text>
+                      <View style={styles.cardInfo}>
+                        <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+                        <Text numberOfLines={1} style={styles.cardSubtitle}>
+                           document{count !== 1 ? 's' : ''} {isUnlocked ? 'unlocked' : 'locked'}
+                        </Text>
+                        {formattedDate ? <Text style={[styles.documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
+                      </View>
                     </View>
-                  ) : (
-                    <Pressable style={[styles.lockedBtn, { backgroundColor: '#ef4444c7' }]} onPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}>
-                      <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
-                      <Text style={styles.lockedBtnText}>Pay to View Document</Text>
-                    </Pressable>
-                  )}
-                </View>
+
+                    {dates.length > 0 && (
+                      <>
+                        <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+                        <View style={styles.dateList}>
+                          {dates.map((date: string, i: number) => (
+                            <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
+                              {formatDate(date)}
+                            </Text>
+                          ))}
+                        </View>
+                      </>
+                    )}
+
+                    <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
+
+                    {isUnlocked ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#065F46', borderRadius: 12, padding: 12 }}>
+                        <FontAwesome name="clock-o" size={14} color="#6EE7B7" style={{ marginRight: 8 }} />
+                        <Text style={{ flex: 1, fontSize: font.base, color: '#D1FAE5', lineHeight: 18 }}>
+                          We will deliver the document within <Text style={{ color: '#ffffff', fontWeight: '600' }}>24–72 hours.</Text>
+                        </Text>
+                      </View>
+                    ) : (
+                      <Pressable style={[styles.lockedBtn, { backgroundColor: '#ef4444c7' }]} onPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}>
+                        <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
+                        <Text style={styles.lockedBtnText}>Pay to View Document</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                </AnimatedAppear>
               );
             })
           ) : (
@@ -306,38 +309,40 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
           <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
         ) : filteredDocuments.length > 0 ? (
           filteredDocuments.map((doc, index) => (
-            <View key={doc._id ?? String(index)} style={styles.card}>
-              <View style={styles.cardTop}>
-                <View style={styles.cardIconContainer}>
-                  <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor} />
+            <AnimatedAppear key={doc._id ?? String(index)} index={index}>
+              <View style={styles.card}>
+                <View style={styles.cardTop}>
+                  <View style={styles.cardIconContainer}>
+                    <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor} />
+                  </View>
+                  <View style={styles.cardInfo}>
+                    <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
+                    <Text numberOfLines={1} style={styles.cardSubtitle}>
+                      {doc.originalFileName ?? doc.documentType ?? 'Document'}
+                    </Text>
+                    <Text numberOfLines={1} style={styles.documentTypeText}>
+                      Type: {doc.documentType ?? 'N/A'}
+                    </Text>
+                  </View>
+                  <View style={styles.cardActions}>
+                    <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
+                      <FontAwesome name="download" size={15} color={palette.iconColor} />
+                    </Pressable>
+                  </View>
                 </View>
-                <View style={styles.cardInfo}>
-                  <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
-                  <Text numberOfLines={1} style={styles.cardSubtitle}>
-                    {doc.originalFileName ?? doc.documentType ?? 'Document'}
+
+                <View style={styles.cardDivider} />
+
+                <View style={styles.cardBottom}>
+                  <Text style={styles.cardDate}>
+                      Uploaded: {formatDate(doc.uploadedAt)}
                   </Text>
-                  <Text numberOfLines={1} style={styles.documentTypeText}>
-                    Type: {doc.documentType ?? 'N/A'}
-                  </Text>
-                </View>
-                <View style={styles.cardActions}>
-                  <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
-                    <FontAwesome name="download" size={15} color={palette.iconColor} />
+                  <Pressable onPress={() => onDocumentViewPress?.(doc)}>
+                    <Text style={styles.cardLink}>View Details</Text>
                   </Pressable>
                 </View>
               </View>
-
-              <View style={styles.cardDivider} />
-
-              <View style={styles.cardBottom}>
-                <Text style={styles.cardDate}>
-                    Uploaded: {formatDate(doc.uploadedAt)}
-                </Text>
-                <Pressable onPress={() => onDocumentViewPress?.(doc)}>
-                  <Text style={styles.cardLink}>View Details</Text>
-                </Pressable>
-              </View>
-            </View>
+            </AnimatedAppear>
           ))
         ) : (
           <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>
@@ -490,11 +495,6 @@ const getStyles = (colors: AppTheme) => {
       padding: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
     },
     cardTop: {
       flexDirection: 'row',
@@ -573,11 +573,6 @@ const getStyles = (colors: AppTheme) => {
       padding: 16,
       borderWidth: 1,
       borderColor: '#FCA5A5',
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
     },
     lockedCardTop: {
       flexDirection: 'row',

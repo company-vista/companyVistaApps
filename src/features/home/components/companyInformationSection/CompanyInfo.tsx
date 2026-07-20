@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AnimatedAppear from '../../../../components/AnimatedAppear';
 import { useThemeColors } from '../../../../theme/colors';
 import type { CompanyCardItem } from '../../screens/quickAccess/CompanyCard';
 import { styles } from "./CompanyInfoStles"
@@ -26,24 +27,27 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyData }) => {
     return (
         <View style={styles.container}>
             {/* HERO SECTION */}
-            <View style={styles.heroSection}>
-                <View style={styles.companyNameRow}>
-                    <Text style={[styles.companyMainTitle, { color: colors.text }]}>{companyData.name}</Text>
-                    <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
-                        <View style={[styles.statusDot, { backgroundColor: statusColor.dot }]} />
-                        <Text style={[styles.statusBadgeText, { color: statusColor.text }]}>{companyData.status}</Text>
+            <AnimatedAppear index={0}>
+                <View style={styles.heroSection}>
+                    <View style={styles.companyNameRow}>
+                        <Text style={[styles.companyMainTitle, { color: colors.text }]}>{companyData.name}</Text>
+                        <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
+                            <View style={[styles.statusDot, { backgroundColor: statusColor.dot }]} />
+                            <Text style={[styles.statusBadgeText, { color: statusColor.text }]}>{companyData.status}</Text>
+                        </View>
+                    </View>
+                    <Text style={[styles.companyIdText, { color: colors.muted }]}>ID: {companyData.id}</Text>
+                    <View style={styles.locationRow}>
+                        <Text style={styles.locationIcon}>📍</Text>
+                        <Text style={[styles.locationText, { color: colors.muted }]}>{companyData.countryOfIncorporation}</Text>
                     </View>
                 </View>
-                <Text style={[styles.companyIdText, { color: colors.muted }]}>ID: {companyData.id}</Text>
-                <View style={styles.locationRow}>
-                    <Text style={styles.locationIcon}>📍</Text>
-                    <Text style={[styles.locationText, { color: colors.muted }]}>{companyData.countryOfIncorporation}</Text>
-                </View>
-            </View>
+            </AnimatedAppear>
 
             {/* COMPANY INFORMATION SECTION */}
-            <View style={[styles.sectionContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Text style={[styles.sectionHeader, { color: colors.text }]}>Company Information</Text>
+            <AnimatedAppear index={1}>
+                <View style={[styles.sectionContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Company Information</Text>
                 <View style={styles.fieldGroup}>
                     <View style={[styles.fieldIcon, iconStyle]}>
                         <FontAwesome name="building" size={15} color={iconColor} />
@@ -94,6 +98,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyData }) => {
                     </View>
                 </View>
             </View>
+            </AnimatedAppear>
         </View>
     );
 };

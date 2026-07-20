@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Text, View, ActivityIndicator } from 'react-nati
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
+import AnimatedAppear from '../../../components/AnimatedAppear';
 import { useThemeColors } from '../../../theme/colors';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
@@ -247,7 +248,6 @@ function TabPlaceholder({
     years: 1,
   });
 
-  // Stats Counters 
   const overdueCount = derivedActions.filter(a => a.status === 'Expired').length;
   const pendingCount = derivedActions.filter(a => a.status === 'Pending').length;
   const doneCount = derivedActions.filter(a => a.status === 'Active' || a.status === 'Completed' || a.status === 'Client Managed').length;
@@ -275,36 +275,19 @@ function TabPlaceholder({
         </View>
       </View>
 
-      {/* --- 2. STATS COUNTER CARDS --- */}
-      <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={[styles.statDot, { backgroundColor: '#DE3730' }]} />
-          <Text style={[styles.statNumber, { color: colors.text }]}>{overdueCount}</Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>Expired</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={[styles.statDot, { backgroundColor: '#E28704' }]} />
-          <Text style={[styles.statNumber, { color: colors.text }]}>{pendingCount}</Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>Pending</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={[styles.statDot, { backgroundColor: '#256F46' }]} />
-          <Text style={[styles.statNumber, { color: colors.text }]}>{doneCount}</Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>Done / Active</Text>
-        </View>
-      </View>
-
       {/* --- 3. COMPLIANCE HEALTH CARD --- */}
-      <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={styles.healthHeader}>
-          <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance health</Text>
-          <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
+      <AnimatedAppear index={3}>
+        <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.healthHeader}>
+            <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance health</Text>
+            <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
+          </View>
+          <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
+            <View style={[styles.progressBarFill, { backgroundColor: '#1E5631', width: `${healthPercentage}%` }]} />
+          </View>
+          <Text style={[styles.healthSubtext, { color: colors.muted }]}>{doneCount} of {totalCount} actions complete</Text>
         </View>
-        <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
-          <View style={[styles.progressBarFill, { backgroundColor: '#1E5631', width: `${healthPercentage}%` }]} />
-        </View>
-        <Text style={[styles.healthSubtext, { color: colors.muted }]}>{doneCount} of {totalCount} actions complete</Text>
-      </View>
+      </AnimatedAppear>
 
       {/* --- 4. SECTION TITLE --- */}
       <View style={styles.sectionHeader}>
@@ -315,22 +298,22 @@ function TabPlaceholder({
       {loading ? (
         <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />
       ) : (
-        derivedActions.map((action: ComplianceActionItem) => {
+        derivedActions.map((action: ComplianceActionItem, idx: number) => {
           const theme = getStatusTheme(action.status);
 
           return (
-            <Pressable
-              key={action.id}
-              style={[
-                styles.mainCard,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  marginBottom: 12,
-                },
-              ]}
-              onPress={() => handleOpenHistory(action)}
-            >
+            <AnimatedAppear key={action.id} index={4 + idx}>
+              <Pressable
+                style={[
+                  styles.mainCard,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    marginBottom: 12,
+                  },
+                ]}
+                onPress={() => handleOpenHistory(action)}
+              >
               <View style={styles.headerRow}>
 
                 <View style={[styles.iconWrap, { backgroundColor: theme.bg }]}>
@@ -371,7 +354,8 @@ function TabPlaceholder({
                 </View>
               </View>
 
-            </Pressable>
+              </Pressable>
+            </AnimatedAppear>
           );
         })
       )}

@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#f8fafc',
-    paddingHorizontal: 12,
+    paddingHorizontal: 2,
   },
   header: {
     flexDirection: 'row',
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 3,
     borderRadius: 16,
-    backgroundColor: '#0f766e',
+    backgroundColor: '#121414',
   },
   formCard: {
     borderRadius: 18,

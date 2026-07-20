@@ -95,7 +95,7 @@ function NotificationScreen({
     return () => {
       isMounted = false;
     };
-  }, [token, companyId]);
+  }, [companyId]);
 
   return (
     <>

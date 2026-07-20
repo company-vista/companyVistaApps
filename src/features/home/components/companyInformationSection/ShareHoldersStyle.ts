@@ -11,15 +11,10 @@ export const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.3)',
         borderRadius: 16,
         borderWidth: 1,
-        elevation: 4,
         minHeight: 108,
         overflow: 'hidden',
         paddingHorizontal: 18,
         paddingVertical: 16,
-        shadowColor: '#000000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.18,
-        shadowRadius: 12,
     },
     summaryDeco: {
         backgroundColor: 'rgba(255,255,255,0.03)',
@@ -96,12 +91,8 @@ export const styles = StyleSheet.create({
     shareholderCard: {
         borderRadius: 8,
         borderWidth: 1,
-        elevation: 1,
         paddingHorizontal: 15,
         paddingVertical: 15,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
     },
     name: {
         fontSize: 15,

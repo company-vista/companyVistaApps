@@ -7,6 +7,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AnimatedAppear from '../../../components/AnimatedAppear';
 import { useThemeColors } from '../../../theme/colors';
 import BackButton from '../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -73,25 +74,26 @@ const ManageOptionsScreen: React.FC<ManageOptionsScreenProps> = ({
       </View>
 
       <View style={styles.body}>
-        {options.map((option) => (
-          <Pressable
-            key={option.id}
-            style={[styles.optionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={() => handleOptionPress(option.id)}
-          >
-            <View style={[styles.optionIconWrap, { backgroundColor: `${option.color}15` }]}>
-              <FontAwesome name={option.icon} size={22} color={option.color} />
-            </View>
-            <View style={styles.optionTextWrap}>
-              <Text style={[styles.optionLabel, { color: colors.text }]}>
-                {option.label}
-              </Text>
-              <Text style={[styles.optionDescription, { color: colors.muted }]}>
-                {option.description}
-              </Text>
-            </View>
-            <FontAwesome name="angle-right" size={20} color={colors.subtle} />
-          </Pressable>
+        {options.map((option, index) => (
+          <AnimatedAppear key={option.id} index={index}>
+            <Pressable
+              style={[styles.optionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => handleOptionPress(option.id)}
+            >
+              <View style={[styles.optionIconWrap, { backgroundColor: `${option.color}15` }]}>
+                <FontAwesome name={option.icon} size={22} color={option.color} />
+              </View>
+              <View style={styles.optionTextWrap}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>
+                  {option.label}
+                </Text>
+                <Text style={[styles.optionDescription, { color: colors.muted }]}>
+                  {option.description}
+                </Text>
+              </View>
+              <FontAwesome name="angle-right" size={20} color={colors.subtle} />
+            </Pressable>
+          </AnimatedAppear>
         ))}
       </View>
     </View>

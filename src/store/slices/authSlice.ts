@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/tool
 
 import {
   handleLoginApi,
+  handleGoogleLoginApi,
   type LoginErrors,
   type LoginUser,
 } from '../../features/auth/api/loginApi';
@@ -28,6 +29,10 @@ type LoginPayload = {
   password: string;
 };
 
+type GoogleLoginPayload = {
+  idToken: string;
+};
+
 type SignupPayload = {
   firstName: string;
   lastName: string;
@@ -44,6 +49,11 @@ type LoginSuccess = {
 
 type LoginFailure = {
   errors: LoginErrors;
+  email: string;
+};
+
+type GoogleLoginFailure = {
+  errors: { general?: string };
   email: string;
 };
 
@@ -118,6 +128,34 @@ export const loginUser = createAsyncThunk<
 
   saveAuthSession(session).catch(error => {
     console.warn('Unable to persist auth session after login', error);
+  });
+
+  return session;
+});
+
+export const googleLoginUser = createAsyncThunk<
+  LoginSuccess,
+  GoogleLoginPayload,
+  { rejectValue: GoogleLoginFailure }
+>('auth/googleLoginUser', async (payload, { rejectWithValue }) => {
+  const result = await handleGoogleLoginApi(payload);
+
+  if (!result.isSuccess) {
+    return rejectWithValue({
+      errors: result.errors,
+      email: result.email,
+    });
+  }
+
+  const session: LoginSuccess = {
+    user: result.user ?? {
+      email: result.email,
+    },
+    token: result.token ?? '',
+  };
+
+  saveAuthSession(session).catch(error => {
+    console.warn('Unable to persist auth session after Google login', error);
   });
 
   return session;
@@ -200,6 +238,21 @@ const authSlice = createSlice({
         state.loginErrors = {};
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.loginErrors = action.payload?.errors ?? {};
+      })
+      .addCase(googleLoginUser.pending, state => {
+        state.isLoading = true;
+        state.loginErrors = {};
+      })
+      .addCase(googleLoginUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.loginErrors = {};
+      })
+      .addCase(googleLoginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.loginErrors = action.payload?.errors ?? {};
       })

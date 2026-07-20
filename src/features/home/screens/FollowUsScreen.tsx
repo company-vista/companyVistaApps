@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -21,11 +21,13 @@ const socialItems = [
     icon: 'facebook-square',
     iconColor: '#3154a4',
     title: 'Follow us on Facebook',
+    url: 'https://www.facebook.com/companyvista',
   },
   {
     icon: 'linkedin-square',
     iconColor: '#0a66c2',
     title: 'Follow us on LinkedIn',
+    url: 'https://www.linkedin.com/company/companyvista/about',
   },
   {
     icon: 'x',
@@ -67,6 +69,7 @@ function FollowUsScreen({ onBackPress }: FollowUsScreenProps) {
           {socialItems.map(item => (
             <Pressable
               key={item.title}
+              onPress={() => item.url && Linking.openURL(item.url)}
               style={[
                 styles.socialCard,
                 { backgroundColor: colors.surface, borderColor: colors.border },

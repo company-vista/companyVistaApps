@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import AnimatedAppear from '../../../../components/AnimatedAppear';
 import {
   fetchInvoicesForCompany,
   selectHasLoadedInvoicesForCompany,
@@ -336,7 +337,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
         ) : null}
         {!isLoading && !errorMessage && !selectedCompany?.id ? (
           <Text style={[styles.stateText, { color: colors.muted }]}>
-            Select a company from the home page to view invoices.
+            Please wait while we load invoices for your companies. 
           </Text>
         ) : null}
         {!isLoading && !errorMessage && selectedCompany?.id && invoices.length === 0 ? (
@@ -354,7 +355,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
             </Pressable>
           </View>
         ) : null}
-        {!isLoading && invoices.map(invoice => {
+        {!isLoading && invoices.map((invoice, index) => {
           const statusColor =
             invoice.status === 'paid' ? '#16a34a' :
             invoice.status === 'partial' ? '#d97706' :
@@ -365,16 +366,15 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
             '#fee2e2';
 
           return (
-            <View
-              key={invoice.id}
-              style={[
-                styles.invoiceCard,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  shadowColor: colors.shadow,
-                },
-              ]}>
+            <AnimatedAppear key={invoice.id} index={index}>
+              <View
+                style={[
+                  styles.invoiceCard,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                ]}>
               <View style={styles.invoiceLeft}>
                 <View style={styles.invoiceIcon}>
                   <FontAwesome name="building-o" size={22} color={palette.iconColor} />
@@ -433,6 +433,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                 )}
               </View>
             </View>
+            </AnimatedAppear>
           );
         })}
       </View>
@@ -546,13 +547,9 @@ const getStyles = (colors: AppTheme) => {
   invoiceCard: {
     borderRadius: 20,
     borderWidth: 1,
-    elevation: 2,
     flexDirection: 'row',
     minHeight: 120,
     padding: 12,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.07,
-    shadowRadius: 18,
   },
   invoiceLeft: {
     flex: 1,
@@ -644,11 +641,6 @@ const getStyles = (colors: AppTheme) => {
     height: 32,
     justifyContent: 'center',
     width: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 2,
-    elevation: 1,
   },
   });
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -6,39 +6,43 @@ import {
   Share,
   StatusBar,
   Text,
+
   View,
 } from 'react-native';
 import { Provider } from 'react-redux';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
 import styles from './App.styles';
 
-import LoginScreen from './src/features/auth/screens/LoginScreen';
-import ForgotPasswordScreen from './src/features/auth/screens/ForgotPasswordScreen';
-import OtpVerifyScreen from './src/features/auth/screens/OtpVerifyScreen';
-import ResetPasswordScreen from './src/features/auth/screens/ResetPasswordScreen';
-import HelpFeedbackScreen from './src/features/help/screens/HelpFeedbackScreen';
-import SupportScreen from './src/features/support/screens/SupportScreen';
-import FollowUsScreen from './src/features/home/screens/FollowUsScreen';
-import HomeScreen from './src/features/home/screens/HomeScreen';
-import QuickAccessScreen from './src/features/home/screens/QuickAccessScreen';
-import BusinessReportsScreen from './src/features/home/screens/quickAccess/BusinessReportsScreen';
-import CompanyProfileScreen from './src/features/home/screens/quickAccess/CompanyProfileScreen';
-import HelpDeskScreen from './src/features/home/screens/quickAccess/HelpDeskScreen';
-import InvoiceCenterScreen from './src/features/home/screens/quickAccess/InvoiceCenterScreen';
-import InvoiceDetailScreen from './src/features/home/screens/invoices/InvoiceDetailScreen';
-import NotificationDetailScreen from './src/features/notifications/screens/NotificationDetailScreen';
-import NotificationScreen from './src/features/notifications/screens/NotificationScreen';
-import SearchScreen from './src/features/home/screens/SearchScreen';
-import RenewComplianceScreen from './src/features/home/screens/compliances/RenewComplianceScreen';
-import AddressRenewalScreen from './src/features/home/screens/compliances/AddressRenewalScreen';
-import FederalFilingScreen from './src/features/home/screens/compliances/FederalFilingScreen';
-import AnnualStateFilingScreen from './src/features/home/screens/compliances/AnnualFilingScreen';
-import ComplianceHistoryScreen from './src/features/home/screens/compliances/ComplianceHistoryScreen';
-import EditProfileScreen from './src/features/profile/screens/EditProfileScreen';
-import ProfileAddressScreen from './src/features/profile/screens/ProfileAddressScreen';
-import ProfileScreen from './src/features/profile/screens/ProfileScreen';
-import SignupScreen from './src/features/auth/screens/SignupScreen';
+
+const LoginScreen = lazy(() => import('./src/features/auth/screens/LoginScreen'));
+const ForgotPasswordScreen = lazy(() => import('./src/features/auth/screens/ForgotPasswordScreen'));
+const OtpVerifyScreen = lazy(() => import('./src/features/auth/screens/OtpVerifyScreen'));  
+const ResetPasswordScreen = lazy(() => import('./src/features/auth/screens/ResetPasswordScreen'));
+const HelpFeedbackScreen = lazy(() => import('./src/features/help/screens/HelpFeedbackScreen'));
+const SupportScreen = lazy(() => import('./src/features/support/screens/SupportScreen'));
+const FollowUsScreen = lazy(() => import('./src/features/home/screens/FollowUsScreen'));
+const HomeScreen = lazy(() => import('./src/features/home/screens/HomeScreen'));
+const QuickAccessScreen = lazy(() => import('./src/features/home/screens/QuickAccessScreen'));  
+const BusinessReportsScreen = lazy(() => import('./src/features/home/screens/quickAccess/BusinessReportsScreen'));
+
+const CompanyProfileScreen = lazy(() => import('./src/features/home/screens/quickAccess/CompanyProfileScreen'));  
+
+const HelpDeskScreen = lazy(() => import('./src/features/home/screens/quickAccess/HelpDeskScreen'));
+const InvoiceCenterScreen = lazy(() => import('./src/features/home/screens/quickAccess/InvoiceCenterScreen'));
+const InvoiceDetailScreen = lazy(() => import('./src/features/home/screens/invoices/InvoiceDetailScreen'));
+const NotificationDetailScreen = lazy(() => import('./src/features/notifications/screens/NotificationDetailScreen'));
+const NotificationScreen = lazy(() => import('./src/features/notifications/screens/NotificationScreen'));
+const SearchScreen = lazy(() => import('./src/features/home/screens/SearchScreen'));
+const RenewComplianceScreen = lazy(() => import('./src/features/home/screens/compliances/RenewComplianceScreen'));
+const AddressRenewalScreen = lazy(() => import('./src/features/home/screens/compliances/AddressRenewalScreen'));
+const FederalFilingScreen = lazy(() => import('./src/features/home/screens/compliances/FederalFilingScreen'));
+const AnnualStateFilingScreen = lazy(() => import('./src/features/home/screens/compliances/AnnualFilingScreen'));
+const ComplianceHistoryScreen = lazy(() => import('./src/features/home/screens/compliances/ComplianceHistoryScreen'));
+const EditProfileScreen = lazy(() => import('./src/features/profile/screens/EditProfileScreen'));
+const ProfileAddressScreen = lazy(() => import('./src/features/profile/screens/ProfileAddressScreen'));
+const ProfileScreen = lazy(() => import('./src/features/profile/screens/ProfileScreen'));
+const SignupScreen = lazy(() => import('./src/features/auth/screens/SignupScreen'));
 import logoImage from './src/assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';

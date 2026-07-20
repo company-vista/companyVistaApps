@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import AnimatedAppear from '../../../../components/AnimatedAppear';
 import { useThemeColors, type AppTheme } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanyDetails } from '../../api/clientProfileApi';
@@ -80,23 +81,27 @@ const ShareHolders: React.FC<ShareHoldersProps> = ({ companyId }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryDeco} />
-        <View style={styles.summaryDecoSmall}>
-          <FontAwesome name="users" size={19} color="rgba(255,255,255,0.25)" />
+      <AnimatedAppear index={0}>
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryDeco} />
+          <View style={styles.summaryDecoSmall}>
+            <FontAwesome name="users" size={19} color="rgba(255,255,255,0.25)" />
+          </View>
+          <Text style={styles.summaryLabel}>Total Equity Stake</Text>
+          <Text style={styles.summaryValue}>{totalStake}%</Text>
+          <View style={styles.primaryBadge}>
+            <FontAwesome name="user" size={9} color="#85B7EB" />
+            <Text style={styles.primaryBadgeText}>Primary Shareholder</Text>
+          </View>
         </View>
-        <Text style={styles.summaryLabel}>Total Equity Stake</Text>
-        <Text style={styles.summaryValue}>{totalStake}%</Text>
-        <View style={styles.primaryBadge}>
-          <FontAwesome name="user" size={9} color="#85B7EB" />
-          <Text style={styles.primaryBadgeText}>Primary Shareholder</Text>
-        </View>
-      </View>
+      </AnimatedAppear>
 
-      <View style={styles.sectionTitleRow}>
-        <FontAwesome name="users" size={16} color={palette.sectionIcon} />
-        <Text style={[styles.header, { color: colors.text }]}>Shareholders</Text>
-      </View>
+      <AnimatedAppear index={1}>
+        <View style={styles.sectionTitleRow}>
+          <FontAwesome name="users" size={16} color={palette.sectionIcon} />
+          <Text style={[styles.header, { color: colors.text }]}>Shareholders</Text>
+        </View>
+      </AnimatedAppear>
 
       <View style={styles.list}>
         {data.length === 0 ? (
@@ -112,16 +117,16 @@ const ShareHolders: React.FC<ShareHoldersProps> = ({ companyId }) => {
             const phone = client?.phoneNumber ? `${client?.countryCode || ''} ${client?.phoneNumber}`.trim() : null;
 
             return (
-              <View
-                key={key}
-                style={[
-                  styles.shareholderCard,
-                  {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    shadowColor: palette.cardShadow,
-                  },
-                ]}>
+              <AnimatedAppear key={key} index={2 + index}>
+                <View
+                  style={[
+                    styles.shareholderCard,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                      shadowColor: palette.cardShadow,
+                    },
+                  ]}>
                 <Text style={[styles.name, { color: colors.text }]}>{name}</Text>
                 <View
                   style={[
@@ -156,6 +161,7 @@ const ShareHolders: React.FC<ShareHoldersProps> = ({ companyId }) => {
                   />
                 ) : null}
               </View>
+              </AnimatedAppear>
             );
           })
         )}

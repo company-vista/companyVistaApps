@@ -747,7 +747,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
   // Form area
   formArea: {
     rowGap: 16,
-    padding: 12
+    padding: 2
   },
   fieldBlock: {
     rowGap: 6,
@@ -765,7 +765,7 @@ const styles = (colors: ThemeColors) => StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 11,
+    paddingVertical: 15,
     fontSize: font.md,
     color: colors.text,
     backgroundColor: colors.surface,

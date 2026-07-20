@@ -393,18 +393,23 @@ export default function HomeScreen({
 
   function openMoreSheet() {
     closeFabMenu();
+    moreSlideAnim.setValue(320);
     setIsMoreOpen(true);
-    Animated.timing(moreSlideAnim, {
-      toValue: 0,
-      duration: 260,
-      useNativeDriver: true,
-    }).start();
+    requestAnimationFrame(() => {
+      Animated.timing(moreSlideAnim, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    });
   }
 
   function closeMoreSheet(onClosed?: () => void) {
     Animated.timing(moreSlideAnim, {
       toValue: 320,
       duration: 220,
+      easing: Easing.in(Easing.cubic),
       useNativeDriver: true,
     }).start(() => {
       setIsMoreOpen(false);

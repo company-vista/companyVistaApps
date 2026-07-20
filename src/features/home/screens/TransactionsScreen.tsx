@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import AnimatedAppear from '../../../components/AnimatedAppear';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
