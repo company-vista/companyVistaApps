@@ -30,6 +30,7 @@ GoogleSignin.configure({
   webClientId: '1080172574320-193qhf74d29aa4b7fuf2f01h70ahjsic.apps.googleusercontent.com',
   offlineAccess: true,
   scopes: ['profile', 'email'],
+  forceCodeForRefreshToken: true,
 });
 
 type LoginScreenProps = {
@@ -79,8 +80,14 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
 
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      try {
+      await GoogleSignin.signOut();
+    } catch (e) {
+      console.error(e)
+    }
       const response = await GoogleSignin.signIn();
-      console.log('GoogleSignIn response:', JSON.stringify(response, null, 2));
+      // console.log('GoogleSignIn response:', JSON.stringify(response, null, 2));
 
       const idToken =
         (response as any).idToken ??

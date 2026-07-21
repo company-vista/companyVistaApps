@@ -68,7 +68,7 @@ type LoginApiResult = {
 };
 
 const CLIENT_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/login`;
-const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google`;
+const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google/login`;
 const API_REQUEST_TIMEOUT_MS = 8000;
 
 function isValidEmail(value: string) {
@@ -426,7 +426,7 @@ export async function handleGoogleLoginApi({
     const requestDurationMs = Date.now() - requestStartedAt;
     const user = getResponseUser(response.data);
     const token = getResponseToken(response.data) || getHeaderToken(response.headers);
-
+    console.log(response)
     if (!token) {
       console.log('Google login response missing token', {
         data: response?.data,
