@@ -11,20 +11,23 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 
 import styles from './LoginScreen.styles';
 import logoImage from '../../../assets/images/logoR.png';
 import { useThemeColors } from '../../../theme/colors';
-import { font } from '../../../theme/typography';
+import type { AuthScreenProps, AuthStackParamList } from '../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
 
-type ResetPasswordScreenProps = {
-  onBackPress: () => void;
-  token?: string;
-};
+type Nav = AuthScreenProps<'ResetPassword'>['navigation'];
+type Route = RouteProp<AuthStackParamList, 'ResetPassword'>;
 
-export default function ResetPasswordScreen({ onBackPress, token }: ResetPasswordScreenProps) {
+export default function ResetPasswordScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const { token } = route.params;
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [newPassword, setNewPassword] = useState('');
@@ -56,7 +59,7 @@ export default function ResetPasswordScreen({ onBackPress, token }: ResetPasswor
         password: newPassword.trim(),
       });
       Toast.show({ type: 'success', text1: 'Password reset successful' });
-      setTimeout(() => onBackPress(), 1500);
+      setTimeout(() => navigation.navigate('Login'), 1500);
     } catch (error: any) {
       const message = error?.response?.data?.message || 'Something went wrong. Please try again.';
       Toast.show({ type: 'error', text1: 'Error', text2: message });
@@ -177,7 +180,7 @@ export default function ResetPasswordScreen({ onBackPress, token }: ResetPasswor
             </View>
           )}
 
-          <Pressable onPress={onBackPress}>
+          <Pressable onPress={() => navigation.navigate('Login')}>
             <Text style={[styles.authLinkText, { color: colors.subtle, textAlign: 'center' }]}>
               Back to{' '}
               <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>

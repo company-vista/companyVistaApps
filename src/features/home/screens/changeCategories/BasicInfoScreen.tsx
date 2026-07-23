@@ -659,7 +659,7 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({
 const styles = (colors: ThemeColors) => StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   scroll: {
     flex: 1,

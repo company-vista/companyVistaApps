@@ -102,16 +102,6 @@ export async function fetchClientProfile(token?: string | null) {
       user: getResponseUser(response.data),
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client profile fetch API error', {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: CLIENT_PROFILE_ROUTE,
-    });
-
     return {
       error: getErrorMessage(error),
       isSuccess: false,
@@ -157,11 +147,6 @@ export async function updateClientProfile({
       street: payload.addressLine1 ?? payload.address?.street ?? payload.address?.addressLine1,
     };
 
-    console.log('Client profile update request', {
-      payloadKeys: Object.keys(requestPayload),
-      tokenLoaded: Boolean(token),
-    });
-
     const response = await axios.put<ClientProfileResponse>(
       CLIENT_PROFILE_ROUTE,
       requestPayload,
@@ -173,27 +158,12 @@ export async function updateClientProfile({
       },
     );
 
-    console.log('Client profile update loaded', {
-      success: response.data.success,
-      userLoaded: Boolean(getResponseUser(response.data)),
-    });
-
     return {
       error: '',
       isSuccess: response.data.success ?? true,
       user: getResponseUser(response.data),
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client profile update API error', {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: CLIENT_PROFILE_ROUTE,
-    });
-
     return {
       error: getErrorMessage(error),
       isSuccess: false,

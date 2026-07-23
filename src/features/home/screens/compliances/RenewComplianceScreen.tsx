@@ -10,6 +10,9 @@ import {
   StatusBar,
   InteractionManager,
 } from "react-native";
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 import { Linking } from "react-native";
 import axios from "axios";
 import BackButton from "../../../../components/buttons/BackButton";
@@ -58,18 +61,16 @@ type RenewActionData = {
   years?: number;
 };
 
-type RenewComplianceProps = {
-  onBackPress: () => void;
-  selectedAction?: RenewActionData | null;
-};
-
 const showAlert = (title: string, message: string) => {
   InteractionManager.runAfterInteractions(() => {
     Alert.alert(title, message);
   });
 };
 
-const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selectedAction }) => {
+const RenewCompliance: React.FC = () => {
+  const navigation = useNavigation<MainScreenProps<'RenewCompliance'>['navigation']>();
+  const route = useRoute<RouteProp<MainStackParamList, 'RenewCompliance'>>();
+  const selectedAction = route.params?.selectedAction;
   const colors = useThemeColors();
   const authUser = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
@@ -162,12 +163,12 @@ const RenewCompliance: React.FC<RenewComplianceProps> = ({ onBackPress, selected
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerText}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? "Renew compliance"}</Text>
           <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
@@ -369,6 +370,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingVertical: 10,
+    paddingTop: 50,
     borderBottomWidth: 0.5,
     flexDirection: "row",
     alignItems: "center",

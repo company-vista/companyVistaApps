@@ -11,20 +11,23 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
 import styles from './LoginScreen.styles';
 import logoImage from '../../../assets/images/logoR.png';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { AuthScreenProps, AuthStackParamList } from '../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
 
-type OtpVerifyScreenProps = {
-  onBackPress: () => void;
-  onOtpVerified: (token: string) => void;
-  email: string;
-};
+type Nav = AuthScreenProps<'OtpVerify'>['navigation'];
+type Route = RouteProp<AuthStackParamList, 'OtpVerify'>;
 
-export default function OtpVerifyScreen({ onBackPress, onOtpVerified, email }: OtpVerifyScreenProps) {
+export default function OtpVerifyScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const { email } = route.params;
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -62,17 +65,16 @@ export default function OtpVerifyScreen({ onBackPress, onOtpVerified, email }: O
 
     setLoading(true);
     try {
-      // console.log(email)
       const { API_BASE_URL } = await import('../../../config/api');
       const axios = (await import('axios')).default;
       const response = await axios.post(`${API_BASE_URL}/api/client/auth/otpverify-app`, {
         email,
         otp: otpString,
       });
-      
+
       const token = response.data?.token;
       if (token) {
-        onOtpVerified(token);
+        navigation.navigate('ResetPassword', { token });
       } else {
         Toast.show({ type: 'error', text1: 'Something went wrong' });
       }
@@ -152,7 +154,7 @@ export default function OtpVerifyScreen({ onBackPress, onOtpVerified, email }: O
             )}
           </Pressable>
 
-          <Pressable onPress={onBackPress}>
+          <Pressable onPress={() => navigation.goBack()}>
             <Text style={[styles.authLinkText, { color: colors.subtle, textAlign: 'center' }]}>
               Back to{' '}
               <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>

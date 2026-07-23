@@ -142,12 +142,6 @@ export async function fetchSubscriptionPayments(token?: string): Promise<FetchSu
   } catch (error) {
     const message = getErrorMessage(error);
 
-    console.log('Subscription payment API error', {
-      message,
-      route: SUBSCRIPTION_PAYMENT_ROUTE,
-      details: error,
-    });
-
     return {
       error: message,
       isSuccess: false,

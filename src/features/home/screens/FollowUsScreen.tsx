@@ -1,10 +1,12 @@
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps } from '../../../navigation/types';
 
 const socialItems = [
   {
@@ -36,11 +38,10 @@ const socialItems = [
   },
 ];
 
-type FollowUsScreenProps = {
-  onBackPress: () => void;
-};
+type Nav = MainScreenProps<'FollowUs'>['navigation'];
 
-function FollowUsScreen({ onBackPress }: FollowUsScreenProps) {
+function FollowUsScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
 
@@ -48,10 +49,10 @@ function FollowUsScreen({ onBackPress }: FollowUsScreenProps) {
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}>
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Follow Us</Text>
       </View>
 
@@ -100,7 +101,7 @@ function FollowUsScreen({ onBackPress }: FollowUsScreenProps) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   header: {
     height: 72,

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
@@ -23,6 +24,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import styles from './LoginScreen.styles';
 import Toast from 'react-native-toast-message';
+import type { AuthScreenProps } from '../navigation/types';
 
 import logoImage from '../../../assets/images/logoR.png';
 
@@ -32,12 +34,6 @@ GoogleSignin.configure({
   scopes: ['profile', 'email'],
   forceCodeForRefreshToken: true,
 });
-
-type LoginScreenProps = {
-  onSignupPress: () => void;
-  onForgotPasswordPress: () => void;
-  onLoginSuccess?: () => void;
-};
 
 const socialLinks = {
   google: 'https://accounts.google.com',
@@ -50,7 +46,10 @@ function openSocialLink(url: string) {
   Linking.openURL(url);
 }
 
-function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: LoginScreenProps) {
+type Nav = AuthScreenProps<'Login'>['navigation'];
+
+function LoginScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -69,7 +68,6 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
       Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
-      onLoginSuccess?.();
     }
   }
 
@@ -82,12 +80,11 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
       try {
-      await GoogleSignin.signOut();
-    } catch (e) {
-      console.error(e)
-    }
+        await GoogleSignin.signOut();
+      } catch (e) {
+        console.error(e);
+      }
       const response = await GoogleSignin.signIn();
-      // console.log('GoogleSignIn response:', JSON.stringify(response, null, 2));
 
       const idToken =
         (response as any).idToken ??
@@ -106,13 +103,11 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
       const result = await dispatch(googleLoginUser({ idToken }));
       if (googleLoginUser.fulfilled.match(result)) {
         Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
-        onLoginSuccess?.();
       }
     } catch (error: any) {
       if (error.code === 'SIGN_IN_CANCELLED') {
         return;
       }
-      console.log('GoogleSignIn error:', JSON.stringify(error, null, 2));
       Toast.show({
         type: 'error',
         text1: 'Google login failed',
@@ -137,10 +132,7 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
           <Image source={logoImage} style={styles.brandLogo} />
         </View>
 
-        <View style={styles.header}>
-          {/* <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Login to continue to Company Vista</Text> */}
-        </View>
+        <View style={styles.header} />
 
         <View style={styles.form}>
           <View style={styles.field}>
@@ -210,7 +202,9 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
             ) : null}
           </View>
 
-          <Pressable style={styles.forgotPassword} onPress={onForgotPasswordPress}>
+          <Pressable
+            style={styles.forgotPassword}
+            onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={[styles.forgotPasswordText, { color: '#ef4444' }]}>Forgot Password?</Text>
           </Pressable>
 
@@ -246,7 +240,7 @@ function LoginScreen({ onSignupPress, onForgotPasswordPress, onLoginSuccess }: L
             </Text>
           </Pressable>
 
-          <Pressable onPress={onSignupPress}>
+          <Pressable onPress={() => navigation.navigate('Signup')}>
             <Text style={[styles.authLinkText, { color: colors.subtle }]}>
               Don't have an account?{' '}
               <Text style={[styles.authLink, { color: colors.accent }]}>Sign Up</Text>

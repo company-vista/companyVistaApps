@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
 import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
@@ -19,6 +20,7 @@ import { BackButton } from '../../../components/buttons';
 import { useAppSelector } from '../../../store/hooks';
 import { API_BASE_URL } from '../../../config/api';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps } from '../../../navigation/types';
 
 interface InfoCardData {
   icon: string;
@@ -127,11 +129,10 @@ function Dropdown({
   );
 }
 
-type ContactSupportProps = {
-  onBackPress?: () => void;
-};
+type Nav = MainScreenProps<'Support'>['navigation'];
 
-export default function ContactSupport({ onBackPress }: ContactSupportProps) {
+export default function ContactSupport() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
@@ -203,9 +204,9 @@ export default function ContactSupport({ onBackPress }: ContactSupportProps) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Support</Text>
       </View>
       <ScrollView contentContainerStyle={styles.content}>

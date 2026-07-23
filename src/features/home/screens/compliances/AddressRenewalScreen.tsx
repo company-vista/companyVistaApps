@@ -10,6 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 import axios from 'axios';
 import BackButton from '../../../../components/buttons/BackButton';
 import { API_BASE_URL } from '../../../../config/api';
@@ -56,11 +59,6 @@ type RenewActionData = {
   price?: number;
   years?: number;
   services?: RenewalServiceInput[] | null;
-};
-
-type AddressRenewalScreenProps = {
-  onBackPress: () => void;
-  selectedAction?: RenewActionData | null;
 };
 
 const getIconName = (icon?: string): string => {
@@ -139,7 +137,10 @@ const buildAddressServices = (apiData: any, action?: RenewActionData | null): Se
   ];
 };
 
-const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress, selectedAction }) => {
+const AddressRenewalScreen: React.FC = () => {
+  const navigation = useNavigation<MainScreenProps<'AddressRenewal'>['navigation']>();
+  const route = useRoute<RouteProp<MainStackParamList, 'AddressRenewal'>>();
+  const selectedAction = route.params?.selectedAction;
   const colors = useThemeColors();
   const authUser = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
@@ -249,11 +250,11 @@ const AddressRenewalScreen: React.FC<AddressRenewalScreenProps> = ({ onBackPress
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
 
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.headerText}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? 'Address Renewal'}</Text>
           <Text style={[styles.headerSubtitle, { color: colors.muted }]}>{selectedAction?.subtitle ?? 'Company · 1 renewable service'}</Text>

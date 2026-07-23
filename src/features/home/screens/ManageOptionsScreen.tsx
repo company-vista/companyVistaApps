@@ -46,7 +46,6 @@ const ManageOptionsScreen: React.FC<ManageOptionsScreenProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: colors.background,
           paddingTop: insets.top + 4,
           paddingBottom: insets.bottom,
         },
@@ -62,7 +61,6 @@ const ManageOptionsScreen: React.FC<ManageOptionsScreenProps> = ({
           styles.header,
           {
             borderBottomColor: colors.border,
-            backgroundColor: colors.background,
           },
         ]}
       >

@@ -1,98 +1,26 @@
 import { lazy, useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   Image,
-  Linking,
-  Share,
   StatusBar,
   Text,
-
   View,
 } from 'react-native';
+import Svg, { Defs, LinearGradient as SvgGradient, Rect, Stop } from 'react-native-svg';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
 import styles from './App.styles';
 
-
-const LoginScreen = lazy(() => import('./src/features/auth/screens/LoginScreen'));
-const ForgotPasswordScreen = lazy(() => import('./src/features/auth/screens/ForgotPasswordScreen'));
-const OtpVerifyScreen = lazy(() => import('./src/features/auth/screens/OtpVerifyScreen'));  
-const ResetPasswordScreen = lazy(() => import('./src/features/auth/screens/ResetPasswordScreen'));
-const HelpFeedbackScreen = lazy(() => import('./src/features/help/screens/HelpFeedbackScreen'));
-const SupportScreen = lazy(() => import('./src/features/support/screens/SupportScreen'));
-const FollowUsScreen = lazy(() => import('./src/features/home/screens/FollowUsScreen'));
-const HomeScreen = lazy(() => import('./src/features/home/screens/HomeScreen'));
-const QuickAccessScreen = lazy(() => import('./src/features/home/screens/QuickAccessScreen'));  
-const BusinessReportsScreen = lazy(() => import('./src/features/home/screens/quickAccess/BusinessReportsScreen'));
-
-const CompanyProfileScreen = lazy(() => import('./src/features/home/screens/quickAccess/CompanyProfileScreen'));  
-
-const HelpDeskScreen = lazy(() => import('./src/features/home/screens/quickAccess/HelpDeskScreen'));
-const InvoiceCenterScreen = lazy(() => import('./src/features/home/screens/quickAccess/InvoiceCenterScreen'));
-const InvoiceDetailScreen = lazy(() => import('./src/features/home/screens/invoices/InvoiceDetailScreen'));
-const NotificationDetailScreen = lazy(() => import('./src/features/notifications/screens/NotificationDetailScreen'));
-const NotificationScreen = lazy(() => import('./src/features/notifications/screens/NotificationScreen'));
-const SearchScreen = lazy(() => import('./src/features/home/screens/SearchScreen'));
-const RenewComplianceScreen = lazy(() => import('./src/features/home/screens/compliances/RenewComplianceScreen'));
-const AddressRenewalScreen = lazy(() => import('./src/features/home/screens/compliances/AddressRenewalScreen'));
-const FederalFilingScreen = lazy(() => import('./src/features/home/screens/compliances/FederalFilingScreen'));
-const AnnualStateFilingScreen = lazy(() => import('./src/features/home/screens/compliances/AnnualFilingScreen'));
-const ComplianceHistoryScreen = lazy(() => import('./src/features/home/screens/compliances/ComplianceHistoryScreen'));
-const EditProfileScreen = lazy(() => import('./src/features/profile/screens/EditProfileScreen'));
-const ProfileAddressScreen = lazy(() => import('./src/features/profile/screens/ProfileAddressScreen'));
-const ProfileScreen = lazy(() => import('./src/features/profile/screens/ProfileScreen'));
-const SignupScreen = lazy(() => import('./src/features/auth/screens/SignupScreen'));
+import RootStack from './src/navigation/RootStack';
 import logoImage from './src/assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';
 import { store } from './src/store';
-import { useThemeColors } from './src/theme/colors';
-import type { QuickAccessItemId } from './src/features/home/data/quickAccessItems';
-import type { NotificationItem } from './src/features/notifications/data/notifications';
+import { useThemeColors, appThemes } from './src/theme/colors';
 
-type AuthScreen = 'login' | 'signup' | 'forgotPassword' | 'otpVerify' | 'resetPassword';
-type RenewActionData = {
-  id: 'address' | 'annual_filing' | 'resident' | 'federal_filing';
-  title: string;
-  subtitle: string;
-  status: string;
-  date: string;
-  details: { label: string; value: string; icon?: string }[];
-  companyId?: string | null;
-  price?: number;
-  years?: number;
-  services?: Array<{
-    id?: number | string | null;
-    name?: string | null;
-    lastDate?: string | null;
-    dueDate?: string | null;
-    price?: number | null;
-    years?: number | null;
-    isExpired?: boolean | null;
-  }> | null;
-};
-
-type AppScreen =
-  | 'auth'
-  | 'editProfile'
-  | 'federalFiling'
-  | 'annualFiling'
-  | 'followUs'
-  | 'helpFeedback'
-  | 'home'
-  | 'invoiceDetail'
-  | 'notificationDetail'
-  | 'notifications'
-  | 'addressRenewal'
-  | 'renewCompliance'
-  | 'complianceHistory'
-  | 'profile'
-  | 'profileAddress'
-  | 'search'
-  | 'support'
-  | `quickAccess:${QuickAccessItemId}`
-  | 'quickAccess';
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }) => (
@@ -115,6 +43,22 @@ const toastConfig: ToastConfig = {
   ),
 };
 
+function GradientBackground({ topColor, bottomColor }: { topColor: string; bottomColor: string }) {
+  return (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+      <Svg height={SCREEN_HEIGHT} width="100%">
+        <Defs>
+          <SvgGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={topColor} />
+            <Stop offset="1" stopColor={bottomColor} />
+          </SvgGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height={SCREEN_HEIGHT} fill="url(#bg)" />
+      </Svg>
+    </View>
+  );
+}
+
 function App() {
   return (
     <Provider store={store}>
@@ -125,49 +69,14 @@ function App() {
 
 function AppContent() {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isRestoring } = useAppSelector(state => state.auth);
+  const { isRestoring } = useAppSelector(state => state.auth);
   const themeMode = useAppSelector(state => state.theme.mode);
   const colors = useThemeColors();
   const isDarkMode = themeMode === 'dark';
+  const gradientColors: [string, string] = isDarkMode
+    ? [colors.background, colors.background]
+    : (appThemes.light.backgroundGradient as [string, string]);
   const [showSplash, setShowSplash] = useState(true);
-  const [appScreen, setAppScreen] = useState<AppScreen>('home');
-  const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
-  const [resetPasswordToken, setResetPasswordToken] = useState<string | null>(null);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [selectedNotification, setSelectedNotification] =
-    useState<NotificationItem | null>(null);
-  const [selectedInvoice, setSelectedInvoice] =
-    useState<Record<string, unknown> | null>(null);
-  const [renewComplianceAction, setRenewComplianceAction] =
-    useState<RenewActionData | null>(null);
-  const [selectedComplianceAction, setSelectedComplianceAction] =
-    useState<RenewActionData | null>(null);
-  const [quickAccessBackScreen, setQuickAccessBackScreen] =
-    useState<'home' | 'quickAccess'>('home');
-  const [homeInitialTab, setHomeInitialTab] = useState<'home' | 'company' | 'reports' | 'billing' | 'more'>('home');
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
-  const [pendingCompanySection, setPendingCompanySection] = useState<'companyInfo' | 'shareholders' | 'menu' | null>(null);
-  const [pendingHomeAction, setPendingHomeAction] = useState<'subscription' | 'addCompany' | 'manageOptions' | 'transactions' | null>(null);
-  const authFadeAnim = useRef(new Animated.Value(1)).current;
-  const authSlideAnim = useRef(new Animated.Value(0)).current;
-
-  function openQuickAccessItem(
-    itemId: QuickAccessItemId,
-    backScreen: 'home' | 'quickAccess',
-  ) {
-    setQuickAccessBackScreen(backScreen);
-    setAppScreen(`quickAccess:${itemId}`);
-  }
-
-  function openNotificationDetail(notification: NotificationItem) {
-    setSelectedNotification(notification);
-    setAppScreen('notificationDetail');
-  }
-
-  function openInvoiceDetail(invoice: Record<string, unknown>) {
-    setSelectedInvoice(invoice);
-    setAppScreen('invoiceDetail');
-  }
 
   useEffect(() => {
     dispatch(restoreAuth());
@@ -181,256 +90,19 @@ function AppContent() {
     return () => clearTimeout(splashTimer);
   }, []);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setAppScreen('home');
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    function handleDeepLink(url: string) {
-      if (url.includes('reset-password')) {
-        const tokenMatch = url.match(/token=([^&]+)/);
-        if (tokenMatch) {
-          setResetPasswordToken(tokenMatch[1]);
-          setAuthScreen('resetPassword');
-        }
-      }
-    }
-
-    Linking.getInitialURL().then(url => {
-      if (url) handleDeepLink(url);
-    });
-
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      handleDeepLink(url);
-    });
-
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    if (showSplash) {
-      return;
-    }
-
-    authFadeAnim.setValue(0);
-    authSlideAnim.setValue(22);
-
-    Animated.parallel([
-      Animated.timing(authFadeAnim, {
-        toValue: 1,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-      Animated.timing(authSlideAnim, {
-        toValue: 0,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [authFadeAnim, authScreen, authSlideAnim, showSplash]);
-
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      {showSplash || isRestoring ? (
-        <SplashScreen />
-      ) : isAuthenticated && appScreen === 'home' ? (
-        <HomeScreen
-          initialTab={homeInitialTab}
-          onFollowUsPress={() => setAppScreen('followUs')}
-          onHelpFeedbackPress={() => setAppScreen('helpFeedback')}
-          onSupportPress={() => setAppScreen('support')}
-          onInvoicePress={openInvoiceDetail}
-          onNotificationPress={() => setAppScreen('notifications')}
-          onSearchPress={() => setAppScreen('search')}
-          onProfilePress={() => setAppScreen('profile')}
-          onQuickAccessItemPress={itemId => openQuickAccessItem(itemId, 'home')}
-          onQuickAccessViewAllPress={() => setAppScreen('quickAccess')}
-          onGoHome={() => setHomeInitialTab('home')}
-          selectedCompanyId={selectedCompanyId}
-          onCompanyChange={setSelectedCompanyId}
-          pendingCompanySection={pendingCompanySection}
-          onClearPendingCompanySection={() => setPendingCompanySection(null)}
-          pendingHomeAction={pendingHomeAction}
-          onClearPendingHomeAction={() => setPendingHomeAction(null)}
-          onOpenRenewPage={(action) => {
-            setRenewComplianceAction(action);
-            if (action.id === 'federal_filing') {
-              setAppScreen('federalFiling');
-            } else if (action.id === 'address') {
-              setAppScreen('addressRenewal');
-            } else if (action.id === 'annual_filing') {
-              setAppScreen('annualFiling');
-            } else {
-              setAppScreen('renewCompliance');
-            }
-          }}
-          onOpenComplianceHistory={(action) => {
-            setSelectedComplianceAction(action);
-            setAppScreen('complianceHistory');
-          }}
-        />
-      ) : isAuthenticated && appScreen === 'invoiceDetail' && selectedInvoice ? (
-        <InvoiceDetailScreen
-          invoice={selectedInvoice}
-          onBackPress={() => { setHomeInitialTab('billing'); setAppScreen('home'); }}
-        />
-      ) : isAuthenticated && appScreen === 'addressRenewal' && renewComplianceAction ? (
-        <AddressRenewalScreen
-          onBackPress={() => {
-            setRenewComplianceAction(null);
-            setAppScreen('home');
-          }}
-          selectedAction={renewComplianceAction}
-        />
-      ) : isAuthenticated && appScreen === 'helpFeedback' ? (
-        <HelpFeedbackScreen onBackPress={() => setAppScreen('home')} />
-      ) : isAuthenticated && appScreen === 'support' ? (
-        <SupportScreen onBackPress={() => setAppScreen('home')} />
-      ) : isAuthenticated && appScreen === 'followUs' ? (
-        <FollowUsScreen onBackPress={() => setAppScreen('home')} />
-      ) : isAuthenticated && appScreen === 'notifications' ? (
-        <NotificationScreen
-          companyId={selectedCompanyId}
-          onBackPress={() => { setHomeInitialTab('home'); setAppScreen('home'); }}
-          onNotificationPress={openNotificationDetail}
-        />
-      ) : isAuthenticated && appScreen === 'search' ? (
-        <SearchScreen
-          onBackPress={() => setAppScreen('home')}
-          onCompanyInfoPress={() => { setPendingCompanySection('companyInfo'); setAppScreen('home'); }}
-          onShareholdersPress={() => { setPendingCompanySection('shareholders'); setAppScreen('home'); }}
-          onManageCompanyPress={() => { setPendingHomeAction('manageOptions'); setAppScreen('home'); }}
-          onTransactionsPress={() => { setPendingHomeAction('transactions'); setAppScreen('home'); }}
-          onStateFilingPress={() => setAppScreen('annualFiling')}
-          onFederalFilingPress={() => setAppScreen('federalFiling')}
-          onAddEntityPress={() => { setAppScreen('home'); }}
-          onChangeAgentPress={() => setAppScreen('addressRenewal')}
-          onSubscriptionPress={() => { setPendingHomeAction('subscription'); setAppScreen('home'); }}
-          onSupportPress={() => setAppScreen('support')}
-          onInviteFriendsPress={() => { Share.share({ message: 'Join me on Company Vista to manage company work in one place.', title: 'Invite Friends' }); }}
-          onFollowUsPress={() => setAppScreen('followUs')}
-          onHelpFeedbackPress={() => setAppScreen('helpFeedback')}
-          onAgentRenewalPress={() => { setRenewComplianceAction({ id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [] }); setAppScreen('renewCompliance'); }}
-          onAddressRenewalPress={() => { setRenewComplianceAction({ id: 'address', title: 'Address Renewal', subtitle: '', status: '', date: '', details: [] }); setAppScreen('addressRenewal'); }}
-          onAnnualFilingPress={() => setAppScreen('annualFiling')}
-        />
-      ) : isAuthenticated && appScreen === 'notificationDetail' && selectedNotification ? (
-        <NotificationDetailScreen
-          notification={selectedNotification}
-          onBackPress={() => setAppScreen('notifications')}
-          onDeleteSuccess={() => setAppScreen('notifications')}
-        />
-      ) : isAuthenticated && appScreen === 'quickAccess' ? (
-        <QuickAccessScreen
-          onBackPress={() => setAppScreen('home')}
-          onItemPress={itemId => openQuickAccessItem(itemId, 'quickAccess')}
-        />
-      ) : isAuthenticated && appScreen === 'quickAccess:companyProfile' ? (
-        <CompanyProfileScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
-      ) : isAuthenticated && appScreen === 'quickAccess:invoiceCenter' ? (
-        <InvoiceCenterScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
-      ) : isAuthenticated && appScreen === 'quickAccess:businessReports' ? (
-        <BusinessReportsScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
-      ) : isAuthenticated && appScreen === 'quickAccess:helpDesk' ? (
-        <HelpDeskScreen onBackPress={() => setAppScreen(quickAccessBackScreen)} />
-      ) : isAuthenticated && appScreen === 'quickAccess:federalFiling' ? (
-        <FederalFilingScreen
-          selectedAction={null}
-          onBackPress={() => setAppScreen(quickAccessBackScreen)}
-        />
-      ) : isAuthenticated && appScreen === 'federalFiling' ? (
-        <FederalFilingScreen
-          selectedAction={renewComplianceAction}
-          onBackPress={() => {
-            setHomeInitialTab('reports');
-            setAppScreen('home');
-          }}
-        />
-      ) : isAuthenticated && appScreen === 'annualFiling' ? (
-        <AnnualStateFilingScreen
-          onBackPress={() => {
-            setHomeInitialTab('reports');
-            setAppScreen('home');
-          }}
-          selectedCompanyId={selectedCompanyId}
-        />
-      ) : isAuthenticated && appScreen === 'complianceHistory' && selectedComplianceAction ? (
-        <ComplianceHistoryScreen
-          selectedAction={selectedComplianceAction}
-          onBackPress={() => {
-            setHomeInitialTab('reports');
-            setAppScreen('home');
-            setSelectedComplianceAction(null);
-          }}
-        />
-      ) : isAuthenticated && appScreen === 'renewCompliance' ? (
-        <RenewComplianceScreen
-          selectedAction={renewComplianceAction}
-          onBackPress={() => {
-            setHomeInitialTab('reports');
-            setAppScreen('home');
-          }}
-        />
-      ) : isAuthenticated && appScreen === 'profile' ? (
-        <ProfileScreen
-          onAddressPress={() => setAppScreen('profileAddress')}
-          onBackPress={() => setAppScreen('home')}
-          onEditPress={() => setAppScreen('editProfile')}
-        />
-      ) : isAuthenticated && appScreen === 'profileAddress' ? (
-        <ProfileAddressScreen onBackPress={() => setAppScreen('profile')} />
-      ) : isAuthenticated && appScreen === 'editProfile' ? (
-        <EditProfileScreen onBackPress={() => setAppScreen('profile')} />
-      ) : (
-        <View style={[styles.authScreen, { backgroundColor: colors.authBackground }]}>
-          <Animated.View
-            style={[
-              styles.authTransition,
-              {
-                backgroundColor: colors.authBackground,
-                opacity: authFadeAnim,
-                transform: [{ translateY: authSlideAnim }],
-              },
-            ]}>
-            {authScreen === 'login' ? (
-              <LoginScreen
-                onSignupPress={() => setAuthScreen('signup')}
-                onForgotPasswordPress={() => setAuthScreen('forgotPassword')}
-                onLoginSuccess={() => setAppScreen('home')}
-              />
-            ) : authScreen === 'forgotPassword' ? (
-              <ForgotPasswordScreen
-                onBackPress={() => setAuthScreen('login')}
-                onOtpVerifyPress={(email) => {
-                  setForgotEmail(email);
-                  setAuthScreen('otpVerify');
-                }}
-              />
-            ) : authScreen === 'otpVerify' ? (
-              <OtpVerifyScreen
-                email={forgotEmail}
-                onBackPress={() => setAuthScreen('forgotPassword')}
-                onOtpVerified={(token) => {
-                  setResetPasswordToken(token);
-                  setAuthScreen('resetPassword');
-                }}
-              />
-            ) : authScreen === 'resetPassword' ? (
-              <ResetPasswordScreen
-                token={resetPasswordToken ?? undefined}
-                onBackPress={() => setAuthScreen('login')}
-              />
-            ) : (
-              <SignupScreen onLoginPress={() => setAuthScreen('login')} />
-            )}
-          </Animated.View>
+      <View style={{ flex: 1 }}>
+        {!isDarkMode && <GradientBackground topColor={gradientColors[0]} bottomColor={gradientColors[1]} />}
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        {showSplash || isRestoring ? (
+          <SplashScreen />
+        ) : (
+          <RootStack />
+        )}
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, elevation: 9999 }}>
+          <Toast config={toastConfig} topOffset={50} />
         </View>
-      )}
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, elevation: 9999 }}>
-        <Toast config={toastConfig} topOffset={50} />
       </View>
     </SafeAreaProvider>
   );

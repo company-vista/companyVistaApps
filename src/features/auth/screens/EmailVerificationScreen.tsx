@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
+  ActivityIndicator,
   StyleSheet,
   View,
   Text,
@@ -8,15 +9,34 @@ import {
   ScrollView,
 } from 'react-native';
 import { Check, Mail, Lock, ShieldCheck, Key, Clock, Edit2 } from 'lucide-react-native';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
 import { font } from '../../../theme/typography';
+import { API_BASE_URL } from '../../../config/api';
 
 type EmailVerificationScreenProps = {
   email: string;
+  signupToken: string;
+  signupClientId: string;
   onEditPress: () => void;
+  onResend: () => void;
+  onOtpVerified: (data: { token: string; clientId: string }) => void;
+  isResending?: boolean;
 };
 
-export default function EmailVerificationScreen({ email, onEditPress }: EmailVerificationScreenProps) {
+export default function EmailVerificationScreen({
+  email,
+  signupToken,
+  signupClientId,
+  onEditPress,
+  onResend,
+  onOtpVerified,
+  isResending,
+}: EmailVerificationScreenProps) {
   const [countdown, setCountdown] = useState(27);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [verifying, setVerifying] = useState(false);
+  const inputs = useRef<(TextInput | null)[]>([]);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -24,11 +44,70 @@ export default function EmailVerificationScreen({ email, onEditPress }: EmailVer
     return () => clearTimeout(timer);
   }, [countdown]);
 
+  function handleOtpChange(text: string, index: number) {
+    if (text.length > 1) {
+      text = text.slice(-1);
+    }
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+
+    if (text && index < 5) {
+      inputs.current[index + 1]?.focus();
+    }
+  }
+
+  function handleKeyPress(e: any, index: number) {
+    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+      inputs.current[index - 1]?.focus();
+      const newOtp = [...otp];
+      newOtp[index - 1] = '';
+      setOtp(newOtp);
+    }
+  }
+
+  async function handleVerifyOtp() {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
+      Toast.show({ type: 'error', text1: 'Please enter 6-digit OTP' });
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      if (signupToken && signupClientId) {
+        await axios.get(`${API_BASE_URL}/api/verify-email/${signupToken}/${signupClientId}`);
+      }
+
+      const response = await axios.post(`${API_BASE_URL}/api/client/auth/otpverify-email`, {
+        email,
+        otp: otpString,
+      });
+
+      const token = response.data?.token;
+      const clientId = response.data?.clientId || response.data?.client_id || '';
+      if (token) {
+        Toast.show({ type: 'success', text1: 'Verified', text2: 'Email otp verified successfully' });
+        onOtpVerified({ token, clientId });
+      } else {
+        Toast.show({ type: 'error', text1: 'Verification failed' });
+      }
+    } catch (error: any) {
+      const message = error?.response?.data?.message || 'Invalid OTP. Please try again.';
+      Toast.show({ type: 'error', text1: 'Error', text2: message });
+    } finally {
+      setVerifying(false);
+    }
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.card}>
-        <Text style={styles.title}>Check Your Inbox</Text>
-        <Text style={styles.subtitle}>We are waiting for your email verification</Text>
+        <Text style={styles.title}>Verify Your Email</Text>
+        <Text style={styles.subtitle}>
+          Enter the 6-digit code sent to
+        </Text>
+        <Text style={styles.emailHighlight}>{email}</Text>
 
         <View style={styles.stepContainer}>
           <View style={styles.stepItem}>
@@ -55,40 +134,51 @@ export default function EmailVerificationScreen({ email, onEditPress }: EmailVer
           </View>
         </View>
 
-        <View style={styles.illustrationBox}>
-          <View style={styles.envelopeCircle}>
-            <Text style={styles.atSymbol}>@</Text>
-          </View>
+        <View style={styles.otpContainer}>
+          {otp.map((digit, index) => (
+            <TextInput
+              key={index}
+              ref={ref => { inputs.current[index] = ref; }}
+              style={[styles.otpInput, digit ? styles.otpInputFilled : null]}
+              keyboardType="number-pad"
+              maxLength={1}
+              onChangeText={text => handleOtpChange(text, index)}
+              onKeyPress={e => handleKeyPress(e, index)}
+              value={digit}
+              autoFocus={index === 0}
+            />
+          ))}
         </View>
 
-        <Text style={styles.infoText}>
-          We sent a verification link to the email below. Open your inbox, click the link, and this page will update automatically.
-        </Text>
-
-        <View style={styles.emailContainer}>
-          <TextInput
-            style={styles.emailInput}
-            value={email}
-            editable={false}
-          />
-          <TouchableOpacity style={styles.editIconBtn} onPress={onEditPress}>
-            <Edit2 size={16} color="#71717A" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.verifyBtn, verifying && styles.verifyBtnDisabled]}
+          disabled={verifying}
+          onPress={handleVerifyOtp}
+        >
+          {verifying ? (
+            <ActivityIndicator color="#042f2e" size="small" />
+          ) : (
+            <Text style={styles.verifyBtnText}>Verify OTP</Text>
+          )}
+        </TouchableOpacity>
 
         <Text style={styles.timerText}>
           Resend will be available in 0:{countdown < 10 ? `0${countdown}` : countdown}.
         </Text>
 
         <TouchableOpacity
-          style={[styles.resendBtn, countdown > 0 && styles.resendBtnDisabled]}
-          disabled={countdown > 0}
+          style={[styles.resendBtn, (countdown > 0 || isResending) && styles.resendBtnDisabled]}
+          disabled={countdown > 0 || isResending}
+          onPress={() => {
+            onResend();
+            setCountdown(27);
+          }}
         >
-          <Text style={styles.resendBtnText}>→ Resend Verification Email</Text>
+          <Text style={styles.resendBtnText}>{isResending ? 'Sending...' : 'Resend Verification Email'}</Text>
         </TouchableOpacity>
 
         <Text style={styles.spamNotice}>
-          If nothing appears, check your spam folder or add the sender to your safe list before requesting another email.
+          Check your spam folder if you don't see the email.
         </Text>
 
         <View style={styles.wrongEmailRow}>
@@ -99,20 +189,20 @@ export default function EmailVerificationScreen({ email, onEditPress }: EmailVer
         </View>
 
         <View style={styles.divider} />
-          <View style={styles.footerRow}>
-            <View style={styles.footerItem}>
-              <ShieldCheck size={14} color="#14b8a6" />
-              <Text style={styles.footerText}>SSL Secured</Text>
-            </View>
-            <View style={styles.footerItem}>
-              <Key size={14} color="#14b8a6" />
-              <Text style={styles.footerText}>2FA Available</Text>
-            </View>
-            <View style={styles.footerItem}>
-              <Clock size={14} color="#14b8a6" />
-              <Text style={styles.footerText}>24/7 Support</Text>
-            </View>
+        <View style={styles.footerRow}>
+          <View style={styles.footerItem}>
+            <ShieldCheck size={14} color="#14b8a6" />
+            <Text style={styles.footerText}>SSL Secured</Text>
           </View>
+          <View style={styles.footerItem}>
+            <Key size={14} color="#14b8a6" />
+            <Text style={styles.footerText}>2FA Available</Text>
+          </View>
+          <View style={styles.footerItem}>
+            <Clock size={14} color="#14b8a6" />
+            <Text style={styles.footerText}>24/7 Support</Text>
+          </View>
+        </View>
 
         <Text style={styles.copyrightText}>
           © 2026 Company Vista Inc - Privacy - Terms
@@ -130,7 +220,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 16,
-    padding: 14,
+    padding: 2,
     alignItems: 'center',
     width: '100%',
   },
@@ -145,6 +235,13 @@ const styles = StyleSheet.create({
     fontSize: font.lg,
     color: '#94a3b8',
     textAlign: 'center',
+    marginBottom: 4,
+  },
+  emailHighlight: {
+    fontSize: font.lg,
+    color: '#f8fafc',
+    fontWeight: '700',
+    textAlign: 'center',
     marginBottom: 24,
   },
   stepContainer: {
@@ -156,7 +253,7 @@ const styles = StyleSheet.create({
   },
   stepItem: {
     alignItems: 'center',
-    width: 75,
+    width: 80,
   },
   stepIcon: {
     width: 26,
@@ -198,55 +295,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#334155',
     marginBottom: 16,
   },
-  illustrationBox: {
+  otpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 24,
     width: '100%',
-    height: 60,
-    backgroundColor: '#1e293b',
+  },
+  otpInput: {
+    width: 46,
+    height: 54,
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 12,
+    backgroundColor: '#111827',
+    color: '#f8fafc',
+    fontSize: font.heading,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  otpInputFilled: {
+    borderColor: '#14b8a6',
+    backgroundColor: '#0f2e2a',
+  },
+  verifyBtn: {
+    width: '100%',
+    height: 48,
+    backgroundColor: '#14b8a6',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
-  },
-  envelopeCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 25,
-    backgroundColor: '#14b8a6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  atSymbol: {
-    fontSize: font.display,
-    color: '#042f2e',
-    fontWeight: '600',
-  },
-  infoText: {
-    fontSize: font.md,
-    color: '#94a3b8',
-    textAlign: 'center',
-    lineHeight: 18,
     marginBottom: 16,
   },
-  emailContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 8,
-    backgroundColor: '#111827',
-    paddingHorizontal: 12,
-    height: 46,
-    marginBottom: 20,
+  verifyBtnDisabled: {
+    opacity: 0.7,
   },
-  emailInput: {
-    flex: 1,
+  verifyBtnText: {
+    color: '#042f2e',
     fontSize: font.lg,
-    color: '#f8fafc',
-    fontWeight: '500',
-  },
-  editIconBtn: {
-    padding: 4,
+    fontWeight: '700',
   },
   timerText: {
     fontSize: font.md,
@@ -256,19 +343,20 @@ const styles = StyleSheet.create({
   resendBtn: {
     width: '100%',
     height: 46,
-    backgroundColor: '#14b8a6',
-    borderRadius: 8,
+    backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
     marginBottom: 16,
   },
   resendBtnDisabled: {
-    backgroundColor: '#1e3a5c',
+    opacity: 0.5,
   },
   resendBtnText: {
-    color: '#042f2e',
-    fontSize: font.lg,
+    color: '#94a3b8',
+    fontSize: font.md,
     fontWeight: '600',
   },
   spamNotice: {

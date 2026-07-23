@@ -10,6 +10,8 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { MainScreenProps } from '../../../../navigation/types';
 import { pick, types } from '@react-native-documents/picker';
 import Feather from 'react-native-vector-icons/Feather';
 import BackButton from '../../../../components/buttons/BackButton';
@@ -21,11 +23,6 @@ import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
 
 type StepStatus = 'done' | 'active' | 'upcoming';
-
-type AnnualStateFilingScreenProps = {
-  onBackPress?: () => void;
-  selectedCompanyId?: string | null;
-};
 
 interface Step {
   number: number;
@@ -44,7 +41,8 @@ const STEPS: Step[] = [
   { number: 7, title: 'Filed', subtitle: 'Filing confirmed by state', status: 'upcoming' },
 ];
 
-export default function AnnualStateFilingScreen({ onBackPress, selectedCompanyId }: AnnualStateFilingScreenProps) {
+export default function AnnualStateFilingScreen() {
+  const navigation = useNavigation<MainScreenProps<'AnnualFiling'>['navigation']>();
   const colors = useThemeColors();
   const authUser = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
@@ -63,7 +61,7 @@ export default function AnnualStateFilingScreen({ onBackPress, selectedCompanyId
   const [companyOptions, setCompanyOptions] = useState<Array<{ id: string; label: string }>>([]);
   const [companyDataList, setCompanyDataList] = useState<Array<Record<string, any>>>([]);
   const [company, setCompany] = useState('Select company');
-  const [selectedCompanyIdState, setSelectedCompanyIdState] = useState<string | null>(selectedCompanyId ?? null);
+  const [selectedCompanyIdState, setSelectedCompanyIdState] = useState<string | null>(null);
   const [taxYearOptions, setTaxYearOptions] = useState<string[]>([]);
   const [taxYear, setTaxYear] = useState('');
   const [isTaxYearDropdownOpen, setIsTaxYearDropdownOpen] = useState(false);
@@ -110,10 +108,6 @@ export default function AnnualStateFilingScreen({ onBackPress, selectedCompanyId
 
     return options;
   };
-
-  useEffect(() => {
-    setSelectedCompanyIdState(selectedCompanyId ?? null);
-  }, [selectedCompanyId]);
 
   const fetchRecentSubmissions = async () => {
     // Placeholder for refresh logic after a successful submission.
@@ -372,16 +366,16 @@ export default function AnnualStateFilingScreen({ onBackPress, selectedCompanyId
   }, [companyDataList, selectedCompanyIdState, taxYear]);
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}> 
+    <SafeAreaView style={styles.safeArea}> 
       <ScrollView
-        style={[styles.screen, { backgroundColor: colors.background }]}
+        style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topPadding} />
 
         <View style={styles.headerRow}>
-          <BackButton onPress={onBackPress} />
+          <BackButton onPress={() => navigation.goBack()} />
           <View style={styles.headerTextContainer}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Annual state filing</Text>
             <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text>

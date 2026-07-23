@@ -41,7 +41,7 @@ function getStyles(colors: AppTheme) {
   const isDark = colors.mode === 'dark';
   return StyleSheet.create({
     root: {
-      backgroundColor: isDark ? colors.background : '#F5F7FA',
+      backgroundColor: isDark ? colors.background : 'transparent',
       flex: 1,
     },
     header: {

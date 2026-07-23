@@ -166,26 +166,12 @@ export async function uploadClientAvatar({
       },
     );
 
-    console.log('Client avatar uploaded', {
-      avatar: getResponseAvatar(response.data),
-      success: response.data.success,
-    });
-
     return {
       avatar: getResponseAvatar(response.data),
       error: '',
       isSuccess: response.data.success ?? true,
     };
   } catch (error) {
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-
-    console.log('Client avatar API error', {
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      tokenLoaded: Boolean(token),
-      url: CLIENT_AVATAR_ROUTE,
-    });
 
     return {
       avatar: undefined,

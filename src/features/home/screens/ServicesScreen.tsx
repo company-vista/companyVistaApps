@@ -81,7 +81,7 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress }: Ser
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}
     >
       <View style={styles.header}>

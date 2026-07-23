@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
@@ -10,24 +13,10 @@ import { formatDate } from '../../../../constants/dateFormatter';
 
 type ComplianceHistoryRecord = Record<string, unknown>;
 
-type ComplianceHistoryScreenProps = {
-  selectedAction: {
-    id: 'address' | 'annual_filing' | 'resident' | 'federal_filing';
-    title: string;
-    subtitle: string;
-    status: string;
-    date: string;
-    details: { label: string; value: string; icon?: string }[];
-    companyId?: string | null;
-    price?: number;
-    years?: number;
-    year?: string;
-    dueDate?: string;
-  };
-  onBackPress: () => void;
-};
-
-const ComplianceHistoryScreen = ({ selectedAction, onBackPress }: ComplianceHistoryScreenProps) => {
+const ComplianceHistoryScreen = () => {
+  const navigation = useNavigation<MainScreenProps<'ComplianceHistory'>['navigation']>();
+  const route = useRoute<RouteProp<MainStackParamList, 'ComplianceHistory'>>();
+  const selectedAction = route.params.selectedAction;
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
   const [history, setHistory] = useState<ComplianceHistoryRecord[]>([]);
@@ -236,10 +225,10 @@ const ComplianceHistoryScreen = ({ selectedAction, onBackPress }: ComplianceHist
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}> 
+    <SafeAreaView style={styles.safeArea}> 
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
-          <BackButton onPress={onBackPress} />
+          <BackButton onPress={() => navigation.goBack()} />
           <View style={styles.headerTextContainer}>
             <Text style={[styles.title, { color: colors.text }]}>Compliance History</Text>
             <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text>

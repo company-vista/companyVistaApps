@@ -275,7 +275,7 @@ console.log(transaction);
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 8 }]}>
+    <View style={[styles.screen, { paddingTop: safeAreaInsets.top + 8 }]}>
       {/* Header */}
       <View style={styles.header}>
         <BackButton onPress={onBackPress} />

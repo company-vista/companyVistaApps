@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
 
@@ -23,9 +24,12 @@ type SignupApiResult = {
   email: string;
   firstName: string;
   lastName: string;
+  token: string;
+  clientId: string;
 };
 
 const SIGNUP_STEP1_ROUTE = `${API_BASE_URL}/api/signup/step1`;
+const RESEND_VERIFICATION_ROUTE = `${API_BASE_URL}/api/signup/resend-verification`;
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -80,51 +84,24 @@ export async function handleSignupApi({
       email: trimmedEmail,
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
+      token: '',
+      clientId: '',
     };
   }
 
   try {
-    const response = await fetch(SIGNUP_STEP1_ROUTE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        firstName: trimmedFirstName,
-        lastName: trimmedLastName,
-        email: trimmedEmail,
-        phoneNumber: trimmedPhone,
-        countryCode,
-        address,
-      }),
+    const response = await axios.post(SIGNUP_STEP1_ROUTE, {
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      email: trimmedEmail,
+      phoneNumber: trimmedPhone,
+      countryCode,
+      address,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const apiErrors: SignupErrors = {};
-
-      if (data.message) {
-        if (data.message.toLowerCase().includes('email')) {
-          apiErrors.email = data.message;
-        } else {
-          apiErrors.email = data.message;
-        }
-      }
-
-      Toast.show({
-        type: 'error',
-        text1: 'Signup failed',
-        text2: data.message || 'Something went wrong.',
-      });
-
-      return {
-        errors: apiErrors,
-        isSuccess: false,
-        email: trimmedEmail,
-        firstName: trimmedFirstName,
-        lastName: trimmedLastName,
-      };
-    }
-
+    const token = response.data?.token || '';
+    const clientId = response.data?.clientId || response.data?.client_id || '';
+   
     Toast.show({
       type: 'success',
       text1: 'Account created',
@@ -137,20 +114,57 @@ export async function handleSignupApi({
       email: trimmedEmail,
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
+      token,
+      clientId,
     };
-  } catch (error) {
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Something went wrong.';
+
     Toast.show({
       type: 'error',
-      text1: 'Network error',
-      text2: 'Unable to reach server.',
+      text1: 'Signup failed',
+      text2: message,
     });
 
     return {
-      errors: { email: 'Network error' },
+      errors: { email: message },
       isSuccess: false,
       email: trimmedEmail,
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
+      token: '',
+      clientId: '',
+    };
+  }
+}
+
+export type ResendVerificationResult = {
+  isSuccess: boolean;
+  message: string;
+};
+
+export async function handleResendVerificationApi(
+  email: string,
+): Promise<ResendVerificationResult> {
+  const trimmedEmail = email.trim();
+
+  if (!trimmedEmail) {
+    return { isSuccess: false, message: 'Email is required.' };
+  }
+
+  try {
+    const response = await axios.post(RESEND_VERIFICATION_ROUTE, {
+      email: trimmedEmail,
+    });
+
+    return {
+      isSuccess: true,
+      message: response.data?.message || 'Verification email sent successfully.',
+    };
+  } catch (error: any) {
+    return {
+      isSuccess: false,
+      message: error.response?.data?.message || 'Network error. Unable to reach server.',
     };
   }
 }

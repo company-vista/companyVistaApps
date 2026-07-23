@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
@@ -17,6 +18,8 @@ import { fetchNotifications, markNotificationAsRead, deleteNotification } from '
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
 
 const notificationFilters = ['All', 'Unread', 'Read'] as const;
 
@@ -26,17 +29,13 @@ function getBadgeCount(count: number) {
   return count > 9 ? '9+' : String(count);
 }
 
-type NotificationScreenProps = {
-  companyId?: string | null;
-  onBackPress: () => void;
-  onNotificationPress: (notification: NotificationItem) => void;
-};
+type Nav = MainScreenProps<'Notifications'>['navigation'];
+type Route = RouteProp<MainStackParamList, 'Notifications'>;
 
-function NotificationScreen({
-  companyId,
-  onBackPress,
-  onNotificationPress,
-}: NotificationScreenProps) {
+function NotificationScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const companyId = route.params?.companyId;
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
@@ -106,11 +105,11 @@ function NotificationScreen({
         ]}
         style={[
           styles.screen,
-          { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 12 },
+          { paddingTop: safeAreaInsets.top + 12 },
         ]}>
         <View style={styles.header}>
           <View style={styles.titleRow}>
-            <BackButton onPress={onBackPress} />
+            <BackButton onPress={() => navigation.goBack()} />
             <Text style={[styles.title, { color: colors.text }]}>Notifications</Text>
           </View>
           {hasNotifications ? (
@@ -166,7 +165,7 @@ function NotificationScreen({
                         );
                         markNotificationAsRead({ token, notificationId: item.id });
                       }
-                      onNotificationPress(item);
+                      navigation.navigate('NotificationDetail', { notification: item });
                     }}
                     onLongPress={() => {
                       setSelectedNotification(item);
@@ -285,7 +284,7 @@ function NotificationScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     paddingHorizontal: 20,

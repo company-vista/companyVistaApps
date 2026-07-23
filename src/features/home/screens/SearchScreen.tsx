@@ -1,38 +1,21 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Share, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps } from '../../../navigation/types';
+import { RenewActionData } from '../../../navigation/types';
 
-type SearchScreenProps = {
-  onBackPress: () => void;
-  onCompanyInfoPress: () => void;
-  onShareholdersPress: () => void;
-  onManageCompanyPress: () => void;
-  onTransactionsPress: () => void;
-  onStateFilingPress: () => void;
-  onFederalFilingPress: () => void;
-  onAddEntityPress: () => void;
-  onChangeAgentPress: () => void;
-  onSubscriptionPress: () => void;
-  onSupportPress: () => void;
-  onInviteFriendsPress: () => void;
-  onFollowUsPress: () => void;
-  onHelpFeedbackPress: () => void;
-  onAgentRenewalPress: () => void;
-  onAddressRenewalPress: () => void;
-  onAnnualFilingPress: () => void;
-  onRegistrationTrackingPress: () => void;
-};
+type Nav = MainScreenProps<'Search'>['navigation'];
 
 const quickActions = [
   { id: 'companyInfo', label: 'Company Information', icon: 'building-o', color: '#4F46E5' },
   { id: 'shareholders', label: 'Shareholders', icon: 'users', color: '#137333' },
-
   { id: 'manageCompany', label: 'Manage Company', icon: 'briefcase', color: '#7C3AED' },
   { id: 'transactions', label: 'Transactions', icon: 'exchange', color: '#0891b2' },
   { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
@@ -63,10 +46,86 @@ const helpAndSupport = [
   { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: '#ca8a04' },
 ];
 
-export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareholdersPress, onManageCompanyPress, onTransactionsPress, onStateFilingPress, onFederalFilingPress, onAddEntityPress, onChangeAgentPress, onSubscriptionPress, onSupportPress, onInviteFriendsPress, onFollowUsPress, onHelpFeedbackPress, onAgentRenewalPress, onAddressRenewalPress, onAnnualFilingPress, onRegistrationTrackingPress }: SearchScreenProps) {
+export default function SearchScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [query, setQuery] = useState('');
+
+  function handleQuickAction(actionId: string) {
+    switch (actionId) {
+      case 'companyInfo':
+        navigation.navigate('Home', { pendingCompanySection: 'companyInfo' });
+        break;
+      case 'shareholders':
+        navigation.navigate('Home', { pendingCompanySection: 'shareholders' });
+        break;
+      case 'manageCompany':
+        navigation.navigate('Home', { pendingHomeAction: 'manageOptions' });
+        break;
+      case 'transactions':
+        navigation.navigate('Home', { pendingHomeAction: 'transactions' });
+        break;
+      case 'subscription':
+        navigation.navigate('Home', { pendingHomeAction: 'subscription' });
+        break;
+    }
+  }
+
+  function handleServicePress(serviceId: string) {
+    switch (serviceId) {
+      case 'stateFiling':
+        navigation.navigate('AnnualFiling');
+        break;
+      case 'federalFiling':
+        navigation.navigate('FederalFiling');
+        break;
+      case 'addEntity':
+        navigation.goBack();
+        break;
+      case 'changeAgent':
+        navigation.navigate('AddressRenewal');
+        break;
+    }
+  }
+
+  function handleCompliancePress(actionId: string) {
+    switch (actionId) {
+      case 'agentRenewal':
+        navigation.navigate('RenewCompliance', {
+          selectedAction: { id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [] },
+        });
+        break;
+      case 'addressRenewal':
+        navigation.navigate('AddressRenewal', {
+          selectedAction: { id: 'address', title: 'Address Renewal', subtitle: '', status: '', date: '', details: [] },
+        });
+        break;
+      case 'federalFiling':
+        navigation.navigate('FederalFiling');
+        break;
+      case 'annualFiling':
+        navigation.navigate('AnnualFiling');
+        break;
+    }
+  }
+
+  function handleHelpPress(itemId: string) {
+    switch (itemId) {
+      case 'support':
+        navigation.navigate('Support');
+        break;
+      case 'inviteFriends':
+        Share.share({ message: 'Join me on Company Vista to manage company work in one place.', title: 'Invite Friends' });
+        break;
+      case 'followUs':
+        navigation.navigate('FollowUs');
+        break;
+      case 'helpFeedback':
+        navigation.navigate('HelpFeedback');
+        break;
+    }
+  }
 
   const filteredActions = useMemo(() => {
     if (!query.trim()) return quickActions;
@@ -99,9 +158,9 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
   }, [query]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: safeAreaInsets.top }]}>
+    <View style={[styles.container, { paddingTop: safeAreaInsets.top }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.title, { color: colors.text }]}>Search</Text>
       </View>
       <AnimatedAppear index={0}>
@@ -123,136 +182,95 @@ export default function SearchScreen({ onBackPress, onCompanyInfoPress, onShareh
           <AnimatedAppear index={1}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>QUICK ACTIONS</Text>}
             <View style={styles.settingsList}>
-              {filteredActions.map((action) => {
-                const onPress = action.id === 'companyInfo'
-                  ? onCompanyInfoPress
-                  : action.id === 'shareholders'
-                    ? onShareholdersPress
-                    : action.id === 'manageCompany'
-                        ? onManageCompanyPress
-                        : action.id === 'transactions'
-                          ? onTransactionsPress
-                          : onSubscriptionPress;
-                return (
-                  <TouchableOpacity
-                    key={action.id}
-                    style={styles.settingsRow}
-                    onPress={onPress}
-                  >
-                    <View style={[styles.settingsIcon, { backgroundColor: `${action.color}15` }]}>
-                      <FontAwesome name={action.icon} size={18} color={action.color} />
-                    </View>
-                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{action.label}</Text>
-                    <FontAwesome name="angle-right" size={18} color={colors.subtle} />
-                  </TouchableOpacity>
-                );
-              })}
+              {filteredActions.map((action) => (
+                <TouchableOpacity
+                  key={action.id}
+                  style={styles.settingsRow}
+                  onPress={() => handleQuickAction(action.id)}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${action.color}15` }]}>
+                    <FontAwesome name={action.icon} size={18} color={action.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{action.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              ))}
             </View>
           </AnimatedAppear>
 
           <AnimatedAppear index={2}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>}
             <View style={styles.settingsList}>
-              {filteredServices.map((service) => {
-                const onPress = service.id === 'stateFiling'
-                  ? onStateFilingPress
-                  : service.id === 'federalFiling'
-                    ? onFederalFilingPress
-                    : service.id === 'addEntity'
-                      ? onAddEntityPress
-                      : onChangeAgentPress;
-                return (
-                  <TouchableOpacity
-                    key={service.id}
-                    style={styles.settingsRow}
-                    onPress={onPress}
-                  >
-                    <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
-                      <FontAwesome name={service.icon} size={18} color={service.color} />
-                    </View>
-                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{service.label}</Text>
-                    <FontAwesome name="angle-right" size={18} color={colors.subtle} />
-                  </TouchableOpacity>
-                );
-              })}
+              {filteredServices.map((service) => (
+                <TouchableOpacity
+                  key={service.id}
+                  style={styles.settingsRow}
+                  onPress={() => handleServicePress(service.id)}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
+                    <FontAwesome name={service.icon} size={18} color={service.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{service.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              ))}
             </View>
           </AnimatedAppear>
 
           <AnimatedAppear index={3}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>COMPLIANCE ACTIONS</Text>}
             <View style={styles.settingsList}>
-              {filteredComplianceActions.map((item) => {
-                const onPress = item.id === 'agentRenewal'
-                  ? onAgentRenewalPress
-                  : item.id === 'addressRenewal'
-                    ? onAddressRenewalPress
-                    : item.id === 'federalFiling'
-                      ? onFederalFilingPress
-                      : onAnnualFilingPress;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.settingsRow}
-                    onPress={onPress}
-                  >
-                    <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
-                      <FontAwesome name={item.icon} size={18} color={item.color} />
-                    </View>
-                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
-                    <FontAwesome name="angle-right" size={18} color={colors.subtle} />
-                  </TouchableOpacity>
-                );
-              })}
+              {filteredComplianceActions.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.settingsRow}
+                  onPress={() => handleCompliancePress(item.id)}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              ))}
             </View>
           </AnimatedAppear>
 
           <AnimatedAppear index={4}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>}
             <View style={styles.settingsList}>
-              {filteredTrackingActions.map((item) => {
-                const onPress = onRegistrationTrackingPress;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.settingsRow}
-                    onPress={onPress}
-                  >
-                    <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
-                      <FontAwesome name={item.icon} size={18} color={item.color} />
-                    </View>
-                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
-                    <FontAwesome name="angle-right" size={18} color={colors.subtle} />
-                  </TouchableOpacity>
-                );
-              })}
+              {filteredTrackingActions.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.settingsRow}
+                  onPress={() => {}}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              ))}
             </View>
           </AnimatedAppear>
 
           <AnimatedAppear index={5}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>HELP & SUPPORT</Text>}
             <View style={styles.settingsList}>
-              {filteredHelpAndSupport.map((item) => {
-                const onPress = item.id === 'support'
-                  ? onSupportPress
-                  : item.id === 'inviteFriends'
-                    ? onInviteFriendsPress
-                    : item.id === 'followUs'
-                      ? onFollowUsPress
-                      : onHelpFeedbackPress;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={styles.settingsRow}
-                    onPress={onPress}
-                  >
-                    <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
-                      <FontAwesome name={item.icon} size={18} color={item.color} />
-                    </View>
-                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
-                    <FontAwesome name="angle-right" size={18} color={colors.subtle} />
-                  </TouchableOpacity>
-                );
-              })}
+              {filteredHelpAndSupport.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.settingsRow}
+                  onPress={() => handleHelpPress(item.id)}
+                >
+                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
+                    <FontAwesome name={item.icon} size={18} color={item.color} />
+                  </View>
+                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
+                  <FontAwesome name="angle-right" size={18} color={colors.subtle} />
+                </TouchableOpacity>
+              ))}
             </View>
           </AnimatedAppear>
 
@@ -285,7 +303,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingHorizontal: 14,
     borderRadius: 10,
-    // borderWidth: 1,
   },
   searchIcon: {
     marginRight: 10,

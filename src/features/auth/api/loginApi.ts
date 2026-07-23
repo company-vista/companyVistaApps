@@ -263,7 +263,6 @@ export async function handleLoginApi({
   }
 
   let lastError: unknown;
-  const requestStartedAt = Date.now();
 
   try {
     const response = await axios.post<LoginApiResponse>(
@@ -276,17 +275,10 @@ export async function handleLoginApi({
         timeout: API_REQUEST_TIMEOUT_MS,
       },
     );
-    const requestDurationMs = Date.now() - requestStartedAt;
     const user = getResponseUser(response.data);
     const token = getResponseToken(response.data) || getHeaderToken(response.headers);
 
     if (!token) {
-      console.log('Client login response missing token', {
-        data: response?.data,
-        dataKeys: isApiRecord(response.data) ? Object.keys(response.data) : [],
-        headerKeys: Object.keys(response.headers),
-      });
-
       Toast.show({
         type: 'error',
         text1: 'Login failed',
@@ -336,12 +328,6 @@ export async function handleLoginApi({
       state: user?.state,
       street: user?.street,
     };
-    console.log('Login API route succeeded', {
-      durationMs: requestDurationMs,
-      url: CLIENT_LOGIN_ROUTE,
-    });
-    console.log('Login user saved', loginUser);
-    console.log('Login token loaded', Boolean(token));
 
     return {
       errors,
@@ -352,18 +338,6 @@ export async function handleLoginApi({
     };
   } catch (error) {
     lastError = error;
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-    const requestError = axiosError.request as { _response?: string } | undefined;
-
-    console.log('Login API route failed', {
-      code: axiosError.code,
-      durationMs: Date.now() - requestStartedAt,
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      requestResponse: requestError?._response,
-      url: CLIENT_LOGIN_ROUTE,
-    });
   }
 
   const message = getErrorMessage(lastError);
@@ -412,7 +386,6 @@ export async function handleGoogleLoginApi({
   }
 
   let lastError: unknown;
-  const requestStartedAt = Date.now();
 
   try {
     const response = await axios.post<LoginApiResponse>(
@@ -423,17 +396,9 @@ export async function handleGoogleLoginApi({
       },
     );
 
-    const requestDurationMs = Date.now() - requestStartedAt;
     const user = getResponseUser(response.data);
     const token = getResponseToken(response.data) || getHeaderToken(response.headers);
-    console.log(response)
     if (!token) {
-      console.log('Google login response missing token', {
-        data: response?.data,
-        dataKeys: isApiRecord(response.data) ? Object.keys(response.data) : [],
-        headerKeys: Object.keys(response.headers),
-      });
-
       Toast.show({
         type: 'error',
         text1: 'Google login failed',
@@ -481,11 +446,6 @@ export async function handleGoogleLoginApi({
       street: user?.street,
     };
 
-    console.log('Google login API route succeeded', {
-      durationMs: requestDurationMs,
-      url: GOOGLE_LOGIN_ROUTE,
-    });
-
     return {
       errors: {},
       isSuccess: true,
@@ -495,18 +455,6 @@ export async function handleGoogleLoginApi({
     };
   } catch (error) {
     lastError = error;
-    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
-    const requestError = axiosError.request as { _response?: string } | undefined;
-
-    console.log('Google login API route failed', {
-      code: axiosError.code,
-      durationMs: Date.now() - requestStartedAt,
-      message: axiosError.message,
-      response: axiosError.response?.data,
-      status: axiosError.response?.status,
-      requestResponse: requestError?._response,
-      url: GOOGLE_LOGIN_ROUTE,
-    });
   }
 
   const message = getErrorMessage(lastError);

@@ -9,6 +9,7 @@ import {
 } from '../../features/auth/api/loginApi';
 import {
   handleSignupApi,
+  handleResendVerificationApi,
   type SignupErrors,
 } from '../../features/auth/api/signupApi';
 
@@ -162,7 +163,7 @@ export const googleLoginUser = createAsyncThunk<
 });
 
 export const signupUser = createAsyncThunk<
-  { email: string; firstName: string; lastName: string },
+  { email: string; firstName: string; lastName: string; token: string; clientId: string },
   SignupPayload,
   { rejectValue: SignupFailure }
 >('auth/signupUser', async (payload, { rejectWithValue }) => {
@@ -181,7 +182,23 @@ export const signupUser = createAsyncThunk<
     email: result.email,
     firstName: result.firstName,
     lastName: result.lastName,
+    token: result.token,
+    clientId: result.clientId,
   };
+});
+
+export const resendVerification = createAsyncThunk<
+  { message: string },
+  { email: string },
+  { rejectValue: { message: string } }
+>('auth/resendVerification', async (payload, { rejectWithValue }) => {
+  const result = await handleResendVerificationApi(payload.email);
+
+  if (!result.isSuccess) {
+    return rejectWithValue({ message: result.message });
+  }
+
+  return { message: result.message };
 });
 
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {

@@ -11,23 +11,22 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 
 import styles from './LoginScreen.styles';
 import logoImage from '../../../assets/images/logoR.png';
 import { useThemeColors } from '../../../theme/colors';
-// import { font } from '../../../theme/typography';
 import { forgotPassword } from '../api/forgotPasswordApi';
+import type { AuthScreenProps } from '../navigation/types';
 
-type ForgotPasswordScreenProps = {
-  onBackPress: () => void;
-  onOtpVerifyPress: (email: string) => void;
-};
+type Nav = AuthScreenProps<'ForgotPassword'>['navigation'];
 
-const checkEmail = "Email not found"
+const checkEmail = 'Email not found';
 
-export default function ForgotPasswordScreen({ onBackPress, onOtpVerifyPress }: ForgotPasswordScreenProps) {
+export default function ForgotPasswordScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [email, setEmail] = useState('');
@@ -43,13 +42,12 @@ export default function ForgotPasswordScreen({ onBackPress, onOtpVerifyPress }: 
     setError('');
     try {
       const res = await forgotPassword(email.trim());
-      if(res.message === checkEmail){
+      if (res.message === checkEmail) {
         Toast.show({ type: 'error', text1: res?.message });
         return;
-      }else{
-        onOtpVerifyPress(email.trim());
+      } else {
+        navigation.navigate('OtpVerify', { email: email.trim() });
       }
-      
     } catch (err: any) {
       const message = err?.response?.data?.message || 'Something went wrong. Please try again.';
       setError(message);
@@ -123,7 +121,7 @@ export default function ForgotPasswordScreen({ onBackPress, onOtpVerifyPress }: 
             )}
           </Pressable>
 
-          <Pressable onPress={onBackPress}>
+          <Pressable onPress={() => navigation.goBack()}>
             <Text style={[styles.authLinkText, { color: colors.subtle, textAlign: 'center' }]}>
               Back to{' '}
               <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>

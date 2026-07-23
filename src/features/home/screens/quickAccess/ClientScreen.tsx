@@ -168,7 +168,7 @@ function ClientScreen({
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -188,7 +188,7 @@ function ClientScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   content: {
     paddingHorizontal: 18,

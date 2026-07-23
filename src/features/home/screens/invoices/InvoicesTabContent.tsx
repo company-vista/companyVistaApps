@@ -205,29 +205,24 @@ function invoiceMatchesCompany(
   invoice: ClientInvoice,
   selectedCompany?: CompanyCardItem | null,
 ) {
-  if (!selectedCompany) {
+  if (!selectedCompany?.id) {
     return false;
   }
 
   const companyObj = getNestedRecord(invoice.company);
 
-  if (!companyObj) {
-    return false;
+  if (companyObj) {
+    const companyId = getStringValue(companyObj._id, companyObj.id);
+    return companyId === selectedCompany.id;
   }
 
-  const companyId = getStringValue(companyObj._id, companyObj.id);
-  const companyName = getStringValue(
-    companyObj.companyName,
-    companyObj.businessName,
-    companyObj.legalName,
-    companyObj.name,
+  const flatCompanyId = getStringValue(
+    invoice.companyId,
+    invoice.clientCompanyId,
+    invoice.clientId,
   );
 
-  const matchesCompany =
-    (companyId && companyId === selectedCompany.id) ||
-    (companyName && companyName.toLowerCase() === selectedCompany.name.toLowerCase());
-
-  return matchesCompany;
+  return flatCompanyId === selectedCompany.id;
 }
 
 function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: BillingTabContentProps) {
@@ -245,10 +240,19 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
     selectHasLoadedInvoicesForCompany(state, selectedCompany?.id),
   );
   const [searchQuery, setSearchQuery] = useState('');
-  const visibleApiInvoices = useMemo(
-    () => apiInvoices.filter(invoice => invoiceMatchesCompany(invoice, selectedCompany)),
-    [apiInvoices, selectedCompany],
-  );
+  const visibleApiInvoices = useMemo(() => {
+    if (!selectedCompany?.id) {
+      return apiInvoices;
+    }
+    const cid = selectedCompany.id;
+    return apiInvoices.filter(invoice => {
+      const { id } = getInvoiceCompany(invoice);
+      if (id !== cid) return false;
+      const status = getStringValue(invoice.status, invoice.paymentStatus, invoice.invoiceStatus).toLowerCase();
+      if (status === 'draft') return false;
+      return true;
+    });
+  }, [apiInvoices, selectedCompany?.id]);
   const invoices = useMemo(() => {
     const mapped = visibleApiInvoices.map(mapInvoice);
     const query = searchQuery.trim();

@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
@@ -27,6 +29,12 @@ import {
 } from './transactionsUtils';
 import { formatCurrency } from '../../../constants/currencyConverter';
 import { font } from '../../../theme/typography';
+import { fetchClientCompanies } from '../api/clientProfileApi';
+import { mapCompanyToListItem } from './quickAccess/companyListItem';
+import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
+
+type Nav = MainScreenProps<'Transactions'>['navigation'];
+type Route = RouteProp<MainStackParamList, 'Transactions'>;
 
 type TransactionItem = {
   id: string;
@@ -204,18 +212,15 @@ function normalizeApiTransaction(item: ApiTransactionItem): TransactionItem {
   };
 }
 
-type TransactionsScreenProps = {
-  onBackPress: () => void;
-  selectedCompany?: CompanyCardItem | null;
-};
-
-export default function TransactionsScreen({
-  onBackPress,
-  selectedCompany,
-}: TransactionsScreenProps) {
+export default function TransactionsScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const companyId = route.params?.companyId;
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
+  const userId = useAppSelector(state => state.auth.user?.id);
+  const [selectedCompany, setSelectedCompany] = useState<CompanyCardItem | null>(null);
   const [activeFilter, setActiveFilter] = useState<
     'All' | 'Success' | 'Pending' | 'Failed'
   >('All');
@@ -226,6 +231,20 @@ export default function TransactionsScreen({
     useState<TransactionItem | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCompany() {
+      try {
+        const result = await fetchClientCompanies({ token: token ?? undefined, userId });
+        if (isMounted && result.companies?.length) {
+          setSelectedCompany(mapCompanyToListItem(result.companies[0], 0));
+        }
+      } catch {}
+    }
+    loadCompany();
+    return () => { isMounted = false; };
+  }, [token]);
 
   useEffect(() => {
     let isMounted = true;
@@ -255,23 +274,22 @@ export default function TransactionsScreen({
   }, [token]);
 
   const filteredTransactions = useMemo(() => {
-    const baseTransactions = transactions.filter(item => {
+    return transactions.filter(item => {
+      if (companyId) {
+        const txnCompanyId = String(item.details?.company ?? '').trim();
+        if (!txnCompanyId || txnCompanyId !== String(companyId)) {
+          return false;
+        }
+      }
       const matchesFilter =
         activeFilter === 'All' || item.status === activeFilter;
       const matchesSearch = matchesTransactionSearch(item, search);
       return matchesFilter && matchesSearch;
     });
-
-    if (!selectedCompany?.id) return baseTransactions;
-
-    return baseTransactions.filter(item =>
-      matchesSelectedCompany(item as never, selectedCompany),
-    );
   }, [
+    companyId,
     activeFilter,
     search,
-    selectedCompany,
-    selectedCompany?.id,
     transactions,
   ]);
 
@@ -349,14 +367,13 @@ export default function TransactionsScreen({
       style={[
         styles.screen,
         {
-          backgroundColor: colors.background,
           paddingTop: safeAreaInsets.top + 8,
         },
       ]}
     >
       {/* Header */}
       <View style={styles.header}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.title, { color: colors.text }]}>Transactions</Text>
       </View>
 

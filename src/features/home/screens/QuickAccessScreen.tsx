@@ -1,20 +1,25 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { quickAccessItems, type QuickAccessItemId } from '../data/quickAccessItems';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
 
-type QuickAccessScreenProps = {
-  onBackPress: () => void;
-  onItemPress: (itemId: QuickAccessItemId) => void;
-};
+type Nav = MainScreenProps<'QuickAccess'>['navigation'];
 
-function QuickAccessScreen({
-  onBackPress,
-  onItemPress,
-}: QuickAccessScreenProps) {
+const quickAccessScreenMap: Record<QuickAccessItemId, keyof MainStackParamList> = {
+  companyProfile: 'CompanyProfile',
+  invoiceCenter: 'InvoiceCenter',
+  businessReports: 'BusinessReports',
+  helpDesk: 'HelpDesk',
+  federalFiling: 'FederalFiling',
+} as const;
+
+function QuickAccessScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
 
@@ -22,12 +27,12 @@ function QuickAccessScreen({
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <Pressable
-            onPress={onBackPress}
+            onPress={() => navigation.goBack()}
             style={[styles.backButton, { backgroundColor: colors.surface }]}>
             <FontAwesome name="arrow-left" size={18} color={colors.text} />
           </Pressable>
@@ -45,7 +50,12 @@ function QuickAccessScreen({
           {quickAccessItems.map(item => (
             <Pressable
               key={item.title}
-              onPress={() => onItemPress(item.id)}
+              onPress={() => {
+                const screenName = quickAccessScreenMap[item.id];
+                if (screenName) {
+                  navigation.navigate(screenName as any);
+                }
+              }}
               style={[
                 styles.accessCard,
                 { backgroundColor: colors.surface, borderColor: colors.border },
@@ -65,7 +75,7 @@ function QuickAccessScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
   },
   header: {

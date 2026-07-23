@@ -188,7 +188,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.container}>
         <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
           <BackButton onPress={onBackPress} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>Registration Tracking</Text>
@@ -203,7 +203,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
 
   if (error || !company) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.container}>
         <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
           <BackButton onPress={onBackPress} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>Registration Tracking</Text>
@@ -237,7 +237,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
   const nextStep = steps[statusIdx + 1];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={styles.container}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Registration Tracking</Text>

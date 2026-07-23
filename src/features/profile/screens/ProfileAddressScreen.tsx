@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton, SaveButton } from '../../../components/buttons';
@@ -17,12 +18,12 @@ import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 import { updateClientProfile } from '../api/clientProfileDetailsApi';
 import styles from './EditProfileScreen.styles';
+import type { MainScreenProps } from '../../../navigation/types';
 
-type ProfileAddressScreenProps = {
-  onBackPress: () => void;
-};
+type Nav = MainScreenProps<'ProfileAddress'>['navigation'];
 
-function ProfileAddressScreen({ onBackPress }: ProfileAddressScreenProps) {
+function ProfileAddressScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -93,7 +94,7 @@ function ProfileAddressScreen({ onBackPress }: ProfileAddressScreenProps) {
         state,
         street,
       }));
-      onBackPress();
+      navigation.goBack();
     } catch (error) {
       const message =
         error instanceof Error
@@ -111,11 +112,11 @@ function ProfileAddressScreen({ onBackPress }: ProfileAddressScreenProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <BackButton onPress={onBackPress} />
+          <BackButton onPress={() => navigation.goBack()} />
           <Text style={[styles.title, { color: colors.text }]}>Address & Edit</Text>
         </View>
       </View>

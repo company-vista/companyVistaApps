@@ -10,6 +10,9 @@ import {
   Alert,
   Pressable,
 } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 import BackButton from '../../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { pick, types } from '@react-native-documents/picker';
@@ -20,27 +23,16 @@ import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
 
-type FederalFilingScreenProps = {
-  onBackPress: () => void;
-  selectedAction?: {
-    title: string;
-    subtitle: string;
-    status: string;
-    date: string;
-    details: { label: string; value: string; icon?: string }[];
-    companyId?: string | null;
-    price?: number;
-    years?: number;
-  } | null;
-};
-
 type SelectedFile = {
   uri: string;
   name: string;
   type?: string | null;
 };
 
-export default function FederalTaxFiling({ onBackPress, selectedAction }: FederalFilingScreenProps) {
+export default function FederalTaxFiling() {
+  const navigation = useNavigation<MainScreenProps<'FederalFiling'>['navigation']>();
+  const route = useRoute<RouteProp<MainStackParamList, 'FederalFiling'>>();
+  const selectedAction = route.params?.selectedAction;
   const colors = useThemeColors();
   const userCompanies = useAppSelector(state => state.auth.user?.companies ?? []);
   const token = useAppSelector(state => state.auth.token);
@@ -283,9 +275,9 @@ export default function FederalTaxFiling({ onBackPress, selectedAction }: Federa
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <View style={styles.topBarText}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? 'Federal Tax Filing'}</Text>
           <Text style={[styles.headerSubtitle, { color: colors.muted }]}>{selectedAction?.subtitle ?? 'Submit your annual federal tax return documents'}</Text>
@@ -542,10 +534,12 @@ export default function FederalTaxFiling({ onBackPress, selectedAction }: Federa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 12
   },
   scrollContainer: {
     padding: 16,
     paddingBottom: 40,
+    paddingTop: 4
   },
   topBar: {
     flexDirection: 'row',
@@ -574,7 +568,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   headerSubtitle: {

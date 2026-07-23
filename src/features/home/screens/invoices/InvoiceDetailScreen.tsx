@@ -1,5 +1,8 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 import { generatePDF } from 'react-native-html-to-pdf';
 import RNFetchBlob from 'react-native-blob-util';
 import Toast from 'react-native-toast-message';
@@ -15,12 +18,6 @@ import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTim
 import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
 import { buildInvoiceHtml } from './invoiceHtmlTemplate';
 import type { ClientInvoice } from '../../api/clientInvoicesApi';
-
-
-type InvoiceDetailScreenProps = {
-  invoice: ClientInvoice;
-  onBackPress: () => void;
-};
 
 
 function getStringValue(...values: unknown[]) {
@@ -104,10 +101,10 @@ function numberToWords(num: number, currency = 'USD'): string {
   return (result.trim() || 'Zero') + ' ' + currencyName + ' Only';
 }
 
-function InvoiceDetailScreen({
-  invoice,
-  onBackPress,
-}: InvoiceDetailScreenProps) {
+function InvoiceDetailScreen() {
+  const navigation = useNavigation<MainScreenProps<'InvoiceDetail'>['navigation']>();
+  const route = useRoute<RouteProp<MainStackParamList, 'InvoiceDetail'>>();
+  const { invoice } = route.params;
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   
@@ -260,7 +257,7 @@ function InvoiceDetailScreen({
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       {/* शीर्ष ऐप बार */}
       <View
         style={[
@@ -274,7 +271,7 @@ function InvoiceDetailScreen({
           },
         ]}
       >
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           Invoice Details
         </Text>

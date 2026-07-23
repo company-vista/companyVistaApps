@@ -215,7 +215,7 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }: S
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <View style={styles.header}>
         <BackButton onPress={onBackPress} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription</Text>

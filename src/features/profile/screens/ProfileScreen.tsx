@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
@@ -9,12 +10,9 @@ import { logoutUser, updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 import { fetchClientProfile } from '../api/clientProfileDetailsApi';
 import styles from './ProfileScreen.styles';
+import type { MainScreenProps } from '../../../navigation/types';
 
-type ProfileScreenProps = {
-  onAddressPress: () => void;
-  onBackPress: () => void;
-  onEditPress: () => void;
-};
+type Nav = MainScreenProps<'Profile'>['navigation'];
 
 function formatProfileDate(value?: string) {
   if (!value) {
@@ -34,7 +32,8 @@ function formatProfileDate(value?: string) {
   });
 }
 
-function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScreenProps) {
+function ProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -112,17 +111,14 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
           paddingTop: safeAreaInsets.top + 22,
         },
       ]}
-      style={[
-        styles.screen,
-        { backgroundColor: colors.background },
-      ]}>
+      style={styles.screen}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <BackButton onPress={onBackPress} />
+          <BackButton onPress={() => navigation.goBack()} />
           <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
         </View>
         <Pressable
-          onPress={onEditPress}
+          onPress={() => navigation.navigate('EditProfile')}
           style={[
             styles.editButton,
             {
@@ -331,7 +327,7 @@ function ProfileScreen({ onAddressPress, onBackPress, onEditPress }: ProfileScre
       </View>
 
       <Pressable
-        onPress={onAddressPress}
+        onPress={() => navigation.navigate('ProfileAddress')}
         style={[styles.addressCard, { backgroundColor: colors.surface }]}>
         <View style={[styles.detailIcon, { backgroundColor: colors.surfaceAlt }]}>
           <FontAwesome name="map-marker" size={17} color={colors.accent} />

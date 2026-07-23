@@ -26,7 +26,7 @@ function QuickAccessDetailScreen({
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
@@ -62,7 +62,7 @@ function QuickAccessDetailScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
   },
   header: {

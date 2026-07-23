@@ -48,7 +48,7 @@ export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: A
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Additional documents</Text>

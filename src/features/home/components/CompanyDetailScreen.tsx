@@ -71,7 +71,7 @@ const CompanyDetailScreen: React.FC<CompanyDetailScreenProps> = ({
   /* ── empty state ─────────────────────────────────────────────── */
   if (!companyData) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <StatusBar
           barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'}
           backgroundColor={colors.background}

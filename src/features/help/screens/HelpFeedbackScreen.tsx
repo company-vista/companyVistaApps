@@ -10,17 +10,15 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { launchImageLibrary } from 'react-native-image-picker';
 import styles from './HelpFeedbackScreen.styles';
+import type { MainScreenProps } from '../../../navigation/types';
 
 import logoImage from '../../../assets/images/logo.jpg';
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
-
-type HelpFeedbackScreenProps = {
-  onBackPress: () => void;
-};
 
 const helpItems = [
   {
@@ -55,7 +53,10 @@ const appInfoItems = [
   { label: 'Support', value: 'support@companyvista.com' },
 ];
 
-function HelpFeedbackScreen({ onBackPress }: HelpFeedbackScreenProps) {
+type Nav = MainScreenProps<'HelpFeedback'>['navigation'];
+
+function HelpFeedbackScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [activePage, setActivePage] = useState<
@@ -112,7 +113,6 @@ function HelpFeedbackScreen({ onBackPress }: HelpFeedbackScreenProps) {
         style={[
           styles.screen,
           {
-            backgroundColor: colors.background,
             paddingTop: safeAreaInsets.top,
           },
         ]}>
@@ -235,7 +235,6 @@ function HelpFeedbackScreen({ onBackPress }: HelpFeedbackScreenProps) {
         style={[
           styles.screen,
           {
-            backgroundColor: colors.background,
             paddingTop: safeAreaInsets.top,
           },
         ]}>
@@ -286,10 +285,10 @@ function HelpFeedbackScreen({ onBackPress }: HelpFeedbackScreenProps) {
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top },
+        { paddingTop: safeAreaInsets.top },
       ]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           Help and feedback
         </Text>

@@ -3,10 +3,12 @@ import {
   Animated,
   Easing,
   Pressable,
+  Share,
   Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 
@@ -39,7 +41,7 @@ import DocumentViewScreen from './documents/DocumentViewScreen';
 import type { DocumentItem } from '../api/clientDocumentApi';
 import ManageCompanyScreen from './ManageCompanyScreen';
 import ManageOptionsScreen from './ManageOptionsScreen';
-import TransactionsScreen from './TransactionsScreen';
+
 import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';
 import AddCompanyScreen from './addCompany/AddCompanyScreen';
@@ -49,64 +51,18 @@ import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import type { QuickAccessItemId } from '../data/quickAccessItems';
+import type { MainScreenProps, MainStackParamList, RenewActionData } from '../../../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
 
 const emptyCompanies: ClientCompany[] = [];
 
-type RenewActionData = {
-  id: 'address' | 'annual_filing' | 'resident' | 'federal_filing';
-  title: string;
-  subtitle: string;
-  status: string;
-  date: string;
-  details: { label: string; value: string; icon?: string }[];
-  companyId?: string | null;
-  price?: number;
-  years?: number;
-};
+type Nav = MainScreenProps<'Home'>['navigation'];
+type Route = RouteProp<MainStackParamList, 'Home'>;
 
-type HomeScreenProps = {
-  initialTab?: TabId;
-  onFollowUsPress: () => void;
-  onHelpFeedbackPress: () => void;
-  onSupportPress?: () => void;
-  onGoHome: () => void;
-  onInvoicePress?: (invoice: Record<string, unknown>) => void;
-  onNotificationPress: () => void;
-  onSearchPress: () => void;
-  onProfilePress: () => void;
-  onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
-  onQuickAccessViewAllPress: () => void;
-  onCompanyChange?: (companyId: string | null) => void;
-  selectedCompanyId?: string | null;
-  onOpenRenewPage?: (action: RenewActionData) => void;
-  onOpenComplianceHistory?: (action: RenewActionData) => void;
-  pendingCompanySection?: 'companyInfo' | 'shareholders' | 'menu' | null;
-  onClearPendingCompanySection?: () => void;
-  pendingHomeAction?: 'subscription' | 'addCompany' | 'manageOptions' | 'transactions' | null;
-  onClearPendingHomeAction?: () => void;
-};
-
-export default function HomeScreen({
-  initialTab,
-  onFollowUsPress,
-  onHelpFeedbackPress,
-  onSupportPress,
-  onGoHome: _onGoHome,
-  onInvoicePress,
-  onNotificationPress,
-  onSearchPress,
-  onProfilePress,
-  onQuickAccessItemPress,
-  onQuickAccessViewAllPress,
-  onCompanyChange,
-  selectedCompanyId,
-  onOpenRenewPage,
-  onOpenComplianceHistory,
-  pendingCompanySection,
-  onClearPendingCompanySection,
-  pendingHomeAction,
-  onClearPendingHomeAction,
-}: HomeScreenProps) {
+export default function HomeScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const { initialTab, pendingCompanySection: routePendingCompanySection, pendingHomeAction: routePendingHomeAction } = route.params ?? {};
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const user = useAppSelector(state => state.auth.user);
@@ -130,7 +86,6 @@ export default function HomeScreen({
   const [isManageOptionsOpen, setIsManageOptionsOpen] = useState(false);
   const [isManageScreenOpen, setIsManageScreenOpen] = useState(false);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
-  const [isTransactionsOpen, setIsTransactionsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
@@ -148,31 +103,22 @@ export default function HomeScreen({
   const fabMenuOpacity = fabMenuAnim;
 
   useEffect(() => {
-    onCompanyChange?.(selectedCompany?.id ?? null);
-  }, [selectedCompany, onCompanyChange]);
-
-  useEffect(() => {
-    if (pendingCompanySection) {
-      setActiveCompanySection(pendingCompanySection);
-      onClearPendingCompanySection?.();
+    if (routePendingCompanySection) {
+      setActiveCompanySection(routePendingCompanySection);
     }
-  }, [pendingCompanySection, onClearPendingCompanySection]);
+  }, [routePendingCompanySection]);
 
   useEffect(() => {
-    if (pendingHomeAction === 'subscription') {
+    if (routePendingHomeAction === 'subscription') {
       setIsSubscriptionOpen(true);
-      onClearPendingHomeAction?.();
-    } else if (pendingHomeAction === 'addCompany') {
+    } else if (routePendingHomeAction === 'addCompany') {
       setIsAddCompanyOpen(true);
-      onClearPendingHomeAction?.();
-    } else if (pendingHomeAction === 'manageOptions') {
+    } else if (routePendingHomeAction === 'manageOptions') {
       setIsManageOptionsOpen(true);
-      onClearPendingHomeAction?.();
-    } else if (pendingHomeAction === 'transactions') {
-      setIsTransactionsOpen(true);
-      onClearPendingHomeAction?.();
+    } else if (routePendingHomeAction === 'transactions') {
+      navigation.navigate('Transactions', { companyId: selectedCompany?.id });
     }
-  }, [pendingHomeAction, onClearPendingHomeAction]);
+  }, [routePendingHomeAction]);
 
   useEffect(() => {
     Animated.loop(
@@ -306,14 +252,6 @@ export default function HomeScreen({
             return currentCompany;
           }
 
-          if (selectedCompanyId) {
-            return (
-              mappedCompanies.find(company => company.id === selectedCompanyId) ??
-              mappedCompanies[0] ??
-              null
-            );
-          }
-
           return mappedCompanies[0] ?? null;
         });
       })
@@ -429,15 +367,15 @@ export default function HomeScreen({
   }
 
   function openHelpFeedback() {
-    closeMoreSheet(onHelpFeedbackPress);
+    closeMoreSheet(() => navigation.navigate('HelpFeedback'));
   }
 
   function openFollowUs() {
-    closeMoreSheet(onFollowUsPress);
+    closeMoreSheet(() => navigation.navigate('FollowUs'));
   }
 
   function openSupport() {
-    closeMoreSheet(onSupportPress);
+    closeMoreSheet(() => navigation.navigate('Support'));
   }
 
   function openFabMenu() {
@@ -496,11 +434,7 @@ export default function HomeScreen({
 
   function openTransactionsScreen() {
     closeFabMenu();
-    setIsTransactionsOpen(true);
-  }
-
-  function closeTransactionsScreen() {
-    setIsTransactionsOpen(false);
+    navigation.navigate('Transactions', { companyId: selectedCompany?.id });
   }
 
   function openServicesScreen() {
@@ -610,15 +544,6 @@ export default function HomeScreen({
     );
   }
 
-  if (isTransactionsOpen) {
-    return (
-      <TransactionsScreen
-        onBackPress={closeTransactionsScreen}
-        selectedCompany={selectedCompany}
-      />
-    );
-  }
-
   if (isServicesOpen) {
     return (
       <ServicesScreen
@@ -657,19 +582,14 @@ export default function HomeScreen({
 
   if (isSupportOpen) {
     return (
-      <ContactSupport
-        onBackPress={() => {
-          setIsSupportOpen(false);
-          setIsRegistrationTrackingOpen(true);
-        }}
-      />
+      <ContactSupport />
     );
   }
 
   const HEADER_CONTENT_HEIGHT = 72;
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       {/* Fixed header wrapper */}
       <View
         style={{
@@ -695,8 +615,8 @@ export default function HomeScreen({
           displayName={displayName}
           notificationCount={notificationCount}
           bellRotation={bellRotation}
-          onSearchPress={onSearchPress}
-          onNotificationPress={onNotificationPress}
+          onSearchPress={() => navigation.navigate('Search')}
+          onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })}
           colors={colors}
         />
       </View>
@@ -724,8 +644,14 @@ export default function HomeScreen({
             onCompanySwitcherPress={openCompanySwitcher}
             onManagePress={() => setIsManageOptionsOpen(true)}
             onAddToCompanyPress={() => setIsAddCompanyOpen(true)}
-            onQuickAccessItemPress={onQuickAccessItemPress}
-            onQuickAccessViewAllPress={onQuickAccessViewAllPress}
+            onQuickAccessItemPress={(itemId) => {
+              if (itemId === 'companyProfile') navigation.navigate('CompanyProfile');
+              else if (itemId === 'invoiceCenter') navigation.navigate('InvoiceCenter');
+              else if (itemId === 'businessReports') navigation.navigate('BusinessReports');
+              else if (itemId === 'helpDesk') navigation.navigate('HelpDesk');
+              else if (itemId === 'federalFiling') navigation.navigate('FederalFiling');
+            }}
+            onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')}
             onTransactionsPress={openTransactionsScreen}
             onServicesPress={openServicesScreen}
           />
@@ -739,13 +665,18 @@ export default function HomeScreen({
         {activeTab === 'reports' ? (
           <ReportsTabContent
             selectedCompany={selectedCompany}
-            onOpenRenewPage={onOpenRenewPage}
-            onOpenComplianceHistory={onOpenComplianceHistory}
+            onOpenRenewPage={(action) => {
+              if (action.id === 'federal_filing') navigation.navigate('FederalFiling', { selectedAction: action });
+              else if (action.id === 'address') navigation.navigate('AddressRenewal', { selectedAction: action });
+              else if (action.id === 'annual_filing') navigation.navigate('AnnualFiling');
+              else if (action.id === 'resident') navigation.navigate('RenewCompliance', { selectedAction: action });
+            }}
+            onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })}
           />
         ) : null}
         {activeTab === 'billing' ? (
           <BillingTabContent
-            onInvoicePress={onInvoicePress}
+            onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })}
             onGoHome={() => setActiveTab('home')}
             selectedCompany={selectedCompany}
           />
@@ -821,7 +752,7 @@ export default function HomeScreen({
               onFollowUsPress={openFollowUs}
               onHelpFeedbackPress={openHelpFeedback}
               onSupportPress={openSupport}
-              onProfilePress={onProfilePress}
+              onProfilePress={() => navigation.navigate('Profile')}
             />
           </Animated.View>
         </View>

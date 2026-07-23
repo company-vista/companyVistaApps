@@ -4,6 +4,7 @@ export const appThemes = {
   light: {
     mode: 'light',
     background: '#f8fafc',
+    backgroundGradient: ['#ccfbf1', '#f8fafc'] as const,
     authBackground: '#0f172a',
     surface: '#ffffff',
     surfaceAlt: '#ecfeff',

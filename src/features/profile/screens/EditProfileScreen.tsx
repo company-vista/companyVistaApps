@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -23,10 +24,9 @@ import ProfileDatePickerModal from '../components/ProfileDatePickerModal';
 import { uploadClientAvatar } from '../api/clientProfileAvatarApi';
 import { updateClientProfile } from '../api/clientProfileDetailsApi';
 import styles from './EditProfileScreen.styles';
+import type { MainScreenProps } from '../../../navigation/types';
 
-type EditProfileScreenProps = {
-  onBackPress: () => void;
-};
+type Nav = MainScreenProps<'EditProfile'>['navigation'];
 
 function withImageCacheBust(uri: string) {
   if (!/^https?:\/\//i.test(uri)) {
@@ -52,7 +52,8 @@ function getDateInputValue(value?: string) {
   return date.toISOString().slice(0, 10);
 }
 
-function EditProfileScreen({ onBackPress }: EditProfileScreenProps) {
+function EditProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
@@ -121,7 +122,7 @@ function EditProfileScreen({ onBackPress }: EditProfileScreenProps) {
         phone,
         phoneNumber: phone,
       }));
-      onBackPress();
+      navigation.goBack();
     } catch (error) {
       const message =
         error instanceof Error
@@ -220,11 +221,11 @@ function EditProfileScreen({ onBackPress }: EditProfileScreenProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 22 },
       ]}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <BackButton onPress={onBackPress} />
+          <BackButton onPress={() => navigation.goBack()} />
           <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
         </View>
       </View>

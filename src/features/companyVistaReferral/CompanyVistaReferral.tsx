@@ -41,7 +41,8 @@ const CompanyVistaReferral: React.FC = () => {
 const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 24,
-    paddingVertical: 30,
+    paddingTop: 30,
+    paddingBottom: 8,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'space-between',

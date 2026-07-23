@@ -1,26 +1,24 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { BackButton } from '../../../components/buttons';
-import type { NotificationItem } from '../data/notifications';
 import { deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
+import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
+import type { RouteProp } from '@react-navigation/native';
 
-type NotificationDetailScreenProps = {
-  notification: NotificationItem;
-  onBackPress: () => void;
-  onDeleteSuccess?: () => void;
-};
+type Nav = MainScreenProps<'NotificationDetail'>['navigation'];
+type Route = RouteProp<MainStackParamList, 'NotificationDetail'>;
 
-function NotificationDetailScreen({
-  notification,
-  onBackPress,
-  onDeleteSuccess,
-}: NotificationDetailScreenProps) {
+function NotificationDetailScreen() {
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const { notification } = route.params;
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const token = useAppSelector(state => state.auth.token);
@@ -33,17 +31,17 @@ function NotificationDetailScreen({
       notificationId: notification.id,
       companyId: notification.companyId || null,
     });
-    onDeleteSuccess?.();
+    navigation.navigate('Notifications');
   }
 
   return (
     <View
       style={[
         styles.screen,
-        { backgroundColor: colors.background, paddingTop: safeAreaInsets.top + 12 },
+        { paddingTop: safeAreaInsets.top + 12 },
       ]}>
       <View style={styles.header}>
-        <BackButton onPress={onBackPress} />
+        <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Notification</Text>
         <View style={{ flex: 1 }} />
         <View style={styles.moreWrapper}>
@@ -85,7 +83,7 @@ function NotificationDetailScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
     paddingHorizontal: 20,
   },
   header: {

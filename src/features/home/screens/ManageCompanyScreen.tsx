@@ -143,7 +143,6 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: colors.background,
           paddingTop: insets.top + 12,
           paddingBottom: insets.bottom,
         },
@@ -160,7 +159,6 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
           styles.header,
           {
             borderBottomColor: colors.border,
-            backgroundColor: colors.background,
           },
         ]}
       >
@@ -191,7 +189,7 @@ const ManageCompanyScreen: React.FC<ManageCompanyScreenProps> = ({
       </View>
 
       <ScrollView
-        style={{ backgroundColor: colors.background }}
+        style={{ backgroundColor: 'transparent' }}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
