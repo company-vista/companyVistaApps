@@ -18,6 +18,7 @@ function RecentActivityAndPaymentOverviewSection({
   selectedCompany,
 }: RecentActivityAndPaymentOverviewSectionProps) {
   const colors = useThemeColors();
+  const isLight = colors.mode === 'light';
 
   const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
 
@@ -33,7 +34,7 @@ function RecentActivityAndPaymentOverviewSection({
         {recentActivities.map(item => (
           <Pressable
             key={item.title}
-            style={[styles.card, { backgroundColor: colors.surface, borderColor: item.borderColor }]}
+            style={[styles.card, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)', borderColor: item.borderColor }]}
             onPress={item.onItemPress}
           >
             <View style={[styles.iconContainer]}>

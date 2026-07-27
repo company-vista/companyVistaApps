@@ -23,6 +23,7 @@ type HomeTabContentProps = {
   onTransactionsPress?: () => void;
   onServicesPress?: () => void;
   selectedCompany?: CompanyCardItem | null;
+  colors?: any;
 };
 
 function HomeTabContent({
@@ -36,7 +37,9 @@ function HomeTabContent({
   onTransactionsPress,
   onServicesPress,
   selectedCompany,
+  colors,
 }: HomeTabContentProps) {
+  const isDark = colors?.mode === 'dark';
   return (
     <View style={styles.container}>
       <AnimatedAppear index={0}>
@@ -51,16 +54,16 @@ function HomeTabContent({
       </AnimatedAppear>
 
       <AnimatedAppear index={1}>
-        <View style={styles.alert}>
-          <FontAwesome name="exclamation-circle" size={15} color="#A32D2D" />
+        <View style={[styles.alert, { backgroundColor: isDark ? '#3b1515' : '#FCEBEB', borderColor: isDark ? '#5c2222' : '#F7C1C1' }]}>
+          <FontAwesome name="exclamation-circle" size={15} color={isDark ? '#fca5a5' : '#A32D2D'} />
           <View style={styles.alertCopy}>
-            <Text style={styles.alertTitle}>Action required</Text>
-            <Text style={styles.alertText}>
+            <Text style={[styles.alertTitle, { color: isDark ? '#fca5a5' : '#791F1F' }]}>Action required</Text>
+            <Text style={[styles.alertText, { color: isDark ? '#f87171' : '#501313' }]}>
               Delaware Franchise Tax is overdue. Late fees of $200/month apply.
               File immediately to maintain Good Standing.
             </Text>
           </View>
-          <Text style={styles.alertAction}>Fix</Text>
+          <Text style={[styles.alertAction, { color: isDark ? '#fca5a5' : '#A32D2D' }]}>Fix</Text>
         </View>
       </AnimatedAppear>
 

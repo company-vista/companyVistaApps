@@ -4,6 +4,10 @@ import { API_BASE_URL } from '../../../config/api';
 
 const COMPANY_REGISTRATION_ROUTE = `${API_BASE_URL}/api/company/public-register`;
 
+export function getCompanyRegistrationUpdateRoute(companyId: string): string {
+  return `${API_BASE_URL}/api/companies/${companyId}/registration`;
+}
+
 type RegistrationResult = {
   error: string;
   isSuccess: boolean;
@@ -71,6 +75,7 @@ export async function submitCompanyRegistration(
     );
 
     const body = response.data;
+    
     const ok = body?.isSuccess ?? body?.success ?? false;
 
     if (!ok) {
@@ -95,6 +100,75 @@ export async function submitCompanyRegistration(
         axiosError.response?.data?.error ??
         axiosError.message ??
         'Registration failed. Please try again.',
+      isSuccess: false,
+    };
+  }
+}
+
+export async function updateCompanyRegistration(
+  companyId: string,
+  payload: Record<string, any>,
+  token?: string | null,
+): Promise<RegistrationResult> {
+  if (!token) {
+    return { error: 'Auth token missing. Please login again.', isSuccess: false };
+  }
+
+  try {
+    const bodyPayload: Record<string, any> = {
+      registrationRequestData: payload,
+      companyName: payload.companyName,
+      alternateCompanyName: payload.alternateCompanyName,
+      countryOfIncorporation: payload.countryOfIncorporation,
+      stateOfRegistration: payload.stateOfRegistration,
+      companyType: payload.companyType,
+      ownershipType: payload.ownershipType,
+      companyWebsite: payload.companyWebsite,
+      principalActivity: payload.principalActivity,
+      companyIntroduction: payload.companyIntroduction,
+      hasLocalAddress: payload.hasLocalAddress,
+      hasLocalRepresentative: payload.hasLocalRepresentative,
+    };
+
+    const updateRoute = getCompanyRegistrationUpdateRoute(companyId);
+
+    const response = await axios.put(
+      updateRoute,
+      bodyPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-auth-token': token,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    const body = response.data;
+    const ok = body?.success ?? false;
+
+    if (!ok) {
+      return {
+        error: body?.message ?? body?.error ?? 'Server rejected the update.',
+        isSuccess: false,
+      };
+    }
+
+    return {
+      error: '',
+      isSuccess: true,
+      data: body?.data ?? body,
+    };
+
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+
+    return {
+      error:
+        axiosError.response?.data?.message ??
+        axiosError.response?.data?.error ??
+        axiosError.message ??
+        'Update failed. Please try again.',
       isSuccess: false,
     };
   }

@@ -355,6 +355,7 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 16,
     marginBottom: 16,
   },
@@ -378,12 +379,12 @@ const styles = StyleSheet.create({
   },
   filters: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 18,
+    gap: 24,
+    marginBottom: 21,
   },
   filter: {
-    paddingVertical: 7,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
     borderRadius: 20,
     borderWidth: 0.5,
   },
@@ -392,6 +393,7 @@ const styles = StyleSheet.create({
   },
   cards: {
     gap: 14,
+    
   },
   infoText: {
     textAlign: 'center',

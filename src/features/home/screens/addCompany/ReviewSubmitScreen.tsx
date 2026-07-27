@@ -15,7 +15,7 @@ import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { resetCompanyRegistration } from '../../../../store/slices/companyRegistrationSlice';
-import { submitCompanyRegistration } from '../../api/companyRegistrationApi';
+import { submitCompanyRegistration, updateCompanyRegistration } from '../../api/companyRegistrationApi';
 
 interface ReviewRow {
   label: string;
@@ -172,7 +172,9 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
     }
    
     try {
-      const result = await submitCompanyRegistration(payload, token);
+      const result = isEditing && companyId
+        ? await updateCompanyRegistration(companyId, payload, token)
+        : await submitCompanyRegistration(payload, token);
       
       if (result.isSuccess) {
         Toast.show({ type: 'success', text1: isEditing ? 'Registration updated successfully!' : 'Registration submitted successfully!' });

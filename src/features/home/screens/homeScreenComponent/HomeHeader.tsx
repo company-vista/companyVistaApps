@@ -35,12 +35,12 @@ export function HomeHeader({
         accessibilityRole="button"
         accessibilityLabel="Open search"
         onPress={onSearchPress}
-        style={styles.headerIcon}>
-        <FontAwesome name="search" size={20} color={colors.muted} />
+        style={[styles.headerIcon, { backgroundColor: colors.bg === '#f1f5f9' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)', borderRadius: 99 }]}>
+        <FontAwesome name="search" size={20} color={colors.text} />
       </Pressable>
       <Pressable
         onPress={onNotificationPress}
-        style={[styles.headerIcon, styles.notificationButton]}>
+        style={[styles.headerIcon, styles.notificationButton, { backgroundColor: colors.bg === '#f1f5f9' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)', borderRadius: 99 }]}>
         <Animated.View style={{ transform: [{ rotate: bellRotation }] }}>
           <FontAwesome name="bell-o" size={21} color={colors.text} />
         </Animated.View>

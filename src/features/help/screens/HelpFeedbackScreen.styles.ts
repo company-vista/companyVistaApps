@@ -5,12 +5,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    minHeight: 86,
+    minHeight: 65,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
     borderBottomWidth: 1,
-    paddingHorizontal: 22,
+    paddingHorizontal: 14,
   },
   headerTitle: {
     flex: 1,
@@ -19,6 +19,8 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingTop: 15,
+    paddingHorizontal: 12,
+    gap: 8,
   },
   itemRow: {
     minHeight: 68,
@@ -26,7 +28,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
     paddingHorizontal: 25,
-    // backgroundColor: '#ffffff',
+    borderRadius: 12,
   },
 
   itemIcon: {

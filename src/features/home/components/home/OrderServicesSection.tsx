@@ -96,6 +96,7 @@ function OrderServicesSection({
   onQuickAccessItemPress,
 }: OrderServicesSectionProps) {
   const colors = useThemeColors();
+  const isLight = colors.mode === 'light';
   const [isExpanded, setIsExpanded] = useState(false);
   const visibleItems = serviceItems.slice(0, 4);
   const extraItems = serviceItems.slice(4);
@@ -116,30 +117,19 @@ function OrderServicesSection({
           return (
               <Pressable 
               key={item.title} 
-              style={[styles.gridItem, { borderColor: tone.borderColor }]}
+              style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}
               onPress={item.title === 'Federal Filing' ? () => onQuickAccessItemPress('federalFiling') : () => console.log(item.title)} 
             >
               <View style={styles.iconWrapper}>
-                {/* 1. स्क्वायर आइकॉन बॉक्स */}
                 <View style={[styles.serviceIcon, tone.icon]}>
                   <FontAwesome
                     name={item.icon}
-                      size={22}
+                      size={21}
                     style={tone.iconText}
                   />
                 </View>
-
-                {/* 2. एब्सोल्यूटली पोज़िशन किया हुआ टैग/पिल (यदि मौजूद हो) */}
-                {item.tag ? (
-                  <View style={[styles.badge, tone.tag]}>
-                    <Text style={[styles.badgeText, tone.tagText]} numberOfLines={1}>
-                      {item.tag.split(' ')[0]} {/* जगह की कमी के कारण पहला शब्द (जैसे 'Urgent' या 'Due') */}
-                    </Text>
-                  </View>
-                ) : null}
               </View>
 
-              {/* 3. मुख्य टाइटल (image_8ba545.png के टेक्स्ट स्टाइल में) */}
                   <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
                 {item.title}
               </Text>
@@ -160,18 +150,11 @@ function OrderServicesSection({
               const tone = getToneStyles(item.tone);
 
               return (
-                <Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor }]} onPress={() => console.log(item.title)}>
+                <Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]} onPress={() => console.log(item.title)}>
                   <View style={styles.iconWrapper}>
                     <View style={[styles.serviceIcon, tone.icon]}>
                       <FontAwesome name={item.icon} size={18} style={tone.iconText} />
                     </View>
-                    {item.tag ? (
-                      <View style={[styles.badge, tone.tag]}>
-                        <Text style={[styles.badgeText, tone.tagText]} numberOfLines={1}>
-                          {item.tag.split(' ')[0]}
-                        </Text>
-                      </View>
-                    ) : null}
                   </View>
               <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
                     {item.title}
@@ -212,7 +195,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'stretch',
-    columnGap: 5,
+    columnGap: 10,
   },
   gridItem: {
     width: '24%',
@@ -221,8 +204,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 2,
+    paddingVertical: 14,
+    paddingHorizontal: 6,
     overflow: 'hidden',
     aspectRatio: 1,
   },
@@ -233,11 +216,12 @@ const styles = StyleSheet.create({
   expandedGridContainer: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    columnGap: 5,
+    columnGap: 10,
   },
   iconWrapper: {
     position: 'relative',
-    marginBottom: 4,
+    marginBottom: 2,
+   
   },
   serviceIcon: {
     width: 50,
@@ -250,7 +234,7 @@ const styles = StyleSheet.create({
     fontSize: font.xs,
     fontWeight: '500',
     textAlign: 'center',
-    lineHeight: font.xs + 4,
+    lineHeight: font.xs + 2,
     minHeight: font.xs * 2 + 4,
   },
   serviceSubtitle: {

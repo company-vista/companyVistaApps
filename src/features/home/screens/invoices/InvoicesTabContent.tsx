@@ -285,7 +285,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <View >
-          <Text style={styles.title}>Invoices</Text>
+          {/* <Text style={styles.title}>Invoices</Text> */}
           <Text style={styles.companyName}>
             Company name: {selectedCompany?.name ?? 'All companies'}
           </Text>
@@ -379,7 +379,7 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                     borderColor: colors.border,
                   },
                 ]}>
-              <View style={styles.invoiceLeft}>
+              <View style={styles.invoiceTopRow}>
                 <View style={styles.invoiceIcon}>
                   <FontAwesome name="building-o" size={22} color={palette.iconColor} />
                 </View>
@@ -390,6 +390,16 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                   <Text style={styles.invoiceCompany}>
                     {invoice.company}
                   </Text>
+                </View>
+                <Text style={styles.amount}>
+                  {invoice.amount}
+                </Text>
+              </View>
+
+              <View style={[styles.invoiceDivider, { backgroundColor: colors.border }]} />
+
+              <View style={styles.invoiceBottomRow}>
+                <View style={styles.invoiceBottomLeft}>
                   <View style={styles.metaRow}>
                     <FontAwesome name="calendar" size={13} color={palette.accentText} />
                     <Text style={styles.metaText}>
@@ -407,34 +417,28 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }: Billin
                     </Text>
                   </View>
                 </View>
-              </View>
-
-              <View style={styles.invoiceRight}>
-                <Text style={styles.amount}>
-                  {invoice.amount}
-                </Text>
-                <View style={[styles.statusActionRow, { marginBottom: 6 }]}>
+                <View style={styles.invoiceBottomRight}>
                   <Pressable
                     onPress={() => onInvoicePress?.(invoice.raw)}
                     style={styles.actionButton}>
                     <FontAwesome name="eye" size={15} color={palette.iconColor} />
                   </Pressable>
+                  {invoice.status === 'unpaid' ? (
+                    <Pressable
+                      onPress={() => onInvoicePress?.(invoice.raw)}
+                      style={[styles.statusPill, { backgroundColor: '#16a34a' }]}>
+                      <Text style={[styles.statusText, { color: '#ffffff' }]}>
+                        Pay Now
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <View style={[styles.statusPill, { backgroundColor: statusBackground }]}>
+                      <Text style={[styles.statusText, { color: statusColor }]}>
+                        {invoice.status === 'paid' ? 'Paid' : 'Partial'}
+                      </Text>
+                    </View>
+                  )}
                 </View>
-                {invoice.status === 'unpaid' ? (
-                  <Pressable
-                    onPress={() => onInvoicePress?.(invoice.raw)}
-                    style={[styles.statusPill, { backgroundColor: '#16a34a', alignSelf: 'flex-end' }]}>
-                    <Text style={[styles.statusText, { color: '#ffffff' }]}>
-                      Pay Now
-                    </Text>
-                  </Pressable>
-                ) : (
-                  <View style={[styles.statusPill, { backgroundColor: statusBackground, alignSelf: 'flex-end' }]}>
-                    <Text style={[styles.statusText, { color: statusColor }]}>
-                      {invoice.status === 'paid' ? 'Paid' : 'Partial'}
-                    </Text>
-                  </View>
-                )}
               </View>
             </View>
             </AnimatedAppear>
@@ -465,7 +469,7 @@ const getStyles = (colors: AppTheme) => {
     color: palette.accentText,
     fontSize: font.xxl,
     fontWeight: '500',
-    marginTop: 4,
+    marginTop: 2,
   },
   searchRow: {
     flexDirection: 'row',
@@ -522,12 +526,12 @@ const getStyles = (colors: AppTheme) => {
   },
   invoiceList: {
     gap: 12,
-    marginTop: 18,
+    marginTop: 16,
   },
   loadingState: {
     alignItems: 'center',
     gap: 10,
-    paddingVertical: 40,
+    paddingVertical: 30,
   },
   emptyState: {
     alignItems: 'center',
@@ -551,14 +555,12 @@ const getStyles = (colors: AppTheme) => {
   invoiceCard: {
     borderRadius: 20,
     borderWidth: 1,
-    flexDirection: 'row',
     minHeight: 120,
     padding: 12,
   },
-  invoiceLeft: {
-    flex: 1,
+  invoiceTopRow: {
     flexDirection: 'row',
-    paddingRight: 8,
+    alignItems: 'center',
   },
   invoiceIcon: {
     alignItems: 'center',
@@ -584,12 +586,29 @@ const getStyles = (colors: AppTheme) => {
     color: palette.primaryText,
     fontSize: font.lg,
     fontWeight: '600',
-    marginTop: 7,
+    marginTop: 4,
+  },
+  invoiceDivider: {
+    height: 1,
+    marginVertical: 10,
+  },
+  invoiceBottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  invoiceBottomLeft: {
+    flex: 1,
+  },
+  invoiceBottomRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   metaRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: 6,
+    marginTop: 4,
   },
   metaText: {
     color: palette.accentText,
@@ -603,11 +622,6 @@ const getStyles = (colors: AppTheme) => {
   paidDueText: {
     color: palette.accentText,
   },
-  invoiceRight: {
-    alignItems: 'flex-end',
-    paddingRight: 1,
-    width: 112,
-  },
   amount: {
     color: palette.primaryText,
     fontSize: font.xxl,
@@ -620,31 +634,19 @@ const getStyles = (colors: AppTheme) => {
     paddingHorizontal: 15,
     paddingVertical: 6,
   },
-  statusActionRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
   statusText: {
     fontSize: font.base,
     fontWeight: '600',
-  },
-  statusDetail: {
-    fontSize: font.base,
-    fontWeight: '600',
-    marginTop: 18,
-    textAlign: 'right',
   },
   actionButton: {
     alignItems: 'center',
     backgroundColor: palette.actionSurface,
     borderColor: palette.actionBorder,
-    borderRadius: 10,
+    borderRadius: 18,
     borderWidth: 1,
-    height: 32,
+    height: 31,
     justifyContent: 'center',
-    width: 32,
+    width: 50,
   },
   });
 };

@@ -210,29 +210,6 @@ export default function HomeScreen() {
   }, [notificationCount]);
 
   useEffect(() => {
-    if (!selectedCompany?.id) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      fetchNotifications({ token: token ?? undefined }).then(result => {
-        const allList = result.isSuccess ? result.notifications : notifications;
-        const filtered = allList.filter(n => n.companyId === selectedCompany.id && !n.isRead);
-        if (filtered.length > prevNotificationCount.current) {
-          Toast.show({
-            type: 'info',
-            text1: 'New Notification',
-            text2: `You have ${filtered.length - prevNotificationCount.current} new notification(s)`,
-          });
-        }
-        setNotificationCount(filtered.length);
-      });
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [token, selectedCompany?.id]);
-
-  useEffect(() => {
     let isMounted = true;
 
     setIsLoadingCompanies(true);
@@ -666,6 +643,7 @@ export default function HomeScreen() {
             onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')}
             onTransactionsPress={openTransactionsScreen}
             onServicesPress={openServicesScreen}
+            colors={colors}
           />
         ) : null}
         {activeTab === 'company' ? (

@@ -155,16 +155,6 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
     fetchCompany();
   }, [fetchCompany]);
 
-  useEffect(() => {
-    if (!companyId) return;
-
-    const interval = setInterval(() => {
-      fetchCompany(true);
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, [companyId, fetchCompany]);
-
   const prevStatusRef = React.useRef<string>('');
 
   useEffect(() => {
@@ -280,9 +270,15 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </Text>
           )}
 
-          <TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
-            <FontAwesome name="pencil" size={16} color="#ffffff" />
-          </TouchableOpacity>
+          {normalizedStatus === 'completed' || normalizedStatus === 'delivered' || normalizedStatus === 'active' ? (
+            <View style={[styles.editIconBtn, { backgroundColor: '#22c55e', alignSelf: 'flex-end' }]}>
+              <FontAwesome name="check" size={16} color="#ffffff" />
+            </View>
+          ) : (
+            <TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
+              <FontAwesome name="pencil" size={16} color="#ffffff" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.metaContainer}>

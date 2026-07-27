@@ -39,8 +39,7 @@ function HomeHeroSection({
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
 
   const dynamicStyles = {
-    borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)',
-    backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)',
+    backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)',
   };
   const heroDecoStyle = { 
     borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.07)', 
@@ -104,7 +103,6 @@ const styles = StyleSheet.create({
   hero: {
     overflow: 'hidden',
     borderRadius: 16,
-    borderWidth: 1,
     backgroundColor: '#0D2137',
     paddingHorizontal: 16,
     paddingTop: 16,

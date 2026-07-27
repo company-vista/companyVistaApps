@@ -460,6 +460,7 @@ type FetchCompanyComplianceHistoryParams = {
   token?: string | null;
 };
 
+// fetch company compliance
 export async function fetchCompanyComplianceHistory({
   companyId,
   token,

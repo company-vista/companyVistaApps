@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 10,
     borderRadius: 12,
     borderWidth: 1,
   },

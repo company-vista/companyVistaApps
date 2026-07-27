@@ -34,6 +34,7 @@ function MoreTabContent({
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
   const isDarkTheme = useAppSelector(state => state.theme.mode === 'dark');
+  const isLight = colors.mode === 'light';
 
   function handleToggleTheme() {
     dispatch(toggleTheme());
@@ -58,7 +59,7 @@ function MoreTabContent({
     <View style={styles.container}>
       <Pressable
         onPress={onProfilePress}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="user-circle" size={17} color={colors.accent} />
         </View>
@@ -75,7 +76,7 @@ function MoreTabContent({
 
       <Pressable
         onPress={handleToggleTheme}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome
             name={isDarkTheme ? 'moon-o' : 'sun-o'}
@@ -101,7 +102,7 @@ function MoreTabContent({
 
       <Pressable
         onPress={handleInviteFriends}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="user-plus" size={17} color={colors.accent} />
         </View>
@@ -118,7 +119,7 @@ function MoreTabContent({
 
       <Pressable
         onPress={onHelpFeedbackPress}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="life-ring" size={17} color={colors.accent} />
         </View>
@@ -135,7 +136,7 @@ function MoreTabContent({
 
       <Pressable
         onPress={onSupportPress}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="headphones" size={17} color={colors.accent} />
         </View>
@@ -152,7 +153,7 @@ function MoreTabContent({
 
       <Pressable
         onPress={onFollowUsPress}
-        style={[styles.menuItem, { backgroundColor: colors.surface }]}>
+        style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="share-alt" size={17} color={colors.accent} />
         </View>

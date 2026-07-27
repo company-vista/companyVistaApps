@@ -27,7 +27,7 @@ function getDocumentPalette(colors: AppTheme) {
 
   return {
     primaryText: isDark ? colors.text : HOME_HERO_COLORS.panel,
-    accentText: isDark ? HOME_HERO_COLORS.accentBlue : '#2F6FAE',
+    accentText: isDark ? HOME_HERO_COLORS.accentBlue : '#303b47',
     panelButton: isDark ? '#183A5C' : HOME_HERO_COLORS.panel,
     actionSurface: isDark ? '#183A5C' : '#EAF4FF',
     actionBorder: isDark ? 'rgba(133,183,235,0.35)' : '#C7DFF6',
@@ -181,7 +181,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         <View style={styles.headerLeft}>
           <View>
             <Text style={styles.headerTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
-            <Text style={styles.headerSubtitle}>Company Portal</Text>
+            {/* <Text style={styles.headerSubtitle}>Company Portal</Text> */}
           </View>
         </View>
         <View style={styles.totalBadge}>
@@ -194,7 +194,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         <FontAwesome name="search" size={16} color={palette.accentText} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by file last four digits, company, or type"
+          placeholder="Search by last four digits, company, or type"
           placeholderTextColor={colors.subtle}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -379,7 +379,7 @@ const getStyles = (colors: AppTheme) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: 10,
     },
     headerLeft: {
       flexDirection: 'row',
@@ -400,14 +400,14 @@ const getStyles = (colors: AppTheme) => {
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
-      backgroundColor: palette.panelButton,
+      // backgroundColor: palette.panelButton,
       justifyContent: 'center',
       alignItems: 'center',
     },
     totalBadgeText: {
       fontSize: font.md,
       fontWeight: '700',
-      color: HOME_HERO_COLORS.accentBlue,
+      color: colors.text,
     },
     searchContainer: {
       flexDirection: 'row',
@@ -452,7 +452,7 @@ const getStyles = (colors: AppTheme) => {
     },
     tabBar: {
       flexDirection: 'row',
-      borderRadius: 12,
+      borderRadius: 24,
       padding: 3,
       marginBottom: 20,
       borderWidth: 1,
@@ -529,7 +529,7 @@ const getStyles = (colors: AppTheme) => {
     documentTypeText: {
       color: palette.documentTypeText,
       fontSize: font.base,
-      fontWeight: '700',
+      fontWeight: '600',
       lineHeight: 16,
       marginBottom: 2,
       marginTop: 2,
@@ -537,6 +537,7 @@ const getStyles = (colors: AppTheme) => {
     cardActions: {
       flexDirection: 'row',
       gap: 8,
+      marginTop: -4,
     },
     actionButton: {
       width: 32,

@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
   },
   notificationButton: {
     position: 'relative',
