@@ -104,17 +104,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   header: {
-    height: 72,
+    height: 42,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
   },
   headerTitle: {
     color: '#111827',
-    fontSize: 21,
-    fontWeight: '400',
+    fontSize: 20,
+    fontWeight: '500',
   },
   content: {
     paddingHorizontal: 20,
