@@ -40,6 +40,7 @@ type SignupPayload = {
   email: string;
   phoneNumber: string;
   countryCode: string;
+  companyName: string;
   address: string;
 };
 

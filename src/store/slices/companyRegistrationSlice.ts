@@ -33,6 +33,8 @@ type DirectorShareholder = {
   countryCode: string;
   phone: string;
   address: AddressForm;
+  passportFile: { name: string; uri: string } | null;
+  addressProofFile: { name: string; uri: string } | null;
 };
 
 type CompanyRegistrationState = {
@@ -157,6 +159,61 @@ const companyRegistrationSlice = createSlice({
     resetCompanyRegistration() {
       return initialState;
     },
+    hydrateCompany(state, action: PayloadAction<Record<string, any>>) {
+      const d = action.payload;
+      if (d.applicantType) state.applicantType = d.applicantType;
+      if (d.firstName) state.firstName = d.firstName;
+      if (d.lastName) state.lastName = d.lastName;
+      if (d.email) state.email = d.email;
+      if (d.phone) state.phone = d.phone;
+      if (d.jurisdiction || d.countryOfIncorporation) {
+        state.jurisdiction = d.jurisdiction ?? null;
+        state.jurisdictionName = d.jurisdictionName ?? d.countryOfIncorporation ?? '';
+      }
+      if (d.stateOfRegistration || d.stateOfIncorporation) {
+        state.stateOfIncorporation = d.stateOfRegistration ?? d.stateOfIncorporation ?? '-- Select --';
+      }
+      if (d.companyType || d.entityType) {
+        state.entityType = d.companyType ?? d.entityType ?? '-- Select --';
+      }
+      if (d.companyName) state.companyName = d.companyName;
+      if (d.alternateCompanyName || d.alternateName) {
+        state.alternateName = d.alternateCompanyName ?? d.alternateName ?? '';
+      }
+      if (d.ownershipType) state.ownershipType = d.ownershipType;
+      if (Array.isArray(d.holdingCompanies)) state.holdingCompanies = d.holdingCompanies;
+      if (d.hasLocalAddress !== undefined) {
+        state.hasAddress = d.hasLocalAddress ? 'yes' : 'no';
+      } else if (d.hasAddress) {
+        state.hasAddress = d.hasAddress;
+      }
+      if (d.localAddress && typeof d.localAddress === 'object') {
+        state.localAddress = { ...state.localAddress, ...d.localAddress };
+      }
+      if (d.hasLocalRepresentative !== undefined) {
+        state.hasAgent = d.hasLocalRepresentative ? 'yes' : 'no';
+      } else if (d.hasAgent) {
+        state.hasAgent = d.hasAgent;
+      }
+      if (d.agentDetails && typeof d.agentDetails === 'object') {
+        state.agentDetails = { ...state.agentDetails, ...d.agentDetails };
+      }
+      if (d.agentAddress && typeof d.agentAddress === 'object') {
+        state.agentAddress = { ...state.agentAddress, ...d.agentAddress };
+      }
+      if (Array.isArray(d.directors)) state.directors = d.directors;
+      if (d.companyWebsite || d.website) {
+        state.website = d.companyWebsite ?? d.website ?? '';
+      }
+      if (d.establishReason) state.establishReason = d.establishReason;
+      if (d.principalActivity) state.principalActivity = d.principalActivity;
+      if (d.companyIntroduction || d.briefIntroduction) {
+        state.briefIntroduction = d.companyIntroduction ?? d.briefIntroduction ?? '';
+      }
+      if (d.additionalInfo) state.additionalInfo = d.additionalInfo;
+      if (Array.isArray(d.holdingFiles)) state.holdingFiles = d.holdingFiles;
+      if (Array.isArray(d.otherFiles)) state.otherFiles = d.otherFiles;
+    },
   },
 });
 
@@ -170,6 +227,7 @@ export const {
   setBusinessInfo,
   setAdditionalDocuments,
   resetCompanyRegistration,
+  hydrateCompany,
 } = companyRegistrationSlice.actions;
 
 export default companyRegistrationSlice.reducer;

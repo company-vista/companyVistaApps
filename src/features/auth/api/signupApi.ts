@@ -15,6 +15,7 @@ type SignupApiParams = {
   email: string;
   phoneNumber: string;
   countryCode: string;
+  companyName: string;
   address: string;
 };
 
@@ -41,6 +42,7 @@ export async function handleSignupApi({
   email,
   phoneNumber,
   countryCode,
+  companyName,
   address,
 }: SignupApiParams): Promise<SignupApiResult> {
   const errors: SignupErrors = {};
@@ -96,6 +98,7 @@ export async function handleSignupApi({
       email: trimmedEmail,
       phoneNumber: trimmedPhone,
       countryCode,
+      companyName,
       address,
     });
 

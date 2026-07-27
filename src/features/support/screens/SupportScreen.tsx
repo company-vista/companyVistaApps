@@ -131,7 +131,7 @@ function Dropdown({
 
 type Nav = MainScreenProps<'Support'>['navigation'];
 
-export default function ContactSupport() {
+export default function ContactSupport({ onBackPress }: { onBackPress?: () => void }) {
   const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
@@ -206,7 +206,7 @@ export default function ContactSupport() {
   return (
     <View style={{ flex: 1 }}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
-        <BackButton onPress={() => navigation.goBack()} />
+        <BackButton onPress={() => onBackPress ? onBackPress() : navigation.goBack()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Support</Text>
       </View>
       <ScrollView contentContainerStyle={styles.content}>

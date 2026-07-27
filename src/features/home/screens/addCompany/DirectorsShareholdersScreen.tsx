@@ -13,7 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { BackButton } from '../../../../components/buttons';
-import { useAppSelector } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { setDirectors } from '../../../../store/slices/companyRegistrationSlice';
 import { formatDate } from '../../../../constants/dateFormatter';
 
 interface RolesState {
@@ -31,25 +32,28 @@ type DirectorsShareholdersScreenProps = {
 export default function DirectorsShareholdersScreen({ onBackPress, onContinue }: DirectorsShareholdersScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
-  const user = useAppSelector(state => state.auth.user);
-  const nameParts = (user?.name ?? '').split(' ');
-  const userFirstName = user?.firstName ?? nameParts[0] ?? '';
-  const userLastName = user?.lastName ?? nameParts.slice(1).join(' ') ?? '';
-  const userEmail = user?.email ?? '';
-  const userPhone = user?.phone ?? user?.phoneNumber ?? user?.mobile ?? '';
-  const userCountryCode = user?.countryCode ?? '';
-  const userDob = user?.dateOfBirth ?? user?.dob ?? '';
-  const userPassport = user?.passportNo ?? user?.passportNumber ?? '';
-  const userAddressLine1 = user?.address?.addressLine1 ?? user?.address?.street ?? user?.addressLine1 ?? user?.street ?? '';
-  const userCity = user?.address?.city ?? '';
-  const userState = user?.address?.state ?? user?.state ?? '';
-  const userPostalCode = user?.address?.postalCode ?? user?.postalCode ?? '';
-  const userCountry = user?.address?.country ?? user?.country ?? '';
+  const authUser = useAppSelector(state => state.auth.user);
+  const reg = useAppSelector(state => state.companyRegistration);
+  const existingDirector = reg.directors.length > 0 ? reg.directors[0] : null;
+  const nameParts = (authUser?.name ?? '').split(' ');
+  const userFirstName = existingDirector?.firstName || (authUser?.firstName ?? nameParts[0] ?? '');
+  const userLastName = existingDirector?.lastName || (authUser?.lastName ?? nameParts.slice(1).join(' ') ?? '');
+  const userEmail = existingDirector?.email || (authUser?.email ?? '');
+  const userPhone = existingDirector?.phone || (authUser?.phone ?? (authUser as any)?.phoneNumber ?? (authUser as any)?.mobile ?? '');
+  const userCountryCode = existingDirector?.countryCode || (authUser?.countryCode ?? '');
+  const userDob = existingDirector?.dob || ((authUser as any)?.dateOfBirth ?? (authUser as any)?.dob ?? '');
+  const userPassport = existingDirector?.passport || ((authUser as any)?.passportNo ?? (authUser as any)?.passportNumber ?? '');
+  const userAddressLine1 = existingDirector?.address?.line1 || ((authUser as any)?.address?.addressLine1 ?? (authUser as any)?.address?.street ?? (authUser as any)?.addressLine1 ?? (authUser as any)?.street ?? '');
+  const userCity = existingDirector?.address?.city || ((authUser as any)?.address?.city ?? '');
+  const userState = existingDirector?.address?.state || ((authUser as any)?.address?.state ?? (authUser as any)?.state ?? '');
+  const userPostalCode = existingDirector?.address?.postalCode || ((authUser as any)?.address?.postalCode ?? (authUser as any)?.postalCode ?? '');
+  const userCountry = existingDirector?.address?.country || ((authUser as any)?.address?.country ?? (authUser as any)?.country ?? '');
 
   const [firstName, setFirstName] = useState(userFirstName);
   const [lastName, setLastName] = useState(userLastName);
-  const [ownership, setOwnership] = useState('100');
+  const [ownership, setOwnership] = useState(existingDirector?.ownership || '100');
   const [dob, setDob] = useState(userDob);
   const [passport, setPassport] = useState(userPassport);
   const [email, setEmail] = useState(userEmail);
@@ -57,12 +61,12 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
   const [phone, setPhone] = useState(userPhone);
 
   const [address, setAddress] = useState({
-    line1: userAddressLine1,
-    line2: '',
-    city: userCity,
-    state: userState,
-    postalCode: userPostalCode,
-    country: userCountry,
+    line1: existingDirector?.address?.line1 || userAddressLine1,
+    line2: existingDirector?.address?.line2 || '',
+    city: existingDirector?.address?.city || userCity,
+    state: existingDirector?.address?.state || userState,
+    postalCode: existingDirector?.address?.postalCode || userPostalCode,
+    country: existingDirector?.address?.country || userCountry,
   });
 
   const [passportFile, setPassportFile] = useState<{ name: string; uri: string } | null>(null);
@@ -81,12 +85,13 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
     }
   };
 
-  const [roles, setRoles] = useState<RolesState>({
+  const [roles, setRoles] = useState<RolesState>(existingDirector?.roles || {
     shareholder: true,
     director: false,
     secretary: false,
     representative: false,
   });
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const toggleRole = (key: keyof RolesState) => {
     setRoles(prev => ({ ...prev, [key]: !prev[key] }));
@@ -132,12 +137,18 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                   <TextInput style={[styles.input, { color: colors.text }]} value={firstName} onChangeText={setFirstName} />
                 </View>
+                {attemptedSubmit && !firstName.trim() && (
+                  <Text style={{ fontSize: 12, color: colors.danger, marginTop: 4 }}>Required</Text>
+                )}
               </View>
               <View style={styles.halfInput}>
                 <Text style={[styles.fieldLabel, { color: colors.muted }]}>LAST NAME <Text style={styles.required}>*</Text></Text>
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                   <TextInput style={[styles.input, { color: colors.text }]} value={lastName} onChangeText={setLastName} />
                 </View>
+                {attemptedSubmit && !lastName.trim() && (
+                  <Text style={{ fontSize: 12, color: colors.danger, marginTop: 4 }}>Required</Text>
+                )}
               </View>
             </View>
 
@@ -190,6 +201,9 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                   <TextInput style={[styles.input, { color: colors.text }]} value={ownership} keyboardType="numeric" onChangeText={setOwnership} />
                 </View>
+                {attemptedSubmit && (isNaN(parseFloat(ownership)) || parseFloat(ownership) <= 0 || parseFloat(ownership) > 100) && (
+                  <Text style={{ fontSize: 12, color: colors.danger, marginTop: 4 }}>Enter a value between 1 and 100</Text>
+                )}
               </View>
               <View style={styles.halfInput}>
                 <Text style={[styles.fieldLabel, { color: colors.muted }]}>DATE OF BIRTH <Text style={styles.required}>*</Text></Text>
@@ -314,7 +328,31 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
           <TouchableOpacity
             style={styles.continueButtonFull}
-            onPress={onContinue}
+            onPress={() => {
+              setAttemptedSubmit(true);
+              const ownershipNum = parseFloat(ownership);
+              if (!firstName.trim() || !lastName.trim()) {
+                return;
+              }
+              if (isNaN(ownershipNum) || ownershipNum <= 0 || ownershipNum > 100) {
+                return;
+              }
+              dispatch(setDirectors([{
+                firstName,
+                lastName,
+                roles,
+                ownership,
+                dob,
+                passport,
+                email,
+                countryCode,
+                phone,
+                address,
+                passportFile,
+                addressProofFile,
+              }]));
+              onContinue();
+            }}
             activeOpacity={0.85}
           >
             <Text style={styles.continueButtonText}>Continue →</Text>

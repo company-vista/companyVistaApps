@@ -37,13 +37,15 @@ type ReviewSubmitScreenProps = {
   onEditAddress?: () => void;
   onEditDirectors?: () => void;
   onEditBusinessActivity?: () => void;
+  companyId?: string | null;
 };
 
-export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplicant, onEditJurisdiction, onEditCompanyName, onEditOwnership, onEditAddress, onEditDirectors, onEditBusinessActivity }: ReviewSubmitScreenProps) {
+export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplicant, onEditJurisdiction, onEditCompanyName, onEditOwnership, onEditAddress, onEditDirectors, onEditBusinessActivity, companyId }: ReviewSubmitScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
+  const isEditing = Boolean(companyId);
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [signature, setSignature] = useState<string>('');
@@ -173,16 +175,16 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
       const result = await submitCompanyRegistration(payload, token);
       
       if (result.isSuccess) {
-        Toast.show({ type: 'success', text1: 'Registration submitted successfully!' });
+        Toast.show({ type: 'success', text1: isEditing ? 'Registration updated successfully!' : 'Registration submitted successfully!' });
         dispatch(resetCompanyRegistration());
         const newCompanyId = result.data?._id || result.data?.company?._id || result.data?.data?._id;
         onSubmit(newCompanyId);
       } else {
         Toast.show({ type: 'error', text1: 'Submission failed', text2: result.error });
       }
-    } catch {
-      
-      Toast.show({ type: 'error', text1: 'Something went wrong', text2: 'Please try again.' });
+    } catch (error: any) {
+      console.log('Company registration error:', error?.response?.data ?? error?.message ?? error);
+      Toast.show({ type: 'error', text1: 'Something went wrong', text2: error?.response?.data?.message || error?.message || 'Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -192,7 +194,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
     <View style={styles.screen}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Review & <Text style={styles.titleAccent}>submit</Text></Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Review & <Text style={styles.titleAccent}>{isEditing ? 'update' : 'submit'}</Text></Text>
       </View>
 
       <View style={styles.body}>
@@ -236,9 +238,31 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
           ))}
 
           <View style={[styles.declarationBox, { borderColor: '#e6a82a', backgroundColor: colors.surface }]}>
-            <Text style={[styles.declarationText, { color: colors.muted }]}>
-              I, the undersigned, on behalf of all the directors/shareholders of the company described above, appoint CompanyVesta (and/or its affiliated registered agents) as authorized representative to act on our behalf in all matters related to this company's registration. CompanyVesta is authorized to prepare, sign and submit the necessary documents to relevant authorities and to take any actions required for registration approval. We acknowledge CompanyVesta is not liable for delays, objections or rejections from authorities, registries, or banks. We confirm the accuracy of all the information provided and agree to indemnify CompanyVesta against any claims, costs or liabilities arising from this registration process.
-            </Text>
+            <Text style={[styles.declarationTitle, { color: colors.text }]}>Authorization & Declaration</Text>
+
+            <View style={styles.declarationItem}>
+              <Text style={[styles.declarationBullet, { color: '#e6a82a' }]}>•</Text>
+              <Text style={[styles.declarationItemText, { color: colors.muted }]}>
+                <Text style={{ fontWeight: '600', color: colors.text }}>Appointment: </Text>
+                We authorize CompanyVista to act on our behalf to prepare, sign, and submit all company registration documents.
+              </Text>
+            </View>
+
+            <View style={styles.declarationItem}>
+              <Text style={[styles.declarationBullet, { color: '#e6a82a' }]}>•</Text>
+              <Text style={[styles.declarationItemText, { color: colors.muted }]}>
+                <Text style={{ fontWeight: '600', color: colors.text }}>Accuracy: </Text>
+                We confirm all provided information is complete and accurate.
+              </Text>
+            </View>
+
+            <View style={styles.declarationItem}>
+              <Text style={[styles.declarationBullet, { color: '#e6a82a' }]}>•</Text>
+              <Text style={[styles.declarationItemText, { color: colors.muted }]}>
+                <Text style={{ fontWeight: '600', color: colors.text }}>Liability: </Text>
+                CompanyVista is not liable for delays, objections, or rejections from government authorities or banks.
+              </Text>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -250,7 +274,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
               {isChecked && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={[styles.checkboxLabel, { color: colors.text }]}>
-              I have read and agree to the terms stated above, and confirm that all information provided is accurate to the best of my knowledge.
+              I agree to the terms and confirm all details are accurate.
             </Text>
           </TouchableOpacity>
 
@@ -284,7 +308,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
           <ContinueButton
-            label="SUBMIT REGISTRATION"
+            label={isEditing ? 'UPDATE REGISTRATION' : 'SUBMIT REGISTRATION'}
             onPress={handleSubmit}
             disabled={!isChecked || !signature}
             loading={isSubmitting}
@@ -380,10 +404,24 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
   },
-  declarationText: {
+  declarationTitle: {
+    fontSize: font.md,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  declarationItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    gap: 8,
+  },
+  declarationBullet: {
+    fontSize: font.md,
+    lineHeight: 18,
+  },
+  declarationItemText: {
     fontSize: font.sm,
-    lineHeight: 14,
-    textAlign: 'justify',
+    lineHeight: 18,
+    flex: 1,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -409,6 +447,7 @@ const styles = StyleSheet.create({
     fontSize: font.sm,
     flex: 1,
     lineHeight: 15,
+    
   },
   inputsRow: {
     flexDirection: 'row',

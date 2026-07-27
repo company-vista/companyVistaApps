@@ -90,6 +90,8 @@ export default function HomeScreen() {
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [supportFromRegistrationTracking, setSupportFromRegistrationTracking] = useState(false);
+  const [editingCompanyId, setEditingCompanyId] = useState<string | null>(null);
   const prevNotificationCount = useRef(0);
   const [companyOptions, setCompanyOptions] = useState<CompanyCardItem[]>([]);
   const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
@@ -501,12 +503,14 @@ export default function HomeScreen() {
   if (isAddCompanyOpen) {
     return (
       <AddCompanyScreen
-        onBackPress={() => setIsAddCompanyOpen(false)}
+        onBackPress={() => { setIsAddCompanyOpen(false); setEditingCompanyId(null); }}
         onSubmit={(companyId) => {
           setIsAddCompanyOpen(false);
+          setEditingCompanyId(null);
           setIsRegistrationTrackingOpen(true);
           refreshCompanies(companyId);
         }}
+        companyId={editingCompanyId}
       />
     );
   }
@@ -568,12 +572,14 @@ export default function HomeScreen() {
         onBackPress={closeRegistrationTrackingScreen}
         companyId={selectedCompany?.id}
         onRefreshCompanies={() => refreshCompanies(selectedCompany?.id)}
-        onEditPress={() => {
+        onEditPress={(companyId) => {
           setIsRegistrationTrackingOpen(false);
+          setEditingCompanyId(companyId || selectedCompany?.id || null);
           setIsAddCompanyOpen(true);
         }}
         onContactSupport={() => {
           setIsRegistrationTrackingOpen(false);
+          setSupportFromRegistrationTracking(true);
           setIsSupportOpen(true);
         }}
       />
@@ -582,7 +588,13 @@ export default function HomeScreen() {
 
   if (isSupportOpen) {
     return (
-      <ContactSupport />
+      <ContactSupport onBackPress={() => {
+        setIsSupportOpen(false);
+        if (supportFromRegistrationTracking) {
+          setSupportFromRegistrationTracking(false);
+          setIsRegistrationTrackingOpen(true);
+        }
+      }} />
     );
   }
 

@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
-import { useAppDispatch } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setBusinessInfo } from '../../../../store/slices/companyRegistrationSlice';
 
 type BusinessFormScreenProps = {
@@ -23,15 +23,17 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
+  const reg = useAppSelector(state => state.companyRegistration);
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
-  const [website, setWebsite] = useState('');
-  const [establishReason, setEstablishReason] = useState('-- Select --');
+  const [website, setWebsite] = useState(reg.website);
+  const [establishReason, setEstablishReason] = useState(reg.establishReason !== '-- Select --' ? reg.establishReason : '-- Select --');
   const [showReasonDropdown, setShowReasonDropdown] = useState(false);
-  const [principalActivity, setPrincipalActivity] = useState('-- Select --');
+  const [principalActivity, setPrincipalActivity] = useState(reg.principalActivity !== '-- Select --' ? reg.principalActivity : '-- Select --');
   const [showActivityDropdown, setShowActivityDropdown] = useState(false);
-  const [briefIntroduction, setBriefIntroduction] = useState('');
-  const [additionalInfo, setAdditionalInfo] = useState('');
+  const [briefIntroduction, setBriefIntroduction] = useState(reg.briefIntroduction);
+  const [additionalInfo, setAdditionalInfo] = useState(reg.additionalInfo);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const reasonOptions = [
     '-- Select --',
@@ -137,6 +139,12 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             </View>
           )}
 
+          {attemptedSubmit && establishReason === '-- Select --' && (
+            <Text style={{ fontSize: 13, color: colors.danger, marginBottom: 4 }}>
+              Please select a reason for establishing the company.
+            </Text>
+          )}
+
           <Text style={[styles.fieldLabel, { color: colors.muted }]}>PRINCIPAL BUSINESS ACTIVITY <Text style={styles.required}>*</Text></Text>
           <TouchableOpacity
             style={[styles.dropdown, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}
@@ -178,6 +186,12 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             </View>
           )}
 
+          {attemptedSubmit && principalActivity === '-- Select --' && (
+            <Text style={{ fontSize: 13, color: colors.danger, marginBottom: 4 }}>
+              Please select a principal business activity.
+            </Text>
+          )}
+
           <Text style={[styles.fieldLabel, { color: colors.muted, marginTop: 16 }]}>
             BRIEF INTRODUCTION ABOUT THE COMPANY, PROPOSED ACTIVITIES AND BUSINESS PLAN <Text style={styles.required}>*</Text>
           </Text>
@@ -193,6 +207,12 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
               textAlignVertical="top"
             />
           </View>
+
+          {attemptedSubmit && !briefIntroduction.trim() && (
+            <Text style={{ fontSize: 13, color: colors.danger, marginBottom: 4 }}>
+              Please provide a brief introduction about the company.
+            </Text>
+          )}
 
           <Text style={[styles.fieldLabel, { color: colors.muted }]}>ADDITIONAL INFORMATION / MESSAGE TO US</Text>
           <View style={[styles.textAreaWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
@@ -212,8 +232,11 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
           <ContinueButton
             onPress={() => {
-              dispatch(setBusinessInfo({ website, establishReason, principalActivity, briefIntroduction, additionalInfo }));
-              onContinue();
+              setAttemptedSubmit(true);
+              if (establishReason !== '-- Select --' && principalActivity !== '-- Select --' && briefIntroduction.trim()) {
+                dispatch(setBusinessInfo({ website, establishReason, principalActivity, briefIntroduction, additionalInfo }));
+                onContinue();
+              }
             }}
           />
         </View>

@@ -12,7 +12,7 @@ import RadioCard from "./components/ownershipRadioCard";
 import { useThemeColors } from "../../../../theme/colors";
 import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from "../../../../components/buttons";
-import { useAppDispatch } from "../../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 import { setOwnership } from "../../../../store/slices/companyRegistrationSlice";
 import Toast from "react-native-toast-message";
 
@@ -25,10 +25,9 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
+  const reg = useAppSelector(state => state.companyRegistration);
 
-  const [ownershipType, setOwnershipType] = useState<
-    "individual" | "company" | "branch"
-  >("individual");
+  const [ownershipType, setOwnershipType] = useState<"individual" | "company" | "branch">(reg.ownershipType || "individual");
 
   interface HoldingCompany {
     legalName: string;
@@ -56,7 +55,7 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
     ownershipPercent: '',
   });
 
-  const [holdingCompanies, setHoldingCompanies] = useState<HoldingCompany[]>([createEmptyHolding()]);
+  const [holdingCompanies, setHoldingCompanies] = useState<HoldingCompany[]>(reg.holdingCompanies.length > 0 ? reg.holdingCompanies as HoldingCompany[] : [createEmptyHolding()]);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const updateHolding = (index: number, field: keyof HoldingCompany, value: string) => {

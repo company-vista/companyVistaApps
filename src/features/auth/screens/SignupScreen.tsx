@@ -54,6 +54,7 @@ function SignupScreen() {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
+  const [companyName, setCompanyName] = useState('');
   const [registrationCountry, setRegistrationCountry] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const [showSetPassword, setShowSetPassword] = useState(false);
@@ -95,6 +96,7 @@ function SignupScreen() {
         email,
         phoneNumber,
         countryCode,
+        companyName,
         registrationCountry,
       }),
     );
@@ -270,6 +272,27 @@ function SignupScreen() {
                       placeholderTextColor={colors.inputPlaceholder}
                       style={[styles.input, { color: colors.inputText }]}
                       value={phoneNumber}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.field}>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: colors.inputBorder,
+                      },
+                    ]}>
+                    <FontAwesome name="building" size={16} color={colors.inputPlaceholder} />
+                    <TextInput
+                      autoCapitalize="words"
+                      onChangeText={setCompanyName}
+                      placeholder="Company name"
+                      placeholderTextColor={colors.inputPlaceholder}
+                      style={[styles.input, { color: colors.inputText }]}
+                      value={companyName}
                     />
                   </View>
                 </View>

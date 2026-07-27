@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { setApplicantInfo, setJurisdiction } from '../../../../store/slices/companyRegistrationSlice';
+import { setApplicantInfo, setJurisdiction, hydrateCompany, resetCompanyRegistration } from '../../../../store/slices/companyRegistrationSlice';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
+import { fetchClientCompanyDetails } from '../../api/clientProfileApi';
 import JurisdictionSelectionScreen from './JurisdictionSelectionScreen';
 import EntityDetailScreen from './EntityDetailScreen';
 import OwnershipScreen from './OwnershipScreen';
@@ -106,26 +108,77 @@ function RadioOption({
 type AddCompanyScreenProps = {
   onBackPress: () => void;
   onSubmit?: (companyId?: string) => void;
+  companyId?: string | null;
 };
 
-export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }: AddCompanyScreenProps) {
+export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit, companyId: editingCompanyId }: AddCompanyScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
+  const token = useAppSelector(state => state.auth.token);
+  const reg = useAppSelector(state => state.companyRegistration);
   const nameParts = (user?.name ?? '').split(' ');
   const userFirstName = user?.firstName ?? nameParts[0] ?? '';
   const userLastName = user?.lastName ?? nameParts.slice(1).join(' ') ?? '';
 
+  const isEditing = Boolean(editingCompanyId);
+  const [loading, setLoading] = useState(isEditing);
   const [step, setStep] = useState(1);
   const [applicantType, setApplicantType] = useState<ApplicantType>('owner');
-  const [firstName, setFirstName] = useState(userFirstName);
-  const [lastName, setLastName] = useState(userLastName);
-  const [email, setEmail] = useState(user?.email ?? '');
-  const [phone, setPhone] = useState(user?.phone ?? user?.phoneNumber ?? user?.mobile ?? '');
-  const [selectedJurisdiction, setSelectedJurisdiction] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState(isEditing ? reg.firstName || userFirstName : userFirstName);
+  const [lastName, setLastName] = useState(isEditing ? reg.lastName || userLastName : userLastName);
+  const [email, setEmail] = useState(isEditing ? reg.email || (user?.email ?? '') : (user?.email ?? ''));
+  const [phone, setPhone] = useState(isEditing ? reg.phone || (user?.phone ?? user?.phoneNumber ?? user?.mobile ?? '') : (user?.phone ?? user?.phoneNumber ?? user?.mobile ?? ''));
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState<string | null>(isEditing ? reg.jurisdiction : null);
+
+  useEffect(() => {
+    if (!editingCompanyId || !token) return;
+
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      dispatch(resetCompanyRegistration());
+      const result = await fetchClientCompanyDetails({ companyId: editingCompanyId, token });
+      if (cancelled) return;
+      if (result.isSuccess && result.company) {
+        dispatch(hydrateCompany(result.company));
+        const c = result.company as any;
+        if (c.firstName) setFirstName(c.firstName);
+        if (c.lastName) setLastName(c.lastName);
+        if (c.email) setEmail(c.email);
+        if (c.phone || c.phoneNumber || c.mobile) setPhone(c.phone || c.phoneNumber || c.mobile);
+        if (c.jurisdiction || c.countryOfIncorporation) setSelectedJurisdiction(c.jurisdiction ?? null);
+        if (c.applicantType) setApplicantType(c.applicantType);
+      }
+      setLoading(false);
+    })();
+
+    return () => { cancelled = true; };
+  }, [editingCompanyId, token, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetCompanyRegistration());
+    };
+  }, [dispatch]);
 
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
+
+  if (loading) {
+    return (
+      <View style={styles.screen}>
+        <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
+          <BackButton onPress={onBackPress} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{isEditing ? 'Edit Company' : 'Add Company'}</Text>
+        </View>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={{ color: colors.muted, marginTop: 12 }}>Loading company details...</Text>
+        </View>
+      </View>
+    );
+  }
 
   if (step === 2) {
     return (
@@ -182,6 +235,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
         onEditAddress={() => setStep(5)}
         onEditDirectors={() => setStep(6)}
         onEditBusinessActivity={() => setStep(7)}
+        companyId={editingCompanyId}
       />
     );
   }
@@ -195,7 +249,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit }
     <View style={styles.screen}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Add Company</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{isEditing ? 'Edit Company' : 'Add Company'}</Text>
       </View>
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: safeAreaInsets.bottom + 24 }]}>
         <Text style={[styles.title, { color: colors.text }]}>

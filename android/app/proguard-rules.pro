@@ -8,3 +8,10 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# PDFBox / JP2 Decoder missing rules fix
+-dontwarn com.gemalto.jp2.**
+-keep class com.gemalto.jp2.** { *; }
+
+-dontwarn com.tom_roush.pdfbox.**
+-keep class com.tom_roush.pdfbox.** { *; }

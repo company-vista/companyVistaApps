@@ -117,7 +117,7 @@ const PACKAGE_TIMES: Record<string, string[]> = {
 type RegistrationTrackingScreenProps = {
   onBackPress: () => void;
   onAddCompany?: () => void;
-  onEditPress?: () => void;
+  onEditPress?: (companyId?: string) => void;
   onContactSupport?: () => void;
   companyId?: string | null;
   onRefreshCompanies?: () => void;
@@ -280,7 +280,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </Text>
           )}
 
-          <TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={onEditPress}>
+          <TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
             <FontAwesome name="pencil" size={16} color="#ffffff" />
           </TouchableOpacity>
         </View>

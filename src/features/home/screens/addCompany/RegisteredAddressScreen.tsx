@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
-import { useAppDispatch } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setRegisteredAddress } from '../../../../store/slices/companyRegistrationSlice';
 
 type HasAddressOption = 'yes' | 'no' | null;
@@ -35,22 +35,33 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
+  const reg = useAppSelector(state => state.companyRegistration);
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
-  const [hasAddress, setHasAddress] = useState<HasAddressOption>(null);
-  const [hasAgent, setHasAgent] = useState<HasAgentOption>(null);
+  const [hasAddress, setHasAddress] = useState<HasAddressOption>(reg.hasAddress ?? null);
+  const [hasAgent, setHasAgent] = useState<HasAgentOption>(reg.hasAgent ?? null);
 
-  const [localAddress, setLocalAddress] = useState<AddressFormState>({
-    line1: '', line2: '', city: '', state: '', postalCode: '', country: ''
-  });
+  const [localAddress, setLocalAddress] = useState<AddressFormState>(
+    reg.hasAddress === 'yes' ? { ...reg.localAddress } : { line1: '', line2: '', city: '', state: '', postalCode: '', country: '' }
+  );
 
-  const [agentDetails, setAgentDetails] = useState({
-    firstName: '', lastName: '', idNumber: ''
-  });
+  const [agentDetails, setAgentDetails] = useState(
+    reg.hasAgent === 'yes' ? { ...reg.agentDetails } : { firstName: '', lastName: '', idNumber: '' }
+  );
 
-  const [agentAddress, setAgentAddress] = useState<AddressFormState>({
-    line1: '', line2: '', city: '', state: '', postalCode: '', country: ''
-  });
+  const [agentAddress, setAgentAddress] = useState<AddressFormState>(
+    reg.hasAgent === 'yes' ? { ...reg.agentAddress } : { line1: '', line2: '', city: '', state: '', postalCode: '', country: '' }
+  );
+
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
+  const handleContinue = () => {
+    setAttemptedSubmit(true);
+    if (hasAddress !== null && hasAgent !== null) {
+      dispatch(setRegisteredAddress({ hasAddress, localAddress, hasAgent, agentDetails, agentAddress }));
+      onContinue();
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -105,6 +116,12 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
               </View>
             </TouchableOpacity>
           </View>
+
+          {attemptedSubmit && hasAddress === null && (
+            <Text style={{ fontSize: 13, color: colors.danger, marginBottom: 8 }}>
+              Please select whether you have a registered address.
+            </Text>
+          )}
 
           {hasAddress === 'yes' && (
             <View style={styles.formSection}>
@@ -210,6 +227,12 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
             </View>
           </TouchableOpacity>
 
+          {attemptedSubmit && hasAgent === null && (
+            <Text style={{ fontSize: 13, color: colors.danger, marginBottom: 8 }}>
+              Please select whether you need a local representative.
+            </Text>
+          )}
+
           {hasAgent === 'yes' && (
             <View style={styles.formSection}>
               <View style={styles.row}>
@@ -313,10 +336,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
           <ContinueButton
-            onPress={() => {
-              dispatch(setRegisteredAddress({ hasAddress, localAddress, hasAgent, agentDetails, agentAddress }));
-              onContinue();
-            }}
+            onPress={handleContinue}
           />
         </View>
       </View>

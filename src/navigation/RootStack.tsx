@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { RootStackParamList } from './types';
 import AuthStack from '../features/auth/navigation/AuthStack';
@@ -7,12 +7,21 @@ import { useAppSelector } from '../store/hooks';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+const appTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    card: '#0f172a',
+    background: '#0f172a',
+  },
+};
+
 export default function RootStack() {
   const { isAuthenticated } = useAppSelector(state => state.auth);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+    <NavigationContainer theme={appTheme}>
+      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0f172a' } }}>
         {isAuthenticated ? (
           <Stack.Screen name="Main" component={MainStack} />
         ) : (

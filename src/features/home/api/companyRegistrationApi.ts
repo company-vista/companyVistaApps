@@ -58,7 +58,7 @@ export async function submitCompanyRegistration(
       }
     });
 
-    const response = await axios.post<RegistrationResult>(
+    const response = await axios.post(
       COMPANY_REGISTRATION_ROUTE,
       formData,
       {
@@ -70,10 +70,20 @@ export async function submitCompanyRegistration(
       },
     );
 
+    const body = response.data;
+    const ok = body?.isSuccess ?? body?.success ?? false;
+
+    if (!ok) {
+      return {
+        error: body?.message ?? body?.error ?? 'Server rejected the registration.',
+        isSuccess: false,
+      };
+    }
+
     return {
       error: '',
-      isSuccess: response.data?.isSuccess ?? true,
-      data: response.data,
+      isSuccess: true,
+      data: body?.data ?? body?.company ?? body,
     };
 
   } catch (error) {

@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
-import { useAppDispatch } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setEntityDetails } from '../../../../store/slices/companyRegistrationSlice';
 
 const usStates = [
@@ -97,22 +97,23 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const dispatch = useAppDispatch();
+  const reg = useAppSelector(state => state.companyRegistration);
   const entityOptions = selectedJurisdiction
     ? entityOptionsByCountry[selectedJurisdiction] ?? defaultEntityOptions
     : defaultEntityOptions;
-  const [selected, setSelected] = useState('-- Select --');
+  const [selected, setSelected] = useState(reg.entityType && reg.entityType !== '-- Select --' ? reg.entityType : '-- Select --');
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedState, setSelectedState] = useState('-- Select --');
+  const [selectedState, setSelectedState] = useState(reg.stateOfIncorporation && reg.stateOfIncorporation !== '-- Select --' ? reg.stateOfIncorporation : '-- Select --');
   const [showStateDropdown, setShowStateDropdown] = useState(false);
-  const [companyName, setCompanyName] = useState('');
-  const [alternateName, setAlternateName] = useState('');
+  const [companyName, setCompanyName] = useState(reg.companyName);
+  const [alternateName, setAlternateName] = useState(reg.alternateName);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const inputBg = colors.mode === 'dark' ? colors.inputBackground : colors.surfaceAlt;
 
   const handleContinue = () => {
     setAttemptedSubmit(true);
-    if (companyName && alternateName) {
+    if (companyName && selected !== '-- Select --') {
       dispatch(setEntityDetails({ stateOfIncorporation: selectedState, entityType: selected, companyName, alternateName }));
       onContinue();
     }
@@ -288,7 +289,7 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
           <View style={[styles.fieldGroup, { marginTop: 20 }]}>
             <View style={styles.labelRow}>
               <Text style={[styles.label, { color: colors.text }]}>
-                ALTERNATE COMPANY NAME <Text style={styles.required}>*</Text>
+                ALTERNATE COMPANY NAME
               </Text>
               <Ionicons name="information-circle-outline" size={16} color={colors.subtle} />
             </View>
@@ -304,11 +305,6 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
             <Text style={[styles.helperText, { color: colors.subtle }]}>
               In case the first is unavailable
             </Text>
-            {attemptedSubmit && !alternateName && (
-              <Text style={[styles.errorText, { color: colors.danger }]}>
-                Please enter an alternate name.
-              </Text>
-            )}
           </View>
         </ScrollView>
 

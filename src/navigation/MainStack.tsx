@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { MainStackParamList } from './types';
+import { useThemeColors } from '../theme/colors';
 import HomeScreen from '../features/home/screens/HomeScreen';
 import ProfileScreen from '../features/profile/screens/ProfileScreen';
 import ProfileAddressScreen from '../features/profile/screens/ProfileAddressScreen';
@@ -26,8 +27,10 @@ import TransactionsScreen from '../features/home/screens/TransactionsScreen';
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export default function MainStack() {
+  const colors = useThemeColors();
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="ProfileAddress" component={ProfileAddressScreen} />
