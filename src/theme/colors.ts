@@ -20,7 +20,7 @@ export const appThemes = {
     inputPlaceholder: '#64748b',
     primary: '#14b8a6',
     primaryText: '#042f2e',
-    accent: '#0f766e',
+    accent: '#0f766dbb',
     accentSoft: '#ccfbf1',
     activeNav: '#fff3eb',
     danger: '#dc2626',

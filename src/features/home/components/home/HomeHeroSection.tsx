@@ -88,11 +88,11 @@ function HomeHeroSection({
         </View>
         <Pressable onPress={onManagePress} style={[styles.heroTile, { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' }]}>
           <FontAwesome name="cog" size={22} color={isLight ? colors.accent : '#85B7EB'} style={{ marginBottom: 0 }} />
-          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Manage</Text>
+          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Manage Company</Text>
         </Pressable>
         <Pressable onPress={onCompanyInfoPress} style={[styles.heroTile, { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' }]}>
           <FontAwesome name="info-circle" size={22} color={isLight ? '#dc2626' : '#F09595'} style={{ marginBottom: 0 }} />
-          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Company Info</Text>
+          <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Company Details</Text>
         </Pressable>
       </View>
     </View>

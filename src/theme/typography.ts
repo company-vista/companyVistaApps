@@ -12,7 +12,7 @@ export const font = {
   heading: s(17),
   hero: s(20),
   display: s(22),
-  large: s(24),
+  large: s(22),
 } as const;
 
 export type FontSize = keyof typeof font;

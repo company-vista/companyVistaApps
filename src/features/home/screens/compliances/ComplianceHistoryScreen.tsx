@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
@@ -225,15 +225,19 @@ const ComplianceHistoryScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}> 
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerRow}>
-          <BackButton onPress={() => navigation.goBack()} />
-          <View style={styles.headerTextContainer}>
-            <Text style={[styles.title, { color: colors.text }]}>Compliance History</Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text>
-          </View>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
+
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <BackButton onPress={() => navigation.goBack()} />
+        <View style={styles.headerTextContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>Compliance History</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text>
         </View>
+        <View style={styles.headerRightPlaceholder} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <View style={styles.cardTitleRow}>
@@ -303,8 +307,16 @@ const ComplianceHistoryScreen = () => {
               </View>
             </View>
             {showRenewButton ? (
-              <Pressable style={[styles.renewButton, { backgroundColor: colors.accent }]}> 
-                <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renew</Text>
+              <Pressable
+                style={[styles.renewButton, { backgroundColor: colors.accent }]}
+                onPress={() => {
+                  if (selectedAction.id === 'address') navigation.navigate('AddressRenewal', { selectedAction });
+                  else if (selectedAction.id === 'resident') navigation.navigate('RenewCompliance', { selectedAction });
+                  else if (selectedAction.id === 'annual_filing') navigation.navigate('AnnualFiling');
+                  else if (selectedAction.id === 'federal_filing') navigation.navigate('FederalFiling', { selectedAction });
+                }}
+              >
+                <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renewal</Text>
               </Pressable>
             ) : null}
           </View>
@@ -363,17 +375,22 @@ const styles = StyleSheet.create({
   container: {
     padding: 18,
     paddingBottom: 40,
-    paddingTop: 48,
+    paddingTop: 16,
   },
-  headerRow: {
+  header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 18,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingTop: 60,
+    borderBottomWidth: 0.5,
+    gap: 10,
   },
   headerTextContainer: {
     flex: 1,
-    marginLeft: 8,
-    marginTop: 6,
+  },
+  headerRightPlaceholder: {
+    width: 40,
   },
   title: {
     fontSize: font.xxl,

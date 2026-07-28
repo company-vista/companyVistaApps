@@ -36,12 +36,12 @@ interface ApplicantOption {
 const applicantOptions: ApplicantOption[] = [
   {
     id: 'owner',
-    title: 'Owner / Director',
+    title: 'Founder / Owner',
     description: "I'm a founder or director of this company",
   },
   {
     id: 'representative',
-    title: 'Representative',
+    title: 'Authorized Representative',
     description: "I'm applying on behalf of the owner(s)",
   },
   {
@@ -253,11 +253,10 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit, 
       </View>
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: safeAreaInsets.bottom + 24 }]}>
         <Text style={[styles.title, { color: colors.text }]}>
-          Let's set up your <Text style={styles.titleAccent}>company</Text>, step by step.
+          Let's set up your <Text style={styles.titleAccent}>business.</Text>
         </Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          This guided form adapts to the country you're registering in — you'll only
-          see the questions that apply to you. It shouldn't take more than 5 minutes.
+          This form adapts to your selected country and takes less than 3 minutes to complete.
         </Text>
 
         <StepProgress total={TOTAL_STEPS} current={CURRENT_STEP} />
@@ -271,7 +270,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit, 
 
         <View style={styles.labelRow}>
           <Text style={[styles.label, { color: colors.text }]}>
-            I AM THE <Text style={styles.required}>*</Text>
+            Your Role in the Company <Text style={styles.required}>*</Text>
           </Text>
           <View style={[styles.helpCircle, { borderColor: colors.subtle }]}>
             <Text style={[styles.helpCircleText, { color: colors.subtle }]}>?</Text>

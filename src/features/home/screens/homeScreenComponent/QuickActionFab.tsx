@@ -105,7 +105,7 @@ export function QuickActionFab({
         style={[
           styles.fab,
           {
-            backgroundColor: `${colors.accent}90`,
+            backgroundColor: colors.accent,
             bottom: safeAreaInsets.bottom + 104,
           },
         ]}>

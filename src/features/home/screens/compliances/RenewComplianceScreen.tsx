@@ -19,6 +19,7 @@ import BackButton from "../../../../components/buttons/BackButton";
 import { API_BASE_URL } from "../../../../config/api";
 import { useAppSelector } from "../../../../store/hooks";
 import { useThemeColors } from '../../../../theme/colors';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 interface Service {
   id: number;
@@ -148,7 +149,7 @@ const RenewCompliance: React.FC = () => {
           },
         },
       );
-    
+      
       const checkoutUrl = response?.data?.url;
       if (checkoutUrl) {
         await Linking.openURL(checkoutUrl);
@@ -273,14 +274,17 @@ const RenewCompliance: React.FC = () => {
           <View style={[styles.checkoutSection, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.checkoutEyebrow, { color: colors.muted }]}>SELECTED ACTION</Text>
             <Text style={[styles.checkoutTitle, { color: colors.text }]}>Details</Text>
-            {selectedAction.details.map((detail, index) => (
-              <View key={`${detail.label}-${index}`} style={styles.ssItem}>
-                <View style={styles.ssItemInfo}>
-                  <Text style={[styles.ssItemName, { color: colors.text }]}>{detail.label}</Text>
-                  <Text style={[styles.ssItemMeta, { color: colors.muted }]}>{detail.value}</Text>
+            <View style={styles.detailsGrid}>
+              {selectedAction.details.map((detail, index) => (
+                <View key={`${detail.label}-${index}`} style={[styles.detailCol, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                  <View style={[styles.detailIconBox, { backgroundColor: colors.surfaceAlt }]}>
+                    <FontAwesome name={detail.icon ?? 'clipboard'} size={14} color={colors.accent} />
+                  </View>
+                  <Text style={[styles.detailLabel, { color: colors.muted }]}>{detail.label}</Text>
+                  <Text style={[styles.detailValue, { color: colors.text }]}>{detail.value}</Text>
                 </View>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
         ) : null}
 
@@ -415,14 +419,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   yearIconText: {
-    fontSize: 14,
+    fontSize: 22,
   },
   yearTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
   },
   yearSubtitle: {
-    fontSize: 11,
+    fontSize: 12,
   },
   deselectBtn: {
     borderRadius: 20,
@@ -430,23 +434,23 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   deselectBtnText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "500",
   },
   serviceCard: {
-    borderRadius: 12,
+    borderRadius: 18,
     borderStyle: "solid",
     padding: 14,
   },
   cardTop: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 10,
+    gap: 16,
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
+    width: 23,
+    height: 23,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 1,
@@ -469,7 +473,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardName: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "500",
   },
   expiredBadge: {
@@ -480,11 +484,11 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   expiredBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "500",
   },
   cardDates: {
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 4,
   },
   dueDateText: {
@@ -492,17 +496,17 @@ const styles = StyleSheet.create({
   },
   cardPrice: {
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: "600",
     marginTop: 10,
   },
   cardSubLabel: {
-    fontSize: 11,
+    fontSize: 12,
   },
   breakdown: {
     borderRadius: 8,
     padding: 12,
     marginTop: 10,
-    gap: 4,
+    gap: 10,
   },
   breakdownRow: {
     flexDirection: "row",
@@ -514,10 +518,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   breakdownLabel: {
-    fontSize: 12,
+    fontSize: 14,
   },
   breakdownValue: {
-    fontSize: 12,
+    fontSize: 14,
   },
   checkoutSection: {
     borderRadius: 12,
@@ -525,13 +529,13 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   checkoutEyebrow: {
-    fontSize: 10,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "600",
     letterSpacing: 0.6,
     marginBottom: 4,
   },
   checkoutTitle: {
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: "500",
     marginBottom: 4,
   },
@@ -646,6 +650,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 11,
     marginTop: 8,
+  },
+  detailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 12,
+  },
+  detailCol: {
+    width: "47%",
+    borderWidth: 0.5,
+    borderRadius: 10,
+    padding: 12,
+  },
+  detailIconBox: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 11,
+    marginBottom: 3,
+  },
+  detailValue: {
+    fontSize: 13,
+    fontWeight: "500",
   },
 });
 

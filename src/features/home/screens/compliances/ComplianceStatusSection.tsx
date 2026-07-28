@@ -383,7 +383,7 @@ function ComplianceStatusSection({
                 </View>
                 <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
                 <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                  Due date: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
+                  {item.title === 'Registered Address' || item.title === 'Registered Agent' ? 'Renewal Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
               </View>
             </View>

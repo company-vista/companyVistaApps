@@ -93,7 +93,7 @@ export default function SearchScreen() {
     switch (actionId) {
       case 'agentRenewal':
         navigation.navigate('RenewCompliance', {
-          selectedAction: { id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [] },
+          selectedAction: { id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [], price: 149, years: 1 },
         });
         break;
       case 'addressRenewal':

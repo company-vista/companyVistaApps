@@ -19,13 +19,14 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 500,
     color: '#1a1a1a',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
+    marginTop: 2,
     color: '#6b6b6b',
   },
 });

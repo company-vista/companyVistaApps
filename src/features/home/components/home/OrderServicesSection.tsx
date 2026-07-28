@@ -12,28 +12,28 @@ type OrderServicesSectionProps = {
 
 const serviceItems = [
   {
-    title: 'State Filing',
+    title: 'State Tax Filing',
     subtitle: 'Delaware - Resolve overdue status',
     tag: 'Urgent',
     icon: 'file-text-o',
     tone: 'red',
   },
   {
-    title: 'Federal Filing',
+    title: 'Federal Tax Filing',
     subtitle: 'Form 1120 / 5472 preparation',
     tag: 'Due_Jul_15',
     icon: 'file-text',
     tone: 'amber',
   },
   {
-    title: 'Add Entity',
+    title: 'Register New Entity',
     subtitle: 'LLC, C-Corp or S-Corp - Any state',
     tag: undefined,
     icon: 'building-o',
     tone: 'blue',
   },
   {
-    title: 'Change Agent',
+    title: 'Change Registered Agent',
     subtitle: 'Nationwide - Same day processing',
     tag: undefined,
     icon: 'exchange',
@@ -104,7 +104,7 @@ function OrderServicesSection({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Order services</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore Services</Text>
         <Pressable onPress={() => setIsExpanded(value => !value)}>
           <Text style={styles.moreText}>{isExpanded ? 'Less' : 'More'}</Text>
         </Pressable>

@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e7eb',
     zIndex: 16,
+    elevation: 21,
   },
   fabIcon: {
     fontWeight: '400',

@@ -29,7 +29,7 @@ function RecentActivityAndPaymentOverviewSection({
 
   return (
     <View style={styles.wrapper}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Activity</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Links</Text>
       <View style={styles.grid}>
         {recentActivities.map(item => (
           <Pressable

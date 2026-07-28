@@ -190,12 +190,14 @@ function TabPlaceholder({
     date: formatDate(residentData.dueDate),
     icon: 'clock-o',
     details: [
-      { label: 'Info', value: residentData.name || 'Not set', icon: 'user' },
-      { label: 'Email', value: residentData.email || 'Not set', icon: 'envelope' },
-      { label: 'Phone', value: residentData.phone || 'Not set', icon: 'phone' },
+      { label: 'Info', value: residentData.name || 'N/A', icon: 'user' },
+      { label: 'Email', value: residentData.email || 'N/A', icon: 'envelope' },
+      { label: 'Phone', value: residentData.phone || 'N/A', icon: 'phone' },
       { label: 'Due Date', value: formatDate(residentData.dueDate), icon: 'calendar' },
       { label: 'Last Filed', value: formatDate(residentData.lastDate), icon: 'history' },
-    ]
+    ],
+    price: 149,
+    years: 1,
   });
 
   // Address Renewal
@@ -207,10 +209,10 @@ function TabPlaceholder({
     date: formatDate(addressData.dueDate),
     icon: 'clock-o',
     details: [
-      { label: 'Street Address', value: addressData.address || 'Not set', icon: 'map-marker' },
-      { label: 'State', value: addressData.state || 'Not set', icon: 'map' },
-      { label: 'Postal Code', value: addressData.postalCode || 'Not set', icon: 'map-pin' },
-      { label: 'Country', value: addressData.country || 'Not set', icon: 'globe' },
+      { label: 'Street Address', value: addressData.address || 'N/A', icon: 'map-marker' },
+      { label: 'State', value: addressData.state || 'N/A', icon: 'map' },
+      { label: 'Postal Code', value: addressData.postalCode || 'N/A', icon: 'map-pin' },
+      { label: 'Country', value: addressData.country || 'N/A', icon: 'globe' },
       { label: 'Due Date', value: formatDate(addressData.dueDate), icon: 'calendar' },
       { label: 'Last Filed', value: formatDate(addressData.lastDate), icon: 'history' },
     ],
@@ -270,7 +272,7 @@ function TabPlaceholder({
             <Text style={[styles.userName, { color: colors.text }]}> 
               {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
             </Text>
-            <Text style={[styles.userEmail, { color: colors.muted }]}>{residentData?.email || 'Not set'}</Text>
+            <Text style={[styles.userEmail, { color: colors.muted }]}>{residentData?.email || 'Email not added'}</Text>
           </View>
         </View>
       </View>
@@ -279,7 +281,7 @@ function TabPlaceholder({
       <AnimatedAppear index={3}>
         <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.healthHeader}>
-            <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance health</Text>
+            <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance Health</Text>
             <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
           </View>
           <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
@@ -346,7 +348,7 @@ function TabPlaceholder({
                         onPress={() => handleRenewPress(action)}
                         style={[styles.renewButton, { backgroundColor: colors.mode === 'dark' ? '#0f766e' : colors.accent }]}
                       >
-                        <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
+                        <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renewal Now</Text>
                       </Pressable>
                     ) : null}
                     

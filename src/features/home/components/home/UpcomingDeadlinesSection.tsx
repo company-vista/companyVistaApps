@@ -38,7 +38,7 @@ function UpcomingDeadlinesSection() {
     <View style={[styles.section, styles.deadlineSection]}>
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Upcoming deadlines
+          Upcoming Deadlines
         </Text>
       </View>
       <View style={styles.deadlineList}>

@@ -288,7 +288,7 @@ export default function FederalTaxFiling() {
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <View style={[styles.headerIconContainer, { backgroundColor: colors.accent }]}>
             <FontAwesome name="file-text" color="#fff" size={24} />
           </View>
@@ -296,7 +296,7 @@ export default function FederalTaxFiling() {
             <Text style={[styles.headerTitle, { color: colors.text }]}>Federal Tax Filing</Text>
             <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual federal tax return documents</Text>
           </View>
-        </View>
+        </View> */}
 
         {/* Status Tracker */}
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -496,21 +496,7 @@ export default function FederalTaxFiling() {
           />
         </View>
 
-        {/* Need Assistance Support Box */}
-        <View style={[styles.supportBox, { backgroundColor: colors.accent }]}>
-          <View style={styles.labelRow}>
-            <FontAwesome name="question-circle" color="#fff" size={20} style={styles.fieldIcon} />
-            <Text style={[styles.supportTitle, { color: colors.textOnDark }]}>Need Assistance?</Text>
-          </View>
-          <Text style={[styles.supportDesc, { color: colors.textOnDark }]}>
-            Our tax experts are here to help you with your federal filing requirements.
-          </Text>
-          <Pressable style={styles.supportButton}>
-            <Text style={[styles.supportButtonText, { color: colors.textOnDark }]}>Contact Support</Text>
-          </Pressable>
-        </View>
-
-        {/* Submit Button */}
+{/* Submit Button */}
         <Pressable
           style={[styles.submitButton, { backgroundColor: colors.accent, shadowColor: colors.accent }, submitting && styles.submitButtonDisabled]}
           onPress={handleSubmit}
@@ -534,7 +520,7 @@ export default function FederalTaxFiling() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 12
+    paddingTop: 18
   },
   scrollContainer: {
     padding: 16,
@@ -569,16 +555,17 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 500,
   },
   headerSubtitle: {
     fontSize: 12,
     marginTop: 2,
   },
   card: {
-    borderRadius: 12,
+    borderRadius: 18,
     padding: 16,
     marginBottom: 14,
+    marginTop: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -587,7 +574,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '500',
     marginBottom: 12,
   },
   labelRow: {
@@ -600,7 +587,7 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   rowBetween: {
     flexDirection: 'row',
@@ -612,19 +599,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 18,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   dropdownList: {
     marginTop: 8,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 18,
     overflow: 'hidden',
   },
   dropdownItem: {
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 14,
     borderBottomWidth: 1,
   },
   dropdownItemText: {
@@ -647,9 +634,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   uploadArea: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderRadius: 8,
+    borderRadius: 18,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -688,7 +675,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 18,
     padding: 12,
     minHeight: 80,
     textAlignVertical: 'top',
@@ -742,8 +729,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitButton: {
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderRadius: 18,
+    paddingVertical: 16,
     alignItems: 'center',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

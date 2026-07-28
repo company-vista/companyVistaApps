@@ -367,23 +367,20 @@ export default function AnnualStateFilingScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}> 
+      <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <BackButton onPress={() => navigation.goBack()} />
+        <View style={styles.topBarText}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Annual state filing</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text>
+        </View>
+        <View style={styles.topBarSpacer} />
+      </View>
+
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.topPadding} />
-
-        <View style={styles.headerRow}>
-          <BackButton onPress={() => navigation.goBack()} />
-          <View style={styles.headerTextContainer}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>Annual state filing</Text>
-            <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text>
-          </View>
-        </View>
-
-        <View style={[styles.headerSpacer, { borderBottomColor: colors.border }]} />
-
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 20 }]}>        
           <View style={styles.cardLabelRow}>
             <Feather name="briefcase" size={15} color={colors.accent} />
@@ -597,18 +594,7 @@ export default function AnnualStateFilingScreen() {
           })}
         </View>
 
-        <View style={[styles.supportCard, { backgroundColor: colors.accentSoft, borderColor: colors.border, borderWidth: 1 }]}> 
-          <View style={styles.cardLabelRow}>
-            <Feather name="shield" size={17} color={colors.primary} />
-            <Text style={[styles.cardLabel, { color: colors.primary }]}>Compliance support</Text>
-          </View>
-          <Text style={[styles.supportText, { color: colors.text }]}>Need help with your annual filing? Our compliance team is ready to assist.</Text>
-          <TouchableOpacity style={[styles.supportButton, { backgroundColor: colors.primary }] }>
-            <Text style={[styles.supportButtonText, { color: colors.surface }]}>Contact support</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.submitButtonWrapper}>
+<View style={styles.submitButtonWrapper}>
           <TouchableOpacity
             style={[styles.submitButton, { backgroundColor: colors.accent }]}
             onPress={handleSubmit}
@@ -655,38 +641,33 @@ function StepBullet({ status, number, colors }: { status: StepStatus; number: nu
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    paddingTop: 50,
   },
   screen: {
     flex: 1,
   },
   content: {
     padding: 14,
-    paddingBottom: 72,
+    paddingBottom: 62,
     flexGrow: 1,
   },
-  topPadding: {
-    height: 18,
-  },
-  headerRow: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 4,
-    paddingBottom: 14,
-    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
   },
-  headerTextContainer: {
+  topBarText: {
     flex: 1,
-    paddingLeft: 8,
+    marginLeft: 12,
   },
-  headerSpacer: {
-    height: 1,
-    width: '100%',
-    marginBottom: 18,
+  topBarSpacer: {
+    width: 24,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 500,
   },
   headerSubtitle: {
     fontSize: 12,
@@ -694,20 +675,20 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 18,
     padding: 16,
     marginBottom: 12,
   },
   cardLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   cardLabelRowBetween: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   cardLabel: {
     fontSize: 13,
@@ -722,15 +703,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 10,
+    borderRadius: 18,
+    paddingVertical: 14,
     paddingHorizontal: 10,
   },
   selectFieldText: {
-    fontSize: 13,
+    fontSize: 14,
   },
   hintText: {
-    fontSize: 11,
+    fontSize: 12,
   },
   choiceRow: {
     flexDirection: 'row',
@@ -739,7 +720,7 @@ const styles = StyleSheet.create({
   choiceButton: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 18,
     paddingVertical: 10,
     alignItems: 'center',
   },
@@ -753,15 +734,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   uploadBox: {
-    borderWidth: 1,
+    borderWidth: 1.6,
     borderStyle: 'dashed',
-    borderRadius: 8,
+    borderRadius: 18,
     paddingVertical: 20,
     paddingHorizontal: 12,
     alignItems: 'center',
   },
   uploadTitle: {
-    fontSize: 12,
+    fontSize: 14,
     marginTop: 8,
   },
   uploadHint: {
@@ -783,7 +764,7 @@ const styles = StyleSheet.create({
   },
   selectedFileItem: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 18,
     paddingVertical: 10,
     paddingHorizontal: 12,
     flexDirection: 'row',
@@ -849,8 +830,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   supportButton: {
-    borderRadius: 8,
-    paddingVertical: 10,
+    borderRadius: 24,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   supportButtonText: {
@@ -880,8 +861,8 @@ const styles = StyleSheet.create({
     paddingBottom: 36,
   },
   submitButton: {
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 24,
+    paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
