@@ -351,7 +351,7 @@ const RenewCompliance: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.payBtn,
-              { backgroundColor: selectedServices.length === 0 ? colors.muted : colors.accent, opacity: selectedServices.length === 0 ? 0.8 : 1 },
+              { backgroundColor: selectedServices.length === 0 ? colors.muted : colors.buttonBackground, opacity: selectedServices.length === 0 ? 0.8 : 1 },
             ]}
             onPress={handlePay}
             activeOpacity={0.85}

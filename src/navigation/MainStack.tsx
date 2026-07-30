@@ -22,7 +22,13 @@ import ComplianceHistoryScreen from '../features/home/screens/compliances/Compli
 import RenewComplianceScreen from '../features/home/screens/compliances/RenewComplianceScreen';
 import AddressRenewalScreen from '../features/home/screens/compliances/AddressRenewalScreen';
 import InvoiceDetailScreen from '../features/home/screens/invoices/InvoiceDetailScreen';
-import TransactionsScreen from '../features/home/screens/TransactionsScreen';
+import TransactionsScreen from '../features/home/screens/transactions/TransactionsScreen';
+import TaxAccountingScreen from '../features/home/screens/exploreServices/TaxAccountingScreen';
+import BusinessComplianceScreen from '../features/home/screens/exploreServices/BusinessComplianceScreen';
+import BankingOwnerScreen from '../features/home/screens/exploreServices/BankingOwnerScreen';
+import CorporateChangesScreen from '../features/home/screens/exploreServices/CorporateChangesScreen';
+import BookkeepingScreen from '../features/home/screens/exploreServices/BookkeepingScreen';
+import ComplianceCheckScreen from '../features/home/screens/exploreServices/ComplianceCheckScreen';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -53,6 +59,12 @@ export default function MainStack() {
       <Stack.Screen name="AddressRenewal" component={AddressRenewalScreen} />
       <Stack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} />
       <Stack.Screen name="Transactions" component={TransactionsScreen} />
+      <Stack.Screen name="TaxAccounting" component={TaxAccountingScreen} />
+      <Stack.Screen name="BusinessCompliance" component={BusinessComplianceScreen} />
+      <Stack.Screen name="BankingOwner" component={BankingOwnerScreen} />
+      <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen} />
+      <Stack.Screen name="Bookkeeping" component={BookkeepingScreen} />
+      <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen} />
     </Stack.Navigator>
   );
 }

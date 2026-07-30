@@ -39,8 +39,8 @@ import CompanyDetailScreen, {
 import DocumentsTabContent from './documents/DocumentsTabContent';
 import DocumentViewScreen from './documents/DocumentViewScreen';
 import type { DocumentItem } from '../api/clientDocumentApi';
-import ManageCompanyScreen from './ManageCompanyScreen';
-import ManageOptionsScreen from './ManageOptionsScreen';
+import ManageCompanyScreen from './manageCompany/ManageCompanyScreen';
+import ManageOptionsScreen from './manageCompany/ManageOptionsScreen';
 
 import ServicesScreen from './ServicesScreen';
 import SubscriptionScreen from './SubscriptionScreen';

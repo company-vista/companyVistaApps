@@ -162,7 +162,7 @@ function RequestCard({
   item: RequestItem;
   colors: Colors;
 }) {
-  const isLight = colors.bg === '#f1f5f9';
+  const isLight = colors.mode === 'light';
   return (
     <View style={[styles.card, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
       <View style={styles.cardHead}>

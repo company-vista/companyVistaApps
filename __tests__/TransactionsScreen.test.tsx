@@ -1,4 +1,4 @@
-import { matchesSelectedCompany } from '../src/features/home/screens/transactionsUtils';
+import { matchesSelectedCompany } from '../../src/features/home/screens/transactions/transactionsUtils';
 
 describe('matchesSelectedCompany', () => {
   it('matches transactions by selected company id', () => {

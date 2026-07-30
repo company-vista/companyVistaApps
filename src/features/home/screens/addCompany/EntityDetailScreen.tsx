@@ -264,7 +264,7 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
           <View style={[styles.fieldGroup, { marginTop: 14 }]}>
             <View style={styles.labelRow}>
               <Text style={[styles.label, { color: colors.text }]}>
-                DESIRED COMPANY NAME <Text style={styles.required}>*</Text>
+                Desired company name <Text style={styles.required}>*</Text>
               </Text>
               <Ionicons name="information-circle-outline" size={16} color={colors.subtle} />
             </View>
@@ -289,7 +289,7 @@ export default function EntityDetailScreen({ selectedJurisdiction, onBackPress, 
           <View style={[styles.fieldGroup, { marginTop: 20 }]}>
             <View style={styles.labelRow}>
               <Text style={[styles.label, { color: colors.text }]}>
-                ALTERNATE COMPANY NAME
+                Alternate company name
               </Text>
               <Ionicons name="information-circle-outline" size={16} color={colors.subtle} />
             </View>
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingBottom: 12,
-    gap: 2,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   inputWrapper: {
-    borderWidth: 0.5,
+    borderWidth: 0.3,
     borderRadius: 8,
     paddingHorizontal: 10,
   },

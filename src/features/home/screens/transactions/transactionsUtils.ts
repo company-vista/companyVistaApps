@@ -1,4 +1,4 @@
-import type { CompanyCardItem } from './quickAccess/CompanyCard';
+import type { CompanyCardItem } from '../quickAccess/CompanyCard';
 
 type TransactionCompanyLike = {
   companyId?: string | null;

@@ -87,7 +87,7 @@ export function QuickActionFab({
               style={styles.fabMenuItem}>
               <FontAwesome name="credit-card" size={19} color="#f59e0b" />
               <Text style={[styles.fabMenuText, { color: colors.text }]}>
-                Transactions
+                Transaction
               </Text>
             </Pressable>
             <Pressable style={styles.fabMenuItem}>
@@ -105,7 +105,7 @@ export function QuickActionFab({
         style={[
           styles.fab,
           {
-            backgroundColor: colors.accent,
+            backgroundColor: colors.buttonBackground,
             bottom: safeAreaInsets.bottom + 104,
           },
         ]}>

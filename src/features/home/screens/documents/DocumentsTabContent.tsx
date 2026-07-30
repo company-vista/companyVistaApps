@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Alert, Linking, ScrollView, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Linking,  StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useAppSelector } from '../../../../store/hooks';
@@ -45,20 +45,82 @@ type DocumentsTabContentProps = {
   onDocumentViewPress?: (doc: DocumentItem) => void;
 };
 
+function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress }: {
+  item: any;
+  idx: number;
+  selectedCompany?: CompanyCardItem | null;
+  colors: AppTheme;
+  onUnlockPress: () => void;
+}) {
+  const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
+  const createdAt = item?.createdAt || '';
+  const formattedDate = formatDate(createdAt);
+  const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
+
+  return (
+    <AnimatedAppear key={item._id ?? idx} index={idx}>
+      <View style={[getStyles(colors).lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
+        <View style={getStyles(colors).lockedCardTop}>
+          <View style={[getStyles(colors).lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
+            <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={14} color={isUnlocked ? '#22C55E' : '#DC2626'} />
+          </View>
+          <View style={getStyles(colors).cardInfo}>
+            <Text style={getStyles(colors).cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+            {formattedDate ? <Text style={[getStyles(colors).documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
+          </View>
+        </View>
+
+        {dates.length > 0 && (
+          <>
+            <View style={[getStyles(colors).lockedDivider, { backgroundColor: colors.border }]} />
+            <View style={getStyles(colors).dateList}>
+              {dates.map((date: string, i: number) => (
+                <Text key={i} style={[getStyles(colors).dateText, { color: colors.muted }]}>
+                  {formatDate(date)}
+                </Text>
+              ))}
+            </View>
+          </>
+        )}
+
+        <View style={[getStyles(colors).lockedDivider, { backgroundColor: colors.border }]} />
+
+        {isUnlocked ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center',  borderRadius: 8, padding: 6 }}>
+            <FontAwesome name="clock-o" size={12} color="#22C55E" style={{ marginRight: 6 }} />
+            <Text style={{ flex: 1, fontSize: font.sm, color: '#22C55E', lineHeight: 16 }}>
+              We will deliver the document within <Text style={{ color: '#22C55E', fontWeight: '600' }}>24–72 hours.</Text>
+            </Text>
+          </View>
+        ) : (
+          <Pressable style={[getStyles(colors).lockedBtn, { backgroundColor: '#16a34a' }]} onPress={onUnlockPress}>
+            <FontAwesome name="eye" size={12} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={getStyles(colors).lockedBtnText}>Pay to View Document</Text>
+          </Pressable>
+        )}
+      </View>
+    </AnimatedAppear>
+  );
+}
+
 function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: DocumentsTabContentProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'records' | 'mails' | 'locked'>('records');
+  const [activeTab, setActiveTab] = useState<'records' | 'mails'>('records');
+  const [mailSubTab, setMailSubTab] = useState<'locked' | 'unlocked'>('locked');
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [lockedDocCount, setLockedDocCount] = useState(0);
-  const [lockedDocDates, setLockedDocDates] = useState<string[]>([]);
   const [lockedItems, setLockedItems] = useState<any[]>([]);
-  const [isLockedLoading, setIsLockedLoading] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [selectedDocumentIndex, setSelectedDocumentIndex] = useState(0);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [tabBarWidth, setTabBarWidth] = useState(0);
+  const [subTabBarWidth, setSubTabBarWidth] = useState(0);
+  const tabWidth = tabBarWidth > 6 ? (tabBarWidth - 6) / 2 : 0;
+  const subTabWidth = subTabBarWidth > 4 ? (subTabBarWidth - 4) / 2 : 0;
   const token = useAppSelector(state => state.auth.token);
   const colors = useThemeColors();
+  const tabSlideAnim = useRef(new Animated.Value(0)).current;
+  const subTabSlideAnim = useRef(new Animated.Value(0)).current;
   const styles = getStyles(colors);
   const palette = getDocumentPalette(colors);
   
@@ -102,12 +164,11 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
   }, [selectedCompany?.id, token]);
 
   useEffect(() => {
-    if (activeTab !== 'locked') return;
+    if (activeTab !== 'mails') return;
     const companyId = selectedCompany?.id;
     if (!companyId) return;
 
     let isMounted = true;
-    setIsLockedLoading(true);
     const fetchLocked = async () => {
       try {
         const { data } = await axios.get(
@@ -116,34 +177,10 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         );
       
         const items = Array.isArray(data?.data) ? data.data : [];
-        const allDates: string[] = [];
-        let totalCount = 0;
-
-        for (const item of items) {
-          const count = parseInt(item?.countDocuments, 10) || 0;
-          totalCount += count;
-          const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
-          if (dates.length > 0) {
-            allDates.push(...dates);
-          } else {
-            for (let i = 0; i < count; i++) {
-              allDates.push(item?.createdAt || '');
-            }
-          }
-        }
-
-        setLockedDocCount(totalCount);
-        setLockedDocDates(allDates);
         setLockedItems(items);
       } catch {
         if (isMounted) {
-          setLockedDocCount(0);
-          setLockedDocDates([]);
           setLockedItems([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLockedLoading(false);
         }
       }
     };
@@ -181,7 +218,6 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
         <View style={styles.headerLeft}>
           <View>
             <Text style={styles.headerTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
-            {/* <Text style={styles.headerSubtitle}>Company Portal</Text> */}
           </View>
         </View>
         <View style={styles.totalBadge}>
@@ -202,150 +238,208 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }: Documents
       </View>
 
       {/* Tabs */}
-      <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <View
+        style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        onLayout={(e) => { const w = e.nativeEvent.layout.width; if (tabBarWidth !== w) setTabBarWidth(w); }}
+      >
+        <Animated.View
+          style={[
+            styles.activeTabIndicator,
+            {
+              backgroundColor: colors.mode === 'dark' ? '#183A5C' : colors.buttonBackground,
+              left: tabSlideAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [3, tabWidth + 3],
+              }),
+              width: tabWidth,
+            },
+          ]}
+        />
         <Pressable
-          style={[styles.tab, activeTab === 'records' && { backgroundColor: colors.primary }]}
-          onPress={() => setActiveTab('records')}
+          style={styles.tab}
+          onPress={() => {
+            Animated.spring(tabSlideAnim, { toValue: 0, useNativeDriver: false, tension: 50, friction: 10 }).start();
+            setActiveTab('records');
+          }}
         >
           <Text style={[styles.tabText, { color: activeTab === 'records' ? '#fff' : palette.accentText }]}>
-            Records
+            Regis documents
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.tab, activeTab === 'mails' && { backgroundColor: colors.primary }]}
-          onPress={() => setActiveTab('mails')}
+          style={styles.tab}
+          onPress={() => {
+            Animated.spring(tabSlideAnim, { toValue: 1, useNativeDriver: false, tension: 80, friction: 10 }).start();
+            setActiveTab('mails');
+          }}
         >
           <Text style={[styles.tabText, { color: activeTab === 'mails' ? '#fff' : palette.accentText }]}>
             Mails & letters
           </Text>
         </Pressable>
-        <Pressable
-          style={[styles.tab, activeTab === 'locked' && { backgroundColor: colors.primary }]}
-          onPress={() => setActiveTab('locked')}
-        >
-          <Text style={[styles.tabText, { color: activeTab === 'locked' ? '#2c1f1fce' : palette.accentText }]}>
-           {lockedItems.length} Locked
-          </Text>
-        </Pressable>
       </View>
-
-      {activeTab === 'locked' && lockedItems.length > 1 && (
-        <View style={styles.unlockAllRow}>
-          <Pressable
-            style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6' }]}
-            onPress={() => setShowSubscriptionModal(true)}
-          >
-            <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }} />
-            <Text style={styles.unlockAllBtnText}>Unlock All Documents</Text>
-          </Pressable>
-        </View>
-      )}
 
       {/* Document List */}
       <View style={styles.listContainer}>
-        {activeTab === 'locked' ? (
-          isLockedLoading ? (
-            <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
-          ) : lockedItems.length > 0 ? (
-            lockedItems.map((item, idx) => {
-              const count = parseInt(item?.countDocuments, 10) || 0;
-              const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
-              const createdAt = item?.createdAt || '';
-              const formattedDate = formatDate(createdAt);
-              const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
-              
-              return (
-                <AnimatedAppear key={item._id ?? idx} index={idx}>
-                  <View style={[styles.lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
-                    <View style={styles.lockedCardTop}>
-                      <View style={[styles.lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
-                        <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={20} color={isUnlocked ? '#22C55E' : '#DC2626'} />
+        {isLoading ? (
+          <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
+        ) : (
+          <>
+            {activeTab !== 'mails' && (
+              filteredDocuments.length > 0 ? (
+                filteredDocuments.map((doc, index) => (
+                  <AnimatedAppear key={doc._id ?? String(index)} index={index}>
+                    <View style={styles.card}>
+                      <View style={styles.cardTop}>
+                        <View style={styles.cardIconContainer}>
+                          <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor} />
+                        </View>
+                        <View style={styles.cardInfo}>
+                          <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
+                          <Text numberOfLines={1} style={styles.cardSubtitle}>
+                            {doc.originalFileName ?? doc.documentType ?? 'Document'}
+                          </Text>
+                          <Text numberOfLines={1} style={styles.documentTypeText}>
+                            Type: {doc.documentType ?? 'N/A'}
+                          </Text>
+                        </View>
+                        <View style={styles.cardActions}>
+                          <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
+                            <FontAwesome name="download" size={15} color={palette.iconColor} />
+                          </Pressable>
+                        </View>
                       </View>
-                      <View style={styles.cardInfo}>
-                        <Text style={styles.cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
-                        <Text numberOfLines={1} style={styles.cardSubtitle}>
-                           document{count !== 1 ? 's' : ''} {isUnlocked ? 'unlocked' : 'locked'}
+
+                      <View style={styles.cardDivider} />
+
+                      <View style={styles.cardBottom}>
+                        <Text style={styles.cardDate}>
+                            Uploaded: {formatDate(doc.uploadedAt)}
                         </Text>
-                        {formattedDate ? <Text style={[styles.documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
+                        <Pressable onPress={() => onDocumentViewPress?.(doc)}>
+                          <Text style={styles.cardLink}>View Details</Text>
+                        </Pressable>
                       </View>
                     </View>
+                  </AnimatedAppear>
+                ))
+              ) : (
+                <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>
+              )
+            )}
 
-                    {dates.length > 0 && (
-                      <>
-                        <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
-                        <View style={styles.dateList}>
-                          {dates.map((date: string, i: number) => (
-                            <Text key={i} style={[styles.dateText, { color: colors.muted }]}>
-                              {formatDate(date)}
-                            </Text>
-                          ))}
-                        </View>
-                      </>
-                    )}
-
-                    <View style={[styles.lockedDivider, { backgroundColor: colors.border }]} />
-
-                    {isUnlocked ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#065F46', borderRadius: 12, padding: 12 }}>
-                        <FontAwesome name="clock-o" size={14} color="#6EE7B7" style={{ marginRight: 8 }} />
-                        <Text style={{ flex: 1, fontSize: font.base, color: '#D1FAE5', lineHeight: 18 }}>
-                          We will deliver the document within <Text style={{ color: '#ffffff', fontWeight: '600' }}>24–72 hours.</Text>
-                        </Text>
-                      </View>
-                    ) : (
-                      <Pressable style={[styles.lockedBtn, { backgroundColor: '#ef4444c7' }]} onPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}>
-                        <FontAwesome name="eye" size={15} color="#fff" style={{ marginRight: 8 }} />
-                        <Text style={styles.lockedBtnText}>Pay to View Document</Text>
-                      </Pressable>
-                    )}
-                  </View>
-                </AnimatedAppear>
-              );
-            })
-          ) : (
-            <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No locked documents found.</Text>
-          )
-        ) : isLoading ? (
-          <ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }} />
-        ) : filteredDocuments.length > 0 ? (
-          filteredDocuments.map((doc, index) => (
-            <AnimatedAppear key={doc._id ?? String(index)} index={index}>
-              <View style={styles.card}>
-                <View style={styles.cardTop}>
-                  <View style={styles.cardIconContainer}>
-                    <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor} />
-                  </View>
-                  <View style={styles.cardInfo}>
-                    <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
-                    <Text numberOfLines={1} style={styles.cardSubtitle}>
-                      {doc.originalFileName ?? doc.documentType ?? 'Document'}
+            {activeTab === 'mails' && (
+              <>
+                <View
+                  style={[styles.subTabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  onLayout={(e) => { const w = e.nativeEvent.layout.width; if (subTabBarWidth !== w) setSubTabBarWidth(w); }}
+                >
+                  <Animated.View
+                    style={[
+                      styles.activeSubTabIndicator,
+                      {
+                        backgroundColor: colors.mode === 'dark' ? '#183A5C' : colors.buttonBackground,
+                        left: subTabSlideAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [2, subTabWidth + 2],
+                        }),
+                        width: subTabWidth,
+                      },
+                    ]}
+                  />
+                  <Pressable
+                    style={styles.subTab}
+                    onPress={() => {
+                      Animated.spring(subTabSlideAnim, { toValue: 0, useNativeDriver: false, tension: 80, friction: 10 }).start();
+                      setMailSubTab('locked');
+                    }}
+                  >
+                    <Text style={[styles.subTabText, { color: mailSubTab === 'locked' ? '#fff' : palette.accentText }]}>
+                      Locked
                     </Text>
-                    <Text numberOfLines={1} style={styles.documentTypeText}>
-                      Type: {doc.documentType ?? 'N/A'}
+                  </Pressable>
+                  <Pressable
+                    style={styles.subTab}
+                    onPress={() => {
+                      Animated.spring(subTabSlideAnim, { toValue: 1, useNativeDriver: false, tension: 80, friction: 10 }).start();
+                      setMailSubTab('unlocked');
+                    }}
+                  >
+                    <Text style={[styles.subTabText, { color: mailSubTab === 'unlocked' ? '#fff' : palette.accentText }]}>
+                      Unlocked
                     </Text>
-                  </View>
-                  <View style={styles.cardActions}>
-                    <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
-                      <FontAwesome name="download" size={15} color={palette.iconColor} />
-                    </Pressable>
-                  </View>
-                </View>
-
-                <View style={styles.cardDivider} />
-
-                <View style={styles.cardBottom}>
-                  <Text style={styles.cardDate}>
-                      Uploaded: {formatDate(doc.uploadedAt)}
-                  </Text>
-                  <Pressable onPress={() => onDocumentViewPress?.(doc)}>
-                    <Text style={styles.cardLink}>View Details</Text>
                   </Pressable>
                 </View>
-              </View>
-            </AnimatedAppear>
-          ))
-        ) : (
-          <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>
+
+                {mailSubTab === 'locked' && lockedItems.length > 0 && (
+                  <>
+                    {lockedItems.length > 1 && (
+                      <Pressable
+                        style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]}
+                        onPress={() => setShowSubscriptionModal(true)}
+                      >
+                        <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }} />
+                        <Text style={styles.unlockAllBtnText}>Unlock All</Text>
+                      </Pressable>
+                    )}
+                    {lockedItems.map((item, idx) => (
+                      <LockedDocumentCard
+                        key={item._id ?? `locked-${idx}`}
+                        item={item}
+                        idx={idx}
+                        selectedCompany={selectedCompany}
+                        colors={colors}
+                        onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}
+                      />
+                    ))}
+                  </>
+                )}
+
+                {mailSubTab === 'unlocked' && (
+                  filteredDocuments.length > 0 ? (
+                    filteredDocuments.map((doc, index) => (
+                      <AnimatedAppear key={doc._id ?? String(index)} index={index}>
+                        <View style={styles.card}>
+                          <View style={styles.cardTop}>
+                            <View style={styles.cardIconContainer}>
+                              <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor} />
+                            </View>
+                            <View style={styles.cardInfo}>
+                              <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
+                              <Text numberOfLines={1} style={styles.cardSubtitle}>
+                                {doc.originalFileName ?? doc.documentType ?? 'Document'}
+                              </Text>
+                              <Text numberOfLines={1} style={styles.documentTypeText}>
+                                Type: {doc.documentType ?? 'N/A'}
+                              </Text>
+                            </View>
+                            <View style={styles.cardActions}>
+                              <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
+                                <FontAwesome name="download" size={15} color={palette.iconColor} />
+                              </Pressable>
+                            </View>
+                          </View>
+
+                          <View style={styles.cardDivider} />
+
+                          <View style={styles.cardBottom}>
+                            <Text style={styles.cardDate}>
+                                Uploaded: {formatDate(doc.uploadedAt)}
+                            </Text>
+                            <Pressable onPress={() => onDocumentViewPress?.(doc)}>
+                              <Text style={styles.cardLink}>View Details</Text>
+                            </Pressable>
+                          </View>
+                        </View>
+                      </AnimatedAppear>
+                    ))
+                  ) : (
+                    <Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>
+                  )
+                )}
+              </>
+            )}
+          </>
         )}
       </View>
 
@@ -391,16 +485,10 @@ const getStyles = (colors: AppTheme) => {
       fontWeight: '600',
       color: palette.primaryText,
     },
-    headerSubtitle: {
-      fontSize: font.lg,
-      color: palette.accentText,
-      marginTop: 2,
-    },
     totalBadge: {
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
-      // backgroundColor: palette.panelButton,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -413,9 +501,9 @@ const getStyles = (colors: AppTheme) => {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.surface,
-      borderRadius: 12,
+      borderRadius: 28,
       paddingHorizontal: 16,
-      height: 48,
+      height: 58,
       marginBottom: 20,
       borderWidth: 1,
       borderColor: colors.border,
@@ -426,30 +514,6 @@ const getStyles = (colors: AppTheme) => {
       fontSize: font.lg,
       color: palette.primaryText,
     },
-    filtersContainer: {
-      gap: 12,
-      marginBottom: 24,
-    },
-    filterButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: palette.accentText,
-    },
-    filterButtonActive: {
-      backgroundColor: palette.panelButton,
-      borderColor: palette.panelButton,
-    },
-    filterText: {
-      fontSize: font.base,
-      fontWeight: '600',
-      color: palette.accentText,
-    },
-    filterTextActive: {
-      color: palette.activeText,
-    },
     tabBar: {
       flexDirection: 'row',
       borderRadius: 24,
@@ -459,7 +523,7 @@ const getStyles = (colors: AppTheme) => {
     },
     tab: {
       flex: 1,
-      paddingVertical: 8,
+      paddingVertical: 12,
       borderRadius: 24,
       alignItems: 'center',
       justifyContent: 'center',
@@ -468,10 +532,11 @@ const getStyles = (colors: AppTheme) => {
       fontSize: font.md,
       fontWeight: '600',
     },
-    unlockAllRow: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      marginBottom: 16,
+    activeTabIndicator: {
+      position: 'absolute',
+      top: 3,
+      bottom: 3,
+      borderRadius: 24,
     },
     unlockAllBtn: {
       flexDirection: 'row',
@@ -570,46 +635,70 @@ const getStyles = (colors: AppTheme) => {
     },
     lockedCard: {
       backgroundColor: colors.surface,
-      borderRadius: 16,
-      padding: 16,
+      borderRadius: 10,
+      padding: 6,
       borderWidth: 1,
-      borderColor: '#FCA5A5',
+      borderColor: 'rgba(252, 165, 165, 0.3)',
     },
     lockedCardTop: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 16,
+      marginBottom: 4,
     },
     lockedIconWrap: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 12,
+      marginRight: 8,
     },
     lockedDivider: {
       height: 1,
-      marginBottom: 16,
+      marginBottom: 4,
     },
     lockedBtn: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: 12,
-      borderRadius: 24,
+      borderRadius: 16,
     },
     lockedBtnText: {
       color: '#ffffff',
-      fontSize: font.lg,
+      fontSize: font.sm,
       fontWeight: '600',
     },
     dateList: {
-      marginBottom: 8,
-      gap: 4,
+      marginBottom: 4,
+      gap: 2,
     },
     dateText: {
-      fontSize: font.md,
+      fontSize: font.sm,
+    },
+    subTabBar: {
+      flexDirection: 'row',
+      borderRadius: 20,
+      padding: 2,
+      marginBottom: 12,
+      borderWidth: 1,
+    },
+    activeSubTabIndicator: {
+      position: 'absolute',
+      top: 2,
+      bottom: 2,
+      borderRadius: 20,
+    },
+    subTab: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subTabText: {
+      fontSize: font.sm,
+      fontWeight: '600',
     },
   });
 };

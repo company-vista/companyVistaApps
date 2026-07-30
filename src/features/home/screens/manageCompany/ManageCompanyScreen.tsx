@@ -7,16 +7,16 @@ import {
   View,
   Pressable,
 } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {styles} from "./ManageCompanyScreenStyle"
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeColors } from '../../../theme/colors';
-import { useAppSelector } from '../../../store/hooks';
-import type { CompanyCardItem } from './quickAccess/CompanyCard';
-import BackButton from '../../../components/buttons/BackButton';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { font } from '../../../theme/typography';
-import BasicInfoScreen from './changeCategories/BasicInfoScreen';
-import MyRequestsScreen from './changeCategories/MyRequestsScreen';
+import { useThemeColors } from '../../../../theme/colors';
+import { useAppSelector } from '../../../../store/hooks';
+import type { CompanyCardItem } from '../quickAccess/CompanyCard';
+import BackButton from '../../../../components/buttons/BackButton';
+import { font } from '../../../../theme/typography';
+import BasicInfoScreen from '../changeCategories/BasicInfoScreen';
+import MyRequestsScreen from '../changeCategories/MyRequestsScreen';
 
 type ManageCompanyScreenProps = {
   selectedCompany: CompanyCardItem | null;

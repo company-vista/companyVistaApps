@@ -39,7 +39,7 @@ function HomeHeroSection({
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
 
   const dynamicStyles = {
-    backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)',
+    backgroundColor: isLight ? '#fff' : 'rgba(255,255,255,0.07)',
   };
   const heroDecoStyle = { 
     borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.07)', 

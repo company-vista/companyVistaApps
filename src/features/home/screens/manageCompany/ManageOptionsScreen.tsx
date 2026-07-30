@@ -6,12 +6,12 @@ import {
   View,
   Pressable,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AnimatedAppear from '../../../components/AnimatedAppear';
-import { useThemeColors } from '../../../theme/colors';
-import BackButton from '../../../components/buttons/BackButton';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { font } from '../../../theme/typography';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AnimatedAppear from '../../../../components/AnimatedAppear';
+import { useThemeColors } from '../../../../theme/colors';
+import BackButton from '../../../../components/buttons/BackButton';
+import { font } from '../../../../theme/typography';
 
 type ManageOptionsScreenProps = {
   onBackPress: () => void;

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -6,38 +7,38 @@ import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import type { QuickAccessItemId } from '../../data/quickAccessItems';
 
-type OrderServicesSectionProps = {
+type ExploreServicesSectionProps = {
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
 };
 
 const serviceItems = [
   {
-    title: 'State Tax Filing',
-    subtitle: 'Delaware - Resolve overdue status',
-    tag: 'Urgent',
-    icon: 'file-text-o',
-    tone: 'red',
-  },
-  {
-    title: 'Federal Tax Filing',
-    subtitle: 'Form 1120 / 5472 preparation',
-    tag: 'Due_Jul_15',
-    icon: 'file-text',
+    title: 'Tax / Acct Services',
+    subtitle: 'Tax filing & bookkeeping',
+    tag: undefined,
+    icon: 'calculator',
     tone: 'amber',
   },
   {
-    title: 'Register New Entity',
-    subtitle: 'LLC, C-Corp or S-Corp - Any state',
+    title: 'Business / Regs',
+    subtitle: 'Entity formation & compliance',
     tag: undefined,
-    icon: 'building-o',
+    icon: 'briefcase',
     tone: 'blue',
   },
   {
-    title: 'Change Registered Agent',
-    subtitle: 'Nationwide - Same day processing',
+    title: 'Banking / Owner Serv.',
+    subtitle: 'Banking & ownership solutions',
     tag: undefined,
-    icon: 'exchange',
+    icon: 'university',
     tone: 'purple',
+  },
+  {
+    title: 'Corporate / Legal Docs',
+    subtitle: 'Amendments & legal docs',
+    tag: undefined,
+    icon: 'file-text-o',
+    tone: 'red',
   },
   {
     title: 'Bookkeeping',
@@ -92,9 +93,10 @@ function getToneStyles(tone: Tone) {
   return toneStyles[tone];
 }
 
-function OrderServicesSection({
+function ExploreServicesSection({
   onQuickAccessItemPress,
-}: OrderServicesSectionProps) {
+}: ExploreServicesSectionProps) {
+  const navigation = useNavigation<any>();
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const [isExpanded, setIsExpanded] = useState(false);
@@ -117,8 +119,19 @@ function OrderServicesSection({
           return (
               <Pressable 
               key={item.title} 
-              style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}
-              onPress={item.title === 'Federal Filing' ? () => onQuickAccessItemPress('federalFiling') : () => console.log(item.title)} 
+              style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? '#ffffff' : colors.surface }]}
+              onPress={() => {
+                const screenMap: Record<string, string> = {
+                  'Tax / Acct Services': 'TaxAccounting',
+                  'Business / Regs': 'BusinessCompliance',
+                  'Banking / Owner Serv.': 'BankingOwner',
+                  'Corporate / Legal Docs': 'CorporateChanges',
+                  'Bookkeeping': 'Bookkeeping',
+                  'Compliance Check': 'ComplianceCheck',
+                };
+                const screen = screenMap[item.title];
+                if (screen) navigation.navigate(screen);
+              }}
             >
               <View style={styles.iconWrapper}>
                 <View style={[styles.serviceIcon, tone.icon]}>
@@ -134,9 +147,8 @@ function OrderServicesSection({
                 {item.title}
               </Text>
               
-              {/* 4. छोटा सब-टेक्स्ट (वर्टिकल लिस्ट के सबटाइटल का डेटा) */}
               {/* <Text style={[styles.serviceSubtitle, { color: colors.muted }]} numberOfLines={1}>
-                {item.subtitle.split(' - ')[0]}
+                {item.subtitle}
               </Text> */}
             </Pressable>
           );
@@ -150,7 +162,18 @@ function OrderServicesSection({
               const tone = getToneStyles(item.tone);
 
               return (
-                <Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]} onPress={() => console.log(item.title)}>
+                <Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? '#ffffff' : colors.surface }]} onPress={() => {
+                const screenMap: Record<string, string> = {
+                  'Tax / Acct Services': 'TaxAccounting',
+                  'Business / Regs': 'BusinessCompliance',
+                  'Banking / Owner Serv.': 'BankingOwner',
+                  'Corporate / Legal Docs': 'CorporateChanges',
+                  'Bookkeeping': 'Bookkeeping',
+                  'Compliance Check': 'ComplianceCheck',
+                };
+                const screen = screenMap[item.title];
+                if (screen) navigation.navigate(screen);
+              }}>
                   <View style={styles.iconWrapper}>
                     <View style={[styles.serviceIcon, tone.icon]}>
                       <FontAwesome name={item.icon} size={18} style={tone.iconText} />
@@ -205,6 +228,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     borderRadius: 12,
     paddingVertical: 14,
+    paddingBottom: 20,
     paddingHorizontal: 6,
     overflow: 'hidden',
     aspectRatio: 1,
@@ -298,4 +322,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderServicesSection;
+export default ExploreServicesSection;

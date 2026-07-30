@@ -52,6 +52,7 @@ function AppContent() {
   const { isRestoring } = useAppSelector(state => state.auth);
   const themeMode = useAppSelector(state => state.theme.mode);
   const isDarkMode = themeMode === 'dark';
+  const colors = useThemeColors();
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ function AppContent() {
 
   return (
     <SafeAreaProvider>
-      <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         {showSplash || isRestoring ? (
           <SplashScreen />

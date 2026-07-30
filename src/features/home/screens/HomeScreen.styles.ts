@@ -293,7 +293,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e7eb',
     zIndex: 16,
-    elevation: 21,
   },
   fabIcon: {
     fontWeight: '400',
@@ -320,9 +319,9 @@ const styles = StyleSheet.create({
     padding: 10,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.16,
+    shadowOpacity: 0.14,
     shadowRadius: 22,
-    elevation: 12,
+    elevation: 4,
     zIndex: 15,
   },
   fabMenuItem: {
@@ -549,8 +548,8 @@ const styles = StyleSheet.create({
   },
   companySwitcherTitle: {
     color: '#111827',
-    fontSize: 18,
-    fontWeight: '900',
+    fontSize: 16,
+    fontWeight: '800',
   },
   rewardTitle: {
     color: '#111827',

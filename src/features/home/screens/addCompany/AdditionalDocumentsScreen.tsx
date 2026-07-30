@@ -60,11 +60,11 @@ export default function AdditionalDocumentsScreen({ onBackPress, onContinue }: A
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={[styles.title, { color: colors.text }]}>
+          {/* <Text style={[styles.title, { color: colors.text }]}>
             Any <Text style={styles.titleAccent}>additional documents</Text>?
-          </Text>
+          </Text> */}
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            You've already uploaded each person's passport and proof of address in the previous step. Add anything else here — clear photos or scans are fine (PDF, JPG, PNG, max 10MB per file).
+            Upload extra documents here (PDF, JPG, PNG, max 10MB).
           </Text>
 
           <Text style={[styles.sectionLabel, { color: colors.muted }]}>HOLDING COMPANY DOCUMENTS *</Text>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingBottom: 12,
-    gap: 2,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {

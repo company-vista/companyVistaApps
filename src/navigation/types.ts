@@ -53,6 +53,12 @@ export type MainStackParamList = {
   AddressRenewal: { selectedAction?: RenewActionData | null } | undefined;
   InvoiceDetail: { invoice: ClientInvoice };
   Transactions: { companyId?: string | null } | undefined;
+  TaxAccounting: undefined;
+  BusinessCompliance: undefined;
+  BankingOwner: undefined;
+  CorporateChanges: undefined;
+  Bookkeeping: undefined;
+  ComplianceCheck: undefined;
 };
 
 export type RootStackParamList = {

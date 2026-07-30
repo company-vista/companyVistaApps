@@ -199,7 +199,7 @@ export default function SearchScreen() {
           </AnimatedAppear>
 
           <AnimatedAppear index={2}>
-            {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>ORDER SERVICES</Text>}
+            {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>EXPLORE SERVICES</Text>}
             <View style={styles.settingsList}>
               {filteredServices.map((service) => (
                 <TouchableOpacity
@@ -302,14 +302,14 @@ const styles = StyleSheet.create({
     margin: 16,
     marginBottom: 8,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: 28,
   },
   searchIcon: {
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    height: 44,
+    height: 54,
     fontSize: font.xl,
   },
   sectionWrap: {

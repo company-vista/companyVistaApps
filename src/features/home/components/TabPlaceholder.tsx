@@ -184,7 +184,7 @@ function TabPlaceholder({
   // Agent Renewal
   derivedActions.push({
     id: 'resident',
-    title: 'Agent Renewal',
+    title: 'Agent Renewal Services',
     subtitle: 'Registered agent',
     status: mapAgentAddressStatus(residentData.status),
     date: formatDate(residentData.dueDate),
@@ -203,7 +203,7 @@ function TabPlaceholder({
   // Address Renewal
   derivedActions.push({
     id: 'address',
-    title: 'Address Renewal',
+    title: 'Address Renewal Services',
     subtitle: 'Registered address',
     status: mapAgentAddressStatus(addressData.status, 'Client Managed'),
     date: formatDate(addressData.dueDate),
@@ -223,7 +223,7 @@ function TabPlaceholder({
   // Federal Filing
   derivedActions.push({
     id: 'federal_filing',
-    title: 'Federal Filing',
+    title: 'Federal Filing Services',
     subtitle: 'Annual federal tax',
     status: mapFederalAnnualStatus(federalTaxFilingData.status),
     date: formatDate(federalTaxFilingData.dueDate),
@@ -237,7 +237,7 @@ function TabPlaceholder({
   // Annual Filing
   derivedActions.push({
     id: 'annual_filing',
-    title: 'Annual Filing',
+    title: 'Annual Filing Services',
     subtitle: 'State compliance',
     status: mapFederalAnnualStatus(annualFilingData.status),
     date: formatDate(annualFilingData.dueDate),
@@ -269,7 +269,7 @@ function TabPlaceholder({
             <View style={styles.activeDot} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}> 
+            <Text style={[styles.userName, { color: colors.text }]}>
               {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
             </Text>
             <Text style={[styles.userEmail, { color: colors.muted }]}>{residentData?.email || 'Email not added'}</Text>
@@ -316,45 +316,48 @@ function TabPlaceholder({
                 ]}
                 onPress={() => handleOpenHistory(action)}
               >
-              <View style={styles.headerRow}>
+                <View style={styles.headerRow}>
 
-                <View style={[styles.iconWrap, { backgroundColor: theme.bg }]}>
-                  <FontAwesome name={action.icon} size={20} color={theme.text} />
-                </View>
+                  <View style={[styles.iconWrap, { backgroundColor: theme.bg }]}>
+                    <FontAwesome name={action.icon} size={20} color={theme.text} />
+                  </View>
 
-                <View style={styles.headerTextBlock}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]} numberOfLines={1}>
-                    {action.title}
-                  </Text>
-                  <Text style={[styles.sectionSubtitle, { color: colors.muted }]} numberOfLines={1}>
-                    {action.subtitle}
-                  </Text>
-                  <View style={styles.dateRow}>
-                    <FontAwesome name="calendar" size={12} color={colors.muted} />
-                    <Text style={[styles.dateText, { color: colors.muted }]}>
-                      {action.date}
+                  <View style={styles.headerTextBlock}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]} numberOfLines={1}>
+                      {action.title}
                     </Text>
-                  </View>
-                </View>
-
-                <View style={styles.rightBadgeWrapper}>
-                  <View style={styles.statusRow}>
-
-                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}> 
-                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                    <Text style={[styles.sectionSubtitle, { color: colors.muted }]} numberOfLines={1}>
+                      {action.subtitle}
+                    </Text>
+                    <View style={styles.dateRow}>
+                      <FontAwesome name="calendar" size={12} color={colors.muted} />
+                      <Text style={[styles.dateText, { color: colors.muted }]}>
+                        {action.date}
+                      </Text>
                     </View>
-                    {shouldShowRenewButton(action) ? (
-                      <Pressable
-                        onPress={() => handleRenewPress(action)}
-                        style={[styles.renewButton, { backgroundColor: colors.mode === 'dark' ? '#0f766e' : colors.accent }]}
-                      >
-                        <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renewal Now</Text>
-                      </Pressable>
-                    ) : null}
-                    
-                  </View>
+
+                   </View>
+                   
+                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                     <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}>
+                       <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                     </View>
+                     <FontAwesome name="chevron-right" size={16} color={colors.muted} style={styles.arrowIcon} />
+                   </View>
+
+                 </View>
+
+
+                <View style={styles.bottomRow}>
+                  {shouldShowRenewButton(action) ? (
+                    <Pressable
+                      onPress={() => handleRenewPress(action)}
+                      style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}
+                    >
+                      <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
+                    </Pressable>
+                  ) : null}
                 </View>
-              </View>
 
               </Pressable>
             </AnimatedAppear>

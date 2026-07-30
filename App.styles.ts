@@ -1,19 +1,10 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  authScreen: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-  },
-  authTransition: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-  },
   splashScreen: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
   },
   logo: {
     width: 250,

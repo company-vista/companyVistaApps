@@ -204,7 +204,7 @@ export default function OwnershipScreen({ onBackPress, onContinue }: OwnershipSc
             How is the company <Text style={styles.titleAccent}>owned?</Text>
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            This determines who'll own and hold details of any private/trading company.
+            Determines who holds ownership of the company.
           </Text>
 
           <RadioCard
@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingBottom: 12,
-    gap: 6,
+    paddingBottom: 18,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   extraFields: {
-    marginTop: 8,
+    marginTop: 6,
   },
   sectionTitle: {
     fontSize: font.lg,

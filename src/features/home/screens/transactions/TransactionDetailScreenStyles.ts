@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { font } from "../../../theme/typography";
+import { font } from "../../../../theme/typography";
 
 export const styles = StyleSheet.create({
   screen: {

@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingBottom: 12,
-    gap: 8,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {

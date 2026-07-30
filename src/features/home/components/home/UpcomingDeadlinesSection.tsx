@@ -43,7 +43,7 @@ function UpcomingDeadlinesSection() {
       </View>
       <View style={styles.deadlineList}>
         {deadlineItems.map((item, index) => (
-          <View key={item.title} style={[styles.deadlineRow, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)', borderColor: index === 0 ? 'rgba(59, 130, 246, 0.5)' : index === 1 ? 'rgba(139, 92, 246, 0.5)' : 'rgba(245, 158, 11, 0.5)' }]}>
+          <View key={item.title} style={[styles.deadlineRow, { backgroundColor: isLight ? '#ffffff' : 'rgba(255,255,255,0.07)', borderColor: index === 0 ? 'rgba(59, 130, 246, 0.5)' : index === 1 ? 'rgba(139, 92, 246, 0.5)' : 'rgba(245, 158, 11, 0.5)' }]}>
             <View style={styles.deadlineDate}>
               <Text style={[styles.deadlineDueLabel, { color: colors.muted }]}>Due</Text>
               <Text style={[styles.deadlineDay, { color: colors.danger }]}>{item.day}</Text>

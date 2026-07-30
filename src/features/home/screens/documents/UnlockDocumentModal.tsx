@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   payButton: {
     flex: 1.3,
     height: 46,
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#00C853',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',

@@ -131,40 +131,46 @@ export default StyleSheet.create({
     fontSize: 11,
     marginLeft: 4,
   },
-  rightBadgeWrapper: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
   badgeWrap: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
-    marginLeft: 14,
+    // marginLeft: 4,
+    
+  },
+  badgeArrowWrapper: {
+    flexDirection: 'column',
+    gap:2,
+    alignItems: 'center',
+  },
+  arrowIcon: {
+    // backgroundColor: '#ece3e3a1',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+    marginLeft: 6,
   },
   badgeText: {
     fontSize: 12,
     fontWeight: '600',
   },
   renewButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 18,
-    minWidth: 84,
+    paddingHorizontal: 13,
+    paddingVertical: 12,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    alignSelf: 'stretch',
   },
   renewButtonText: {
     fontSize: 13,
     fontWeight: '700',
     // textTransform: 'uppercase',
   },
-  statusRow: {
+  bottomRow: {
     flexDirection: 'column',
-    alignItems: 'center',
-    gap: 2,
+    gap: 8,
+    marginTop: 12,
   },
   expandedDetails: {
     marginTop: 12,

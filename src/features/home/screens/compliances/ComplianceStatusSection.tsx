@@ -351,7 +351,7 @@ function ComplianceStatusSection({
 
   const tileWidth = useMemo(() => {
     const GAP = rs(8);
-    const PADDING = rs(48);
+    const PADDING = rs(40);
     return Math.floor((rs(375) - PADDING - GAP) / 2);
   }, [rs]);
 
@@ -368,7 +368,7 @@ function ComplianceStatusSection({
 
           return (
               <View key={item.title} style={[styles.tileWrapper, { width: tileWidth }]}>
-              <View style={[styles.complianceTile, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+              <View style={[styles.complianceTile, isLight ? { backgroundColor: '#ffffff' } : styles.complianceTileDark]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
                     <FontAwesome
@@ -426,6 +426,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 11,
+  },
+  complianceTileDark: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   complianceTileHeader: {
     flexDirection: 'row',

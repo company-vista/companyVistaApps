@@ -498,7 +498,7 @@ export default function FederalTaxFiling() {
 
 {/* Submit Button */}
         <Pressable
-          style={[styles.submitButton, { backgroundColor: colors.accent, shadowColor: colors.accent }, submitting && styles.submitButtonDisabled]}
+          style={[styles.submitButton, { backgroundColor: colors.buttonBackground, shadowColor: colors.accent }, submitting && styles.submitButtonDisabled]}
           onPress={handleSubmit}
           disabled={submitting}
         >

@@ -46,7 +46,7 @@ export default function ContinueButton({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#e6a82a',
-    borderRadius: 8,
+    borderRadius: 24,
     paddingVertical: 14,
     alignItems: 'center',
   },
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: font.base,
     fontWeight: '500',
-    color: '#1a1204',
+    color: '#140e03',
   },
   textBold: {
     fontSize: font.md,

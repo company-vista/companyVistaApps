@@ -351,8 +351,8 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             <Text style={[styles.helpTitle, { color: colors.primaryText }]}>Need Help?</Text>
           </View>
           <Text style={[styles.helpSubtitle, { color: colors.primaryText }]}>Have questions? Our support team is ready.</Text>
-          <TouchableOpacity style={[styles.helpButton, { backgroundColor: colors.primaryText }]} onPress={onContactSupport}>
-            <Text style={[styles.helpButtonText, { color: colors.primary }]}>Contact Support</Text>
+          <TouchableOpacity style={[styles.helpButton, { backgroundColor: colors.buttonBackground }]} onPress={onContactSupport}>
+            <Text style={[styles.helpButtonText, { color: colors.buttonText }]}>Contact Support</Text>
           </TouchableOpacity>
         </View>
 

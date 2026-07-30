@@ -1,3 +1,4 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
@@ -8,18 +9,17 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import type { RouteProp } from '@react-navigation/native';
 import { BackButton } from '../../../components/buttons';
+import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
-import { notifications, type NotificationItem } from '../data/notifications';
-import { fetchNotifications, markNotificationAsRead, deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
-import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
-import type { RouteProp } from '@react-navigation/native';
+import { deleteNotification, fetchNotifications, markNotificationAsRead } from '../api/notificationsApi';
+import { notifications, type NotificationItem } from '../data/notifications';
 
 const notificationFilters = ['All', 'Unread', 'Read'] as const;
 
@@ -150,7 +150,7 @@ function NotificationScreen() {
             </View>
 
             {filteredNotifications.length > 0 ? (
-              <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
+              <View style={[styles.listCard, ]}>
                 {filteredNotifications.map(item => (
                   <Pressable
                     key={item.id}
@@ -245,6 +245,8 @@ function NotificationScreen() {
               Deleting this will result to permanent removal. You can archive instead
             </Text>
 
+
+              {/* ---- delete popup model---- */}
             <View style={styles.modalActions}>
               <Pressable
                 onPress={async () => {
@@ -327,27 +329,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 18,
+    borderRadius: 22,
+    paddingHorizontal: 28,
+    paddingVertical: 12
   },
   activeFilterButton: {
   },
   filterButtonText: {
     fontSize: font.md,
     fontWeight: '500',
+   
   },
   activeFilterButtonText: {
   },
   listCard: {
     borderRadius: 18,
-    backgroundColor: '#ffffff',
+    // backgroundColor: '#ffffff',
     marginTop: 16,
-    paddingHorizontal: 14,
+    paddingHorizontal: 4,
   },
   emptyCard: {
     alignItems: 'center',
     borderRadius: 18,
-    backgroundColor: '#ffffff',
+    // backgroundColor: '#ffffff',
     marginTop: 24,
     paddingHorizontal: 24,
     paddingVertical: 40,

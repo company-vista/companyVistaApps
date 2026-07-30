@@ -85,7 +85,7 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             Provide the details of your business operations.
           </Text>
 
-          <Text style={[styles.fieldLabel, { color: colors.muted }]}>WEBSITE</Text>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>Website</Text>
           <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
             <TextInput
               placeholder="https://"
@@ -98,7 +98,7 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             />
           </View>
 
-          <Text style={[styles.fieldLabel, { color: colors.muted }]}>REASON FOR ESTABLISHING THE COMPANY <Text style={styles.required}>*</Text></Text>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>Reason for establishing the company <Text style={styles.required}>*</Text></Text>
           <TouchableOpacity
             style={[styles.dropdown, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}
             onPress={() => setShowReasonDropdown(!showReasonDropdown)}
@@ -145,11 +145,11 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             </Text>
           )}
 
-          <Text style={[styles.fieldLabel, { color: colors.muted }]}>PRINCIPAL BUSINESS ACTIVITY <Text style={styles.required}>*</Text></Text>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>Principal business activity <Text style={styles.required}>*</Text></Text>
           <TouchableOpacity
             style={[styles.dropdown, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}
             onPress={() => setShowActivityDropdown(!showActivityDropdown)}
-            activeOpacity={0.8}
+            activeOpacity={0.5}
           >
             <Text style={[styles.dropdownText, { color: colors.text }]}>{principalActivity}</Text>
             <Text style={[styles.dropdownArrow, { color: colors.subtle }]}>
@@ -193,7 +193,7 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
           )}
 
           <Text style={[styles.fieldLabel, { color: colors.muted, marginTop: 16 }]}>
-            BRIEF INTRODUCTION ABOUT THE COMPANY, PROPOSED ACTIVITIES AND BUSINESS PLAN <Text style={styles.required}>*</Text>
+            Brief introduction about the company, proposed activities and business plan <Text style={styles.required}>*</Text>
           </Text>
           <View style={[styles.textAreaWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
             <TextInput
@@ -214,7 +214,7 @@ export default function BusinessFormScreen({ onBackPress, onContinue }: Business
             </Text>
           )}
 
-          <Text style={[styles.fieldLabel, { color: colors.muted }]}>ADDITIONAL INFORMATION / MESSAGE TO US</Text>
+          <Text style={[styles.fieldLabel, { color: colors.muted }]}>Additional information / message to us</Text>
           <View style={[styles.textAreaWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
             <TextInput
               placeholder="Any additional information or message..."
@@ -290,14 +290,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     marginBottom: 6,
     marginTop: 12,
-    marginLeft: 6
+    marginLeft: 6,
+    fontWeight: 600
   },
   required: {
     color: '#e6a82a',
   },
   inputWrapper: {
-    borderWidth: 0.5,
-    borderRadius: 8,
+    borderWidth: 0.3,
+    borderRadius: 12,
     paddingHorizontal: 10,
     marginBottom: 4,
   },
@@ -325,10 +326,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 0.5,
-    borderRadius: 8,
+    borderWidth: 0.3,
+    borderRadius: 12,
     paddingHorizontal: 12,
-    height: 44,
+    height: 50,
     marginBottom: 4,
   },
   dropdownText: {
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: font.sm,
   },
   dropdownList: {
-    borderWidth: 0.5,
+    borderWidth: 0.3,
     borderRadius: 8,
     marginBottom: 8,
     overflow: 'hidden',
@@ -363,7 +364,7 @@ const styles = StyleSheet.create({
   },
   continueButtonFull: {
     backgroundColor: '#e6a82a',
-    borderRadius: 8,
+    borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },

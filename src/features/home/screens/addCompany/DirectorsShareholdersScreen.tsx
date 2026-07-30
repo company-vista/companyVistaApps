@@ -114,7 +114,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
             Who are the <Text style={styles.titleAccent}>directors & shareholders</Text>?
           </Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Add each individual's details, position or shareholder. You can add up to 5 people here.
+            Add details for up to 5 directors or shareholders.
           </Text>
 
           <Text style={[styles.shareholderIndicator, { color: colors.text }]}>
@@ -127,7 +127,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue }:
             <View style={[styles.infoBanner, { borderColor: '#6b5320', backgroundColor: 'rgba(230,168,42,0.08)' }]}>
               <Text style={styles.infoIcon}>{'\u2139'}</Text>
               <Text style={[styles.infoText, { color: colors.muted }]}>
-                <Text style={{fontWeight: '700', color: '#e6a82a'}}>Auto-filled from your profile</Text> — fields below are pre-populated with your account details. You can edit any field if needed.
+                <Text style={{fontWeight: '700', color: '#e67f2a'}}>Details are pre-filled from your profile. Edit if needed.</Text>
               </Text>
             </View>
 
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingBottom: 12,
-    gap: 6,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {

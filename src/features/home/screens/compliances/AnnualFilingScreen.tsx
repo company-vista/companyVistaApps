@@ -596,7 +596,7 @@ export default function AnnualStateFilingScreen() {
 
 <View style={styles.submitButtonWrapper}>
           <TouchableOpacity
-            style={[styles.submitButton, { backgroundColor: colors.accent }]}
+            style={[styles.submitButton, { backgroundColor: colors.buttonBackground }]}
             onPress={handleSubmit}
             disabled={submitting}
           >

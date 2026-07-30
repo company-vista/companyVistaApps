@@ -20,38 +20,38 @@ const serviceItems: ServiceItem[] = [
     icon: 'credit-card',
     tone: 'green',
   },
-  {
-    title: 'Federal Filing',
-    subtitle: 'Form 1120 / 5472 preparation',
-    tag: 'Due Jul 15',
-    icon: 'file-text',
-    tone: 'amber',
-  },
-  {
-    title: 'Add Entity',
-    subtitle: 'LLC, C-Corp or S-Corp - Any state',
-    icon: 'building-o',
-    tone: 'blue',
-  },
-  {
-    title: 'Change Agent',
-    subtitle: 'Nationwide - Same day processing',
-    icon: 'exchange',
-    tone: 'purple',
-  },
-  {
-    title: 'Bookkeeping',
-    subtitle: 'Monthly reconciliation and reports',
-    icon: 'calculator',
-    tone: 'blue',
-  },
-  {
-    title: 'Compliance Check',
-    subtitle: 'Stay ahead of filing deadlines',
-    tag: 'New',
-    icon: 'check-square-o',
-    tone: 'purple',
-  },
+  // {
+  //   title: 'Federal Filing',
+  //   subtitle: 'Form 1120 / 5472 preparation',
+  //   tag: 'Due Jul 15',
+  //   icon: 'file-text',
+  //   tone: 'amber',
+  // },
+  // {
+  //   title: 'Add Entity',
+  //   subtitle: 'LLC, C-Corp or S-Corp - Any state',
+  //   icon: 'building-o',
+  //   tone: 'blue',
+  // },
+  // {
+  //   title: 'Change Agent',
+  //   subtitle: 'Nationwide - Same day processing',
+  //   icon: 'exchange',
+  //   tone: 'purple',
+  // },
+  // {
+  //   title: 'Bookkeeping',
+  //   subtitle: 'Monthly reconciliation and reports',
+  //   icon: 'calculator',
+  //   tone: 'blue',
+  // },
+  // {
+  //   title: 'Compliance Check',
+  //   subtitle: 'Stay ahead of filing deadlines',
+  //   tag: 'New',
+  //   icon: 'check-square-o',
+  //   tone: 'purple',
+  // },
 ];
 
 const toneStyles: Record<string, { iconBg: string; iconColor: string; tagBg: string; tagText: string }> = {

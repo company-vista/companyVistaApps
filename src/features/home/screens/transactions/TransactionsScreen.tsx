@@ -8,30 +8,30 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import AnimatedAppear from '../../../components/AnimatedAppear';
+import AnimatedAppear from '../../../../components/AnimatedAppear';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import { BackButton } from '../../../components/buttons';
-import { useThemeColors } from '../../../theme/colors';
-import { useAppSelector } from '../../../store/hooks';
+import { BackButton } from '../../../../components/buttons';
+import { useThemeColors } from '../../../../theme/colors';
+import { useAppSelector } from '../../../../store/hooks';
 import TransactionDetailScreen, {
   type TransactionDetail,
 } from './TransactionDetailScreen';
-import { fetchSubscriptionPayments } from '../api/subscriptionPaymentsApi';
-import { formatDate } from '../../../constants/dateFormatter';
-import type { CompanyCardItem } from './quickAccess/CompanyCard';
+import { fetchSubscriptionPayments } from '../../api/subscriptionPaymentsApi';
+import { formatDate } from '../../../../constants/dateFormatter';
+import type { CompanyCardItem } from '../quickAccess/CompanyCard';
 import {
   matchesSelectedCompany,
   matchesTransactionSearch,
 } from './transactionsUtils';
-import { formatCurrency } from '../../../constants/currencyConverter';
-import { font } from '../../../theme/typography';
-import { fetchClientCompanies } from '../api/clientProfileApi';
-import { mapCompanyToListItem } from './quickAccess/companyListItem';
-import type { MainScreenProps, MainStackParamList } from '../../../navigation/types';
+import { formatCurrency } from '../../../../constants/currencyConverter';
+import { font } from '../../../../theme/typography';
+import { fetchClientCompanies } from '../../api/clientProfileApi';
+import { mapCompanyToListItem } from '../quickAccess/companyListItem';
+import type { MainScreenProps, MainStackParamList } from '../../../../navigation/types';
 
 type Nav = MainScreenProps<'Transactions'>['navigation'];
 type Route = RouteProp<MainStackParamList, 'Transactions'>;

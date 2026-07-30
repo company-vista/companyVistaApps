@@ -7,7 +7,7 @@ import type { CompanyCardItem } from '../screens/quickAccess/CompanyCard';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
 import HomeHeroSection from './home/HomeHeroSection';
-import OrderServicesSection from './home/OrderServicesSection';
+import ExploreServicesSection from './home/ExploreServicesSection';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
 import UpcomingDeadlinesSection from './home/UpcomingDeadlinesSection';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
@@ -75,7 +75,7 @@ function HomeTabContent({
       </AnimatedAppear>
 
       <AnimatedAppear index={3}>
-        <OrderServicesSection onQuickAccessItemPress={onQuickAccessItemPress} />
+        <ExploreServicesSection onQuickAccessItemPress={onQuickAccessItemPress} />
       </AnimatedAppear>
       <AnimatedAppear index={4}>
         <RecentActivityAndPaymentOverviewSection

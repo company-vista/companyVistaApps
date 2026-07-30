@@ -308,7 +308,7 @@ const ComplianceHistoryScreen = () => {
             </View>
             {showRenewButton ? (
               <Pressable
-                style={[styles.renewButton, { backgroundColor: colors.accent }]}
+                style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}
                 onPress={() => {
                   if (selectedAction.id === 'address') navigation.navigate('AddressRenewal', { selectedAction });
                   else if (selectedAction.id === 'resident') navigation.navigate('RenewCompliance', { selectedAction });
@@ -316,7 +316,7 @@ const ComplianceHistoryScreen = () => {
                   else if (selectedAction.id === 'federal_filing') navigation.navigate('FederalFiling', { selectedAction });
                 }}
               >
-                <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renewal</Text>
+                <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renew Now</Text>
               </Pressable>
             ) : null}
           </View>

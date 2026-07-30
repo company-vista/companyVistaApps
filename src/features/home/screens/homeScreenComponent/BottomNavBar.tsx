@@ -8,9 +8,9 @@ export type TabId = 'home' | 'company' | 'reports' | 'billing' | 'documents' | '
 
 const tabs: Array<{ id: TabId; title: string; icon: string }> = [
   { id: 'home', title: 'Home', icon: 'home' },
-  { id: 'reports', title: 'Compliances', icon: 'check-square-o' },
-  { id: 'billing', title: 'Invoices', icon: 'file-text-o' },
-  { id: 'documents', title: 'Documents', icon: 'folder-o' },
+  { id: 'reports', title: 'Compliance', icon: 'check-square-o' },
+  { id: 'billing', title: 'Invoice', icon: 'file-text-o' },
+  { id: 'documents', title: 'Document', icon: 'folder-o' },
   { id: 'more', title: 'More', icon: 'ellipsis-h' },
 ];
 
@@ -34,7 +34,7 @@ export function BottomNavBar({
       style={[
         styles.bottomNav,
         {
-          backgroundColor: colors.surface,
+          backgroundColor: colors.background,
           paddingBottom: safeAreaInsets.bottom + 10,
         },
       ]}>

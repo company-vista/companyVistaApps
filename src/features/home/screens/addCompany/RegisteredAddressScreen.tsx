@@ -67,7 +67,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
     <View style={styles.screen}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={onBackPress} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Registered address / Local representation</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Registered Address & Agent</Text>
       </View>
 
       <View style={styles.body}>
@@ -76,15 +76,15 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={[styles.title, { color: colors.text }]}>
+          {/* <Text style={[styles.title, { color: colors.text }]}>
             Registered address & <Text style={styles.titleAccent}>local representation</Text>
-          </Text>
+          </Text> */}
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Many jurisdictions require a registered address and/or a local agent or director. We'll add the right one for you.
+            We’ll add a required local address or agent for you.
           </Text>
 
           <Text style={[styles.sectionLabel, { color: colors.muted }]}>
-            DO YOU ALREADY HAVE A REGISTERED/LOCAL BUSINESS ADDRESS IN THE JURISDICTION? ⓘ
+            Do you have a local business address?
           </Text>
 
           <View style={styles.radioGroup}>
@@ -192,11 +192,11 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }: Reg
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-          <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 20 }]}>
+          {/* <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: 20 }]}>
             LOCAL REPRESENTATIVE / REGISTERED AGENT
-          </Text>
+          </Text> */}
           <Text style={[styles.sectionLabel, { color: colors.muted, marginTop: -4 }]}>
-            DO YOU WANT A LOCAL REPRESENTATIVE / REGISTERED AGENT? ⓘ
+            Do you need a local registered agent?
           </Text>
 
           <TouchableOpacity
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingBottom: 12,
-    gap: 2,
+    gap: 12,
     borderBottomWidth: 1,
   },
   headerTitle: {

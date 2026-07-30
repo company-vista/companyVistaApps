@@ -12,8 +12,8 @@ import { generatePDF } from 'react-native-html-to-pdf';
 import RNFetchBlob from 'react-native-blob-util';
 import Toast from 'react-native-toast-message';
 
-import { BackButton } from '../../../components/buttons';
-import { useThemeColors } from '../../../theme/colors';
+import { BackButton } from '../../../../components/buttons';
+import { useThemeColors } from '../../../../theme/colors';
 import { styles } from './TransactionDetailScreenStyles';
 
 export type TransactionDetail = {

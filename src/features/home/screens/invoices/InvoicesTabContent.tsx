@@ -478,11 +478,11 @@ const getStyles = (colors: AppTheme) => {
   },
   searchBox: {
     alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: 28,
     borderWidth: 1,
     flex: 1,
     flexDirection: 'row',
-    height: 50,
+    height: 58,
     paddingHorizontal: 14,
   },
   searchInput: {
