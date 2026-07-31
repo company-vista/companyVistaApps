@@ -284,6 +284,29 @@ function findCurrentCompliance(
   return findCurrentCompliance(record.data, depth + 1);
 }
 
+const complianceKeyPattern = /(filing|address|resident|agent|annual|compliance|due)/i;
+
+function hasComplianceKeys(record: Record<string, unknown>) {
+  return Object.keys(record).some(key => complianceKeyPattern.test(key));
+}
+
+function findCurrentComplianceMap(
+  value: unknown,
+  depth = 0,
+): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || depth > 3) {
+    return undefined;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  if (hasComplianceKeys(record) && !('current' in record)) {
+    return record;
+  }
+
+  return findCurrentComplianceMap(record.data, depth + 1);
+}
+
 function getResponseComplianceHistory(data: CompanyComplianceHistoryResponse) {
   const fromCurrent = mapCurrentComplianceHistory(findCurrentCompliance(data));
   if (fromCurrent.length > 0) {
@@ -306,6 +329,16 @@ function getResponseComplianceHistory(data: CompanyComplianceHistoryResponse) {
   for (const candidate of historyCandidates) {
     if (Array.isArray(candidate) && candidate.length > 0) {
       return candidate as CompanyComplianceHistoryItem[];
+    }
+  }
+
+  const directMap = findCurrentComplianceMap(data) ?? findCurrentComplianceMap(dataObj);
+
+  if (directMap) {
+    const mapped = mapCurrentComplianceHistory(directMap);
+
+    if (mapped.length > 0) {
+      return mapped;
     }
   }
 

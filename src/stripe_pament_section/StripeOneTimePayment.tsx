@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
 
-type PaymentType = 'invoice' | 'document_subscription' | 'document_unlock';
+type PaymentType = 'invoice' | 'document_subscription' | 'document_unlock' | 'service_purchase';
 
 interface InvoiceData {
   id?: string;
@@ -65,7 +65,7 @@ export default function StripeOneTimePayment({
   buttonStyle,
 }: StripeOneTimePaymentProps) {
   const [loading, setLoading] = useState(false);
-
+  console.log(invoice)
   const handlePayment = async () => {
     const companyId = invoice?.companyId || invoice?.company?._id;
     const amount = Number(invoice?.amount || 0);
@@ -90,7 +90,9 @@ export default function StripeOneTimePayment({
         ? `${API_BASE_URL}/api/payment/create-document-subscription`
         : paymentType === 'document_unlock'
           ? `${API_BASE_URL}/api/payment/create-document-unlock`
-          : `${API_BASE_URL}/api/payment/create-ontime-paynment`;
+          : paymentType === 'service_purchase'
+            ? `${API_BASE_URL}/api/payment/create-ontime-paynment`
+            : `${API_BASE_URL}/api/payment/create-ontime-paynment`;
 
     const payload =
       paymentType === 'document_subscription'
@@ -106,13 +108,19 @@ export default function StripeOneTimePayment({
               documentIndex: invoice?.documentIndex,
               currency: invoice?.currency || 'USD',
             }
-          : {
-              companyId,
-              invoiceId: invoice?.id,
-              amount,
-              plan: 'invoice',
-              currency: invoice?.currency || 'USD',
-            };
+          : paymentType === 'service_purchase'
+            ? {
+                companyId,
+                amount,
+                currency: invoice?.currency || 'USD',
+              }
+            : {
+                companyId,
+                invoiceId: invoice?.id,
+                amount,
+                plan: 'invoice',
+                currency: invoice?.currency || 'USD',
+              };
 
     if (paymentType === 'document_subscription' && !payload.plan) {
       Toast.show({ type: 'error', text1: 'Subscription plan is missing' });
@@ -130,11 +138,11 @@ export default function StripeOneTimePayment({
     try {
       setLoading(true);
       Toast.show({ type: 'info', text1: 'Initializing payment...' });
-
+      
       const { data } = await axios.post(endpoint, payload, {
         withCredentials: true,
       });
-
+    
       onInitiated?.(data);
       onSuccess?.(data);
 

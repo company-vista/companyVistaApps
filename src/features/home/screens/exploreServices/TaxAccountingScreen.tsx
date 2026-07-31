@@ -5,32 +5,44 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import type { MainScreenProps } from '../../../../navigation/types';
+import { formatPrice, getCategoryServices } from '../../../../constants/exploreServicesData';
 import { ServiceCard } from './ServicesCard';
 
 type Nav = MainScreenProps<'TaxAccounting'>['navigation'];
 
-function TaxAccountingScreen() {
+const CATEGORY_NAME = 'Tax & Accounting Services';
+const SERVICES = getCategoryServices(CATEGORY_NAME);
+
+function TaxAccountingScreen({ route }: MainScreenProps<'TaxAccounting'>) {
   const navigation = useNavigation<Nav>();
   const colors = useThemeColors();
   const safeAreaInsets = useSafeAreaInsets();
+  const companyId = route.params?.companyId;
 
   return (
     <View style={[styles.screen, { paddingTop: safeAreaInsets.top + 22 }]}>
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
-        <Text style={[styles.heading, { color: colors.text }]}>Tax & Accounting Services</Text>
+        <Text style={[styles.heading, { color: colors.text }]}>{CATEGORY_NAME}</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: Math.max(safeAreaInsets.bottom, 24) }}>
-        <ServiceCard
-          title="Annual Tax Filing"
-          price="$299"
-          description="Complete federal and state tax preparation and filing for your business."
-          onRequestQuote={() => {}}
-          onPayNow={() => {}}
-        />
+        <View style={styles.list}>
+          {SERVICES.map((service) => (
+            <ServiceCard
+              key={service.name}
+              title={service.name}
+              price={formatPrice(service)}
+              amount={service.price}
+              companyId={companyId}
+              description={service.description}
+              onRequestQuote={() => {}}
+              onPayNow={() => {}}
+            />
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -50,6 +62,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginLeft: 12,
+  },
+  list: {
+    gap: 16,
   },
 });
 

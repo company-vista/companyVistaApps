@@ -10,6 +10,7 @@ import HomeHeroSection from './home/HomeHeroSection';
 import ExploreServicesSection from './home/ExploreServicesSection';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
 import UpcomingDeadlinesSection from './home/UpcomingDeadlinesSection';
+import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 type HomeTabContentProps = {
@@ -40,6 +41,7 @@ function HomeTabContent({
   colors,
 }: HomeTabContentProps) {
   const isDark = colors?.mode === 'dark';
+  const compliance = useCompanyCompliance(selectedCompany?.id);
   return (
     <View style={styles.container}>
       <AnimatedAppear index={0}>
@@ -69,13 +71,18 @@ function HomeTabContent({
 
       <AnimatedAppear index={2}>
         <ComplianceStatusSection
-          companyId={selectedCompany?.id}
+          dueDatesByTitle={compliance.dueDatesByTitle}
+          statusesByTitle={compliance.statusesByTitle}
+          isLoadingDueDates={compliance.isLoading}
           onViewAllPress={onQuickAccessViewAllPress}
         />
       </AnimatedAppear>
 
       <AnimatedAppear index={3}>
-        <ExploreServicesSection onQuickAccessItemPress={onQuickAccessItemPress} />
+        <ExploreServicesSection
+          onQuickAccessItemPress={onQuickAccessItemPress}
+          selectedCompany={selectedCompany}
+        />
       </AnimatedAppear>
       <AnimatedAppear index={4}>
         <RecentActivityAndPaymentOverviewSection
@@ -85,7 +92,10 @@ function HomeTabContent({
         />
       </AnimatedAppear>
       <AnimatedAppear index={5}>
-        <UpcomingDeadlinesSection />
+        <UpcomingDeadlinesSection
+          rawDueDatesByTitle={compliance.rawDueDatesByTitle}
+          isLoading={compliance.isLoading}
+        />
       </AnimatedAppear>
       <AnimatedAppear index={6}>
         <CompanyVistaReferral />

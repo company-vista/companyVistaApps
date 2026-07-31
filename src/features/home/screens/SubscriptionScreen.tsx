@@ -227,7 +227,7 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }: S
 
       <Text style={[cTitle, { color: colors.text }]}>
         Subscription overview for{' '}
-        <Text style={cTitleAccent}>{userName || 'subham kumarjha'}</Text>
+        <Text style={cTitleAccent}>{userName || 'username not provide'}</Text>
       </Text>
 
       <Text style={[cSubtitle, { color: colors.muted }]}>
@@ -274,8 +274,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingTop: 40,
+    paddingHorizontal: 18,
+    paddingTop: 48,
     gap: 12,
   },
   headerTitle: {
@@ -291,9 +291,11 @@ const cEyebrow = {
   alignSelf: 'flex-start',
   borderWidth: 0.5,
   borderRadius: 6,
-  paddingHorizontal: 8,
-  paddingVertical: 3,
+  paddingHorizontal: 10,
+  paddingVertical: 6,
   marginBottom: 10,
+  marginTop: 8,
+  marginLeft: 6
 } as const;
 
 const cEyebrowText = {
@@ -308,17 +310,20 @@ const cTitle = {
   fontWeight: '500',
   lineHeight: 22,
   marginBottom: 6,
+  marginLeft: 6
 } as const;
 
 const cTitleAccent = {
   color: '#e6a82a',
   fontStyle: 'italic',
+  
 } as const;
 
 const cSubtitle = {
   fontSize: font.base,
   lineHeight: 18,
   marginBottom: 24,
+  marginLeft: 6
 } as const;
 
 const cSummaryRow = {

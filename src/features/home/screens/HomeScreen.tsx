@@ -604,7 +604,7 @@ export default function HomeScreen() {
           displayName={displayName}
           notificationCount={notificationCount}
           bellRotation={bellRotation}
-          onSearchPress={() => navigation.navigate('Search')}
+          onSearchPress={() => navigation.navigate('Search', { companyId: selectedCompany?.id })}
           onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })}
           colors={colors}
         />

@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import BackButton from '../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 
@@ -81,16 +82,11 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress }: Ser
     <View
       style={[
         styles.screen,
-        { paddingTop: safeAreaInsets.top + 22 },
+        { paddingTop: safeAreaInsets.top + 12 },
       ]}
     >
       <View style={styles.header}>
-        <Pressable
-          onPress={onBackPress}
-          style={[styles.backButton, { backgroundColor: colors.surface }]}
-        >
-          <FontAwesome name="arrow-left" size={18} color={colors.text} />
-        </Pressable>
+        <BackButton onPress={onBackPress} />
         <Text style={[styles.title, { color: colors.text }]}>Services</Text>
       </View>
 
@@ -140,13 +136,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 12,
     marginBottom: 20,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
   },
   title: { fontSize: font.hero, fontWeight: '500' },
   card: {

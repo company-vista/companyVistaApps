@@ -9,10 +9,13 @@ import {
 } from 'react-native';
 
 import { useThemeColors } from '../../../../theme/colors';
+import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 
 export interface ServiceCardProps {
   title: string;
   price: string;
+  amount?: number;
+  companyId?: string | null;
   description: string;
   onRequestQuote?: () => void;
   onPayNow?: () => void;
@@ -22,6 +25,8 @@ export interface ServiceCardProps {
 export const ServiceCard: React.FC<ServiceCardProps> = ({
   title,
   price,
+  amount,
+  companyId,
   description,
   onRequestQuote,
   onPayNow,
@@ -47,12 +52,28 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           <Text style={[styles.outlineButtonText, { color: isDark ? '#F1F5F9' : colors.text }]}>Request Quote</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.primaryButton, { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground }]}
-          activeOpacity={0.8}
-          onPress={onPayNow}>
-          <Text style={[styles.primaryButtonText, { color: isDark ? '#000000' : colors.buttonText }]}>Pay Now</Text>
-        </TouchableOpacity>
+        {typeof amount === 'number' ? (
+          <StripeOneTimePayment
+            invoice={{
+              companyId: companyId ?? undefined,
+              amount,
+              currency: 'USD',
+            }}
+            paymentType="service_purchase"
+            label="Pay Now"
+            buttonStyle={[
+              styles.primaryButton,
+              { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground },
+            ]}
+          />
+        ) : (
+          <TouchableOpacity
+            style={[styles.primaryButton, { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground }]}
+            activeOpacity={0.8}
+            onPress={onPayNow}>
+            <Text style={[styles.primaryButtonText, { color: isDark ? '#000000' : colors.buttonText }]}>Pay Now</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -71,18 +92,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
     flex: 1,
     marginRight: 8,
   },
   price: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: '#FFA500',
   },
   description: {
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
     marginBottom: 20,
   },

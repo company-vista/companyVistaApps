@@ -1,51 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
-import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
 import { useResponsive } from '../../../../hooks/useResponsive';
+import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 
 type ComplianceStatusSectionProps = {
-  companyId?: string | null;
+  dueDatesByTitle?: Record<string, string>;
+  statusesByTitle?: Record<string, string>;
+  isLoadingDueDates?: boolean;
   onViewAllPress: () => void;
 };
-
-const complianceItems = [
-  {
-    title: 'Registered Address',
-    dueDate: 'Jun 1',
-    tag: 'Overdue',
-    icon: 'file-text-o',
-    matchTerms: ['registered address', 'address'],
-    tone: 'red',
-  },
-  {
-    title: 'Registered Agent',
-    dueDate: 'Jul 15',
-    tag: 'Due Jul 15',
-    icon: 'file-text',
-    matchTerms: ['registered agent', 'agent', 'resident'],
-    tone: 'amber',
-  },
-  {
-    title: 'State Filing',
-    dueDate: 'Jul 31',
-    tag: 'Due Jul 31',
-    icon: 'university',
-    matchTerms: ['state filing', 'state', 'annual report', 'annual filing'],
-    tone: 'amber',
-  },
-  {
-    title: 'Federal Filing',
-    dueDate: 'Jan 31',
-    tag: 'Active',
-    icon: 'user',
-    matchTerms: ['federal filing', 'federal', 'irs', 'tax', 'federal tax filing'],
-    tone: 'green',
-  },
-] as const;
 
 type Tone = (typeof complianceItems)[number]['tone'];
 
@@ -100,101 +66,6 @@ function getToneStyles(tone: Tone, colors: ReturnType<typeof useThemeColors>) {
   return toneStyles[tone];
 }
 
-function normalizeText(value: unknown) {
-  return String(value ?? '')
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/[_-]+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
-
-function getRecordLabel(record: Record<string, unknown>) {
-  return [
-    record.title,
-    record.name,
-    record.complianceName,
-    record.complianceType,
-    record.type,
-    record.category,
-    record.serviceName,
-    record.service,
-    record.key,
-    record.slug,
-  ]
-    .map(normalizeText)
-    .filter(Boolean)
-    .join(' ');
-}
-
-function getComplianceCardTitle(record: Record<string, unknown>) {
-  const label = normalizeText(record.complianceName ?? record.title);
-
-  const titleByApiKey: Record<string, string> = {
-    address: 'Registered Address',
-    resident: 'Registered Agent',
-    'annual filing': 'State Filing',
-    'federal tax filing': 'Federal Filing',
-  };
-
-  return titleByApiKey[label];
-}
-
-function getRecordDueDate(record: Record<string, unknown>) {
-  const details =
-    record.details && typeof record.details === 'object' && !Array.isArray(record.details)
-      ? record.details as Record<string, unknown>
-      : {};
-  const compliance =
-    record.compliance &&
-    typeof record.compliance === 'object' &&
-    !Array.isArray(record.compliance)
-      ? record.compliance as Record<string, unknown>
-      : {};
-  const dueDate =
-    record.dueDate ??
-    record.duedate ??
-    record.due_date ??
-    record.due ??
-    record.deadline ??
-    record.nextDueDate ??
-    record.expiryDate ??
-    record.filingDate ??
-    details.dueDate ??
-    details.deadline ??
-    compliance.dueDate ??
-    compliance.deadline;
-
-  if (typeof dueDate === 'string' && dueDate.trim()) {
-    return dueDate.trim();
-  }
-
-  if (typeof dueDate === 'number') {
-    return String(dueDate);
-  }
-
-  return '';
-}
-
-function getRecordLastDate(record: Record<string, unknown>) {
-  const value = record.lastDate ?? record.last_date ?? record.completedAt;
-
-  return typeof value === 'string' ? value : '';
-}
-
-function formatDueDate(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
 function formatStatus(value: unknown) {
   const status = normalizeText(value);
 
@@ -219,124 +90,15 @@ function getStatusTone(value: unknown): Tone {
   return 'amber';
 }
 
-function isExpiringWithinOneMonth(value: string) {
-  const dueDate = new Date(value);
-
-  if (Number.isNaN(dueDate.getTime())) {
-    return false;
-  }
-
-  const today = new Date();
-  const oneMonthFromToday = new Date(today);
-
-  oneMonthFromToday.setMonth(oneMonthFromToday.getMonth() + 1);
-
-  return dueDate.getTime() >= today.getTime() &&
-    dueDate.getTime() <= oneMonthFromToday.getTime();
-}
-
-function getYearlyFilingStatus(record: Record<string, unknown>) {
-  const backendStatus = normalizeText(record.status);
-  const lastDate = new Date(getRecordLastDate(record));
-  const isCompletedThisYear =
-    !Number.isNaN(lastDate.getTime()) &&
-    lastDate.getFullYear() === new Date().getFullYear() &&
-    backendStatus === 'active';
-
-  return isCompletedThisYear ? 'completed' : 'pending';
-}
-
 function ComplianceStatusSection({
-  companyId,
+  dueDatesByTitle = {},
+  statusesByTitle = {},
+  isLoadingDueDates = false,
   // onViewAllPress,
 }: ComplianceStatusSectionProps) {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
-  const token = useAppSelector(state => state.auth.token);
   const { rs } = useResponsive();
-  const [dueDatesByTitle, setDueDatesByTitle] = useState<Record<string, string>>({});
-  const [statusesByTitle, setStatusesByTitle] = useState<Record<string, string>>({});
-  const [isLoadingDueDates, setIsLoadingDueDates] = useState(false);
-
-  useEffect(() => {
-    if (!companyId) {
-      setDueDatesByTitle({});
-      setStatusesByTitle({});
-      return;
-    }
-
-    let isMounted = true;
-
-    setIsLoadingDueDates(true);
-
-    fetchCompanyComplianceHistory({ companyId, token }).then(result => {
-      if (!isMounted) {
-        return;
-      }
-
-      const nextDueDates = result.history.reduce<Record<string, string>>(
-        (acc, record) => {
-          const directTitle = getComplianceCardTitle(record);
-          const fallbackItem = complianceItems.find(item => {
-            const label = getRecordLabel(record);
-
-            return item.matchTerms.some(term => label.includes(term));
-          });
-          const cardTitle = directTitle ?? fallbackItem?.title;
-          const dueDate = getRecordDueDate(record);
-
-          if (cardTitle && dueDate) {
-            acc[cardTitle] = formatDueDate(dueDate);
-          }
-
-          return acc;
-        },
-        {},
-      );
-      const nextStatuses = result.history.reduce<Record<string, string>>(
-        (acc, record) => {
-          const directTitle = getComplianceCardTitle(record);
-          const fallbackItem = complianceItems.find(item => {
-            const label = getRecordLabel(record);
-
-            return item.matchTerms.some(term => label.includes(term));
-          });
-          const cardTitle = directTitle ?? fallbackItem?.title;
-          const dueDate = getRecordDueDate(record);
-          const usesRenewalWarning =
-            cardTitle === 'Registered Address' ||
-            cardTitle === 'Registered Agent';
-          const usesYearlyFilingStatus =
-            cardTitle === 'State Filing' ||
-            cardTitle === 'Federal Filing';
-
-          if (cardTitle) {
-            if (usesYearlyFilingStatus) {
-              acc[cardTitle] = getYearlyFilingStatus(record);
-            } else {
-              acc[cardTitle] = usesRenewalWarning && isExpiringWithinOneMonth(dueDate)
-                ? 'expiring_soon'
-                : String(record.status ?? '');
-            }
-          }
-
-          return acc;
-        },
-        {},
-      );
-
-      setDueDatesByTitle(nextDueDates);
-      setStatusesByTitle(nextStatuses);
-    }).finally(() => {
-      if (isMounted) {
-        setIsLoadingDueDates(false);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [companyId, token]);
 
   const complianceCards = useMemo(() => complianceItems.map(item => ({
     ...item,

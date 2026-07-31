@@ -6,9 +6,11 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import type { QuickAccessItemId } from '../../data/quickAccessItems';
+import type { CompanyCardItem } from '../../screens/quickAccess/CompanyCard';
 
 type ExploreServicesSectionProps = {
   onQuickAccessItemPress: (itemId: QuickAccessItemId) => void;
+  selectedCompany?: CompanyCardItem | null;
 };
 
 const serviceItems = [
@@ -94,7 +96,8 @@ function getToneStyles(tone: Tone) {
 }
 
 function ExploreServicesSection({
-  onQuickAccessItemPress,
+  onQuickAccessItemPress: _onQuickAccessItemPress,
+  selectedCompany,
 }: ExploreServicesSectionProps) {
   const navigation = useNavigation<any>();
   const colors = useThemeColors();
@@ -130,7 +133,7 @@ function ExploreServicesSection({
                   'Compliance Check': 'ComplianceCheck',
                 };
                 const screen = screenMap[item.title];
-                if (screen) navigation.navigate(screen);
+                if (screen) navigation.navigate(screen, { companyId: selectedCompany?.id });
               }}
             >
               <View style={styles.iconWrapper}>
@@ -172,7 +175,7 @@ function ExploreServicesSection({
                   'Compliance Check': 'ComplianceCheck',
                 };
                 const screen = screenMap[item.title];
-                if (screen) navigation.navigate(screen);
+                if (screen) navigation.navigate(screen, { companyId: selectedCompany?.id });
               }}>
                   <View style={styles.iconWrapper}>
                     <View style={[styles.serviceIcon, tone.icon]}>

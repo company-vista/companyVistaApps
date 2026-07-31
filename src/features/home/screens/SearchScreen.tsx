@@ -9,7 +9,8 @@ import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 import type { MainScreenProps } from '../../../navigation/types';
-import { RenewActionData } from '../../../navigation/types';
+import { getServiceCategories } from '../../../constants/exploreServicesData';
+import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 
 type Nav = MainScreenProps<'Search'>['navigation'];
 
@@ -21,12 +22,28 @@ const quickActions = [
   { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
 ];
 
-const orderServices = [
-  { id: 'stateFiling', label: 'State Filing', icon: 'file-text-o', color: '#B45309' },
-  { id: 'federalFiling', label: 'Federal Filing', icon: 'file-text', color: '#DC2626' },
-  { id: 'addEntity', label: 'Add Entity', icon: 'building-o', color: '#1D4ED8' },
-  { id: 'changeAgent', label: 'Change Agent', icon: 'exchange', color: '#7C3AED' },
-];
+const exploreServiceMeta: Record<string, { id: string; icon: string; color: string; label: string }> = {
+  'Tax & Accounting Services': { id: 'TaxAccounting', icon: 'calculator', color: '#B45309', label: 'Tax & Accounting' },
+  'Business Compliance & Registrations': { id: 'BusinessCompliance', icon: 'briefcase', color: '#DC2626', label: 'Business Compliance' },
+  'Banking & Owner Services': { id: 'BankingOwner', icon: 'university', color: '#1D4ED8', label: 'Banking & Owner' },
+  'Corporate Changes & Legal Documentation': { id: 'CorporateChanges', icon: 'file-text-o', color: '#7C3AED', label: 'Corporate & Legal' },
+};
+
+const orderServices = getServiceCategories().map((category) => {
+  const meta = exploreServiceMeta[category] ?? {
+    id: category,
+    icon: 'cube',
+    color: '#6B7280',
+    label: category,
+  };
+
+  return {
+    id: meta.id,
+    label: meta.label,
+    icon: meta.icon,
+    color: meta.color,
+  };
+});
 
 const complianceActions = [
   { id: 'agentRenewal', label: 'Agent Renewal', icon: 'refresh', color: '#dc2626' },
@@ -46,11 +63,12 @@ const helpAndSupport = [
   { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: '#ca8a04' },
 ];
 
-export default function SearchScreen() {
+export default function SearchScreen({ route }: MainScreenProps<'Search'>) {
   const navigation = useNavigation<Nav>();
   const safeAreaInsets = useSafeAreaInsets();
   const colors = useThemeColors();
   const [query, setQuery] = useState('');
+  const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
 
   function handleQuickAction(actionId: string) {
     switch (actionId) {
@@ -74,17 +92,17 @@ export default function SearchScreen() {
 
   function handleServicePress(serviceId: string) {
     switch (serviceId) {
-      case 'stateFiling':
-        navigation.navigate('AnnualFiling');
+      case 'TaxAccounting':
+        navigation.navigate('TaxAccounting');
         break;
-      case 'federalFiling':
-        navigation.navigate('FederalFiling');
+      case 'BusinessCompliance':
+        navigation.navigate('BusinessCompliance');
         break;
-      case 'addEntity':
-        navigation.goBack();
+      case 'BankingOwner':
+        navigation.navigate('BankingOwner');
         break;
-      case 'changeAgent':
-        navigation.navigate('AddressRenewal');
+      case 'CorporateChanges':
+        navigation.navigate('CorporateChanges');
         break;
     }
   }
@@ -156,6 +174,15 @@ export default function SearchScreen() {
     const q = query.toLowerCase();
     return helpAndSupport.filter(h => h.label.toLowerCase().includes(q));
   }, [query]);
+
+  if (isRegistrationTrackingOpen) {
+    return (
+      <RegistrationTrackingScreen
+        onBackPress={() => setIsRegistrationTrackingOpen(false)}
+        companyId={route.params?.companyId}
+      />
+    );
+  }
 
   return (
     <View style={[styles.container, { paddingTop: safeAreaInsets.top }]}>
@@ -243,7 +270,7 @@ export default function SearchScreen() {
                 <TouchableOpacity
                   key={item.id}
                   style={styles.settingsRow}
-                  onPress={() => {}}
+                  onPress={() => setIsRegistrationTrackingOpen(true)}
                 >
                   <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
                     <FontAwesome name={item.icon} size={18} color={item.color} />

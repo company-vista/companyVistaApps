@@ -1,38 +1,68 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { complianceItems } from '../../hooks/useCompanyCompliance';
 
-const deadlineItems = [
-  {
-    day: '15',
-    month: 'Jul',
-    title: 'Annual Report',
-    subtitle: 'C-Corp - Extended deadline',
-    badge: '35 days',
-    tone: 'soon',
-  },
-  {
-    day: '31',
-    month: 'Jul',
-    title: 'Franchise Tax',
-    subtitle: 'Delaware - Good Standing',
-    badge: '51 days',
-    tone: 'soon',
-  },
-  {
-    day: '01',
-    month: 'Aug',
-    title: 'Business License Renewal',
-    subtitle: 'State - Annual',
-    badge: '52 days',
-    tone: 'ok',
-  },
-] as const;
+type UpcomingDeadlinesSectionProps = {
+  rawDueDatesByTitle: Record<string, string>;
+  isLoading?: boolean;
+};
 
-function UpcomingDeadlinesSection() {
+function getDueDateParts(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return {
+    day: date.toLocaleDateString('en-IN', { day: '2-digit' }),
+    month: date.toLocaleDateString('en-IN', { month: 'short' }),
+  };
+}
+
+function getDaysRemaining(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return Math.round((date.getTime() - today.getTime()) / 86400000);
+}
+
+function UpcomingDeadlinesSection({
+  rawDueDatesByTitle,
+  isLoading = false,
+}: UpcomingDeadlinesSectionProps) {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
+
+  const deadlineItems = useMemo(() => complianceItems.map(item => {
+    const dueDate = rawDueDatesByTitle[item.title];
+    const parts = getDueDateParts(dueDate);
+    const days = getDaysRemaining(dueDate);
+    const badge = isLoading
+      ? 'Loading...'
+      : days === null
+        ? 'Not available'
+        : days < 0
+          ? 'Overdue'
+          : `${days} days`;
+
+    return {
+      title: item.title,
+      day: parts?.day ?? '--',
+      month: parts?.month ?? '--',
+      badge,
+      tone: days !== null && days > 30 ? 'ok' : 'soon',
+    };
+  }), [rawDueDatesByTitle, isLoading]);
 
   return (
     <View style={[styles.section, styles.deadlineSection]}>
@@ -52,7 +82,7 @@ function UpcomingDeadlinesSection() {
             <View style={[styles.deadlineDivider, { backgroundColor: colors.border }]} />
             <View style={styles.deadlineCopy}>
               <Text style={[styles.deadlineTitle, { color: colors.text }]}>{item.title}</Text>
-              <Text style={[styles.deadlineSubtitle, { color: colors.muted }]}>{item.subtitle}</Text>
+              {/* <Text style={[styles.deadlineSubtitle, { color: colors.muted }]}>{item.subtitle}</Text> */}
             </View>
             <View
               style={[

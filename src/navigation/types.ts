@@ -37,7 +37,7 @@ export type MainStackParamList = {
   EditProfile: undefined;
   Notifications: { companyId?: string | null } | undefined;
   NotificationDetail: { notification: NotificationItem };
-  Search: undefined;
+  Search: { companyId?: string | null } | undefined;
   HelpFeedback: undefined;
   Support: undefined;
   FollowUs: undefined;
@@ -53,10 +53,10 @@ export type MainStackParamList = {
   AddressRenewal: { selectedAction?: RenewActionData | null } | undefined;
   InvoiceDetail: { invoice: ClientInvoice };
   Transactions: { companyId?: string | null } | undefined;
-  TaxAccounting: undefined;
-  BusinessCompliance: undefined;
-  BankingOwner: undefined;
-  CorporateChanges: undefined;
+  TaxAccounting: { companyId?: string | null } | undefined;
+  BusinessCompliance: { companyId?: string | null } | undefined;
+  BankingOwner: { companyId?: string | null } | undefined;
+  CorporateChanges: { companyId?: string | null } | undefined;
   Bookkeeping: undefined;
   ComplianceCheck: undefined;
 };
