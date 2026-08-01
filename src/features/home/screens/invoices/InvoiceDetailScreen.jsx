@@ -1,0 +1,692 @@
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { generatePDF } from 'react-native-html-to-pdf';
+import RNFetchBlob from 'react-native-blob-util';
+import Toast from 'react-native-toast-message';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import logo from "../../../../assets/images/logoR.png";
+import BackButton from '../../../../components/buttons/BackButton';
+import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
+import { formatDate } from '../../../../constants/dateFormatter';
+import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
+import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
+import { buildInvoiceHtml } from './invoiceHtmlTemplate';
+function getStringValue(...values) {
+    const value = values.find(candidate => typeof candidate === 'string' && candidate.trim().length > 0);
+    return typeof value === 'string' ? value.trim() : '';
+}
+function getNumberValue(...values) {
+    for (const value of values) {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+        }
+        if (typeof value === 'string') {
+            const parsed = Number(value.replace(/[^0-9.-]/g, ''));
+            if (Number.isFinite(parsed)) {
+                return parsed;
+            }
+        }
+    }
+    return 0;
+}
+export function formatAmount(value, currency = 'USD') {
+    return new Intl.NumberFormat('en-US', {
+        currency,
+        style: 'currency',
+    }).format(value);
+}
+// नंबर को इंग्लिश शब्दों में बदलने का बेसिक हेल्पर (Amount in Words के लिए)
+function numberToWords(num, currency = 'USD') {
+    if (num === 0)
+        return currency === 'INR' ? 'Zero Indian Rupees Only' : 'Zero US Dollars Only';
+    const ones = [
+        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+        'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+        'Seventeen', 'Eighteen', 'Nineteen',
+    ];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    function twoDigits(n) {
+        if (n < 20)
+            return ones[n];
+        const t = Math.floor(n / 10);
+        const o = n % 10;
+        return tens[t] + (o ? ' ' + ones[o] : '');
+    }
+    function threeDigits(n) {
+        const h = Math.floor(n / 100);
+        const rem = n % 100;
+        let result = '';
+        if (h > 0)
+            result += ones[h] + ' Hundred';
+        if (rem > 0)
+            result += (result ? ' and ' : '') + twoDigits(rem);
+        return result;
+    }
+    const currencyName = currency === 'INR' ? 'Indian Rupees' : 'US Dollars';
+    if (currency === 'INR') {
+        const crore = Math.floor(num / 10000000);
+        const lakh = Math.floor((num % 10000000) / 100000);
+        const thousand = Math.floor((num % 100000) / 1000);
+        const hundred = Math.floor(num % 1000);
+        let result = '';
+        if (crore > 0)
+            result += twoDigits(crore) + ' Crore ';
+        if (lakh > 0)
+            result += twoDigits(lakh) + ' Lakh ';
+        if (thousand > 0)
+            result += twoDigits(thousand) + ' Thousand ';
+        if (hundred > 0)
+            result += threeDigits(hundred);
+        return (result.trim() || 'Zero') + ' ' + currencyName + ' Only';
+    }
+    const millions = Math.floor(num / 1000000);
+    const thousands = Math.floor((num % 1000000) / 1000);
+    const remainder = Math.floor(num % 1000);
+    let result = '';
+    if (millions > 0)
+        result += twoDigits(millions) + ' Million ';
+    if (thousands > 0)
+        result += twoDigits(thousands) + ' Thousand ';
+    if (remainder > 0)
+        result += threeDigits(remainder);
+    return (result.trim() || 'Zero') + ' ' + currencyName + ' Only';
+}
+function InvoiceDetailScreen() {
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { invoice } = route.params;
+    const colors = useThemeColors();
+    const insets = useSafeAreaInsets();
+    // डेटा पार्सिंग
+    const paymentStatus = getStringValue(invoice.paymentStatus).toLowerCase();
+    const isPaid = paymentStatus === 'paid';
+    const isPartial = paymentStatus === 'partial';
+    const companyName = getStringValue(invoice.companyName, invoice.businessName) ||
+        'Company Vista Inc';
+    const fromAddress = getStringValue(invoice.companyAddress, invoice.fromAddress) ||
+        '10409 Montgomery West Pkwy NE, Suite 202A, Albuquerque, NM 87111';
+    const companyEmail = getStringValue(invoice.companyEmail, 'sales@companyvista.com');
+    const clientName = getStringValue(invoice?.company?.companyName, invoice.companyName, invoice.customerName, invoice.clientName) ||
+        'AARS EXHIBITS LLC';
+    const clientAddress = getStringValue(invoice.clientAddress, invoice.toAddress) ||
+        (invoice?.company?.countryOfIncorporation
+            ? `Company address not available (${invoice?.company?.countryOfIncorporation})`
+            : 'Company address not available');
+    const clientCountry = getStringValue(invoice.country, invoice.clientCountry, invoice?.company?.countryOfIncorporation) || 'United States';
+    const currency = getStringValue(invoice.currency, invoice.currencyCode) || 'USD';
+    const subtotal = getNumberValue(invoice.subtotal, invoice.subTotal) ||
+        getNumberValue(invoice.totalAmount, invoice.total, invoice.grandTotal, invoice.amount);
+    const gstAmount = currency === 'INR' ? subtotal * 0.18 : 0;
+    const totalAmount = subtotal + gstAmount;
+    const rawPaidAmount = getNumberValue(invoice.paidAmount, invoice.amountPaid);
+    const paidAmount = isPaid ? totalAmount : rawPaidAmount;
+    const balanceDue = isPaid ? 0 : totalAmount - rawPaidAmount;
+    const bankName = getStringValue(invoice.bankName, 'Column N.A.');
+    const accountNo = getStringValue(invoice.accountNo, '939612679843912');
+    const routing = getStringValue(invoice.routing, '121145433');
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const invoiceNumber = getStringValue(invoice.invoiceNumber, invoice.invoiceNo, invoice.number) ||
+        'INV-202606-0001';
+    const invDate = formatDate(getStringValue(invoice.invoiceDate, invoice.createdAt) || undefined, currency);
+    const dueDate = formatDate(getStringValue(invoice.dueDate, invoice.due) || undefined, currency);
+    // PDF डाउनलोड करने का फ़ंक्शन (इमेज के डिज़ाइन जैसा ही HTML आउटपुट)
+    async function handleDownload() {
+        const itemsHtml = items
+            .map((item, i) => {
+            const itemName = getStringValue(item.itemName, item.name, item.title) ||
+                'AGENT & ADDRESS';
+            const itemDesc = getStringValue(item.description) ||
+                'Provides your company with a professional business presence...';
+            const itemAmount = getNumberValue(item.amount) || 145.0;
+            const itemQty = getNumberValue(item.quantity, 1);
+            const itemType = getStringValue(item.itemType) || 'ONE-TIME';
+            return `
+        <tr style="vertical-align: top;">
+          <td style="padding: 15px 10px; text-align: center; color: #94a3b8; border-bottom: 1px solid #f1f5f9;">${i + 1}</td>
+          <td style="padding: 15px 10px; border-bottom: 1px solid #f1f5f9;">
+            <div style="margin-bottom: 5px;">
+              <span style="background: #14b8a6; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 8px;">${itemType}</span>
+              <span style="font-size: 13px; font-weight: bold; color: #1e1b4b;">${itemName}</span>
+            </div>
+            <div style="font-size: 11px; color: #64748b; line-height: 1.5;">${itemDesc}</div>
+          </td>
+          <td style="padding: 15px 10px; text-align: center; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${itemQty}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemAmount / itemQty, currency)}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: bold; color: #1e1b4b; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemAmount, currency)}</td>
+        </tr>`;
+        })
+            .join('');
+        const html = buildInvoiceHtml({
+            invoiceNumber,
+            isPaid,
+            isPartial,
+            companyName,
+            fromAddress,
+            companyEmail,
+            clientName,
+            clientAddress,
+            clientCountry,
+            invDate,
+            dueDate,
+            currency,
+            itemsHtml,
+            subtotal,
+            gstAmount,
+            totalAmount,
+            paidAmount,
+            balanceDue,
+            bankName,
+            accountNo,
+            routing,
+            amountInWords: numberToWords(totalAmount, currency),
+        });
+        try {
+            const file = await generatePDF({
+                html,
+                fileName: `Invoice_${invoiceNumber}`,
+            });
+            if (file.filePath) {
+                const fileName = `Invoice_${invoiceNumber}.pdf`;
+                const downloadsPath = RNFetchBlob.fs.dirs.DownloadDir + '/' + fileName;
+                await RNFetchBlob.fs.cp(file.filePath, downloadsPath);
+                await RNFetchBlob.android.addCompleteDownload({
+                    title: fileName,
+                    path: downloadsPath,
+                    mime: 'application/pdf',
+                    description: `Invoice ${invoiceNumber}`,
+                    showNotification: true,
+                });
+                Toast.show({
+                    type: 'success',
+                    text1: 'PDF Downloaded',
+                    text2: 'Saved to Downloads folder',
+                });
+            }
+        }
+        catch (err) {
+            Toast.show({ type: `Invoice PDF download failed ${err}` });
+            Toast.show({
+                type: 'error',
+                text1: 'Download Failed',
+                text2: err?.message || 'Could not save PDF file.',
+            });
+        }
+    }
+    return (<View style={styles.screen}>
+      {/* शीर्ष ऐप बार */}
+      <View style={[
+            styles.header,
+            {
+                backgroundColor: colors.surface,
+                borderBottomColor: colors.border,
+                borderBottomWidth: 1,
+                paddingTop: insets.top + 10,
+                paddingBottom: 14,
+            },
+        ]}>
+        <BackButton onPress={() => navigation.goBack()}/>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          Invoice Details
+        </Text>
+        <Pressable onPress={handleDownload} style={styles.topDownloadBtn}>
+          <FontAwesome name="download" size={14} color="#4f46e5"/>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
+        {/* कॉर्पोरेट डार्क बैनर स्टाइल हेडर */}
+        <View style={styles.corporateHeader}>
+          <View>
+            <Text style={styles.logoText}>
+              <View>
+                <Image source={logo} style={styles.logos} resizeMode="contain"/>
+              </View> 
+            </Text>
+         
+          </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text style={styles.invoiceTitleText}>INVOICE</Text>
+            <Text style={styles.invoiceNumText}>{invoiceNumber}</Text>
+            <View style={[
+            styles.statusBadge,
+            { backgroundColor: isPaid ? '#22c55e' : isPartial ? '#d97706' : '#ef4444' },
+        ]}>
+              <Text style={styles.statusBadgeText}>
+                {isPaid ? 'PAID' : isPartial ? 'PARTIAL' : 'UNPAID'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* पीला डिवाइडर बॉर्डर */}
+        <View style={styles.yellowDivider}/>
+
+        {/* एड्रेस और इन्वॉइस मेटा डेटा ग्रिड */}
+        <View style={styles.detailsGrid}>
+          <View style={styles.gridColumn}>
+            <Text style={styles.columnLabel}>FROM</Text>
+            <Text style={styles.companyNameText}>{companyName}</Text>
+            <Text style={styles.addressText}>{fromAddress}</Text>
+            <Text style={styles.emailText}>{companyEmail}</Text>
+          </View>
+
+          <View style={styles.gridColumn}>
+            <Text style={styles.columnLabel}>BILL TO</Text>
+            <Text style={styles.companyNameText}>{clientName}</Text>
+            <Text style={styles.addressText}>{clientAddress}</Text>
+            <Text style={styles.addressText}>{clientCountry}</Text>
+          </View>
+
+          <View style={styles.gridColumn}>
+            <Text style={styles.columnLabel}>INVOICE DETAILS</Text>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Invoice No.</Text>
+              <Text style={styles.metaValue}>{invoiceNumber}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Date</Text>
+              <Text style={styles.metaValue}>{invDate}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Due Date</Text>
+              <Text style={styles.metaValue}>{dueDate}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Currency</Text>
+              <Text style={styles.metaValue}>{currency} — USD</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* टेबल हेडर */}
+        <View style={styles.tableHeaderRow}>
+          <Text style={[styles.tableHeaderText, { width: 24, textAlign: 'center' }]}>
+            #
+          </Text>
+          <Text style={[styles.tableHeaderText, { flex: 1, paddingLeft: 8 }]}>
+            SERVICE / DESCRIPTION
+          </Text>
+          <Text style={[styles.tableHeaderText, { width: 36, textAlign: 'center' }]}>
+            QTY
+          </Text>
+          <Text style={[styles.tableHeaderText, { width: 70, textAlign: 'right' }]}>
+            PRICE
+          </Text>
+          <Text style={[styles.tableHeaderText, { width: 75, textAlign: 'right' }]}>
+            AMOUNT
+          </Text>
+        </View>
+
+        {/* टेबल लिस्ट आइटम्स */}
+        {items.map((item, index) => {
+            const itemAmount = getNumberValue(item.amount) || 145.0;
+            const itemQty = getNumberValue(item.quantity, 1);
+            const itemName = getStringValue(item.itemName, item.name, item.title) ||
+                'AGENT & ADDRESS';
+            const itemDesc = getStringValue(item.description) ||
+                'Provides your company with a professional business presence...';
+            const itemType = getStringValue(item.itemType) || 'ONE-TIME';
+            return (<View key={index} style={styles.tableBodyRow}>
+              <Text style={styles.tableRowIndex}>{index + 1}</Text>
+              <View style={{ flex: 1, paddingHorizontal: 8 }}>
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 4,
+                }}>
+                  <View style={styles.itemTypeTag}>
+                    <Text style={styles.itemTypeTagText}>{itemType}</Text>
+                  </View>
+                  <Text style={styles.itemNameText}>{itemName}</Text>
+                </View>
+                <Text style={styles.itemDescText}>{itemDesc}</Text>
+              </View>
+              <Text style={styles.tableRowQty}>{itemQty}</Text>
+              <Text style={styles.tableRowPrice}>
+                {formatAmount(itemAmount / itemQty, currency)}
+              </Text>
+              <Text style={styles.tableRowAmount}>
+                {formatAmount(itemAmount, currency)}
+              </Text>
+            </View>);
+        })}
+
+        <View style={styles.splitBox}>
+          <View style={styles.splitLeft}>
+            <Text style={styles.boxTitle}>BANK DETAILS</Text>
+            <View style={styles.bankRow}>
+              <Text style={styles.bankLabel}>Bank Name:</Text>
+              <Text style={styles.bankValue}>{bankName}</Text>
+            </View>
+            <View style={styles.bankRow}>
+              <Text style={styles.bankLabel}>Account No:</Text>
+              <Text style={styles.bankValue}>{accountNo}</Text>
+            </View>
+            <View style={styles.bankRow}>
+              <Text style={styles.bankLabel}>Routing:</Text>
+              <Text style={styles.bankValue}>{routing}</Text>
+            </View>
+            <View style={styles.bankRow}>
+              <Text style={styles.bankLabel}>Account Holder:</Text>
+              <Text style={styles.bankValue}>{companyName}</Text>
+            </View>
+
+            <Text style={[styles.boxTitle, { marginTop: 16 }]}>
+              PAYMENT TERMS
+            </Text>
+            <Text style={styles.termsText}>
+              • Payment due upon receipt of invoice.
+            </Text>
+            <Text style={styles.termsText}>
+              • Accepted: Bank Transfer, Check, Credit Card.
+            </Text>
+          </View>
+
+          <View style={styles.splitRight}>
+            <Text style={styles.boxTitle}>AMOUNT SUMMARY</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>One-time Services</Text>
+              <Text style={styles.summaryValueText}>
+                {formatAmount(subtotal, currency)}
+              </Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>Sub Total</Text>
+              <Text style={styles.summaryValueText}>
+                {formatAmount(subtotal, currency)}
+              </Text>
+            </View>
+            {currency === 'INR' && (<View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>GST (18.0%)</Text>
+              <Text style={styles.summaryValueText}>
+                {formatAmount(gstAmount, currency)}
+              </Text>
+            </View>)}
+            <View style={[
+            styles.summaryRow,
+            { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 6 },
+        ]}>
+              <Text style={{ fontWeight: '700', fontSize: font.base }}>Total</Text>
+              <Text style={{ fontWeight: '700', fontSize: font.base }}>
+                {formatAmount(totalAmount, currency)}
+              </Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>Amount Received</Text>
+              <Text style={styles.summaryValueText}>
+                {formatAmount(paidAmount, currency)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.balanceStrip}>
+          <Text style={styles.balanceStripLabel}>Balance Due</Text>
+          <Text style={styles.balanceStripValue}>
+            {formatAmount(Math.max(0, balanceDue), currency)}
+          </Text>
+        </View>
+
+        {paymentStatus !== 'paid' && (<View style={styles.payButtonsRow}>
+            {currency === 'INR' && (<RazorpayOneTimePayment invoice={{
+                    id: getStringValue(invoice._id) || invoiceNumber,
+                    companyId: getStringValue(invoice.companyId) || undefined,
+                    company: invoice.company,
+                    amount: balanceDue,
+                    currency,
+                }} paymentType="invoice" label="Pay with Razorpay" buttonStyle={[styles.payButton, { backgroundColor: '#072654' }]}/>)}
+            <StripeOneTimePayment invoice={{
+                id: invoiceNumber,
+                companyId: getStringValue(invoice.companyId) || undefined,
+                company: invoice.company,
+                amount: balanceDue,
+                currency,
+            }} paymentType="invoice" label="Pay with Stripe" buttonStyle={[styles.payButton, { backgroundColor: '#635BFF' }]}/>
+          </View>)}
+
+        <View style={styles.wordsStrip}>
+          <Text style={styles.wordsLabel}>Amount in Words:</Text>
+          <Text style={styles.wordsValue}>{numberToWords(totalAmount, currency)}</Text>
+        </View>
+
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerMainText}>
+            Thank you for choosing {companyName}.
+          </Text>
+          <Text style={styles.footerSubText}>
+            This invoice is system-generated — no signature required.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>);
+}
+const styles = StyleSheet.create({
+    screen: { flex: 1 },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+    },
+    headerTitle: { fontSize: font.heading, fontWeight: '600' },
+    topDownloadBtn: { paddingLeft: 16, paddingRight: 16, paddingBottom: 10, paddingTop: 10, backgroundColor: '#eef2ff', borderRadius: 8 },
+    corporateHeader: {
+        backgroundColor: '#1e1b4b',
+        padding: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    logoText: {
+        color: '#ffffff',
+        fontSize: font.hero,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    logoLight: { color: '#eab308', fontWeight: '300' },
+    logoSubText: {
+        color: '#94a3b8',
+        fontSize: font.xs,
+        letterSpacing: 2,
+        marginTop: 2,
+        paddingLeft: 18,
+    },
+    logos: {
+        width: 162,
+        height: 45
+    },
+    invoiceTitleText: {
+        color: '#ffffff',
+        fontSize: font.hero,
+        fontWeight: '500',
+        letterSpacing: 1,
+    },
+    invoiceNumText: { color: '#94a3b8', fontSize: font.sm, marginTop: 2 },
+    statusBadge: {
+        borderRadius: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        marginTop: 6,
+    },
+    statusBadgeText: {
+        color: '#ffffff',
+        fontSize: font.sm,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
+    yellowDivider: { height: 4, backgroundColor: '#eab308' },
+    detailsGrid: { padding: 16, backgroundColor: '#ffffff', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+    gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: 8, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, backgroundColor: '#fafafa' },
+    columnLabel: {
+        color: '#6d28d9',
+        fontSize: font.sm,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+        marginBottom: 6,
+    },
+    companyNameText: {
+        fontSize: font.lg,
+        fontWeight: '700',
+        color: '#1e1b4b',
+        marginBottom: 4,
+    },
+    addressText: { fontSize: font.base, color: '#64748b', lineHeight: 16 },
+    emailText: { fontSize: font.base, color: '#6d28d9', marginTop: 4 },
+    metaRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+    },
+    metaLabel: { fontSize: font.base, color: '#94a3b8' },
+    metaValue: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
+    tableHeaderRow: {
+        backgroundColor: '#231f4f',
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    tableHeaderText: { color: '#ffffff', fontSize: font.sm, fontWeight: '700' },
+    tableBodyRow: {
+        flexDirection: 'row',
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        backgroundColor: '#ffffff',
+        alignItems: 'flex-start',
+    },
+    tableRowIndex: {
+        width: 24,
+        textAlign: 'center',
+        color: '#94a3b8',
+        fontSize: font.base,
+    },
+    itemTypeTag: {
+        backgroundColor: '#14b8a6',
+        borderRadius: 4,
+        paddingHorizontal: 5,
+        paddingVertical: 1.5,
+        marginRight: 6,
+    },
+    itemTypeTagText: { color: '#ffffff', fontSize: font.xs, fontWeight: '700' },
+    itemNameText: { fontSize: font.base, fontWeight: '700', color: '#1e1b4b', flex: 1 },
+    itemDescText: {
+        fontSize: font.sm,
+        color: '#64748b',
+        lineHeight: 15,
+        marginTop: 2,
+    },
+    tableRowQty: {
+        width: 36,
+        textAlign: 'center',
+        fontSize: font.base,
+        color: '#1e1b4b',
+        fontWeight: '500',
+    },
+    tableRowPrice: {
+        width: 70,
+        textAlign: 'right',
+        fontSize: font.base,
+        color: '#1e1b4b',
+        fontWeight: '500',
+    },
+    tableRowAmount: {
+        width: 75,
+        textAlign: 'right',
+        fontSize: font.base,
+        fontWeight: '700',
+        color: '#1e1b4b',
+    },
+    splitBox: {
+        flexDirection: "column",
+        backgroundColor: '#ffffff',
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
+    },
+    splitLeft: {
+        flex: 1,
+        padding: 14,
+        borderRightWidth: 1,
+        borderRightColor: '#f1f5f9',
+    },
+    splitRight: { flex: 1, padding: 14, backgroundColor: '#fafafa' },
+    boxTitle: {
+        color: '#6d28d9',
+        fontSize: font.sm,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+        marginBottom: 8,
+    },
+    bankRow: { flexDirection: 'row', marginBottom: 4 },
+    bankLabel: { width: 95, fontSize: font.sm, color: '#94a3b8' },
+    bankValue: { flex: 1, fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
+    termsText: { fontSize: font.sm, color: '#64748b', marginBottom: 2 },
+    summaryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 6,
+    },
+    summaryLabelText: { fontSize: font.sm, color: '#94a3b8' },
+    summaryValueText: { fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
+    balanceStrip: {
+        backgroundColor: '#1e1b4b',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    balanceStripLabel: { color: '#ffffff', fontSize: font.lg, fontWeight: '500' },
+    balanceStripValue: { color: '#ffffff', fontSize: font.display, fontWeight: '900' },
+    wordsStrip: {
+        padding: 12,
+        backgroundColor: '#faf5ff',
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e2e8f0',
+    },
+    wordsLabel: { fontSize: font.sm, fontWeight: '700', color: '#4c1d95' },
+    wordsValue: {
+        fontSize: font.sm,
+        color: '#6d28d9',
+        fontStyle: 'italic',
+        marginLeft: 4,
+        flex: 1,
+        fontWeight: '500',
+    },
+    footerContainer: {
+        padding: 20,
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+    },
+    footerMainText: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
+    footerSubText: { fontSize: font.sm, color: '#64748b', marginTop: 2 },
+    payButtonsRow: {
+        flexDirection: 'row',
+        gap: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        backgroundColor: '#ffffff',
+    },
+    payButton: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 14,
+        borderRadius: 10,
+    },
+    payButtonText: {
+        color: '#ffffff',
+        fontSize: font.lg,
+        fontWeight: '700',
+    },
+});
+export default InvoiceDetailScreen;
