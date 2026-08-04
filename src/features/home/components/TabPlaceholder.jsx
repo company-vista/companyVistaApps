@@ -12,8 +12,22 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const [apiData, setApiData] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const effectiveCompanyId = companyId ?? null;
+
+    const avatarPlaceholder = {
+        backgroundColor: colors.surface,
+        borderWidth: 1,
+        borderColor: colors.border,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+    const mainCardStyle = {
+        backgroundColor: colors.surface,
+        borderColor: colors.border,
+        marginBottom: 12,
+    }
+
     useEffect(() => {
         const fetchComplianceData = async () => {
             if (!token || !effectiveCompanyId) {
@@ -181,106 +195,96 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         price: 149,
         years: 1,
     });
-    const overdueCount = derivedActions.filter(a => a.status === 'Expired').length;
-    const pendingCount = derivedActions.filter(a => a.status === 'Pending').length;
+
     const doneCount = derivedActions.filter(a => a.status === 'Active' || a.status === 'Completed' || a.status === 'Client Managed').length;
     const totalCount = derivedActions.length;
     const healthPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
     return (<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-      {/* --- 1. PROFILE HEADER SECTION --- */}
-      <View style={styles.header}>
-        <View style={styles.profileContainer}>
-          <View style={styles.avatarWrapper}>
-            <View style={[
-            styles.avatarPlaceholder,
-            {
-                backgroundColor: colors.surface,
-                borderWidth: 1,
-                borderColor: colors.border,
-                justifyContent: 'center',
-                alignItems: 'center',
-            },
-        ]}>
-              <FontAwesome name="user" size={20} color={colors.accent}/>
+        {/* --- 1. PROFILE HEADER SECTION --- */}
+        <View style={styles.header}>
+            <View style={styles.profileContainer}>
+                <View style={styles.avatarWrapper}>
+                    <View style={[
+                        styles.avatarPlaceholder,
+                        avatarPlaceholder,
+                    ]}>
+                        <FontAwesome name="user" size={20} color={colors.accent} />
+                    </View>
+                    <View style={styles.activeDot} />
+                </View>
+                <View style={styles.userInfo}>
+                    <Text style={[styles.userName, { color: colors.text }]}>
+                        {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
+                    </Text>
+                    <Text style={[styles.userEmail, { color: colors.muted }]}>
+                        {residentData?.email || 'Email not added'}
+                    </Text>
+                </View>
             </View>
-            <View style={styles.activeDot}/>
-          </View>
-          <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}>
-              {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
-            </Text>
-            <Text style={[styles.userEmail, { color: colors.muted }]}>
-              {residentData?.email || 'Email not added'}
-            </Text>
-          </View>
         </View>
-      </View>
 
-      <AnimatedAppear index={3}>
-        <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.healthHeader}>
-            <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance Health</Text>
-            <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
-          </View>
-          <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
-            <View style={[
-            styles.progressBarFill,
-            { backgroundColor: '#1E5631', width: `${healthPercentage}%` },
-        ]}/>
-          </View>
-          <Text style={[styles.healthSubtext, { color: colors.muted }]}>
-            {doneCount} of {totalCount} actions complete
-          </Text>
+        <AnimatedAppear index={3}>
+            <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.healthHeader}>
+                    <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance Health</Text>
+                    <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
+                </View>
+                <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
+                    <View style={[
+                        styles.progressBarFill,
+                        { backgroundColor: '#1E5631', width: `${healthPercentage}%` },
+                    ]} />
+                </View>
+                <Text style={[styles.healthSubtext, { color: colors.muted }]}>
+                    {doneCount} of {totalCount} actions complete
+                </Text>
+            </View>
+        </AnimatedAppear>
+
+        <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitleText, { color: colors.text }]}>COMPLIANCE ACTIONS</Text>
         </View>
-      </AnimatedAppear>
 
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitleText, { color: colors.text }]}>COMPLIANCE ACTIONS</Text>
-      </View>
-
-      {loading ? (<ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }}/>) : (derivedActions.map((action, idx) => {
+        {loading ? (<ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />) : (derivedActions.map((action, idx) => {
             const theme = getStatusTheme(action.status);
             return (<AnimatedAppear key={action.id} index={4 + idx}>
-              <Pressable style={[
+                <Pressable style={[
                     styles.mainCard,
-                    {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                        marginBottom: 12,
-                    },
+                    mainCardStyle,
                 ]} onPress={() => handleOpenHistory(action)}>
-                <View style={styles.headerRow}>
-                  <View style={[styles.iconWrap, { backgroundColor: theme.bg }]}>
-                    <FontAwesome name={action.icon} size={20} color={theme.text}/>
-                  </View>
+                    <View style={styles.headerRow}>
+                        <View style={[styles.iconWrap, { backgroundColor: theme.bg }]}>
+                            <FontAwesome name={action.icon} size={20} color={theme.text} />
+                        </View>
 
-                  <View style={styles.headerTextBlock}>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]} numberOfLines={1}>
-                      {action.title}
-                    </Text>
-                    <Text style={[styles.sectionSubtitle, { color: colors.muted }]} numberOfLines={1}>
-                      {action.subtitle}
-                    </Text>
-                    <View style={styles.dateRow}>
-                      <FontAwesome name="calendar" size={12} color={colors.muted}/>
-                      <Text style={[styles.dateText, { color: colors.muted }]}>{action.date}</Text>
+                        <View style={styles.headerTextBlock}>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]} numberOfLines={1}>
+                                {action.title}
+                            </Text>
+                            <Text style={[styles.sectionSubtitle, { color: colors.muted }]} numberOfLines={1}>
+                                {action.subtitle}
+                            </Text>
+                            <View style={styles.dateRow}>
+                                <FontAwesome name="calendar" size={12} color={colors.muted} />
+                                <Text style={[styles.dateText, { color: colors.muted }]}>{action.date}</Text>
+                            </View>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}>
+                                <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                            </View>
+                            <FontAwesome name="chevron-right" size={16} color={colors.muted} style={styles.arrowIcon} />
+                        </View>
                     </View>
-                  </View>
 
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={[styles.badgeWrap, { backgroundColor: theme.bg }]}>
-                      <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
+                    <View style={styles.bottomRow}>
+                        {shouldShowRenewButton(action) ? (<Pressable onPress={() => handleRenewPress(action)} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
+                            <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
+                            {/* <FontAwesome name="chevron-right" size={14} color={colors.muted} style={styles.arrowIcon}/> */}
+                        </Pressable>) : null}
                     </View>
-                    <FontAwesome name="chevron-right" size={16} color={colors.muted} style={styles.arrowIcon}/>
-                  </View>
-                </View>
-
-                <View style={styles.bottomRow}>
-                  {shouldShowRenewButton(action) ? (<Pressable onPress={() => handleRenewPress(action)} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
-                      <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
-                    </Pressable>) : null}
-                </View>
-              </Pressable>
+                </Pressable>
             </AnimatedAppear>);
         }))}
     </ScrollView>);

@@ -67,6 +67,8 @@ export default function HomeScreen() {
     const moreSlideAnim = useRef(new Animated.Value(320)).current;
     const bellAnim = useRef(new Animated.Value(0)).current;
     const fabMenuOpacity = fabMenuAnim;
+
+    
     useEffect(() => {
         if (routePendingCompanySection) {
             setActiveCompanySection(routePendingCompanySection);
@@ -165,24 +167,24 @@ export default function HomeScreen() {
         setIsLoadingCompanies(true);
         fetchClientCompanies({ token, userId })
             .then(result => {
-            if (!isMounted) {
-                return;
-            }
-            const loadedCompanies = result.companies.length > 0 ? result.companies : userCompanies;
-            const mappedCompanies = loadedCompanies.map(mapCompanyToListItem);
-            setCompanyOptions(mappedCompanies);
-            setSelectedCompany(currentCompany => {
-                if (currentCompany) {
-                    return currentCompany;
+                if (!isMounted) {
+                    return;
                 }
-                return mappedCompanies[0] ?? null;
-            });
-        })
+                const loadedCompanies = result.companies.length > 0 ? result.companies : userCompanies;
+                const mappedCompanies = loadedCompanies.map(mapCompanyToListItem);
+                setCompanyOptions(mappedCompanies);
+                setSelectedCompany(currentCompany => {
+                    if (currentCompany) {
+                        return currentCompany;
+                    }
+                    return mappedCompanies[0] ?? null;
+                });
+            })
             .finally(() => {
-            if (isMounted) {
-                setIsLoadingCompanies(false);
-            }
-        });
+                if (isMounted) {
+                    setIsLoadingCompanies(false);
+                }
+            });
         return () => {
             isMounted = false;
         };
@@ -371,61 +373,61 @@ export default function HomeScreen() {
         closeCompanySwitcher();
     }
     if (activeCompanySection) {
-        return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} onBackPress={() => setActiveCompanySection(null)}/>);
+        return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} onBackPress={() => setActiveCompanySection(null)} />);
     }
     if (isAddCompanyOpen) {
         return (<AddCompanyScreen onBackPress={() => { setIsAddCompanyOpen(false); setEditingCompanyId(null); }} onSubmit={(companyId) => {
-                setIsAddCompanyOpen(false);
-                setEditingCompanyId(null);
-                setIsRegistrationTrackingOpen(true);
-                refreshCompanies(companyId);
-            }} companyId={editingCompanyId}/>);
+            setIsAddCompanyOpen(false);
+            setEditingCompanyId(null);
+            setIsRegistrationTrackingOpen(true);
+            refreshCompanies(companyId);
+        }} companyId={editingCompanyId} />);
     }
     if (isManageOptionsOpen) {
         return (<ManageOptionsScreen onBackPress={() => setIsManageOptionsOpen(false)} onRequestChangePress={() => {
-                setIsManageOptionsOpen(false);
-                setIsManageScreenOpen(true);
-            }}/>);
+            setIsManageOptionsOpen(false);
+            setIsManageScreenOpen(true);
+        }} />);
     }
     if (isManageScreenOpen) {
         return (<ManageCompanyScreen selectedCompany={selectedCompany} onBackPress={() => {
-                setIsManageScreenOpen(false);
-                setIsManageOptionsOpen(true);
-            }}/>);
+            setIsManageScreenOpen(false);
+            setIsManageOptionsOpen(true);
+        }} />);
     }
     if (selectedDocumentForView) {
-        return (<DocumentViewScreen documentItem={selectedDocumentForView} onBackPress={() => setSelectedDocumentForView(null)}/>);
+        return (<DocumentViewScreen documentItem={selectedDocumentForView} onBackPress={() => setSelectedDocumentForView(null)} />);
     }
     if (isServicesOpen) {
-        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen}/>);
+        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} />);
     }
     if (isSubscriptionOpen) {
-        return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany}/>);
+        return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
     }
     if (isRegistrationTrackingOpen) {
         return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={selectedCompany?.id} onRefreshCompanies={() => refreshCompanies(selectedCompany?.id)} onEditPress={(companyId) => {
-                setIsRegistrationTrackingOpen(false);
-                setEditingCompanyId(companyId || selectedCompany?.id || null);
-                setIsAddCompanyOpen(true);
-            }} onContactSupport={() => {
-                setIsRegistrationTrackingOpen(false);
-                setSupportFromRegistrationTracking(true);
-                setIsSupportOpen(true);
-            }}/>);
+            setIsRegistrationTrackingOpen(false);
+            setEditingCompanyId(companyId || selectedCompany?.id || null);
+            setIsAddCompanyOpen(true);
+        }} onContactSupport={() => {
+            setIsRegistrationTrackingOpen(false);
+            setSupportFromRegistrationTracking(true);
+            setIsSupportOpen(true);
+        }} />);
     }
     if (isSupportOpen) {
         return (<ContactSupport onBackPress={() => {
-                setIsSupportOpen(false);
-                if (supportFromRegistrationTracking) {
-                    setSupportFromRegistrationTracking(false);
-                    setIsRegistrationTrackingOpen(true);
-                }
-            }}/>);
+            setIsSupportOpen(false);
+            if (supportFromRegistrationTracking) {
+                setSupportFromRegistrationTracking(false);
+                setIsRegistrationTrackingOpen(true);
+            }
+        }} />);
     }
     const HEADER_CONTENT_HEIGHT = 72;
     return (<View style={styles.screen}>
-      {/* Fixed header wrapper */}
-      <View style={{
+        {/* Fixed header wrapper */}
+        <View style={{
             position: 'absolute',
             top: 0,
             left: 0,
@@ -434,8 +436,7 @@ export default function HomeScreen() {
             zIndex: 30,
             justifyContent: 'center',
             paddingTop: safeAreaInsets.top,
-            paddingHorizontal: 18,
-            backgroundColor: colors.background,
+            backgroundColor: colors.surface,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 6 },
             shadowOpacity: 0.03,
@@ -443,17 +444,17 @@ export default function HomeScreen() {
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
         }}>
-        <HomeHeader displayName={displayName} notificationCount={notificationCount} bellRotation={bellRotation} onSearchPress={() => navigation.navigate('Search', { companyId: selectedCompany?.id })} onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })} colors={colors}/>
-      </View>
+            <HomeHeader displayName={displayName} notificationCount={notificationCount} bellRotation={bellRotation} onSearchPress={() => navigation.navigate('Search', { companyId: selectedCompany?.id })} onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })} colors={colors} />
+        </View>
 
-      <PullToRefresh token={token} selectedCompanyId={selectedCompany?.id} colors={colors} onNotificationCountChange={setNotificationCount} progressViewOffset={safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16} contentContainerStyle={[
+        <PullToRefresh token={token} selectedCompanyId={selectedCompany?.id} colors={colors} onNotificationCountChange={setNotificationCount} progressViewOffset={safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16} contentContainerStyle={[
             styles.content,
             {
                 paddingTop: safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16, // leave space for fixed header
                 paddingBottom: safeAreaInsets.bottom + 116,
             },
         ]} showsVerticalScrollIndicator={false}>
-        {activeTab === 'home' ? (<HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {
+            {activeTab === 'home' ? (<HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {
                 if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
@@ -464,9 +465,9 @@ export default function HomeScreen() {
                     navigation.navigate('HelpDesk');
                 else if (itemId === 'federalFiling')
                     navigation.navigate('FederalFiling');
-            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} colors={colors}/>) : null}
-        {activeTab === 'company' ? (<CompanyTabContent selectedCompany={selectedCompany} onSectionPress={setActiveCompanySection}/>) : null}
-        {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
+            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} colors={colors} />) : null}
+            {activeTab === 'company' ? (<CompanyTabContent selectedCompany={selectedCompany} onSectionPress={setActiveCompanySection} />) : null}
+            {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
                 if (action.id === 'federal_filing')
                     navigation.navigate('FederalFiling', { selectedAction: action });
                 else if (action.id === 'address')
@@ -475,21 +476,21 @@ export default function HomeScreen() {
                     navigation.navigate('AnnualFiling');
                 else if (action.id === 'resident')
                     navigation.navigate('RenewCompliance', { selectedAction: action });
-            }} onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })}/>) : null}
-        {activeTab === 'billing' ? (<BillingTabContent onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} onGoHome={() => setActiveTab('home')} selectedCompany={selectedCompany}/>) : null}
-        {activeTab === 'documents' ? (<DocumentsTabContent selectedCompany={selectedCompany} onDocumentViewPress={doc => setSelectedDocumentForView(doc)}/>) : null}
-      </PullToRefresh>
+            }} onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })} />) : null}
+            {activeTab === 'billing' ? (<BillingTabContent onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} selectedCompany={selectedCompany} />) : null}
+            {activeTab === 'documents' ? (<DocumentsTabContent selectedCompany={selectedCompany} onDocumentViewPress={doc => setSelectedDocumentForView(doc)} />) : null}
+        </PullToRefresh>
 
-      {activeTab === 'home' ? <QuickActionFab isFabMenuOpen={isFabMenuOpen} fabMenuOpacity={fabMenuOpacity} fabMenuScale={fabMenuScale} fabMenuTranslateY={fabMenuTranslateY} fabIconRotate={fabIconRotate} onToggleMenu={toggleFabMenu} onCloseMenu={closeFabMenu} colors={colors} safeAreaInsets={safeAreaInsets} onTransactionsPress={openTransactionsScreen} onAddCompanyPress={() => {
-                closeFabMenu();
-                setIsAddCompanyOpen(true);
-            }} onRegistrationTrackingPress={openRegistrationTrackingScreen}/> : null}
+        {activeTab === 'home' ? <QuickActionFab isFabMenuOpen={isFabMenuOpen} fabMenuOpacity={fabMenuOpacity} fabMenuScale={fabMenuScale} fabMenuTranslateY={fabMenuTranslateY} fabIconRotate={fabIconRotate} onToggleMenu={toggleFabMenu} onCloseMenu={closeFabMenu} colors={colors} safeAreaInsets={safeAreaInsets} onTransactionsPress={openTransactionsScreen} onAddCompanyPress={() => {
+            closeFabMenu();
+            setIsAddCompanyOpen(true);
+        }} onRegistrationTrackingPress={openRegistrationTrackingScreen} /> : null}
 
-      <BottomNavBar activeTab={activeTab} isMoreOpen={isMoreOpen} onTabPress={handleTabPress} colors={colors} safeAreaInsets={safeAreaInsets}/>
+        <BottomNavBar activeTab={activeTab} isMoreOpen={isMoreOpen} onTabPress={handleTabPress} colors={colors} safeAreaInsets={safeAreaInsets} />
 
-      {isMoreOpen ? (<View style={styles.moreOverlay}>
-          <Pressable onPress={() => closeMoreSheet()} style={[styles.moreBackdrop, { backgroundColor: colors.backdrop }]}/>
-          <Animated.View style={[
+        {isMoreOpen ? (<View style={styles.moreOverlay}>
+            <Pressable onPress={() => closeMoreSheet()} style={[styles.moreBackdrop, { backgroundColor: colors.backdrop }]} />
+            <Animated.View style={[
                 styles.moreSheet,
                 {
                     backgroundColor: colors.sheet,
@@ -497,22 +498,22 @@ export default function HomeScreen() {
                     transform: [{ translateY: moreSlideAnim }],
                 },
             ]}>
-            <View style={[styles.sheetHandle, { backgroundColor: colors.border }]}/>
-            <View style={styles.sheetHeader}>
-              <Text style={[styles.sheetTitle, { color: colors.text }]}>
-                More
-              </Text>
-              <Pressable onPress={() => closeMoreSheet()} style={[
-                styles.sheetCloseButton,
-                { backgroundColor: colors.surface },
-            ]}>
-                <FontAwesome name="close" size={18} color={colors.text}/>
-              </Pressable>
-            </View>
-            <MoreTabContent onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')}/>
-          </Animated.View>
+                <View style={[styles.sheetHandle, { backgroundColor: colors.border }]} />
+                <View style={styles.sheetHeader}>
+                    <Text style={[styles.sheetTitle, { color: colors.text }]}>
+                        More
+                    </Text>
+                    <Pressable onPress={() => closeMoreSheet()} style={[
+                        styles.sheetCloseButton,
+                        { backgroundColor: colors.surface },
+                    ]}>
+                        <FontAwesome name="close" size={18} color={colors.text} />
+                    </Pressable>
+                </View>
+                <MoreTabContent onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} />
+            </Animated.View>
         </View>) : null}
 
-      <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} colors={colors} safeAreaInsets={safeAreaInsets}/>
+        <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import { useThemeColors } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
@@ -12,6 +13,16 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
     const isDark = colors.mode === 'dark';
     const token = useAppSelector(state => state.auth.token);
     const [submitting, setSubmitting] = useState(false);
+
+    //***********INNER STYLE***************** */
+    const sendButtonStyle = { backgroundColor: isDark ? '#1E293B' : '#F1F5F9', borderColor: colors.border }
+    const sendButtonTextStyle = { color: isDark ? '#F1F5F9' : colors.text }
+    const StripeOneTimePaymentStyle = { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground }
+    const payNowButtonTextStyle = { color: isDark ? '#000000' : colors.buttonText }
+    //***********INNER STYLE***************** */
+
+
+    //*************HANDLE REQUEST QUOTE***************** */
     const handleRequestQuote = async () => {
         if (onRequestQuote) {
             onRequestQuote();
@@ -29,7 +40,7 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
                 Toast.show({
                     type: 'success',
                     text1: 'Request Sent',
-                    text2: 'Our team will reach out to you shortly.',
+                    text2: 'Our team will contact you soon.',
                 });
             }
             else {
@@ -51,32 +62,39 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
             setSubmitting(false);
         }
     };
+
     return (<View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }, containerStyle]}>
-      <View style={styles.headerRow}>
-        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-        <Text style={styles.price}>{price}</Text>
-      </View>
+        <View style={styles.headerRow}>
+            <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+            <Text style={styles.price}>{price}</Text>
+        </View>
 
-      <Text style={[styles.description, { color: colors.muted }]}>{description}</Text>
+        <Text style={[styles.description, { color: colors.muted }]}>{description}</Text>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.outlineButton, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9', borderColor: colors.border }]} activeOpacity={0.7} onPress={handleRequestQuote} disabled={submitting}>
-          <Text style={[styles.outlineButtonText, { color: isDark ? '#F1F5F9' : colors.text }]}>{submitting ? 'Sending...' : 'Request Quote'}</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity style={[styles.outlineButton, sendButtonStyle]} activeOpacity={0.7} onPress={handleRequestQuote} disabled={submitting}>
+                <Text style={[styles.outlineButtonText, sendButtonTextStyle]}>{submitting ? 'Sending...' : 'Send Request'}</Text>
+                <FontAwesome name="send" size={12} color={isDark ? '#F1F5F9' : colors.text} />
+            </TouchableOpacity>
 
-        {typeof amount === 'number' ? (<StripeOneTimePayment invoice={{
+            {typeof amount === 'number' ? (<StripeOneTimePayment invoice={{
                 companyId: companyId ?? undefined,
                 amount,
                 currency: 'USD',
-            }} paymentType="service_purchase" label="Pay Now" buttonStyle={[
+                serviceSlug: service?.slug ?? '',
+            }} 
+            paymentType="service_purchase" label="Pay Now" buttonStyle={[
                 styles.primaryButton,
-                { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground },
-            ]}/>) : (<TouchableOpacity style={[styles.primaryButton, { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground }]} activeOpacity={0.8} onPress={onPayNow}>
-            <Text style={[styles.primaryButtonText, { color: isDark ? '#000000' : colors.buttonText }]}>Pay Now</Text>
-          </TouchableOpacity>)}
-      </View>
+                StripeOneTimePaymentStyle,
+            ]} />) : (<TouchableOpacity style={[styles.primaryButton, StripeOneTimePaymentStyle]} activeOpacity={0.8} onPress={onPayNow}>
+                <Text style={[styles.primaryButtonText, payNowButtonTextStyle]}>Pay Now</Text>
+            </TouchableOpacity>)}
+        </View>
     </View>);
 };
+
+
+
 const styles = StyleSheet.create({
     card: {
         borderRadius: 16,
@@ -116,6 +134,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 6,
     },
     outlineButtonText: {
         fontSize: 14,

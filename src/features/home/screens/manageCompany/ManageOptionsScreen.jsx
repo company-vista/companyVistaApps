@@ -26,15 +26,16 @@ const ManageOptionsScreen = ({ onBackPress, onRequestChangePress, }) => {
     return (<View style={[
             styles.container,
             {
-                paddingTop: insets.top + 4,
                 paddingBottom: insets.bottom,
             },
         ]}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
 
       <View style={[
             styles.header,
             {
+                paddingTop: insets.top + 4,
+                backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
                 borderBottomColor: colors.border,
             },
         ]}>
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
+        paddingHorizontal: 14,
         paddingVertical: 8,
         borderBottomWidth: 1,
         gap: 8,

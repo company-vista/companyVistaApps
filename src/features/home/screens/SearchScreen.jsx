@@ -161,8 +161,8 @@ export default function SearchScreen({ route }) {
     if (isRegistrationTrackingOpen) {
         return (<RegistrationTrackingScreen onBackPress={() => setIsRegistrationTrackingOpen(false)} companyId={route.params?.companyId}/>);
     }
-    return (<View style={[styles.container, { paddingTop: safeAreaInsets.top }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+    return (<View style={styles.container}>
+      <View style={[styles.header, { paddingTop: safeAreaInsets.top, borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
         <BackButton onPress={() => navigation.goBack()}/>
         <Text style={[styles.title, { color: colors.text }]}>Search</Text>
       </View>

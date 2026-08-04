@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
@@ -103,10 +103,16 @@ function mapInvoice(invoice) {
     const invoiceCompany = getInvoiceCompany(invoice);
     const status = getInvoiceStatus(invoice);
     const currency = getStringValue(invoice.currency, invoice.currencyCode) || 'USD';
+    const amountValue = getInvoiceAmount(invoice);
+    const rawDate = getStringValue(invoice.createdAt ?? invoice.created_at ?? invoice.invoiceDate);
+    const parsedDate = new Date(rawDate);
+    const createdTs = Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
     return {
-        amount: formatAmount(getInvoiceAmount(invoice), currency),
+        amount: formatAmount(amountValue, currency),
+        amountValue,
         company: invoiceCompany.name || 'Company',
-        created: formatDate(invoice.createdAt ?? invoice.created_at ?? invoice.invoiceDate),
+        created: formatDate(rawDate),
+        createdTs,
         due: formatDate(invoice.dueDate ?? invoice.due ?? invoice.due_at),
         id: getStringValue(invoice.invoiceNumber, invoice.invoiceNo, invoice.number, invoice._id, invoice.id) || 'Invoice',
         raw: invoice,
@@ -126,7 +132,13 @@ function invoiceMatchesCompany(invoice, selectedCompany) {
     const flatCompanyId = getStringValue(invoice.companyId, invoice.clientCompanyId, invoice.clientId);
     return flatCompanyId === selectedCompany.id;
 }
-function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }) {
+const SORT_OPTIONS = [
+    { label: 'Newest', value: 'newest' },
+    { label: 'Oldest', value: 'oldest' },
+    { label: 'High to Low', value: 'amountHigh' },
+    { label: 'Low to High', value: 'amountLow' },
+];
+function BillingTabContent({ onInvoicePress, selectedCompany }) {
     const colors = useThemeColors();
     const palette = getInvoicePalette(colors);
     const styles = getStyles(colors);
@@ -137,6 +149,8 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }) {
     const apiInvoices = useAppSelector(state => selectInvoicesForCompany(state, selectedCompany?.id));
     const hasLoadedInvoices = useAppSelector(state => selectHasLoadedInvoicesForCompany(state, selectedCompany?.id));
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortOption, setSortOption] = useState('newest');
+    const [isSortOpen, setIsSortOpen] = useState(false);
     const visibleApiInvoices = useMemo(() => {
         if (!selectedCompany?.id) {
             return apiInvoices;
@@ -155,22 +169,34 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }) {
     const invoices = useMemo(() => {
         const mapped = visibleApiInvoices.map(mapInvoice);
         const query = searchQuery.trim();
-        if (!query) {
-            return mapped;
+        let filtered = mapped;
+        if (query) {
+            const digitsOnly = query.replace(/[^0-9.]/g, '');
+            filtered = mapped.filter(inv => {
+                const lastFour = inv.id.replace(/\D/g, '').slice(-4);
+                if (lastFour === query.replace(/\D/g, '')) {
+                    return true;
+                }
+                const amountOnly = inv.amount.replace(/[^0-9.]/g, '');
+                if (digitsOnly && amountOnly.includes(digitsOnly)) {
+                    return true;
+                }
+                return false;
+            });
         }
-        const digitsOnly = query.replace(/[^0-9.]/g, '');
-        return mapped.filter(inv => {
-            const lastFour = inv.id.replace(/\D/g, '').slice(-4);
-            if (lastFour === query.replace(/\D/g, '')) {
-                return true;
+        return [...filtered].sort((a, b) => {
+            if (sortOption === 'oldest') {
+                return a.createdTs - b.createdTs;
             }
-            const amountOnly = inv.amount.replace(/[^0-9.]/g, '');
-            if (digitsOnly && amountOnly.includes(digitsOnly)) {
-                return true;
+            if (sortOption === 'amountHigh') {
+                return b.amountValue - a.amountValue;
             }
-            return false;
+            if (sortOption === 'amountLow') {
+                return a.amountValue - b.amountValue;
+            }
+            return b.createdTs - a.createdTs;
         });
-    }, [visibleApiInvoices, searchQuery]);
+    }, [visibleApiInvoices, searchQuery, sortOption]);
     useEffect(() => {
         if (!selectedCompany?.id || !token || hasLoadedInvoices) {
             return;
@@ -207,8 +233,24 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }) {
         </View>
         <View style={styles.sortRow}>
           <Text style={[styles.sortLabel, { color: colors.muted }]}>Sort by:</Text>
-          <Text style={styles.sortValue}>Newest</Text>
-          <FontAwesome name="angle-down" size={18} color={palette.accentText}/>
+          <Pressable onPress={() => setIsSortOpen(prev => !prev)} style={styles.sortDropdown}>
+            <Text style={styles.sortValue}>
+              {SORT_OPTIONS.find(opt => opt.value === sortOption)?.label}
+            </Text>
+            <FontAwesome name={isSortOpen ? 'angle-up' : 'angle-down'} size={18} color={palette.accentText}/>
+          </Pressable>
+          {isSortOpen ? (<View style={[styles.sortDropdownList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              {SORT_OPTIONS.map(option => (
+                <Pressable key={option.value} onPress={() => {
+                    setSortOption(option.value);
+                    setIsSortOpen(false);
+                }} style={styles.sortDropdownItem}>
+                  <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '700' }]}>
+                    {option.label}
+                  </Text>
+                  {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText}/> : null}
+                </Pressable>))}
+            </View>) : null}
         </View>
       </View>
 
@@ -226,14 +268,10 @@ function BillingTabContent({ onInvoicePress, onGoHome, selectedCompany }) {
             Please wait while we load invoices for your companies. 
           </Text>) : null}
         {!isLoading && !errorMessage && selectedCompany?.id && invoices.length === 0 ? (<View style={styles.emptyState}>
+            <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90 }} resizeMode="contain"/>
             <Text style={[styles.stateText, { color: colors.muted }]}>
             No invoices found for this company.
           </Text>
-            <Pressable onPress={() => {
-                onGoHome?.();
-            }} style={styles.homeButton}>
-              <Text style={styles.text}>Go To Home </Text>
-            </Pressable>
           </View>) : null}
         {!isLoading && invoices.map((invoice, index) => {
             const statusColor = invoice.status === 'paid' ? '#16a34a' :
@@ -340,7 +378,7 @@ const getStyles = (colors) => {
             borderWidth: 1,
             flex: 1,
             flexDirection: 'row',
-            height: 58,
+            height: 50,
             paddingHorizontal: 14,
         },
         searchInput: {
@@ -364,17 +402,48 @@ const getStyles = (colors) => {
         sortRow: {
             alignItems: 'center',
             flexDirection: 'row',
-            gap: 5,
+            gap: 8,
             paddingTop: 4,
+            position: 'relative',
         },
         sortLabel: {
             fontSize: font.lg,
             fontWeight: '700',
         },
+        sortDropdown: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: 8,
+        },
         sortValue: {
             color: palette.link,
             fontSize: font.lg,
             fontWeight: '900',
+        },
+        sortDropdownList: {
+            position: 'absolute',
+            right: 0,
+            top: 34,
+            zIndex: 20,
+            elevation: 6,
+            minWidth: 190,
+            borderWidth: 1,
+            borderRadius: 10,
+            overflow: 'hidden',
+            paddingVertical: 4,
+        },
+        sortDropdownItem: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            gap: 10,
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+        },
+        sortDropdownItemText: {
+            color: palette.primaryText,
+            fontSize: font.lg,
+            fontWeight: '500',
         },
         stateText: {
             fontSize: font.md,
@@ -384,7 +453,7 @@ const getStyles = (colors) => {
         },
         invoiceList: {
             gap: 12,
-            marginTop: 16,
+            marginTop: 23,
         },
         loadingState: {
             alignItems: 'center',
@@ -396,19 +465,7 @@ const getStyles = (colors) => {
             justifyContent: 'center',
             gap: 16,
             paddingVertical: 40,
-            marginTop: 130
-        },
-        homeButton: {
-            backgroundColor: palette.actionSurface,
-            borderColor: palette.actionBorder,
-            borderWidth: 1,
-            padding: 10,
-            borderRadius: 10,
-            alignItems: 'center',
-        },
-        text: {
-            color: palette.buttonText,
-            fontWeight: '600',
+            marginTop: 50
         },
         invoiceCard: {
             borderRadius: 20,

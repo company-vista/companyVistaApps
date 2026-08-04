@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Linking, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
+import { Alert, Animated, Image, Linking, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
@@ -258,7 +258,10 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                         </Pressable>
                       </View>
                     </View>
-                  </AnimatedAppear>))) : (<Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>))}
+                    </AnimatedAppear>))) : (<View style={{ alignItems: 'center', marginTop: 90 }}>
+                    <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90, marginBottom: 12 }} resizeMode="contain"/>
+                    <Text style={{ color: colors.muted }}>No documents found.</Text>
+                  </View>))}
 
             {activeTab === 'mails' && (<>
                 <View style={[styles.subTabBar, { backgroundColor: colors.surface, borderColor: colors.border }]} onLayout={(e) => { const w = e.nativeEvent.layout.width; if (subTabBarWidth !== w)
@@ -385,7 +388,7 @@ const getStyles = (colors) => {
             backgroundColor: colors.surface,
             borderRadius: 28,
             paddingHorizontal: 16,
-            height: 58,
+            height: 50,
             marginBottom: 20,
             borderWidth: 1,
             borderColor: colors.border,

@@ -78,16 +78,17 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
     return (<View style={[
             styles.container,
             {
-                paddingTop: insets.top + 12,
                 paddingBottom: insets.bottom,
             },
         ]}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
 
       {/* --- HEADER --- */}
       <View style={[
             styles.header,
             {
+                paddingTop: insets.top + 12,
+                backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
                 borderBottomColor: colors.border,
             },
         ]}>

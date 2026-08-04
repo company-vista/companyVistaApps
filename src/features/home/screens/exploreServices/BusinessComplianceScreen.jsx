@@ -12,7 +12,7 @@ function BusinessComplianceScreen({ route }) {
     const colors = useThemeColors();
     const safeAreaInsets = useSafeAreaInsets();
     const companyId = route.params?.companyId;
-    return (<View style={[styles.screen, { paddingTop: safeAreaInsets.top + 22 }]}>
+    return (<View style={[styles.screen, { paddingTop: safeAreaInsets.top + 16 }]}>
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()}/>
         <Text style={[styles.heading, { color: colors.text }]}>{CATEGORY_NAME}</Text>

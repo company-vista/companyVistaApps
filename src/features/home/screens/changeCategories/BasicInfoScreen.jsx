@@ -191,7 +191,7 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
     };
     if (submitted) {
         return (<SafeAreaView style={styles(colors).safe}>
-        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
+        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
         <View style={styles(colors).successContainer}>
           <Text style={styles(colors).successIcon}>✓</Text>
           <Text style={styles(colors).successTitle}>Update submitted</Text>
@@ -208,10 +208,10 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
       </SafeAreaView>);
     }
     return (<SafeAreaView style={styles(colors).safe}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView style={styles(colors).scroll} contentContainerStyle={styles(colors).scrollContent} keyboardShouldPersistTaps="handled">
-          {/* Header */}
+        {/* Header - fixed at top */}
+        <View style={styles(colors).header}>
           <View style={styles(colors).headerRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <BackButton onPress={onBackPress}/>
@@ -225,6 +225,8 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
                 </Text>
               </TouchableOpacity>)}
           </View>
+        </View>
+        <ScrollView style={styles(colors).scroll} contentContainerStyle={styles(colors).scrollContent} keyboardShouldPersistTaps="handled">
 
           {/* 3-Column Buttons Layout - only show when no category pre-selected */}
           {!selectedCategory && (<>
@@ -330,14 +332,27 @@ const styles = (colors) => StyleSheet.create({
     scrollContent: {
         padding: 14,
         paddingBottom: 100,
-        marginTop: 40
+        paddingTop: 6,
     },
     // Header
+    header: {
+        paddingHorizontal: 14,
+        paddingTop: 50,
+        paddingBottom: 12,
+        backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: colors.border,
+        zIndex: 10,
+        elevation: 4,
+        shadowColor: colors.text,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+    },
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 14,
     },
     headerTitle: {
         fontSize: font.xxl,
@@ -345,6 +360,7 @@ const styles = (colors) => StyleSheet.create({
         color: colors.text,
         flexShrink: 1,
         marginRight: 8,
+        marginLeft: 14,
     },
     selectAllBtn: {
         fontSize: font.xxl,

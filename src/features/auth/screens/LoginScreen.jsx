@@ -19,7 +19,7 @@ GoogleSignin.configure({
 const socialLinks = {
     google: 'https://accounts.google.com',
     facebook: 'https://www.facebook.com/companyvista',
-    instagram: 'https://www.instagram.com',
+    instagram: 'https://www.instagram.com/company_vista_/',
     linkedin: 'https://www.linkedin.com/company/companyvista/about',
 };
 function openSocialLink(url) {

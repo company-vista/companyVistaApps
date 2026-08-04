@@ -3,8 +3,9 @@ import { Animated, Image, Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import logoImage from '../../../../assets/images/logo.jpg';
 import styles from '../HomeScreen.styles';
+
 export function HomeHeader({ displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress, colors, }) {
-    return (<View style={styles.header}>
+    return (<View style={[styles.header, { backgroundColor: colors.surface, paddingHorizontal: 18 }]}>
       <Image source={logoImage} style={styles.avatar}/>
       <Text numberOfLines={1} style={[styles.greeting, { color: colors.text }]}>
         Hi, {displayName || 'User'}

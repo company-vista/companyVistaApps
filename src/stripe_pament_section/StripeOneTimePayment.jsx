@@ -4,6 +4,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
+import { useAppSelector } from '../store/hooks';
 let paymentStatusInterval = null;
 function startPaymentStatusFlow({ paymentType, companyId, invoiceId, }) {
     clearPaymentStatusFlow();
@@ -19,8 +20,10 @@ function clearPaymentStatusFlow() {
 }
 export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitiated, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
     const [loading, setLoading] = useState(false);
-    console.log(invoice);
+    const token = useAppSelector(state => state.auth.token);
+  
     const handlePayment = async () => {
+        console.log(invoice, 'invoice');
         const companyId = invoice?.companyId || invoice?.company?._id;
         const amount = Number(invoice?.amount || 0);
         if (!companyId) {
@@ -40,7 +43,7 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
             : paymentType === 'document_unlock'
                 ? `${API_BASE_URL}/api/payment/create-document-unlock`
                 : paymentType === 'service_purchase'
-                    ? `${API_BASE_URL}/api/payment/create-ontime-paynment`
+                    ? `${API_BASE_URL}/api/payment/create-service-purchase`
                     : `${API_BASE_URL}/api/payment/create-ontime-paynment`;
         const payload = paymentType === 'document_subscription'
             ? {
@@ -58,7 +61,7 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
                 : paymentType === 'service_purchase'
                     ? {
                         companyId,
-                        amount,
+                        serviceSlug: invoice?.serviceSlug,
                         currency: invoice?.currency || 'USD',
                     }
                     : {
@@ -82,6 +85,10 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
             Toast.show({ type: 'info', text1: 'Initializing payment...' });
             const { data } = await axios.post(endpoint, payload, {
                 withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'x-auth-token': token,
+                },
             });
             onInitiated?.(data);
             onSuccess?.(data);
@@ -107,15 +114,15 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
         }
     };
     return (<Pressable onPress={handlePayment} disabled={loading} style={({ pressed }) => [
-            styles.button,
-            buttonStyle,
-            loading && styles.buttonDisabled,
-            pressed && !loading && styles.buttonPressed,
-        ]}>
-      {loading ? (<ActivityIndicator size="small" color="#ffffff"/>) : null}
-      <Text style={styles.buttonText}>
-        {loading ? 'Processing...' : label}
-      </Text>
+        styles.button,
+        buttonStyle,
+        loading && styles.buttonDisabled,
+        pressed && !loading && styles.buttonPressed,
+    ]}>
+        {loading ? (<ActivityIndicator size="small" color="#ffffff" />) : null}
+        <Text style={styles.buttonText}>
+            {loading ? 'Processing...' : label}
+        </Text>
     </Pressable>);
 }
 const styles = StyleSheet.create({

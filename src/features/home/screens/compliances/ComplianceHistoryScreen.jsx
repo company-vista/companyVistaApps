@@ -181,7 +181,7 @@ const ComplianceHistoryScreen = () => {
         <BackButton onPress={() => navigation.goBack()}/>
         <View style={styles.headerTextContainer}>
           <Text style={[styles.title, { color: colors.text }]}>Compliance History</Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text>
+          {/* <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text> */}
         </View>
         <View style={styles.headerRightPlaceholder}/>
       </View>

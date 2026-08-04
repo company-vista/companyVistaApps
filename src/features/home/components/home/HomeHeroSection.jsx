@@ -36,6 +36,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
         <FontAwesome name="map-marker" size={11} color={isLight ? colors.accent : '#85B7EB'}/>
         <Text style={[styles.heroEyebrow, heroEyebrowStyle]}>{heroCompanyCountry}</Text>
         <View style={{ flex: 1 }}/>
+        <Text style={[styles.heroAdded, heroMetaStyle]}>Added {heroCompanyDate}</Text>
       </View>
       <Pressable onPress={onCompanySwitcherPress} style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
         <Text numberOfLines={1} style={[styles.heroCompany, heroCompanyStyle]}>
@@ -47,7 +48,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
       </Pressable>
       <Text style={[styles.heroMeta, heroMetaStyle]}>
         {heroCompanyType}  -  EIN{' '}
-        <Text style={styles.heroMetaAccent}>{heroCompanyEin}</Text>  -  Added {heroCompanyDate}
+        <Text style={styles.heroMetaAccent}>{heroCompanyEin}</Text>
       </Text>
       <View style={styles.heroStats}>
 
@@ -113,6 +114,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         letterSpacing: 0.7,
         textTransform: 'uppercase',
+    },
+    heroAdded: {
+        fontSize: font.sm,
     },
     heroCompany: {
         flex: 1,

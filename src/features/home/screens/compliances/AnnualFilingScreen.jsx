@@ -22,16 +22,9 @@ const STEPS = [
 export default function AnnualStateFilingScreen() {
     const navigation = useNavigation();
     const colors = useThemeColors();
-    const authUser = useAppSelector(state => state.auth.user);
     const token = useAppSelector(state => state.auth.token);
     const authUserId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? []);
-    const userCompanyName = authUser?.companyName ??
-        authUser?.businessName ??
-        authUser?.legalName ??
-        authUser?.company ??
-        authUser?.name ??
-        'Select company';
     const [companyOptions, setCompanyOptions] = useState([]);
     const [companyDataList, setCompanyDataList] = useState([]);
     const [company, setCompany] = useState('Select company');
@@ -286,15 +279,18 @@ export default function AnnualStateFilingScreen() {
     }, [companyDataList, selectedCompanyIdState, taxYear]);
     return (<SafeAreaView style={styles.safeArea}> 
       <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        
+        {/* ***************** HEADING TEXT *********************** */}
         <BackButton onPress={() => navigation.goBack()}/>
         <View style={styles.topBarText}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Annual state filing</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text>
+          {/* <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text> */}
         </View>
         <View style={styles.topBarSpacer}/>
       </View>
 
       <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* ***************** SELECT COMPANY SECTION *********************** */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 20 }]}>        
           <View style={styles.cardLabelRow}>
             <Feather name="briefcase" size={15} color={colors.accent}/>
@@ -315,6 +311,8 @@ export default function AnnualStateFilingScreen() {
             </View>)}
         </View>
 
+
+        {/* ***************** FISCIAL YEAR SECTION *********************** */}
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 10 }]}> 
           <View style={styles.cardLabelRow}>
             <Feather name="calendar" size={15} color={colors.primary}/>
@@ -334,7 +332,9 @@ export default function AnnualStateFilingScreen() {
             </View>)}
           <Text style={[styles.hintText, { color: colors.muted }]}>Deadline: typically 2-4 months after fiscal year end.</Text>
         </View>
-
+        {/* ***************** FISCIAL YEAR SECTION *********************** */}
+        
+        {/* ***************** ANY CHANGE TO REPORT SECTION *********************** */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <View style={styles.cardLabelRowBetween}>
             <View style={styles.cardLabelRow}>
@@ -381,6 +381,7 @@ export default function AnnualStateFilingScreen() {
             </View>) : null}
         </View>
 
+        {/* ***************** SUPPORTING DOCUMENTS SECTION *********************** */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <View style={styles.cardLabelRowBetween}>
             <View style={styles.cardLabelRow}>
@@ -404,6 +405,9 @@ export default function AnnualStateFilingScreen() {
                 </View>))}
             </View>) : null}
         </View>
+       
+        
+        {/* ***************** STATE FILING NOTES SECTION *********************** */}
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
           <View style={styles.cardLabelRow}>
@@ -440,8 +444,8 @@ export default function AnnualStateFilingScreen() {
 
     <View style={styles.submitButtonWrapper}>
           <TouchableOpacity style={[styles.submitButton, { backgroundColor: colors.buttonBackground }]} onPress={handleSubmit} disabled={submitting}>
-            <Feather name="send" size={15} color={colors.surface}/>
             <Text style={[styles.submitButtonText, { color: colors.surface }]}>Submit annual filing</Text>
+            <Feather name="send" size={15} style={styles.sendIcon}  color={colors.surface}/>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -465,6 +469,8 @@ function StepBullet({ status, number, colors }) {
       <Text style={[styles.stepBulletNumber, { color: colors.muted }]}>{number}</Text>
     </View>);
 }
+
+// STYLING SECTION
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -699,4 +705,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
     },
-});
+    sendIcon: {
+        rotation: '45deg',
+        transform: [{ rotate: '20deg' }],
+    },
+    });
