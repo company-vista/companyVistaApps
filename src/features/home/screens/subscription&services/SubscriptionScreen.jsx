@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { BackButton } from '../../../components/buttons';
-import { useThemeColors } from '../../../theme/colors';
-import { API_BASE_URL } from '../../../config/api';
-import { useAppSelector } from '../../../store/hooks';
-import { font } from '../../../theme/typography';
+import { BackButton } from '../../../../components/buttons';
+import { useThemeColors } from '../../../../theme/colors';
+import { API_BASE_URL } from '../../../../config/api';
+import { useAppSelector } from '../../../../store/hooks';
+import { font } from '../../../../theme/typography';
 function StatBox({ icon, label, value, sub, colors }) {
     return (<View style={[cStatBox, { backgroundColor: colors.surfaceAlt }]}>
       <FontAwesome name={icon} size={16} color={colors.muted} style={cStatIcon}/>
@@ -120,6 +121,8 @@ function buildCompanyData(selected, apiData) {
 }
 export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
     const colors = useThemeColors();
+    const safeAreaInsets = useSafeAreaInsets();
+    const isLight = colors.mode === 'light';
     const token = useAppSelector(state => state.auth.token);
     const userName = useAppSelector(state => state.auth.user?.name || '');
     const [complianceData, setComplianceData] = useState(null);
@@ -156,9 +159,11 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
         expiredPlans: 0,
     };
     return (<View style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <BackButton onPress={onBackPress}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription</Text>
+      <View style={[styles.headerArea, { backgroundColor: isLight ? '#ffffff' : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
+        <View style={styles.header}>
+          <BackButton onPress={onBackPress}/>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription</Text>
+        </View>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[cEyebrow, { backgroundColor: 'rgba(230,168,42,0.12)', borderColor: '#6b5320' }]}>
@@ -207,8 +212,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 18,
-        paddingTop: 48,
         gap: 12,
+    },
+    headerArea: {
+        paddingBottom: 12,
+        marginBottom: 0,
     },
     headerTitle: {
         fontSize: font.title,

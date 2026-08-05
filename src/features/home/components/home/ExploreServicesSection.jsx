@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
@@ -85,19 +85,13 @@ function ExploreServicesSection({ onQuickAccessItemPress: _onQuickAccessItemPres
     const navigation = useNavigation();
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
-    const [isExpanded, setIsExpanded] = useState(false);
-    const visibleItems = serviceItems.slice(0, 4);
-    const extraItems = serviceItems.slice(4);
     return (<View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore Services</Text>
-        <Pressable onPress={() => setIsExpanded(value => !value)}>
-          <Text style={styles.moreText}>{isExpanded ? 'Less' : 'More'}</Text>
-        </Pressable>
       </View>
 
-      <View style={styles.gridContainer}>
-        {visibleItems.map(item => {
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gridContainer}>
+        {serviceItems.map(item => {
             const tone = getToneStyles(item.tone);
             return (<Pressable key={item.title} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? '#ffffff' : colors.surface }]} onPress={() => {
                     const screenMap = {
@@ -114,50 +108,16 @@ function ExploreServicesSection({ onQuickAccessItemPress: _onQuickAccessItemPres
                 }}>
               <View style={styles.iconWrapper}>
                 <View style={[styles.serviceIcon, tone.icon]}>
-                  <FontAwesome name={item.icon} size={21} style={tone.iconText}/>
+                  <FontAwesome name={item.icon} size={22} style={tone.iconText}/>
                 </View>
               </View>
 
                   <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
                 {item.title}
               </Text>
-              
-              {/* <Text style={[styles.serviceSubtitle, { color: colors.muted }]} numberOfLines={1}>
-                  {item.subtitle}
-                </Text> */}
             </Pressable>);
         })}
-      </View>
-
-      {isExpanded && extraItems.length > 0 ? (<View style={styles.expandedSection}>
-          <View style={styles.expandedGridContainer}>
-            {extraItems.map(item => {
-                const tone = getToneStyles(item.tone);
-                return (<Pressable key={`${item.title}-extra`} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? '#ffffff' : colors.surface }]} onPress={() => {
-                        const screenMap = {
-                            'Tax / Acct Services': 'TaxAccounting',
-                            'Business / Regs': 'BusinessCompliance',
-                            'Banking / Owner Serv.': 'BankingOwner',
-                            'Corporate / Legal Docs': 'CorporateChanges',
-                            'Bookkeeping': 'Bookkeeping',
-                            'Compliance Check': 'ComplianceCheck',
-                        };
-                        const screen = screenMap[item.title];
-                        if (screen)
-                            navigation.navigate(screen, { companyId: selectedCompany?.id });
-                    }}>
-                  <View style={styles.iconWrapper}>
-                    <View style={[styles.serviceIcon, tone.icon]}>
-                      <FontAwesome name={item.icon} size={18} style={tone.iconText}/>
-                    </View>
-                  </View>
-              <Text style={[styles.serviceTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">
-                    {item.title}
-                  </Text>
-                </Pressable>);
-            })}
-          </View>
-        </View>) : null}
+      </ScrollView>
     </View>);
 }
 const styles = StyleSheet.create({
@@ -169,63 +129,47 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 24,
+        marginBottom: 14,
     },
     sectionTitle: {
         color: '#2C2C2A',
         fontSize: font.xl,
         fontWeight: '500',
     },
-    moreText: {
-        color: '#D85A30',
-        fontSize: font.base,
-        fontWeight: '600',
-    },
     gridContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'stretch',
         columnGap: 10,
+        // paddingRight: 4,
     },
     gridItem: {
-        width: '24%',
-        alignItems: 'center',
+        width: 140,
+        alignItems: 'flex-start',
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: '#E5E7EB',
-        borderRadius: 12,
-        paddingVertical: 14,
-        paddingBottom: 20,
-        paddingHorizontal: 6,
+        borderRadius: 14,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
         overflow: 'hidden',
-        aspectRatio: 1,
-    },
-    expandedSection: {
-        marginTop: 10,
-        paddingTop: 0,
-    },
-    expandedGridContainer: {
-        flexDirection: 'row',
-        alignItems: 'stretch',
-        columnGap: 10,
     },
     iconWrapper: {
         position: 'relative',
-        marginBottom: 2,
+        marginBottom: 0,
     },
     serviceIcon: {
-        width: 50,
-        height: 50,
-        alignItems: 'center',
+        width: 40,
+        height: 40,
+        // alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
     },
     serviceTitle: {
         fontSize: font.xs,
         fontWeight: '500',
-        textAlign: 'center',
+        textAlign: 'left',
         lineHeight: font.xs + 2,
-        minHeight: font.xs * 2 + 4,
+        marginTop: 1,
     },
     serviceSubtitle: {
         fontSize: font.xs,

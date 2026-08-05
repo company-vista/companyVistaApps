@@ -209,7 +209,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
             setActiveTab('records');
         }}>
           <Text style={[styles.tabText, { color: activeTab === 'records' ? '#fff' : palette.accentText }]}>
-            Regis documents
+            Company Docs
           </Text>
         </Pressable>
         <Pressable style={styles.tab} onPress={() => {

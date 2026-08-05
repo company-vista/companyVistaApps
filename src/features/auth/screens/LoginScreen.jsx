@@ -69,6 +69,7 @@ function LoginScreen() {
                 });
                 return;
             }
+            console.log(response, 'response from google signin')
             const result = await dispatch(googleLoginUser({ idToken }));
             if (googleLoginUser.fulfilled.match(result)) {
                 Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });

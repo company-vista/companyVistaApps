@@ -4,14 +4,13 @@ import { font } from '../../../theme/typography';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
 import HomeHeroSection from './home/HomeHeroSection';
-import ExploreServicesSection from './home/ExploreServicesSection';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
 import UpcomingDeadlinesSection from './home/UpcomingDeadlinesSection';
 import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessItemPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, selectedCompany, colors, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, selectedCompany, colors, }) {
   const isDark = colors?.mode === 'dark';
   const compliance = useCompanyCompliance(selectedCompany?.id);
 
@@ -53,15 +52,12 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onComp
     </AnimatedAppear>
 
     <AnimatedAppear index={3}>
-      <ExploreServicesSection onQuickAccessItemPress={onQuickAccessItemPress} selectedCompany={selectedCompany} />
-    </AnimatedAppear>
-    <AnimatedAppear index={4}>
       <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} selectedCompany={selectedCompany} />
     </AnimatedAppear>
-    <AnimatedAppear index={5}>
+    <AnimatedAppear index={4}>
       <UpcomingDeadlinesSection rawDueDatesByTitle={compliance.rawDueDatesByTitle} isLoading={compliance.isLoading} />
     </AnimatedAppear>
-    <AnimatedAppear index={6}>
+    <AnimatedAppear index={5}>
       <CompanyVistaReferral />
     </AnimatedAppear>
   </View>);

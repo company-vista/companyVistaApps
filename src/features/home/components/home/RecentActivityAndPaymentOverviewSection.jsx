@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         marginBottom: 14,
     },
     sectionTitle: {
-        fontSize: font.lg,
+        fontSize: font.xl,
         fontWeight: '500',
         marginBottom: 12,
         marginLeft: 2,

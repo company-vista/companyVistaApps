@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { useResponsive } from '../../../../hooks/useResponsive';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
+import { font } from '../../../../theme/typography';
 function getToneStyles(tone, colors) {
     const isDark = colors.mode === 'dark';
     const toneStyles = {
@@ -101,7 +102,7 @@ function ComplianceStatusSection({ dueDatesByTitle = {}, statusesByTitle = {}, i
               <View style={[styles.complianceTile, isLight ? { backgroundColor: '#ffffff' } : styles.complianceTileDark]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
-                    <FontAwesome name={item.icon} size={14} style={tone.iconText}/>
+                    <FontAwesome name={item.icon} size={18} style={tone.iconText}/>
                   </View>
                   <View style={[styles.tag, tone.tag]}>
                     <Text style={[styles.tagText, tone.tagText]}>{item.tag}</Text>
@@ -109,7 +110,7 @@ function ComplianceStatusSection({ dueDatesByTitle = {}, statusesByTitle = {}, i
                 </View>
                 <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
                 <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                  {item.title === 'Registered Address' || item.title === 'Registered Agent' ? 'Renewal Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
+                  {item.title === 'Registered Address' || item.title === 'Registered Agent' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
               </View>
             </View>);
@@ -129,12 +130,12 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         color: '#2C2C2A',
-        fontSize: 14,
+        fontSize: font.xl,
         fontWeight: '500',
     },
     sectionLink: {
         color: '#D85A30',
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '500',
     },
     complianceGrid: {
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
     },
     complianceTile: {
         borderRadius: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 11,
     },
     complianceTileDark: {
@@ -162,11 +163,11 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     statusIcon: {
-        width: 30,
-        height: 30,
+        width: 42,
+        height: 42,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 7,
+        borderRadius: 12,
     },
     iconAmber: {
         backgroundColor: '#FEF3C7',
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
     },
     tagText: {
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: '600',
     },
     tagAmber: {

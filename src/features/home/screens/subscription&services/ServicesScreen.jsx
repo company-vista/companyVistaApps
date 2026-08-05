@@ -1,9 +1,9 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BackButton from '../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../theme/colors';
-import { font } from '../../../theme/typography';
+import BackButton from '../../../../components/buttons/BackButton';
+import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 const serviceItems = [
     {
         title: 'Subscription',
@@ -11,19 +11,19 @@ const serviceItems = [
         icon: 'credit-card',
         tone: 'green',
     },
-    // {
-    //   title: 'Federal Filing',
-    //   subtitle: 'Form 1120 / 5472 preparation',
+    {
+      title: 'Request a services',
+      subtitle: 'Request a service from our team',
     //   tag: 'Due Jul 15',
-    //   icon: 'file-text',
-    //   tone: 'amber',
-    // },
-    // {
-    //   title: 'Add Entity',
-    //   subtitle: 'LLC, C-Corp or S-Corp - Any state',
-    //   icon: 'building-o',
-    //   tone: 'blue',
-    // },
+      icon: 'envelope',
+      tone: 'amber',
+    },
+    {
+      title: 'Services History',
+      subtitle: 'See your past service requests and payments',
+      icon: 'history',
+      tone: 'blue',
+    },
     // {
     //   title: 'Change Agent',
     //   subtitle: 'Nationwide - Same day processing',
@@ -51,21 +51,30 @@ const toneStyles = {
     purple: { iconBg: '#EDE9FE', iconColor: '#7C3AED', tagBg: '#EDE9FE', tagText: '#7C3AED' },
     green: { iconBg: '#D1FAE5', iconColor: '#059669', tagBg: '#D1FAE5', tagText: '#059669' },
 };
-export default function ServicesScreen({ onBackPress, onSubscriptionPress }) {
+export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExploreServicesPress, onServicesHistoryPress }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const isLight = colors.mode === 'light';
     function handleItemPress(item) {
         if (item.title === 'Subscription') {
             onSubscriptionPress?.();
         }
+        if (item.title === 'Request a services') {
+            onExploreServicesPress?.();
+        }
+        if (item.title === 'Services History') {
+            onServicesHistoryPress?.();
+        }
     }
-    return (<View style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 12 },
+    return (<View style={styles.screen}>
+      <View style={[
+            styles.headerArea,
+            { backgroundColor: isLight ? '#ffffff' : undefined, paddingTop: safeAreaInsets.top + 12 },
         ]}>
-      <View style={styles.header}>
-        <BackButton onPress={onBackPress}/>
-        <Text style={[styles.title, { color: colors.text }]}>Services</Text>
+        <View style={styles.header}>
+          <BackButton onPress={onBackPress}/>
+          <Text style={[styles.title, { color: colors.text }]}>Services</Text>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
@@ -95,14 +104,17 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress }) {
 }
 const styles = StyleSheet.create({
     screen: { flex: 1 },
+    headerArea: {
+        paddingHorizontal: 20,
+        paddingBottom: 12,
+        marginBottom: 20,
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
         gap: 12,
-        marginBottom: 20,
     },
-    title: { fontSize: font.hero, fontWeight: '500' },
+    title: { fontSize: font.title, fontWeight: '600' },
     card: {
         flexDirection: 'row',
         alignItems: 'center',

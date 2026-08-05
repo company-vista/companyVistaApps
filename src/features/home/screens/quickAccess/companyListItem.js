@@ -14,6 +14,25 @@ const einKeys = [
     'taxIdNumber',
     'federalTaxId',
 ];
+const formationDateKeys = [
+    'formationDate',
+    'dateOfFormation',
+    'dateOfIncorporation',
+    'incorporationDate',
+    'formedDate',
+    'dateIncorporated',
+    'incorporation',
+    'filingDate',
+];
+const stateKeys = [
+    'stateOfIncorporation',
+    'stateOfRegistration',
+    'formationState',
+    'registeredState',
+    'incorporationState',
+    'stateOfFormation',
+    'state',
+];
 function getCompanyName(company) {
     return (company.companyName ??
         company.businessName ??
@@ -84,6 +103,36 @@ function formatCompanyDate(value) {
         year: 'numeric',
     });
 }
+function findField(value, keys, depth = 0) {
+    if (!value || typeof value !== 'object' || depth > 4 || Array.isArray(value)) {
+        return '';
+    }
+    const record = value;
+    for (const key of keys) {
+        const fieldValue = record[key];
+        if (typeof fieldValue === 'string' && fieldValue.trim()) {
+            return fieldValue.trim();
+        }
+        if (typeof fieldValue === 'number') {
+            return String(fieldValue);
+        }
+    }
+    for (const nestedValue of Object.values(record)) {
+        const nestedField = findField(nestedValue, keys, depth + 1);
+        if (nestedField) {
+            return nestedField;
+        }
+    }
+    return '';
+}
+function getFormationDate(company) {
+    const raw = findField(company, formationDateKeys);
+    return raw ? formatCompanyDate(raw) : 'N/A';
+}
+function getState(company) {
+    const raw = findField(company, stateKeys);
+    return raw || 'N/A';
+}
 export function mapCompanyToListItem(company, index) {
     const name = getCompanyName(company);
     const colors = avatarColors[index % avatarColors.length];
@@ -99,6 +148,8 @@ export function mapCompanyToListItem(company, index) {
             company.created_at ??
             company.updatedAt ??
             company.updated_at),
+        formationDate: getFormationDate(company),
+        state: getState(company),
         ...colors,
     };
 }

@@ -23,8 +23,10 @@ import DocumentsTabContent from './documents/DocumentsTabContent';
 import DocumentViewScreen from './documents/DocumentViewScreen';
 import ManageCompanyScreen from './manageCompany/ManageCompanyScreen';
 import ManageOptionsScreen from './manageCompany/ManageOptionsScreen';
-import ServicesScreen from './ServicesScreen';
-import SubscriptionScreen from './SubscriptionScreen';
+import ServicesScreen from './subscription&services/ServicesScreen';
+import SubscriptionScreen from './subscription&services/SubscriptionScreen';
+import ExploreServicesScreen from './subscription&services/ExploreServicesScreen';
+import ServicesHistoryScreen from './subscription&services/ServicesHistoryScreen';
 import AddCompanyScreen from './addCompany/AddCompanyScreen';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 import ContactSupport from '../../support/screens/SupportScreen';
@@ -53,6 +55,8 @@ export default function HomeScreen() {
     const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+    const [isExploreServicesOpen, setIsExploreServicesOpen] = useState(false);
+    const [isServicesHistoryOpen, setIsServicesHistoryOpen] = useState(false);
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [supportFromRegistrationTracking, setSupportFromRegistrationTracking] = useState(false);
@@ -215,6 +219,12 @@ export default function HomeScreen() {
                         ? currentCompany.date
                         : detailCompany.date,
                     ein: detailCompany.ein || currentCompany.ein,
+                    formationDate: detailCompany.formationDate && detailCompany.formationDate !== 'N/A'
+                        ? detailCompany.formationDate
+                        : currentCompany.formationDate,
+                    state: detailCompany.state && detailCompany.state !== 'N/A'
+                        ? detailCompany.state
+                        : currentCompany.state,
                     status: detailCompany.status || currentCompany.status,
                 };
             });
@@ -229,6 +239,12 @@ export default function HomeScreen() {
                         company.countryOfIncorporation,
                     date: detailCompany.date === 'N/A' ? company.date : detailCompany.date,
                     ein: detailCompany.ein || company.ein,
+                    formationDate: detailCompany.formationDate && detailCompany.formationDate !== 'N/A'
+                        ? detailCompany.formationDate
+                        : company.formationDate,
+                    state: detailCompany.state && detailCompany.state !== 'N/A'
+                        ? detailCompany.state
+                        : company.state,
                     status: detailCompany.status || company.status,
                 };
             }));
@@ -337,6 +353,22 @@ export default function HomeScreen() {
     function closeServicesScreen() {
         setIsServicesOpen(false);
     }
+    function openExploreServicesScreen() {
+        setIsServicesOpen(false);
+        setIsExploreServicesOpen(true);
+    }
+    function closeExploreServicesScreen() {
+        setIsExploreServicesOpen(false);
+        setIsServicesOpen(true);
+    }
+    function openServicesHistoryScreen() {
+        setIsServicesOpen(false);
+        setIsServicesHistoryOpen(true);
+    }
+    function closeServicesHistoryScreen() {
+        setIsServicesHistoryOpen(false);
+        setIsServicesOpen(true);
+    }
     function openRegistrationTrackingScreen() {
         closeFabMenu();
         setIsRegistrationTrackingOpen(true);
@@ -399,7 +431,13 @@ export default function HomeScreen() {
         return (<DocumentViewScreen documentItem={selectedDocumentForView} onBackPress={() => setSelectedDocumentForView(null)} />);
     }
     if (isServicesOpen) {
-        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} />);
+        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} onExploreServicesPress={openExploreServicesScreen} onServicesHistoryPress={openServicesHistoryScreen} />);
+    }
+    if (isExploreServicesOpen) {
+        return (<ExploreServicesScreen onBackPress={closeExploreServicesScreen} selectedCompany={selectedCompany} />);
+    }
+    if (isServicesHistoryOpen) {
+        return (<ServicesHistoryScreen onBackPress={closeServicesHistoryScreen} />);
     }
     if (isSubscriptionOpen) {
         return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
