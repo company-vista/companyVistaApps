@@ -7,7 +7,7 @@ function SaveButton({ disabled = false, isLoading = false, label = 'Save', onPre
     return (<Pressable accessibilityRole="button" disabled={isDisabled} onPress={onPress} style={[
             styles.button,
             {
-                backgroundColor: colors.mode === 'dark' ? colors.accentSoft : colors.accent,
+                backgroundColor: colors.mode === 'dark' ? colors.accentSoft : colors.danger,
                 borderColor: colors.accent,
             },
             isDisabled ? styles.disabled : null,

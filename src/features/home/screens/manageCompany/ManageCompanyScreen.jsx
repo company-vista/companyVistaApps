@@ -8,6 +8,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import BackButton from '../../../../components/buttons/BackButton';
 import BasicInfoScreen from '../changeCategories/BasicInfoScreen';
 import MyRequestsScreen from '../changeCategories/MyRequestsScreen';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const categories = [
     {
         id: 'basic',
@@ -19,7 +20,7 @@ const categories = [
     },
     {
         id: 'shareholder-director',
-        label: 'ShareHolder/Director',
+        label: 'Shareholder/Director',
         fields: 11,
         description: 'List, term, change leads',
         icon: 'percent',
@@ -35,7 +36,7 @@ const categories = [
     },
     {
         id: 'local-representative',
-        label: 'Local representative',
+        label: 'Local Rep.',
         fields: 1,
         description: 'End-on, change',
         icon: 'calendar',
@@ -43,9 +44,9 @@ const categories = [
     },
 ];
 const urgencyLevels = [
-    { id: 'low', label: 'low', icon: 'circle', color: '#22C55E' },
-    { id: 'medium', label: 'medium', icon: 'circle', color: '#F59E0B' },
-    { id: 'high', label: 'high', icon: 'circle', color: '#EF4444' },
+    { id: 'low', label: 'Low', icon: 'circle', color: '#22C55E' },
+    { id: 'medium', label: 'Medium', icon: 'circle', color: '#F59E0B' },
+    { id: 'high', label: 'High', icon: 'circle', color: '#EF4444' },
 ];
 const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
     const colors = useThemeColors();
@@ -95,7 +96,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
         <View style={styles.headerLeft}>
           <BackButton onPress={onBackPress}/>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Request changes
+            Request Changes
           </Text>
         </View>
         <View style={[
@@ -120,7 +121,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
             <Text style={[styles.stepLabel, { color: colors.muted }]}>
               Submit changes for{' '}
               <Text style={{ color: colors.primary, fontWeight: '700' }}>
-                {selectedCompany?.name ?? 'Company'}
+                { capitalizeCompanyName(selectedCompany?.name ?? 'Company') }
               </Text>
             </Text>
           </View>
@@ -128,7 +129,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
           {/* Urgency Level Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Urgency level
+              Urgency Level
             </Text>
             <View style={styles.urgencyGrid}>
               {urgencyLevels.map(level => (<Pressable key={level.id} onPress={() => setSelectedUrgency(level.id)} style={[
@@ -163,7 +164,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
           {/* Change Categories Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Select Types
+              Select Request Type
             </Text>
             <View style={styles.categoriesGrid}>
               {categories.map(category => (<Pressable key={category.id} onPress={() => {
@@ -190,7 +191,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
                     {category.label}
                   </Text>
                   <Text style={[styles.categoryFields, { color: colors.muted }]}>
-                    {category.fields} fields
+                    {`${category.fields} ${category.fields === 1 ? 'field' : 'fields'}`}
                   </Text>
                 </Pressable>))}
             </View>
@@ -218,11 +219,10 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.feedbackTitle, { color: colors.primary }]}>
-                  Live inquiry feedback
+                  Live Inquiry Feedback
                 </Text>
                 <Text style={[styles.feedbackText, { color: colors.muted }]}>
-                  Selection logic: Transferring shares will automatically flag
-                  'Owner list update' as an associated field for review.
+                  Note: Transferring shares will automatically include 'Owner List Update' for review.
                 </Text>
               </View>
             </View>

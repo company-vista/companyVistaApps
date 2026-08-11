@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, StatusBar } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
 import { formatDate } from '../../../../constants/dateFormatter';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const ComplianceHistoryScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
@@ -69,6 +69,10 @@ const ComplianceHistoryScreen = () => {
                 return ['address', 'registered address', 'address renewal'];
             case 'resident':
                 return ['agent', 'registered agent', 'resident', 'resident agent'];
+            case 'agent_address':
+                return ['address', 'registered address', 'registered agent', 'agent', 'resident'];
+            case 'itin':
+                return ['itin', 'tax id', 'taxpayer id', 'tax identification'];
             case 'annual_filing':
                 return ['annual filing', 'state filing', 'annual', 'state'];
             case 'federal_filing':
@@ -78,15 +82,24 @@ const ComplianceHistoryScreen = () => {
         }
     }, [selectedAction.id, selectedAction.title]);
     const getHistorySegment = (record) => {
+        if (selectedAction.id === 'agent_address') {
+            const segment = record.Address ?? record.resident;
+            if (segment && typeof segment === 'object' && !Array.isArray(segment)) {
+                return segment;
+            }
+            return record;
+        }
         const segmentKey = selectedAction.id === 'address'
             ? 'Address'
             : selectedAction.id === 'resident'
                 ? 'resident'
-                : selectedAction.id === 'annual_filing'
-                    ? 'annualFiling'
-                    : selectedAction.id === 'federal_filing'
-                        ? 'federalTaxFiling'
-                        : undefined;
+                : selectedAction.id === 'itin'
+                    ? 'itin'
+                    : selectedAction.id === 'annual_filing'
+                        ? 'annualFiling'
+                        : selectedAction.id === 'federal_filing'
+                            ? 'federalTaxFiling'
+                            : undefined;
         const segment = segmentKey && record[segmentKey];
         if (segment && typeof segment === 'object' && !Array.isArray(segment)) {
             return segment;
@@ -174,124 +187,119 @@ const ComplianceHistoryScreen = () => {
         }
         return '--';
     };
-    return (<SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface}/>
+    return (<View style={styles.safeArea}>
+        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface} />
 
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <View style={styles.headerTextContainer}>
-          <Text style={[styles.title, { color: colors.text }]}>Compliance History</Text>
-          {/* <Text style={[styles.subtitle, { color: colors.muted }]}>Review action details and history for this compliance item.</Text> */}
-        </View>
-        <View style={styles.headerRightPlaceholder}/>
-      </View>
+        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <View style={styles.cardTitleRow}>
-            <Text style={[styles.cardTitle, { color: colors.text }]}>{selectedAction.title}</Text>
-            <View style={[styles.statusBadge, { backgroundColor: badgeStyle.backgroundColor }]}> 
-              <Text style={[styles.statusBadgeText, { color: badgeStyle.color }]}>{selectedAction.status}</Text>
-            </View>
-          </View>
-          <Text style={[styles.cardSubtitle, { color: colors.muted }]}>{selectedAction.subtitle}</Text>
-          <View style={styles.metaRow}>
-            <FontAwesome name="calendar" size={12} color={colors.muted}/>
-            <Text style={[styles.metaText, { color: colors.muted }]}>{selectedAction.date}</Text>
-          </View>
-          {selectedAction.companyId ? (<View style={styles.metaRow}>
-              <FontAwesome name="building" size={12} color={colors.muted}/>
-              <Text style={[styles.metaText, { color: colors.muted }]}>Company ID: {selectedAction.companyId}</Text>
-            </View>) : null}
-          {selectedAction.price != null || selectedAction.years != null ? (<View style={styles.metaRow}>
-              <FontAwesome name="tag" size={12} color={colors.muted}/>
-              <Text style={[styles.metaText, { color: colors.muted }]}> 
-                {selectedAction.price != null ? `Price ${selectedAction.price}` : ''}
-                {selectedAction.price != null && selectedAction.years != null ? ' · ' : ''}
-                {selectedAction.years != null ? `${selectedAction.years} year(s)` : ''}
-              </Text>
-            </View>) : null}
-        </View>
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <Text style={[styles.sectionHeading, { color: colors.text }]}>Action details</Text>
-          <View style={styles.detailGrid}>
-            {selectedAction.details.map((detail, index) => (<View key={`${detail.label}-${index}`} style={[styles.detailCard, { backgroundColor: colors.background, borderColor: colors.border }]}> 
-                <View style={[styles.detailIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-                  <FontAwesome name={detail.icon ?? 'circle'} size={12} color={colors.muted}/>
-                </View>
-                <View style={styles.detailContent}>
-                  <Text style={[styles.detailLabel, { color: colors.muted }]}>{detail.label}</Text>
-                  <Text style={[styles.detailValue, { color: colors.text }]}>{detail.value}</Text>
-                </View>
-              </View>))}
-          </View>
-        </View>
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <View style={styles.sectionHeaderRow}>
-            <Text style={[styles.historyHeading, { color: colors.text }]}>History</Text>
-            <Text style={[styles.historySubtext, { color: colors.muted }]}>Recent status and renewal options</Text>
-          </View>
-          <View style={[styles.historyCard, { backgroundColor: colors.background, borderColor: colors.border }]}> 
-            <View style={styles.historyFields}>
-              <View style={styles.historyFieldItem}>
-                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Year</Text>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{selectedAction.year ?? getHistoryYear(selectedAction)}</Text>
-              </View>
-              <View style={styles.historyFieldItem}>
-                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Due Date</Text>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{selectedAction.dueDate ?? selectedAction.date ?? '--'}</Text>
-              </View>
-              <View style={styles.historyFieldItem}>
-                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Status</Text>
-                <Text style={[styles.summaryValue, { color: colors.text }]}>{selectedAction.status}</Text>
-              </View>
-            </View>
-            {showRenewButton ? (<Pressable style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]} onPress={() => {
-                if (selectedAction.id === 'address')
-                    navigation.navigate('AddressRenewal', { selectedAction });
-                else if (selectedAction.id === 'resident')
-                    navigation.navigate('RenewCompliance', { selectedAction });
-                else if (selectedAction.id === 'annual_filing')
-                    navigation.navigate('AnnualFiling');
-                else if (selectedAction.id === 'federal_filing')
-                    navigation.navigate('FederalFiling', { selectedAction });
-            }}>
-                <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renew Now</Text>
-              </Pressable>) : null}
-          </View>
-          {historyError ? (<Text style={[styles.errorText, { color: colors.danger }]}>{historyError}</Text>) : null}
-          {isHistoryLoading ? (<ActivityIndicator color={colors.accent} style={styles.loadingIndicator}/>) : (<View style={styles.historyList}>
-              {filteredHistory.length > 0 ? (filteredHistory.map((record, index) => (<View key={`${String(record.title ?? record.complianceName ?? 'history')}-${index}`} style={[styles.historyItemCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    <View style={styles.historyItemHeader}>
-                      <Text style={[styles.historyItemTitle, { color: colors.text }]}> 
-                        {getHistoryTitle(record)}
-                      </Text>
-                      <Text style={[styles.historyItemStatus, { color: colors.muted }]}> 
-                        {getHistoryStatus(record) || 'Unknown'}
-                      </Text>
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.cardTitleRow}>
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>{selectedAction.title}</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: badgeStyle.backgroundColor }]}>
+                        <Text style={[styles.statusBadgeText, { color: badgeStyle.color }]}>{selectedAction.status}</Text>
                     </View>
-                    <View style={styles.historyItemRow}>
-                      <View style={styles.historyItemField}>
-                        <Text style={[styles.summaryLabel, { color: colors.muted }]}>Year</Text>
-                        <Text style={[styles.historyItemValue, { color: colors.text }]}>{getHistoryYear(record)}</Text>
-                      </View>
-                      <View style={styles.historyItemField}>
-                        <Text style={[styles.summaryLabel, { color: colors.muted }]}>Due Date</Text>
-                        <Text style={[styles.historyItemValue, { color: colors.text }]}>{formatRecordValue(getHistoryDueDate(record), true)}</Text>
-                      </View>
-                      <View style={styles.historyItemField}>
-                        <Text style={[styles.summaryLabel, { color: colors.muted }]}>Status</Text>
-                        <Text style={[styles.historyItemValue, { color: colors.text }]}>{formatRecordValue(getHistoryStatus(record))}</Text>
-                      </View>
+                </View>
+                
+                <View style={styles.metaRow}>
+                    <FontAwesome name="calendar" size={12} color={colors.muted} />
+                    <Text style={[styles.metaText, { color: colors.muted }]}>{selectedAction.date}</Text>
+                </View>
+                {selectedAction.companyId ? (<View style={styles.metaRow}>
+                    <FontAwesome name="building" size={12} color={colors.muted} />
+                    <Text style={[styles.metaText, { color: colors.muted }]}>Company ID: {selectedAction.companyId}</Text>
+                </View>) : null}
+                {selectedAction.price != null || selectedAction.years != null ? (<View style={styles.metaRow}>
+                    <FontAwesome name="tag" size={12} color={colors.muted} />
+                    <Text style={[styles.metaText, { color: colors.muted }]}>
+                        {selectedAction.price != null ? `Price ${selectedAction.price}` : ''}
+                        {selectedAction.price != null && selectedAction.years != null ? ' · ' : ''}
+                        {selectedAction.years != null ? `${selectedAction.years} year(s)` : ''}
+                    </Text>
+                </View>) : null}
+            </View>
+
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.sectionHeading, { color: colors.text }]}>Action details</Text>
+                <View style={styles.detailGrid}>
+                    {selectedAction.details.map((detail, index) => (<View key={`${detail.label}-${index}`} style={[styles.detailCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                        <View style={[styles.detailIcon, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                            <FontAwesome name={detail.icon ?? 'circle'} size={12} color={colors.muted} />
+                        </View>
+                        <View style={styles.detailContent}>
+                            <Text style={[styles.detailLabel, { color: colors.muted }]}>{detail.label}</Text>
+                            <Text style={[styles.detailValue, { color: colors.text }]}>{detail.value}</Text>
+                        </View>
+                    </View>))}
+                </View>
+            </View>
+
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.sectionHeaderRow}>
+                    <Text style={[styles.historyHeading, { color: colors.text }]}>History</Text>
+                    <Text style={[styles.historySubtext, { color: colors.muted }]}>Recent Status & Renewal</Text>
+                </View>
+                <View style={[styles.historyCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    <View style={styles.historyFields}>
+                        <View style={styles.historyFieldItem}>
+                            <Text style={[styles.summaryLabel, { color: colors.muted }]}>Year</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>{selectedAction.year ?? getHistoryYear(selectedAction)}</Text>
+                        </View>
+                        <View style={styles.historyFieldItem}>
+                            <Text style={[styles.summaryLabel, { color: colors.muted }]}>Due Date</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>{selectedAction.dueDate ?? selectedAction.date ?? '--'}</Text>
+                        </View>
+                        <View style={styles.historyFieldItem}>
+                            <Text style={[styles.summaryLabel, { color: colors.muted }]}>Status</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>{capitalizeCompanyName(selectedAction.status)}</Text>
+                        </View>
                     </View>
-                  </View>))) : (<Text style={[styles.historyEmptyText, { color: colors.muted }]}>No compliance history records found.</Text>)}
-            </View>)}
-        </View>
-      </ScrollView>
-    </SafeAreaView>);
+                    {showRenewButton ? (<Pressable style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]} onPress={() => {
+                        if (selectedAction.id === 'address')
+                            navigation.navigate('AddressRenewal', { selectedAction });
+                        else if (selectedAction.id === 'resident')
+                            navigation.navigate('RenewCompliance', { selectedAction });
+                        else if (selectedAction.id === 'agent_address')
+                            navigation.navigate('AddressRenewal', { selectedAction });
+                        else if (selectedAction.id === 'itin')
+                            navigation.navigate('RenewCompliance', { selectedAction });
+                        else if (selectedAction.id === 'annual_filing')
+                            navigation.navigate('AnnualFiling');
+                        else if (selectedAction.id === 'federal_filing')
+                            navigation.navigate('FederalFiling', { selectedAction });
+                    }}>
+                        <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renew Now</Text>
+                    </Pressable>) : null}
+                </View>
+                {historyError ? (<Text style={[styles.errorText, { color: colors.danger }]}>{historyError}</Text>) : null}
+                {isHistoryLoading ? (<ActivityIndicator color={colors.accent} style={styles.loadingIndicator} />) : (<View style={styles.historyList}>
+                    {filteredHistory.length > 0 ? (filteredHistory.map((record, index) => (<View key={`${String(record.title ?? record.complianceName ?? 'history')}-${index}`} style={[styles.historyItemCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                        <View style={styles.historyItemHeader}>
+                            <Text style={[styles.historyItemTitle, { color: colors.text }]}>
+                                {capitalizeCompanyName(getHistoryTitle(record))}
+                            </Text>
+                            <Text style={[styles.historyItemStatus, { color: colors.muted }]}>
+                                {capitalizeCompanyName(getHistoryStatus(record)) || 'Unknown'}
+                            </Text>
+                        </View>
+                        <View style={styles.historyItemRow}>
+                            <View style={styles.historyItemField}>
+                                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Year</Text>
+                                <Text style={[styles.historyItemValue, { color: colors.text }]}>{getHistoryYear(record)}</Text>
+                            </View>
+                            <View style={styles.historyItemField}>
+                                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Due Date</Text>
+                                <Text style={[styles.historyItemValue, { color: colors.text }]}>{formatRecordValue(getHistoryDueDate(record), true)}</Text>
+                            </View>
+                            <View style={styles.historyItemField}>
+                                <Text style={[styles.summaryLabel, { color: colors.muted }]}>Status</Text>
+                                <Text style={[styles.historyItemValue, { color: colors.text }]}>{formatRecordValue(capitalizeCompanyName(getHistoryStatus(record)))}</Text>
+                            </View>
+                        </View>
+                    </View>))) : (<Text style={[styles.historyEmptyText, { color: colors.muted }]}>No compliance history records found.</Text>)}
+                </View>)}
+            </View>
+        </ScrollView>
+    </View>);
 };
 const styles = StyleSheet.create({
     safeArea: {
@@ -301,29 +309,6 @@ const styles = StyleSheet.create({
         padding: 18,
         paddingBottom: 40,
         paddingTop: 16,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        paddingTop: 60,
-        borderBottomWidth: 0.5,
-        gap: 10,
-    },
-    headerTextContainer: {
-        flex: 1,
-    },
-    headerRightPlaceholder: {
-        width: 40,
-    },
-    title: {
-        fontSize: font.xxl,
-        fontWeight: '700',
-    },
-    subtitle: {
-        fontSize: font.base,
-        marginTop: 4,
     },
     card: {
         borderWidth: 1,
@@ -339,7 +324,7 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: font.xxl,
-        fontWeight: '700',
+        fontWeight: '400',
         flex: 1,
         marginRight: 12,
     },
@@ -354,8 +339,8 @@ const styles = StyleSheet.create({
     },
     statusBadgeText: {
         fontSize: font.sm,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+        fontWeight: '400',
+        textTransform: 'capitalize',
     },
     metaRow: {
         flexDirection: 'row',
@@ -368,7 +353,7 @@ const styles = StyleSheet.create({
     },
     sectionHeading: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
         marginBottom: 12,
     },
     detailGrid: {
@@ -396,7 +381,7 @@ const styles = StyleSheet.create({
     },
     historyHeading: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     historySubtext: {
         fontSize: font.base,
@@ -433,7 +418,7 @@ const styles = StyleSheet.create({
     },
     historyItemTitle: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     historyItemStatus: {
         fontSize: font.base,
@@ -451,7 +436,7 @@ const styles = StyleSheet.create({
     },
     historyItemValue: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     historyEmptyText: {
         fontSize: font.md,
@@ -483,13 +468,13 @@ const styles = StyleSheet.create({
     },
     summaryLabel: {
         fontSize: font.sm,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+        fontWeight: '400',
+        textTransform: 'capitalize',
         marginBottom: 4,
     },
     summaryValue: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     renewButton: {
         marginTop: 16,
@@ -499,7 +484,7 @@ const styles = StyleSheet.create({
     },
     renewButtonText: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     detailIcon: {
         width: 32,
@@ -515,8 +500,8 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: font.sm,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+        fontWeight: '400',
+        textTransform: 'capitalize',
         marginBottom: 4,
     },
     detailValue: {

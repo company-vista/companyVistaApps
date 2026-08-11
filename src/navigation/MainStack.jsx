@@ -1,64 +1,95 @@
+import React, { lazy, Suspense } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../theme/colors';
-import HomeScreen from '../features/home/screens/HomeScreen';
-import ProfileScreen from '../features/profile/screens/ProfileScreen';
-import ProfileAddressScreen from '../features/profile/screens/ProfileAddressScreen';
-import EditProfileScreen from '../features/profile/screens/EditProfileScreen';
-import NotificationScreen from '../features/notifications/screens/NotificationScreen';
-import NotificationDetailScreen from '../features/notifications/screens/NotificationDetailScreen';
-import SearchScreen from '../features/home/screens/SearchScreen';
-import HelpFeedbackScreen from '../features/help/screens/HelpFeedbackScreen';
-import SupportScreen from '../features/support/screens/SupportScreen';
-import FollowUsScreen from '../features/home/screens/FollowUsScreen';
-import QuickAccessScreen from '../features/home/screens/QuickAccessScreen';
-import CompanyProfileScreen from '../features/home/screens/quickAccess/CompanyProfileScreen';
-import InvoiceCenterScreen from '../features/home/screens/quickAccess/InvoiceCenterScreen';
-import BusinessReportsScreen from '../features/home/screens/quickAccess/BusinessReportsScreen';
-import HelpDeskScreen from '../features/home/screens/quickAccess/HelpDeskScreen';
-import FederalFilingScreen from '../features/home/screens/compliances/FederalFilingScreen';
-import AnnualStateFilingScreen from '../features/home/screens/compliances/AnnualFilingScreen';
-import ComplianceHistoryScreen from '../features/home/screens/compliances/ComplianceHistoryScreen';
-import RenewComplianceScreen from '../features/home/screens/compliances/RenewComplianceScreen';
-import AddressRenewalScreen from '../features/home/screens/compliances/AddressRenewalScreen';
-import InvoiceDetailScreen from '../features/home/screens/invoices/InvoiceDetailScreen';
-import TransactionsScreen from '../features/home/screens/transactions/TransactionsScreen';
-import TaxAccountingScreen from '../features/home/screens/exploreServices/TaxAccountingScreen';
-import BusinessComplianceScreen from '../features/home/screens/exploreServices/BusinessComplianceScreen';
-import BankingOwnerScreen from '../features/home/screens/exploreServices/BankingOwnerScreen';
-import CorporateChangesScreen from '../features/home/screens/exploreServices/CorporateChangesScreen';
-import BookkeepingScreen from '../features/home/screens/exploreServices/BookkeepingScreen';
-import ComplianceCheckScreen from '../features/home/screens/exploreServices/ComplianceCheckScreen';
+import { font } from '../theme/typography';
+
+const HomeScreen = lazy(() => import('../features/home/screens/HomeScreen'));
+const ProfileScreen = lazy(() => import('../features/profile/screens/ProfileScreen'));
+const ProfileAddressScreen = lazy(() => import('../features/profile/screens/ProfileAddressScreen'));
+const EditProfileScreen = lazy(() => import('../features/profile/screens/EditProfileScreen'));
+const NotificationScreen = lazy(() => import('../features/notifications/screens/NotificationScreen'));
+const NotificationDetailScreen = lazy(() => import('../features/notifications/screens/NotificationDetailScreen'));
+const SearchScreen = lazy(() => import('../features/home/screens/SearchScreen'));
+const HelpFeedbackScreen = lazy(() => import('../features/help/screens/HelpFeedbackScreen'));
+const SupportScreen = lazy(() => import('../features/support/screens/SupportScreen'));
+const FollowUsScreen = lazy(() => import('../features/home/screens/FollowUsScreen'));
+const QuickAccessScreen = lazy(() => import('../features/home/screens/QuickAccessScreen'));
+const CompanyProfileScreen = lazy(() => import('../features/home/screens/quickAccess/CompanyProfileScreen'));
+const InvoiceCenterScreen = lazy(() => import('../features/home/screens/quickAccess/InvoiceCenterScreen'));
+const BusinessReportsScreen = lazy(() => import('../features/home/screens/quickAccess/BusinessReportsScreen'));
+const HelpDeskScreen = lazy(() => import('../features/home/screens/quickAccess/HelpDeskScreen'));
+const FederalFilingScreen = lazy(() => import('../features/home/screens/compliances/FederalFilingScreen'));
+const AnnualStateFilingScreen = lazy(() => import('../features/home/screens/compliances/AnnualFilingScreen'));
+const ComplianceHistoryScreen = lazy(() => import('../features/home/screens/compliances/ComplianceHistoryScreen'));
+const RenewComplianceScreen = lazy(() => import('../features/home/screens/compliances/RenewComplianceScreen'));
+const AddressRenewalScreen = lazy(() => import('../features/home/screens/compliances/AddressRenewalScreen'));
+const InvoiceDetailScreen = lazy(() => import('../features/home/screens/invoices/InvoiceDetailScreen'));
+const TransactionsScreen = lazy(() => import('../features/home/screens/transactions/TransactionsScreen'));
+const TaxAccountingScreen = lazy(() => import('../features/home/screens/exploreServices/TaxAccountingScreen'));
+const BusinessComplianceScreen = lazy(() => import('../features/home/screens/exploreServices/BusinessComplianceScreen'));
+const BankingOwnerScreen = lazy(() => import('../features/home/screens/exploreServices/BankingOwnerScreen'));
+const CorporateChangesScreen = lazy(() => import('../features/home/screens/exploreServices/CorporateChangesScreen'));
+const BookkeepingScreen = lazy(() => import('../features/home/screens/exploreServices/BookkeepingScreen'));
+const ComplianceCheckScreen = lazy(() => import('../features/home/screens/exploreServices/ComplianceCheckScreen'));
+
 const Stack = createNativeStackNavigator();
+
+function LoadingFallback() {
+    const colors = useThemeColors();
+    return (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+      <ActivityIndicator size="large" color={colors.accent}/>
+    </View>);
+}
+
 export default function MainStack() {
     const colors = useThemeColors();
-    return (<Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-      <Stack.Screen name="Home" component={HomeScreen}/>
-      <Stack.Screen name="Profile" component={ProfileScreen}/>
-      <Stack.Screen name="ProfileAddress" component={ProfileAddressScreen}/>
-      <Stack.Screen name="EditProfile" component={EditProfileScreen}/>
-      <Stack.Screen name="Notifications" component={NotificationScreen}/>
-      <Stack.Screen name="NotificationDetail" component={NotificationDetailScreen}/>
-      <Stack.Screen name="Search" component={SearchScreen}/>
-      <Stack.Screen name="HelpFeedback" component={HelpFeedbackScreen}/>
-      <Stack.Screen name="Support" component={SupportScreen}/>
-      <Stack.Screen name="FollowUs" component={FollowUsScreen}/>
-      <Stack.Screen name="QuickAccess" component={QuickAccessScreen}/>
-      <Stack.Screen name="CompanyProfile" component={CompanyProfileScreen}/>
-      <Stack.Screen name="InvoiceCenter" component={InvoiceCenterScreen}/>
-      <Stack.Screen name="BusinessReports" component={BusinessReportsScreen}/>
-      <Stack.Screen name="HelpDesk" component={HelpDeskScreen}/>
-      <Stack.Screen name="FederalFiling" component={FederalFilingScreen}/>
-      <Stack.Screen name="AnnualFiling" component={AnnualStateFilingScreen}/>
-      <Stack.Screen name="ComplianceHistory" component={ComplianceHistoryScreen}/>
-      <Stack.Screen name="RenewCompliance" component={RenewComplianceScreen}/>
-      <Stack.Screen name="AddressRenewal" component={AddressRenewalScreen}/>
-      <Stack.Screen name="InvoiceDetail" component={InvoiceDetailScreen}/>
-      <Stack.Screen name="Transactions" component={TransactionsScreen}/>
-      <Stack.Screen name="TaxAccounting" component={TaxAccountingScreen}/>
-      <Stack.Screen name="BusinessCompliance" component={BusinessComplianceScreen}/>
-      <Stack.Screen name="BankingOwner" component={BankingOwnerScreen}/>
-      <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen}/>
-      <Stack.Screen name="Bookkeeping" component={BookkeepingScreen}/>
-      <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen}/>
-    </Stack.Navigator>);
+    return (<Suspense fallback={<LoadingFallback/>}>
+      <Stack.Navigator screenOptions={{
+        headerShown: true,
+        headerBackTitleVisible: false,
+        headerTitleAlign: 'left',
+        headerStyle: { backgroundColor: colors.surface },
+        headerShadowVisible: false,
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontSize: font.hero, fontWeight: '500', color: colors.text },
+        contentStyle: { backgroundColor: colors.background },
+    }}>
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => ({
+        title: 'Profile',
+        headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <FontAwesome name="pencil" size={15} color={colors.accent}/>
+          <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '900' }}>Edit</Text>
+        </Pressable>),
+      })}/>
+      <Stack.Screen name="ProfileAddress" component={ProfileAddressScreen} options={{ title: 'Address & Edit' }}/>
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }}/>
+      <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Notifications' }}/>
+      <Stack.Screen name="NotificationDetail" component={NotificationDetailScreen} options={{ title: 'Notification' }}/>
+      <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search' }}/>
+      <Stack.Screen name="HelpFeedback" component={HelpFeedbackScreen} options={{ title: 'Help and feedback', headerTitleStyle: { fontSize: font.hero, color: colors.text } }}/>
+      <Stack.Screen name="Support" component={SupportScreen} options={{ title: 'Support' }}/>
+      <Stack.Screen name="FollowUs" component={FollowUsScreen} options={{ title: 'Follow Us' }}/>
+      <Stack.Screen name="QuickAccess" component={QuickAccessScreen} options={{ title: 'Quick Access' }}/>
+      <Stack.Screen name="CompanyProfile" component={CompanyProfileScreen} options={{ title: 'Company Profile' }}/>
+      <Stack.Screen name="InvoiceCenter" component={InvoiceCenterScreen} options={{ title: 'Invoice Center' }}/>
+      <Stack.Screen name="BusinessReports" component={BusinessReportsScreen} options={{ title: 'Business Reports' }}/>
+      <Stack.Screen name="HelpDesk" component={HelpDeskScreen} options={{ title: 'Help Desk' }}/>
+      <Stack.Screen name="FederalFiling" component={FederalFilingScreen} options={({ route }) => ({ title: route.params?.selectedAction?.title ?? 'Federal Tax Filing' })}/>
+      <Stack.Screen name="AnnualFiling" component={AnnualStateFilingScreen} options={{ title: 'Annual state filing' }}/>
+      <Stack.Screen name="ComplianceHistory" component={ComplianceHistoryScreen} options={{ title: 'Compliance History' }}/>
+      <Stack.Screen name="RenewCompliance" component={RenewComplianceScreen} options={({ route }) => ({ title: route.params?.selectedAction?.title ?? 'Renew compliance' })}/>
+      <Stack.Screen name="AddressRenewal" component={AddressRenewalScreen} options={({ route }) => ({ title: route.params?.selectedAction?.title ?? 'Address Renewal' })}/>
+      <Stack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={{ title: 'Invoice Details' }}/>
+      <Stack.Screen name="Transactions" component={TransactionsScreen} options={{ title: 'Transactions' }}/>
+      <Stack.Screen name="TaxAccounting" component={TaxAccountingScreen} options={{ title: 'Tax & Accounting Services' }}/>
+      <Stack.Screen name="BusinessCompliance" component={BusinessComplianceScreen} options={{ title: 'Business Compliance & Regis.' }}/>
+      <Stack.Screen name="BankingOwner" component={BankingOwnerScreen} options={{ title: 'Banking & Owner Services' }}/>
+      <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen} options={{ title: 'Company Updates & Documents' }}/>
+      <Stack.Screen name="Bookkeeping" component={BookkeepingScreen} options={{ title: 'Bookkeeping' }}/>
+      <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen} options={{ title: 'Compliance Check' }}/>
+    </Stack.Navigator>
+    </Suspense>);
 }

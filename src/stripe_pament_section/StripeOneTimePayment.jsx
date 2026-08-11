@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
 import { useAppSelector } from '../store/hooks';
+const API_REQUEST_TIMEOUT_MS = 10000;
 let paymentStatusInterval = null;
-function startPaymentStatusFlow({ paymentType, companyId, invoiceId, }) {
-    clearPaymentStatusFlow();
-    paymentStatusInterval = setInterval(() => {
-        // Poll payment status
-    }, 5000);
+function getAuthHeaders(token) {
+    return token
+        ? {
+            Authorization: `Bearer ${token}`,
+            'x-auth-token': token,
+        }
+        : {};
 }
 function clearPaymentStatusFlow() {
     if (paymentStatusInterval) {
@@ -18,12 +21,56 @@ function clearPaymentStatusFlow() {
         paymentStatusInterval = null;
     }
 }
+function pollPaymentStatus({ referenceId, token, onPaid, onGiveUp }) {
+    clearPaymentStatusFlow();
+    let attempts = 0;
+    const MAX_ATTEMPTS = 12;
+    paymentStatusInterval = setInterval(async () => {
+        attempts++;
+        if (attempts > MAX_ATTEMPTS) {
+            clearPaymentStatusFlow();
+            onGiveUp?.();
+            return;
+        }
+        try {
+            const { data } = await axios.get(`${API_BASE_URL}/api/payment/details/${referenceId}`, {
+                withCredentials: true,
+                timeout: API_REQUEST_TIMEOUT_MS,
+                params: { _t: Date.now() },
+                headers: {
+                    ...getAuthHeaders(token),
+                    'Cache-Control': 'no-cache',
+                    Pragma: 'no-cache',
+                },
+            });
+            const stripeStatus = data?.stripeDetails?.status || '';
+            const invoiceStatus = data?.invoice?.paymentStatus || data?.invoice?.status || data?.paymentStatus || '';
+            const isPaid = stripeStatus === 'active' ||
+                stripeStatus === 'paid' ||
+                invoiceStatus === 'paid' ||
+                invoiceStatus === 'completed';
+            if (isPaid) {
+                clearPaymentStatusFlow();
+                onPaid?.(data);
+            }
+        }
+        catch {
+            // silently retry
+        }
+    }, 5000);
+}
 export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitiated, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
     const [loading, setLoading] = useState(false);
     const token = useAppSelector(state => state.auth.token);
-  
+    useEffect(() => {
+        return () => clearPaymentStatusFlow();
+    }, []);
     const handlePayment = async () => {
         console.log(invoice, 'invoice');
+        if (!token) {
+            Toast.show({ type: 'error', text1: 'Please login to continue' });
+            return;
+        }
         const companyId = invoice?.companyId || invoice?.company?._id;
         const amount = Number(invoice?.amount || 0);
         if (!companyId) {
@@ -85,22 +132,35 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
             Toast.show({ type: 'info', text1: 'Initializing payment...' });
             const { data } = await axios.post(endpoint, payload, {
                 withCredentials: true,
+                timeout: API_REQUEST_TIMEOUT_MS,
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'x-auth-token': token,
                 },
             });
             onInitiated?.(data);
-            onSuccess?.(data);
             if (!data?.url) {
                 throw new Error('Payment URL is missing');
             }
-            startPaymentStatusFlow({
-                paymentType,
-                companyId,
-                invoiceId: invoice?.id || '',
-            });
             await Linking.openURL(data.url);
+            const referenceId = invoice?.id || data?.paymentId || data?.orderId || data?.id || '';
+            if (referenceId) {
+                Toast.show({ type: 'info', text1: 'Verifying payment status...' });
+                pollPaymentStatus({
+                    referenceId,
+                    token,
+                    onPaid: (statusData) => {
+                        Toast.show({ type: 'success', text1: 'Payment successful!' });
+                        onSuccess?.(statusData || data);
+                    },
+                    onGiveUp: () => {
+                        Toast.show({ type: 'info', text1: 'Payment not confirmed', text2: 'Your payment may still be processing. Check Transactions shortly.' });
+                    },
+                });
+            }
+            else {
+                Toast.show({ type: 'info', text1: 'Payment initiated', text2: 'Payment status will update shortly.' });
+            }
         }
         catch (error) {
             clearPaymentStatusFlow();

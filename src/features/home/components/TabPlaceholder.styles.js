@@ -1,5 +1,6 @@
 // TabPlaceholder.styles.ts में ये प्रॉपर्टीज सुनिश्चित करें:
 import { StyleSheet } from 'react-native';
+import { font } from '../../../theme/typography';
 export default StyleSheet.create({
     container: {
         paddingTop: 1,
@@ -42,7 +43,7 @@ export default StyleSheet.create({
     },
     userName: {
         fontSize: 18,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     userEmail: {
         fontSize: 12,
@@ -89,13 +90,13 @@ export default StyleSheet.create({
         alignItems: 'center',
     },
     sectionTitleText: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: font.xxl,
+        fontWeight: '500',
         letterSpacing: 0.5,
     },
     mainCard: {
         borderRadius: 12,
-        padding: 8,
+        padding: 14,
         borderWidth: 1,
     },
     headerRow: {
@@ -115,7 +116,7 @@ export default StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '500',
     },
     sectionSubtitle: {
         fontSize: 12,

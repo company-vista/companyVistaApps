@@ -59,7 +59,12 @@ export async function markNotificationAsRead({ token, notificationId }) {
     catch (error) {
         const axiosError = error;
         console.log('Mark read error', { message: axiosError.message, id: notificationId });
-        return { isSuccess: false };
+        return {
+            isSuccess: false,
+            error: axiosError.response?.data?.message ??
+                axiosError.response?.data?.error ??
+                'Failed to mark notification as read.',
+        };
     }
 }
 export async function deleteNotification({ token, notificationId, companyId }) {
@@ -78,6 +83,13 @@ export async function deleteNotification({ token, notificationId, companyId }) {
     }
 }
 export async function fetchNotifications({ token } = {}) {
+    if (!token) {
+        return {
+            isSuccess: false,
+            error: 'Please login to view notifications.',
+            notifications: [],
+        };
+    }
     try {
         const response = await axios.get(NOTIFICATIONS_ROUTE, {
             headers: token

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 import { API_BASE_URL } from '../../../config/api';
 const COMPANY_REGISTRATION_ROUTE = `${API_BASE_URL}/api/company/public-register`;
+const API_REQUEST_TIMEOUT_MS = 10000;
 export function getCompanyRegistrationUpdateRoute(companyId) {
     return `${API_BASE_URL}/api/companies/${companyId}/registration`;
 }
@@ -53,6 +54,7 @@ export async function submitCompanyRegistration(payload, token) {
                 'x-auth-token': token,
                 'Content-Type': 'multipart/form-data',
             },
+            timeout: API_REQUEST_TIMEOUT_MS,
         });
         const body = response.data;
         const ok = body?.isSuccess ?? body?.success ?? false;
@@ -105,6 +107,7 @@ export async function updateCompanyRegistration(companyId, payload, token) {
                 'x-auth-token': token,
                 'Content-Type': 'application/json',
             },
+            timeout: API_REQUEST_TIMEOUT_MS,
         });
         const body = response.data;
         const ok = body?.success ?? false;

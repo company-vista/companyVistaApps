@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, Vie
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton, SaveButton } from '../../../components/buttons';
+import { SaveButton } from '../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
@@ -82,17 +82,7 @@ function ProfileAddressScreen() {
             setIsSaving(false);
         }
     };
-    return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 22 },
-        ]}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <BackButton onPress={() => navigation.goBack()}/>
-          <Text style={[styles.title, { color: colors.text }]}>Address & Edit</Text>
-        </View>
-      </View>
-
+    return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },

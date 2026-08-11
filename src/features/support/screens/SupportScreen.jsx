@@ -140,10 +140,10 @@ export default function ContactSupport({ onBackPress }) {
         }
     };
     return (<View style={{ flex: 1 }}>
-      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
+      {onBackPress ? (<View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
         <BackButton onPress={() => onBackPress ? onBackPress() : navigation.goBack()}/>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Support</Text>
-      </View>
+      </View>) : null}
       <ScrollView contentContainerStyle={styles.content}>
       <View style={{ flexDirection: 'column', gap: 8, marginBottom: 14 }}>
         <View style={{ flexDirection: 'row', gap: 8 }}>

@@ -164,12 +164,13 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 14,
+        paddingHorizontal: 16,
         paddingBottom: 12,
-        gap: 6,
+        gap: 12,
         borderBottomWidth: 1,
     },
     headerTitle: {
+        flex: 1,
         fontSize: font.heading,
         fontWeight: '600',
     },

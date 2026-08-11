@@ -3,7 +3,6 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, Vi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import TransactionDetailScreen from './TransactionDetailScreen';
@@ -122,8 +121,8 @@ function normalizeApiTransaction(item) {
     };
 }
 export default function TransactionsScreen() {
-    const navigation = useNavigation();
     const route = useRoute();
+    const navigation = useNavigation();
     const companyId = route.params?.companyId;
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
@@ -234,20 +233,12 @@ export default function TransactionsScreen() {
         }
     };
     if (selectedTransaction && selectedTransaction.details) {
-        return (<TransactionDetailScreen transaction={selectedTransaction.details} onBackPress={() => setSelectedTransaction(null)} />);
+        return (<TransactionDetailScreen transaction={selectedTransaction.details} onBackPress={() => {
+            setSelectedTransaction(null);
+            navigation.setOptions({ headerShown: true });
+        }} />);
     }
-    return (<View style={[
-        styles.screen,
-        {
-            paddingTop: safeAreaInsets.top + 8,
-        },
-    ]}>
-        {/* Header */}
-        <View style={styles.header}>
-            <BackButton onPress={() => navigation.goBack()} />
-            <Text style={[styles.title, { color: colors.text }]}>Transactions</Text>
-        </View>
-
+    return (<View style={styles.screen}>
         {/* Summary Cards (one per currency) */}
         <View style={styles.summaryContainer}>
             {summaryDOM.keys.map(currency => {
@@ -343,7 +334,10 @@ export default function TransactionsScreen() {
             <Text style={[styles.emptyText, { color: colors.text }]}>
                 No transactions found
             </Text>
-        </View>} renderItem={({ item }) => (<Pressable onPress={() => setSelectedTransaction(item)}>
+        </View>} renderItem={({ item }) => (<Pressable onPress={() => {
+            setSelectedTransaction(item);
+            navigation.setOptions({ headerShown: false });
+        }}>
             <View style={[
                 styles.txCard,
                 {
@@ -387,14 +381,6 @@ export default function TransactionsScreen() {
 }
 const styles = StyleSheet.create({
     screen: { flex: 1 },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        gap: 10,
-        marginBottom: 14,
-    },
-    title: { fontSize: font.hero, fontWeight: '500' },
     searchContainer: { paddingHorizontal: 20, marginBottom: 16 },
     searchInput: {
         height: 50,
@@ -408,10 +394,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         gap: 12,
         marginBottom: 20,
+        marginTop: 12,
     },
     summaryCard: { flex: 1, padding: 16, borderRadius: 16, borderWidth: 1 },
     summaryLabel: { fontSize: font.base, fontWeight: '600', marginBottom: 6 },
-    summaryValue: { fontSize: font.xxl, fontWeight: '800' },
+    summaryValue: { fontSize: font.large, fontWeight: '800' },
     filterRow: {
         flexDirection: 'row',
         paddingHorizontal: 20,

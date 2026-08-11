@@ -3,9 +3,18 @@ import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { font } from '../../../../theme/typography';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+const STATUS_META = {
+  pending: { label: 'Pending Review', icon: 'time-outline', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)', border: '#B45309' },
+  quoted: { label: 'Quote Ready', icon: 'document-text-outline', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
+  paid: { label: 'Paid', icon: 'checkmark-circle', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)', border: '#059669' },
+  'in-progress': { label: 'In Progress', icon: 'refresh', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
+  completed: { label: 'Completed', icon: 'checkmark-circle', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)', border: '#059669' },
+  rejected: { label: 'Rejected', icon: 'close-circle', color: '#F43F5E', bg: 'rgba(244, 63, 94, 0.12)', border: '#BE123C' },
+};
+
 function ServiceCard({
   title,
-  isPaid = true,
+  status = 'pending',
   paymentType = 'Direct Payment',
   companyName,
   requestedDate,
@@ -14,6 +23,7 @@ function ServiceCard({
   onPress,
   isLight,
 }) {
+  const meta = STATUS_META[status] || STATUS_META.pending;
   return (
     <Pressable
       onPress={onPress}
@@ -29,38 +39,28 @@ function ServiceCard({
             {title}
           </Text>
           <Text style={[styles.subInfo, isLight ? styles.subLight : styles.subDark]} numberOfLines={1}>
-            <Ionicons name="business-outline" size={12} color="#6B7280" /> {companyName}
-            <Text style={styles.dot}> • </Text>Requested {requestedDate}
+            <Ionicons name="business-outline" size={14} color="#6B7280" /> {companyName}
           </Text>
         </View>
 
-        <View style={styles.priceContainer}>
+        <View style={styles.topRight}>
+        <View style={[styles.statusBadge, { backgroundColor: meta.bg, borderColor: meta.border }]}>
+          <Ionicons name={meta.icon} size={12} color={meta.color} />
+          <Text style={[styles.statusText, { color: meta.color }]}>{meta.label}</Text>
+        </View>
           <Text style={styles.amount}>{amount}</Text>
-          <View style={[styles.statusBadge, isPaid ? styles.paidBadge : styles.pendingBadge]}>
-            <Ionicons
-              name={isPaid ? 'checkmark-circle' : 'time-outline'}
-              size={12}
-              color={isPaid ? '#10B981' : '#F59E0B'}
-            />
-            <Text style={[styles.statusText, { color: isPaid ? '#10B981' : '#F59E0B' }]}>
-              {isPaid ? 'Paid' : 'Pending'}
-            </Text>
-          </View>
         </View>
       </View>
 
       <View style={styles.bottomRow}>
         <View style={[styles.typeBadge, isLight ? styles.typeBadgeLight : styles.typeBadgeDark]}>
-          <Ionicons name="card-outline" size={12} color={isLight ? '#475569' : '#94A3B8'} />
+          <Ionicons name="card-outline" size={18} color={isLight ? '#475569' : '#94A3B8'} />
           <Text style={[styles.typeBadgeText, isLight ? styles.typeBadgeTextLight : styles.typeBadgeTextDark]}>
             {paymentType}
           </Text>
         </View>
 
-        <View style={styles.receiptRow}>
-          <Text style={[styles.receiptLabel, isLight ? styles.subLight : styles.subDark]}>View receipt</Text>
-          <Ionicons name="chevron-forward" size={14} color="#F59E0B" />
-        </View>
+        <Text style={[styles.dateText, isLight ? styles.subLight : styles.subDark]}>Requested {requestedDate}</Text>
       </View>
     </Pressable>
   );
@@ -109,6 +109,10 @@ const styles = StyleSheet.create({
   titleWrap: {
     flex: 1,
   },
+  topRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
   cardTitle: {
     fontSize: font.base,
     fontWeight: '700',
@@ -129,12 +133,9 @@ const styles = StyleSheet.create({
   subLight: {
     color: '#64748B',
   },
-  dot: {
-    color: '#4B5563',
-  },
-  priceContainer: {
-    alignItems: 'flex-end',
-    gap: 4,
+  dateText: {
+    fontSize: font.sm,
+    fontWeight: '500',
   },
   amount: {
     color: '#F59E0B',
@@ -145,21 +146,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
   },
-  paidBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
-    borderColor: '#059669',
-  },
-  pendingBadge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.12)',
-    borderColor: '#B45309',
-  },
   statusText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '600',
   },
   bottomRow: {
@@ -176,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
   },
@@ -197,15 +190,6 @@ const styles = StyleSheet.create({
   },
   typeBadgeTextLight: {
     color: '#475569',
-  },
-  receiptRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  receiptLabel: {
-    fontSize: font.sm,
-    fontWeight: '500',
   },
 });
 export default ServiceCard;

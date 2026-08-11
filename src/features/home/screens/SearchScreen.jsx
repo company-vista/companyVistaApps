@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Share, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../components/AnimatedAppear';
-import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 import { getServiceCategories } from '../../../constants/exploreServicesData';
@@ -53,7 +51,6 @@ const helpAndSupport = [
 ];
 export default function SearchScreen({ route }) {
     const navigation = useNavigation();
-    const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const [query, setQuery] = useState('');
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
@@ -162,10 +159,6 @@ export default function SearchScreen({ route }) {
         return (<RegistrationTrackingScreen onBackPress={() => setIsRegistrationTrackingOpen(false)} companyId={route.params?.companyId}/>);
     }
     return (<View style={styles.container}>
-      <View style={[styles.header, { paddingTop: safeAreaInsets.top, borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={[styles.title, { color: colors.text }]}>Search</Text>
-      </View>
       <AnimatedAppear index={0}>
         <View style={[styles.searchInputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <FontAwesome name="search" size={18} color={colors.subtle} style={styles.searchIcon}/>
@@ -247,18 +240,6 @@ export default function SearchScreen({ route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 14,
-        paddingBottom: 12,
-        gap: 8,
-        borderBottomWidth: 1,
-    },
-    title: {
-        fontSize: font.heading,
-        fontWeight: '600',
     },
     searchInputWrap: {
         flexDirection: 'row',

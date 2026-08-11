@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { useResponsive } from '../../../../hooks/useResponsive';
@@ -70,9 +70,7 @@ function getStatusTone(value) {
     }
     return 'amber';
 }
-function ComplianceStatusSection({ dueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false,
-// onViewAllPress,
- }) {
+function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     const { rs } = useResponsive();
@@ -92,13 +90,23 @@ function ComplianceStatusSection({ dueDatesByTitle = {}, statusesByTitle = {}, i
     return (<View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Compliance status
+          Compliance Status
         </Text>
       </View>
       <View style={styles.complianceGrid}>
         {complianceCards.map(item => {
             const tone = getToneStyles(item.tone, colors);
-            return (<View key={item.title} style={[styles.tileWrapper, { width: tileWidth }]}>
+            return (<Pressable key={item.title} onPress={() => onOpenComplianceHistory?.({
+                id: item.id,
+                title: item.title,
+                subtitle: item.subtitle,
+                status: item.tag,
+                date: item.dueDate,
+                details: item.details ?? [],
+                companyId,
+                price: item.price,
+                years: item.years,
+            })} style={[styles.tileWrapper, { width: tileWidth }]}>
               <View style={[styles.complianceTile, isLight ? { backgroundColor: '#ffffff' } : styles.complianceTileDark]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
@@ -110,10 +118,10 @@ function ComplianceStatusSection({ dueDatesByTitle = {}, statusesByTitle = {}, i
                 </View>
                 <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
                 <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                  {item.title === 'Registered Address' || item.title === 'Registered Agent' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
+                  {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
               </View>
-            </View>);
+            </Pressable>);
         })}
       </View>
     </View>);

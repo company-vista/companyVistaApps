@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 function formatBytes(bytes) {
     if (bytes === undefined || bytes === null)
         return '0 KB';
@@ -44,7 +45,7 @@ function getStyles(colors) {
             color: colors.text,
             flex: 1,
             fontSize: font.xxl,
-            fontWeight: '700',
+            fontWeight: '500',
             marginLeft: 12,
         },
         scrollContent: {
@@ -77,8 +78,8 @@ function getStyles(colors) {
             marginBottom: 16,
         },
         filename: {
-            fontSize: font.xxl,
-            fontWeight: '700',
+            fontSize: font.md,
+            fontWeight: '400',
             color: colors.text,
             textAlign: 'center',
             marginBottom: 8,
@@ -90,7 +91,7 @@ function getStyles(colors) {
         },
         sectionTitle: {
             fontSize: font.sm,
-            fontWeight: '700',
+            fontWeight: '500',
             color: isDark ? colors.muted : '#164066',
             textTransform: 'uppercase',
             letterSpacing: 0.5,
@@ -107,13 +108,13 @@ function getStyles(colors) {
             borderBottomWidth: 0,
         },
         rowLabel: {
-            fontSize: font.md,
+            fontSize: font.sm,
             color: colors.muted,
             flex: 1,
         },
         rowValue: {
-            fontSize: font.md,
-            fontWeight: '600',
+            fontSize: font.sm,
+            fontWeight: '500',
             color: colors.text,
             flex: 2,
             textAlign: 'right',
@@ -129,7 +130,7 @@ function getStyles(colors) {
             marginBottom: 4,
         },
         stackedValue: {
-            fontSize: font.md,
+            fontSize: font.sm,
             color: colors.text,
         },
     });
@@ -166,7 +167,7 @@ function DocumentViewScreen({ documentItem, onBackPress }) {
           
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Company Name</Text>
-            <Text style={styles.rowValue}>{documentItem.companyName ?? 'N/A'}</Text>
+            <Text style={styles.rowValue}>{capitalizeCompanyName(documentItem.companyName) ?? 'N/A'}</Text>
           </View>
           
           <View style={styles.row}>

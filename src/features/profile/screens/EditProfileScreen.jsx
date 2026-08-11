@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton, SaveButton } from '../../../components/buttons';
+import { SaveButton } from '../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
@@ -168,83 +168,73 @@ function EditProfileScreen() {
         setDateOfBirth(value);
         setIsDatePickerVisible(false);
     };
-    return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 22 },
-        ]}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <BackButton onPress={() => navigation.goBack()}/>
-          <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
-        </View>
-      </View>
-
-      <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={[
+    return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },
         ]}>
-        <View style={[styles.avatarCard, { backgroundColor: colors.surface }]}>
-          <View style={styles.avatarWrap}>
-            <View style={[
-            styles.avatar,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.accentSoft },
-        ]}>
-              {profileImage ? (<Image onError={event => console.log('Edit profile avatar failed', event.nativeEvent.error, profileImage)} source={{ uri: profileImage }} style={styles.avatarImage}/>) : (<FontAwesome name="user" size={42} color={colors.accent}/>)}
+            <View style={[styles.avatarCard, { backgroundColor: colors.surface }]}>
+                <View style={styles.avatarWrap}>
+                    <View style={[
+                        styles.avatar,
+                        { backgroundColor: colors.surfaceAlt, borderColor: colors.accentSoft },
+                    ]}>
+                        {profileImage ? (<Image onError={event => console.log('Edit profile avatar failed', event.nativeEvent.error, profileImage)} source={{ uri: profileImage }} style={styles.avatarImage} />) : (<FontAwesome name="user" size={42} color={colors.accent} />)}
+                    </View>
+                    <Pressable disabled={isUploadingAvatar} onPress={handleAvatarPress} style={[
+                        styles.cameraButton,
+                        { backgroundColor: colors.accent, borderColor: colors.surface },
+                    ]}>
+                        {isUploadingAvatar ? (<ActivityIndicator size="small" color="#ffffff" />) : (<FontAwesome name="camera" size={22} color="#ffffff" />)}
+                    </Pressable>
+                </View>
             </View>
-            <Pressable disabled={isUploadingAvatar} onPress={handleAvatarPress} style={[
-            styles.cameraButton,
-            { backgroundColor: colors.accent, borderColor: colors.surface },
-        ]}>
-              {isUploadingAvatar ? (<ActivityIndicator size="small" color="#ffffff"/>) : (<FontAwesome name="camera" size={14} color="#ffffff"/>)}
-            </Pressable>
-          </View>
-        </View>
 
-        <View style={[styles.formCard, { backgroundColor: colors.surface }]}>
-          <ProfileInput icon="user-o" label="Name" onChangeText={setName} value={name}/>
-          <ProfileInput icon="envelope-o" label="Email" editable={false} keyboardType="email-address" onChangeText={setEmail} value={email}/>
-          <ProfileInput icon="phone" label="Phone" keyboardType="phone-pad" onChangeText={setPhone} value={phone}/>
-          <DateProfileInput icon="calendar-o" label="Date of Birth" onPress={handleOpenDatePicker} placeholder="YYYY-MM-DD" value={dateOfBirth}/>
-          <ProfileInput icon="id-card-o" label="Passport Number" autoCapitalize="characters" onChangeText={setPassportNumber} value={passportNumber}/>
-        </View>
+            <View style={[styles.formCard, { backgroundColor: colors.surface }]}>
+                <ProfileInput icon="user-o" label="Name" onChangeText={setName} value={name} />
+                <ProfileInput icon="envelope-o" label="Email" editable={false} keyboardType="email-address" onChangeText={setEmail} value={email} />
+                <ProfileInput icon="phone" label="Phone" keyboardType="phone-pad" onChangeText={setPhone} value={phone} />
+                <DateProfileInput icon="calendar-o" label="Date of Birth" onPress={handleOpenDatePicker} placeholder="YYYY-MM-DD" value={dateOfBirth} />
+                <ProfileInput icon="id-card-o" label="Passport Number" autoCapitalize="characters" onChangeText={setPassportNumber} value={passportNumber} />
+            </View>
 
-        <SaveButton isLoading={isSavingProfile} onPress={handleSavePress}/>
-      </ScrollView>
+            <SaveButton isLoading={isSavingProfile} onPress={handleSavePress} />
+        </ScrollView>
 
-      <ProfileDatePickerModal onClose={() => setIsDatePickerVisible(false)} onConfirm={handleConfirmDate} value={dateOfBirth} visible={isDatePickerVisible}/>
+        <ProfileDatePickerModal onClose={() => setIsDatePickerVisible(false)} onConfirm={handleConfirmDate} value={dateOfBirth} visible={isDatePickerVisible} />
     </KeyboardAvoidingView>);
 }
 function ProfileInput({ autoCapitalize = 'sentences', editable = true, icon, keyboardType = 'default', label, onChangeText, placeholder, value, }) {
     const colors = useThemeColors();
     return (<View style={styles.inputGroup}>
-      <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
-      <View style={[
+        <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
+        <View style={[
             styles.inputRow,
             { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
         ]}>
-        <FontAwesome name={icon} size={16} color={colors.accent}/>
-        <TextInput autoCapitalize={autoCapitalize} editable={editable} value={value} onChangeText={onChangeText} keyboardType={keyboardType} placeholder={placeholder} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]}/>
-      </View>
+            <FontAwesome name={icon} size={16} color={colors.accent} />
+            <TextInput autoCapitalize={autoCapitalize} editable={editable} value={value} onChangeText={onChangeText} keyboardType={keyboardType} placeholder={placeholder} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]} />
+        </View>
     </View>);
 }
 function DateProfileInput({ icon, label, onPress, placeholder, value, }) {
     const colors = useThemeColors();
     return (<Pressable accessibilityRole="button" onPress={onPress} style={styles.inputGroup}>
-      <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
-      <View style={[
+        <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
+        <View style={[
             styles.inputRow,
             { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
         ]}>
-        <FontAwesome name={icon} size={16} color={colors.accent}/>
-        <Text numberOfLines={1} style={[
-            styles.input,
-            styles.dateInputText,
-            { color: value ? colors.text : colors.muted },
-        ]}>
-          {value || placeholder}
-        </Text>
-        <FontAwesome name="angle-down" size={18} color={colors.muted}/>
-      </View>
+            <FontAwesome name={icon} size={16} color={colors.accent} />
+            <Text numberOfLines={1} style={[
+                styles.input,
+                styles.dateInputText,
+                { color: value ? colors.text : colors.muted },
+            ]}>
+                {value || placeholder}
+            </Text>
+            <FontAwesome name="angle-down" size={18} color={colors.muted} />
+        </View>
     </Pressable>);
 }
 export default EditProfileScreen;

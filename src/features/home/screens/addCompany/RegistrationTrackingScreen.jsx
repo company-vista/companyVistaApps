@@ -301,9 +301,9 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 14,
+        paddingHorizontal: 16,
         paddingBottom: 12,
-        gap: 8,
+        gap: 12,
         borderBottomWidth: 1,
     },
     headerTitle: {

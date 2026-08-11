@@ -51,7 +51,7 @@ const RAW_CATALOG = [
         ],
     },
     {
-        category: "Business Compliance & Registrations",
+        category: "Business Compliance & Regis.",
         services: [
             {
                 name: "DBA / Trade Name Registration",
@@ -122,7 +122,7 @@ const RAW_CATALOG = [
         ],
     },
     {
-        category: "Corporate Changes & Legal Documentation",
+        category: "Company Updates & Documents",
         services: [
             {
                 name: "Company Amendment Filing",
@@ -175,4 +175,13 @@ export function getServiceCategories() {
 export function formatPrice(service) {
     const base = `$${service.price}${service.unit ?? ''}`;
     return service.note ? `${base} ${service.note}` : base;
+}
+export function findServiceBySlugOrName(value) {
+    if (!value) return null;
+    const key = String(value).trim().toLowerCase();
+    for (const category of RAW_CATALOG) {
+        const match = category.services.find((s) => s.slug === key || s.name.toLowerCase() === key);
+        if (match) return match;
+    }
+    return null;
 }

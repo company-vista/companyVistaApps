@@ -104,7 +104,7 @@ function RequestCard({ item, colors, }) {
       </View>
 
       <Text style={[styles.progressLabel, { color: colors.textMuted }]}>
-        REQUEST PROGRESS
+        Request Progress
       </Text>
       <ProgressTrack stage={item.stage} colors={colors}/>
 

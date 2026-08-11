@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
+import { getNetworkErrorMessage } from '../../../utils/errorMessages';
 const SUBSCRIPTION_PAYMENT_ROUTE = `${API_BASE_URL}/api/subscription/All/payment`;
 const API_REQUEST_TIMEOUT_MS = 8000;
 function asSubscriptionPaymentArray(value) {
@@ -43,7 +44,7 @@ function getErrorMessage(error) {
     const axiosError = error;
     const requestError = axiosError.request;
     if (axiosError.message === 'Network Error') {
-        return 'Unable to reach the payments API. Verify the backend is running on port 5000.';
+        return getNetworkErrorMessage();
     }
     return (axiosError.response?.data?.message ??
         axiosError.response?.data?.error ??

@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
 import Toast from 'react-native-toast-message';
+import { getNetworkErrorMessage } from '../../../utils/errorMessages';
 const COMPANY_DOCUMENTS_PATH = '/api/documents/company';
 const API_REQUEST_TIMEOUT_MS = 8000;
 function getErrorMessage(error) {
     const axiosError = error;
     const requestError = axiosError.request;
     if (axiosError.message === 'Network Error') {
-        return 'Unable to reach server. Check that the backend is running on port 5000.';
+        return getNetworkErrorMessage();
     }
     return (axiosError.response?.data?.message ??
         axiosError.response?.data?.error ??

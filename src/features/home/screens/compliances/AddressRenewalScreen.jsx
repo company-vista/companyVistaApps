@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Linking, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { Alert, Linking, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import BackButton from '../../../../components/buttons/BackButton';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import Toast from 'react-native-toast-message';
+const API_REQUEST_TIMEOUT_MS = 10000;
 const getIconName = (icon) => {
     const normalized = (icon ?? '').toLowerCase().trim();
     const iconMap = {
@@ -76,7 +76,6 @@ const buildAddressServices = (apiData, action) => {
     ];
 };
 const AddressRenewalScreen = () => {
-    const navigation = useNavigation();
     const route = useRoute();
     const selectedAction = route.params?.selectedAction;
     const colors = useThemeColors();
@@ -102,6 +101,7 @@ const AddressRenewalScreen = () => {
                         'x-auth-token': token,
                         'Content-Type': 'application/json',
                     },
+                    timeout: API_REQUEST_TIMEOUT_MS,
                 });
                 setServices(buildAddressServices(response?.data, selectedAction));
             }
@@ -152,6 +152,7 @@ const AddressRenewalScreen = () => {
                     'x-auth-token': token,
                     'Content-Type': 'application/json',
                 },
+                timeout: API_REQUEST_TIMEOUT_MS,
             });
             const checkoutUrl = response?.data?.url;
             if (checkoutUrl) {
@@ -168,17 +169,8 @@ const AddressRenewalScreen = () => {
             Alert.alert('Payment', status ? `${message} (Status ${status})` : message);
         }
     };
-    return (<SafeAreaView style={styles.safeArea}>
+    return (<View style={styles.safeArea}>
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface}/>
-
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <View style={styles.headerText}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? 'Address Renewal'}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>{selectedAction?.subtitle ?? 'Company · 1 renewable service'}</Text>
-        </View>
-        <View style={styles.headerRightPlaceholder}/>
-      </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.yearHeader}>
@@ -321,23 +313,10 @@ const AddressRenewalScreen = () => {
           <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe · Card and wallet checkout</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>);
+    </View>);
 };
 const styles = StyleSheet.create({
     safeArea: { flex: 1 },
-    header: {
-        paddingHorizontal: 20,
-        paddingVertical: 14,
-        borderBottomWidth: 0.5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        marginTop: 40,
-    },
-    headerText: { flex: 1 },
-    headerTitle: { fontSize: 15, fontWeight: '500' },
-    headerSubtitle: { fontSize: 12, marginTop: 1 },
-    headerRightPlaceholder: { width: 40 },
     content: { flex: 1 },
     contentContainer: { padding: 16, gap: 14 },
     yearHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

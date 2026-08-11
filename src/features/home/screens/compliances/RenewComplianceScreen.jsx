@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, SafeAreaView, StatusBar, InteractionManager, } from "react-native";
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, StatusBar, InteractionManager, } from "react-native";
+import { useRoute } from '@react-navigation/native';
 import { Linking } from "react-native";
 import axios from "axios";
-import BackButton from "../../../../components/buttons/BackButton";
 import { API_BASE_URL } from "../../../../config/api";
 import { useAppSelector } from "../../../../store/hooks";
 import { useThemeColors } from '../../../../theme/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+const API_REQUEST_TIMEOUT_MS = 10000;
 const BreakdownRow = ({ label, value, isTotal = false, colors }) => (<View style={[styles.breakdownRow, isTotal && [styles.breakdownRowTotal, { borderTopColor: colors.border }]]}>
     <Text style={[styles.breakdownLabel, { color: isTotal ? colors.text : colors.muted, fontWeight: isTotal ? '500' : undefined }]}>
       {label}
@@ -22,7 +22,6 @@ const showAlert = (title, message) => {
     });
 };
 const RenewCompliance = () => {
-    const navigation = useNavigation();
     const route = useRoute();
     const selectedAction = route.params?.selectedAction;
     const colors = useThemeColors();
@@ -86,6 +85,7 @@ const RenewCompliance = () => {
                     "x-auth-token": token,
                     "Content-Type": "application/json",
                 },
+                timeout: API_REQUEST_TIMEOUT_MS,
             });
             const checkoutUrl = response?.data?.url;
             if (checkoutUrl) {
@@ -101,20 +101,8 @@ const RenewCompliance = () => {
             showAlert("Payment", message);
         }
     };
-    return (<SafeAreaView style={styles.safeArea}>
+    return (<View style={styles.safeArea}>
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.surface}/>
-
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <View style={styles.headerText}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? "Renew compliance"}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
-            {selectedAction?.subtitle ?? "Company · 1 renewable service"}
-          </Text>
-        </View>
-        <View style={styles.headerRightPlaceholder}/>
-      </View>
 
       {/* Scrollable Content */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
@@ -131,9 +119,9 @@ const RenewCompliance = () => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity style={[styles.deselectBtn, { backgroundColor: colors.surfaceAlt }]} onPress={deselectAll}>
+          {selectedServices.length > 0 && (<TouchableOpacity style={[styles.deselectBtn, { backgroundColor: colors.surfaceAlt }]} onPress={deselectAll}>
             <Text style={[styles.deselectBtnText, { color: colors.accent }]}>Deselect all</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
         </View>
 
         {/* Service Cards */}
@@ -264,34 +252,11 @@ const RenewCompliance = () => {
           <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe · Card and wallet checkout</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>);
+    </View>);
 };
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-    },
-    header: {
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        paddingTop: 50,
-        borderBottomWidth: 0.5,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-    },
-    headerText: {
-        flex: 1,
-    },
-    headerTitle: {
-        fontSize: 15,
-        fontWeight: "500",
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        marginTop: 1,
-    },
-    headerRightPlaceholder: {
-        width: 40,
     },
     content: {
         flex: 1,

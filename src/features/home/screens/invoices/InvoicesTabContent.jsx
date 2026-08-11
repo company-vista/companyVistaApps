@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
+import InvoiceScreenSkeleton from '../../../../components/skeletons/InvoiceScreen';
 import { fetchInvoicesForCompany, selectHasLoadedInvoicesForCompany, selectInvoicesForCompany, } from '../../../../store/slices/invoicesSlice';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const HOME_HERO_COLORS = {
     panel: '#0D2137',
     accentBlue: '#85B7EB',
@@ -17,6 +19,7 @@ function getInvoicePalette(colors) {
     return {
         primaryText: isDark ? colors.text : HOME_HERO_COLORS.panel,
         accentText: isDark ? HOME_HERO_COLORS.accentBlue : '#2F6FAE',
+        dateText: isDark ? HOME_HERO_COLORS.accentBlue : '#303b47',
         actionSurface: isDark ? '#183A5C' : '#EAF4FF',
         actionBorder: isDark ? 'rgba(133,183,235,0.35)' : '#C7DFF6',
         iconSurface: isDark ? 'rgba(133,183,235,0.14)' : '#EAF4FF',
@@ -203,147 +206,143 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
         }
         dispatch(fetchInvoicesForCompany({ companyId: selectedCompany.id, token }));
     }, [dispatch, hasLoadedInvoices, selectedCompany?.id, token]);
-    return (<View style={styles.container}>
-      <View style={styles.titleRow}>
-        <View>
-          {/* <Text style={styles.title}>Invoices</Text> */}
-          <Text style={styles.companyName}>
-            Company name: {selectedCompany?.name ?? 'All companies'}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.searchRow}>
-        <View style={[
-            styles.searchBox,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}>
-          <FontAwesome name="search" size={17} color={palette.accentText}/>
-          <TextInput editable={!isLoading} placeholder="Search by invoice no. or amount" placeholderTextColor={colors.muted} value={searchQuery} onChangeText={setSearchQuery} style={styles.searchInput}/>
-        </View>
-      </View>
-
-      <View style={styles.listHeader}>
-        <View>
-          <Text style={[styles.foundSubtitle, { color: colors.muted }]}>
-            {isLoading
-            ? 'Loading invoices...'
-            : `Showing ${invoices.length} invoice${invoices.length === 1 ? '' : 's'}`}
-          </Text>
-        </View>
-        <View style={styles.sortRow}>
-          <Text style={[styles.sortLabel, { color: colors.muted }]}>Sort by:</Text>
-          <Pressable onPress={() => setIsSortOpen(prev => !prev)} style={styles.sortDropdown}>
-            <Text style={styles.sortValue}>
-              {SORT_OPTIONS.find(opt => opt.value === sortOption)?.label}
-            </Text>
-            <FontAwesome name={isSortOpen ? 'angle-up' : 'angle-down'} size={18} color={palette.accentText}/>
-          </Pressable>
-          {isSortOpen ? (<View style={[styles.sortDropdownList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              {SORT_OPTIONS.map(option => (
-                <Pressable key={option.value} onPress={() => {
-                    setSortOption(option.value);
-                    setIsSortOpen(false);
-                }} style={styles.sortDropdownItem}>
-                  <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '700' }]}>
-                    {option.label}
-                  </Text>
-                  {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText}/> : null}
-                </Pressable>))}
-            </View>) : null}
-        </View>
-      </View>
-
-      <View style={styles.invoiceList}>
-        {isLoading ? (<View style={styles.loadingState}>
-            <ActivityIndicator size="large" color={palette.accentText}/>
-            <Text style={[styles.stateText, { color: colors.muted }]}>
-              Loading invoices...
-            </Text>
-          </View>) : null}
-        {!isLoading && errorMessage ? (<Text style={[styles.stateText, { color: colors.danger }]}>
-            {errorMessage}
-          </Text>) : null}
-        {!isLoading && !errorMessage && !selectedCompany?.id ? (<Text style={[styles.stateText, { color: colors.muted }]}>
-            Please wait while we load invoices for your companies. 
-          </Text>) : null}
-        {!isLoading && !errorMessage && selectedCompany?.id && invoices.length === 0 ? (<View style={styles.emptyState}>
-            <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90 }} resizeMode="contain"/>
-            <Text style={[styles.stateText, { color: colors.muted }]}>
-            No invoices found for this company.
-          </Text>
-          </View>) : null}
-        {!isLoading && invoices.map((invoice, index) => {
-            const statusColor = invoice.status === 'paid' ? '#16a34a' :
-                invoice.status === 'partial' ? '#d97706' :
-                    '#dc2626';
-            const statusBackground = invoice.status === 'paid' ? '#dcfce7' :
-                invoice.status === 'partial' ? '#fef3c7' :
-                    '#fee2e2';
-            return (<AnimatedAppear key={invoice.id} index={index}>
-              <View style={[
-                    styles.invoiceCard,
-                    {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                    },
-                ]}>
-              <View style={styles.invoiceTopRow}>
-                <View style={styles.invoiceIcon}>
-                  <FontAwesome name="building-o" size={22} color={palette.iconColor}/>
-                </View>
-                <View style={styles.invoiceCopy}>
-                  <Text style={styles.invoiceId}>
-                    {invoice.id}
-                  </Text>
-                  <Text style={styles.invoiceCompany}>
-                    {invoice.company}
-                  </Text>
-                </View>
-                <Text style={styles.amount}>
-                  {invoice.amount}
+    return (isLoading || (selectedCompany?.id && !hasLoadedInvoices && !errorMessage) ? (<View style={[styles.container, { flex: 1 }]}>
+        <InvoiceScreenSkeleton />
+    </View>) : <View style={styles.container}>
+        <View style={styles.titleRow}>
+            <View>
+                {/* <Text style={styles.title}>Invoices</Text> */}
+                <Text style={styles.companyName}>
+                    Company Name: {capitalizeCompanyName(selectedCompany?.name) ?? 'All companies'}
                 </Text>
-              </View>
-
-              <View style={[styles.invoiceDivider, { backgroundColor: colors.border }]}/>
-
-              <View style={styles.invoiceBottomRow}>
-                <View style={styles.invoiceBottomLeft}>
-                  <View style={styles.metaRow}>
-                    <FontAwesome name="calendar" size={13} color={palette.accentText}/>
-                    <Text style={styles.metaText}>
-                      Created: {invoice.created}
-                    </Text>
-                  </View>
-                  <View style={styles.metaRow}>
-                    <FontAwesome name="calendar" size={13} color={palette.accentText}/>
-                    <Text style={[
-                    styles.metaText,
-                    invoice.status === 'unpaid' ? styles.overdueDueText : styles.paidDueText,
-                ]}>
-                      Due: {invoice.due}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.invoiceBottomRight}>
-                  <Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={styles.actionButton}>
-                    <FontAwesome name="eye" size={15} color={palette.iconColor}/>
-                  </Pressable>
-                  {invoice.status === 'unpaid' ? (<Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={[styles.statusPill, { backgroundColor: '#16a34a' }]}>
-                      <Text style={[styles.statusText, { color: '#ffffff' }]}>
-                        Pay Now
-                      </Text>
-                    </Pressable>) : (<View style={[styles.statusPill, { backgroundColor: statusBackground }]}>
-                      <Text style={[styles.statusText, { color: statusColor }]}>
-                        {invoice.status === 'paid' ? 'Paid' : 'Partial'}
-                      </Text>
-                    </View>)}
-                </View>
-              </View>
             </View>
-            </AnimatedAppear>);
-        })}
-      </View>
+        </View>
+
+        <View style={styles.searchRow}>
+            <View style={[
+                styles.searchBox,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}>
+                <FontAwesome name="search" size={17} color={palette.accentText} />
+                <TextInput editable={!isLoading} placeholder="Search by invoice no. or amount" placeholderTextColor={colors.muted} value={searchQuery} onChangeText={setSearchQuery} style={styles.searchInput} />
+            </View>
+        </View>
+
+        <View style={styles.listHeader}>
+            <View>
+                <Text style={[styles.foundSubtitle, { color: colors.muted }]}>
+                    {isLoading
+                        ? 'Loading invoices...'
+                        : `Showing ${invoices.length} invoice${invoices.length === 1 ? '' : 's'}`}
+                </Text>
+            </View>
+            <View style={styles.sortRow}>
+                <Text style={[styles.sortLabel, { color: colors.muted }]}>Sort by:</Text>
+                <Pressable onPress={() => setIsSortOpen(prev => !prev)} style={styles.sortDropdown}>
+                    <Text style={styles.sortValue}>
+                        {SORT_OPTIONS.find(opt => opt.value === sortOption)?.label}
+                    </Text>
+                    <FontAwesome name={isSortOpen ? 'angle-up' : 'angle-down'} size={18} color={palette.accentText} />
+                </Pressable>
+                {isSortOpen ? (<View style={[styles.sortDropdownList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    {SORT_OPTIONS.map(option => (
+                        <Pressable key={option.value} onPress={() => {
+                            setSortOption(option.value);
+                            setIsSortOpen(false);
+                        }} style={styles.sortDropdownItem}>
+                            <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '700' }]}>
+                                {option.label}
+                            </Text>
+                            {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText} /> : null}
+                        </Pressable>))}
+                </View>) : null}
+            </View>
+        </View>
+
+        <View style={styles.invoiceList}>
+            {!isLoading && errorMessage ? (<Text style={[styles.stateText, { color: colors.danger }]}>
+                {errorMessage}
+            </Text>) : null}
+            {!isLoading && !errorMessage && !selectedCompany?.id ? (<Text style={[styles.stateText, { color: colors.muted }]}>
+                Please wait while we load invoices for your companies.
+            </Text>) : null}
+            {!isLoading && !errorMessage && selectedCompany?.id && invoices.length === 0 ? (<View style={styles.emptyState}>
+                <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90 }} resizeMode="contain" />
+                <Text style={[styles.stateText, { color: colors.muted }]}>
+                    No invoices found for this company.
+                </Text>
+            </View>) : null}
+            {!isLoading && invoices.map((invoice, index) => {
+                const statusColor = invoice.status === 'paid' ? '#16a34a' :
+                    invoice.status === 'partial' ? '#d97706' :
+                        '#dc2626';
+                const statusBackground = invoice.status === 'paid' ? '#dcfce7' :
+                    invoice.status === 'partial' ? '#fef3c7' :
+                        '#fee2e2';
+                return (<AnimatedAppear key={invoice.id} index={index}>
+                    <View style={[
+                        styles.invoiceCard,
+                        {
+                            backgroundColor: colors.surface,
+                            borderColor: colors.border,
+                        },
+                    ]}>
+                        <View style={styles.invoiceTopRow}>
+                            <View style={styles.invoiceIcon}>
+                                <FontAwesome name="building-o" size={22} color={palette.iconColor} />
+                            </View>
+                            <View style={styles.invoiceCopy}>
+                                <Text style={styles.invoiceId}>
+                                    {invoice.id}
+                                </Text>
+                                <Text style={styles.invoiceCompany}>
+                                    {capitalizeCompanyName(invoice.company)}
+                                </Text>
+                            </View>
+                            <Text style={styles.amount}>
+                                {invoice.amount}
+                            </Text>
+                        </View>
+
+                        <View style={[styles.invoiceDivider, { backgroundColor: colors.border }]} />
+
+                        <View style={styles.invoiceBottomRow}>
+                            <View style={styles.invoiceBottomLeft}>
+                                <View style={styles.metaRow}>
+                                    <FontAwesome name="calendar" size={13} color={palette.accentText} />
+                                    <Text style={styles.metaText}>
+                                        Created: {invoice.created}
+                                    </Text>
+                                </View>
+                                <View style={styles.metaRow}>
+                                    <FontAwesome name="calendar" size={13} color={palette.accentText} />
+                                    <Text style={[
+                                        styles.metaText,
+                                        invoice.status === 'unpaid' ? styles.overdueDueText : styles.paidDueText,
+                                    ]}>
+                                        Due Date: {invoice.due}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.invoiceBottomRight}>
+                                <Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={styles.actionButton}>
+                                    <FontAwesome name="eye" size={15} color={palette.iconColor} />
+                                </Pressable>
+                                {invoice.status === 'unpaid' ? (<Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={[styles.statusPill, { backgroundColor: '#16a34a' }]}>
+                                    <Text style={[styles.statusText, { color: '#ffffff' }]}>
+                                        Pay Now
+                                    </Text>
+                                </Pressable>) : (<View style={[styles.statusPill, { backgroundColor: statusBackground }]}>
+                                    <Text style={[styles.statusText, { color: statusColor }]}>
+                                        {invoice.status === 'paid' ? 'Paid' : 'Partial'}
+                                    </Text>
+                                </View>)}
+                            </View>
+                        </View>
+                    </View>
+                </AnimatedAppear>);
+            })}
+        </View>
     </View>);
 }
 const getStyles = (colors) => {
@@ -353,7 +352,7 @@ const getStyles = (colors) => {
             paddingTop: 1,
         },
         titleRow: {
-            marginBottom: 4,
+            marginBottom: 2,
         },
         title: {
             color: palette.primaryText,
@@ -365,12 +364,11 @@ const getStyles = (colors) => {
             color: palette.accentText,
             fontSize: font.xxl,
             fontWeight: '500',
-            marginTop: 2,
         },
         searchRow: {
             flexDirection: 'row',
             gap: 10,
-            marginTop: 18,
+            marginTop: 10,
         },
         searchBox: {
             alignItems: 'center',
@@ -393,7 +391,7 @@ const getStyles = (colors) => {
             alignItems: 'flex-start',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: 26,
+            marginTop: 18,
         },
         foundSubtitle: {
             fontSize: font.lg,
@@ -494,13 +492,13 @@ const getStyles = (colors) => {
         invoiceId: {
             color: palette.primaryText,
             fontSize: font.md,
-            fontWeight: '600',
+            fontWeight: '400',
             letterSpacing: 0,
         },
         invoiceCompany: {
             color: palette.primaryText,
             fontSize: font.lg,
-            fontWeight: '600',
+            fontWeight: '500',
             marginTop: 4,
         },
         invoiceDivider: {
@@ -526,16 +524,16 @@ const getStyles = (colors) => {
             marginTop: 4,
         },
         metaText: {
-            color: palette.accentText,
+            color: palette.dateText,
             fontSize: font.base,
             fontWeight: '400',
             marginLeft: 8,
         },
         overdueDueText: {
-            color: '#dc2626',
+            color: palette.dateText,
         },
         paidDueText: {
-            color: palette.accentText,
+            color: palette.dateText,
         },
         amount: {
             color: palette.primaryText,

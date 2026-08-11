@@ -10,7 +10,7 @@ const options = [
     {
         id: 'requestChange',
         label: 'Request Change',
-        description: 'Submit changes for company details, shareholders, address & more',
+        description: 'Submit Request for Company Updates',
         icon: 'edit',
         color: '#4F46E5',
     },
@@ -107,11 +107,11 @@ const styles = StyleSheet.create({
     },
     optionLabel: {
         fontSize: font.xxl,
-        fontWeight: '600',
+        fontWeight: '500',
         marginBottom: 4,
     },
     optionDescription: {
-        fontSize: font.md,
+        fontSize: font.base,
         lineHeight: 18,
     },
 });

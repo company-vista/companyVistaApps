@@ -5,6 +5,8 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../theme/typography';
 import { API_BASE_URL, RAZORPAY_KEY_ID } from '../config/api';
+import { useAppSelector } from '../store/hooks';
+const API_REQUEST_TIMEOUT_MS = 10000;
 let paymentStatusInterval = null;
 function clearPaymentStatusFlow() {
     if (paymentStatusInterval) {
@@ -12,7 +14,15 @@ function clearPaymentStatusFlow() {
         paymentStatusInterval = null;
     }
 }
-function pollPaymentStatus(invoiceId) {
+function getAuthHeaders(token) {
+    return token
+        ? {
+            Authorization: `Bearer ${token}`,
+            'x-auth-token': token,
+        }
+        : {};
+}
+function pollPaymentStatus(invoiceId, token, onPaid) {
     clearPaymentStatusFlow();
     let attempts = 0;
     const MAX_ATTEMPTS = 12;
@@ -20,18 +30,24 @@ function pollPaymentStatus(invoiceId) {
         attempts++;
         if (attempts >= MAX_ATTEMPTS) {
             clearPaymentStatusFlow();
-            Toast.show({ type: 'info', text1: 'Please refresh to check payment status' });
+            Toast.show({ type: 'info', text1: 'Payment not confirmed', text2: 'Your payment may still be processing. Check Transactions shortly.' });
             return;
         }
         try {
-            const { data } = await axios.get(`${API_BASE_URL}/api/subscription/details/${invoiceId}`, {
+            const { data } = await axios.get(`${API_BASE_URL}/api/payment/details/${invoiceId}`, {
                 withCredentials: true,
+                timeout: API_REQUEST_TIMEOUT_MS,
                 params: { _t: Date.now() },
-                headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+                headers: {
+                    ...getAuthHeaders(token),
+                    'Cache-Control': 'no-cache',
+                    Pragma: 'no-cache',
+                },
             });
-            const status = data?.paymentStatus || data?.status || '';
+            const status = data?.invoice?.paymentStatus || data?.paymentStatus || data?.status || '';
             if (status === 'paid' || status === 'completed') {
                 clearPaymentStatusFlow();
+                onPaid?.(data);
                 Toast.show({ type: 'success', text1: 'Payment successful!' });
             }
         }
@@ -42,10 +58,15 @@ function pollPaymentStatus(invoiceId) {
 }
 export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInitiated, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
     const [loading, setLoading] = useState(false);
+    const token = useAppSelector(state => state.auth.token);
     useEffect(() => {
         return () => clearPaymentStatusFlow();
     }, []);
     const handlePayment = async () => {
+        if (!token) {
+            Toast.show({ type: 'error', text1: 'Please login to continue' });
+            return;
+        }
         const companyId = invoice?.companyId || invoice?.company?._id;
         const amount = Number(invoice?.amount || 0);
         if (!companyId) {
@@ -85,6 +106,8 @@ export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInit
             Toast.show({ type: 'info', text1: 'Creating Razorpay order...' });
             const { data } = await axios.post(endpoint, payload, {
                 withCredentials: true,
+                timeout: API_REQUEST_TIMEOUT_MS,
+                headers: getAuthHeaders(token),
             });
             onInitiated?.(data);
             const order = data?.order;
@@ -107,18 +130,41 @@ export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInit
             // console.log(options , "options")
             const razorpayResponse = await RazorpayCheckout.open(options);
             console.log(razorpayResponse, "razorpayResponse");
-            Toast.show({ type: 'success', text1: 'Payment successful!' });
-            axios.post(`${API_BASE_URL}/api/subscription/verify-payment`, {
-                ...razorpayResponse,
-                companyId,
-                invoiceId: invoice?.id,
-                amount,
-                type: paymentType,
-            }, { withCredentials: true }).catch((err) => { console.log(err, "err"); });
-            if (invoice?.id) {
-                pollPaymentStatus(invoice.id);
+            Toast.show({ type: 'info', text1: 'Verifying payment...' });
+            const invoiceId = invoice?.id || '';
+            let verifyData = null;
+            let verifyConfirmed = false;
+            try {
+                const verifyResponse = await axios.post(`${API_BASE_URL}/api/subscription/verify-payment`, {
+                    ...razorpayResponse,
+                    companyId,
+                    invoiceId,
+                    amount,
+                    type: paymentType,
+                }, { withCredentials: true, timeout: API_REQUEST_TIMEOUT_MS, headers: getAuthHeaders(token) });
+                verifyData = verifyResponse?.data;
+                const verifyStatus = String(verifyData?.status || '').toLowerCase();
+                verifyConfirmed = !(verifyData?.success === false || verifyStatus === 'failed' || verifyStatus === 'error');
             }
-            onSuccess?.({ ...data, razorpayResponse });
+            catch (err) {
+                console.log(err, "verify error");
+            }
+            if (verifyConfirmed) {
+                Toast.show({ type: 'success', text1: 'Payment successful!' });
+                onSuccess?.({ ...data, razorpayResponse, verification: verifyData });
+                if (invoiceId) {
+                    pollPaymentStatus(invoiceId, token);
+                }
+            }
+            else if (invoiceId) {
+                Toast.show({ type: 'info', text1: 'Payment received', text2: 'Confirming status...' });
+                pollPaymentStatus(invoiceId, token, () => {
+                    onSuccess?.({ ...data, razorpayResponse });
+                });
+            }
+            else {
+                Toast.show({ type: 'info', text1: 'Payment submitted', text2: 'Status will update shortly.' });
+            }
         }
         catch (error) {
             clearPaymentStatusFlow();

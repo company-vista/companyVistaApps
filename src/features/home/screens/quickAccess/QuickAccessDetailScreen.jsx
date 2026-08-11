@@ -1,22 +1,11 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 function QuickAccessDetailScreen({ color, description, icon, onBackPress, title, }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
-    return (<View style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 22 },
-        ]}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <BackButton onPress={onBackPress}/>
-          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-        </View>
-      </View>
-
+    return (<View style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },

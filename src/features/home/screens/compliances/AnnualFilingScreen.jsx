@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, View, Text, ScrollView, TextInput, TouchableOpacity, Pressable, StyleSheet, SafeAreaView, } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Alert, View, Text, ScrollView, TextInput, TouchableOpacity, Pressable, StyleSheet, } from 'react-native';
 import { pick, types } from '@react-native-documents/picker';
 import Feather from 'react-native-vector-icons/Feather';
-import BackButton from '../../../../components/buttons/BackButton';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
+import { font } from '../../../../theme/typography';
 const STEPS = [
     { number: 1, title: 'Company selection', subtitle: 'Select the company for filing', status: 'done' },
     { number: 2, title: 'Fiscal year', subtitle: 'Choose the filing year', status: 'upcoming' },
@@ -20,7 +19,6 @@ const STEPS = [
     { number: 7, title: 'Filed', subtitle: 'Filing confirmed by state', status: 'upcoming' },
 ];
 export default function AnnualStateFilingScreen() {
-    const navigation = useNavigation();
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const authUserId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
@@ -79,10 +77,10 @@ export default function AnnualStateFilingScreen() {
             const selectedFiles = response
                 .filter(item => item?.uri)
                 .map(item => ({
-                uri: item.uri,
-                name: item.name ?? `supporting-document-${Date.now()}`,
-                type: item.type ?? 'application/octet-stream',
-            }));
+                    uri: item.uri,
+                    name: item.name ?? `supporting-document-${Date.now()}`,
+                    type: item.type ?? 'application/octet-stream',
+                }));
             if (selectedFiles.length === 0) {
                 Alert.alert('No files selected', 'Please choose at least one document to upload.');
                 return;
@@ -277,196 +275,185 @@ export default function AnnualStateFilingScreen() {
             setTaxYear(options[0] ?? '');
         }
     }, [companyDataList, selectedCompanyIdState, taxYear]);
-    return (<SafeAreaView style={styles.safeArea}> 
-      <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        
-        {/* ***************** HEADING TEXT *********************** */}
-        <BackButton onPress={() => navigation.goBack()}/>
-        <View style={styles.topBarText}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Annual state filing</Text>
-          {/* <Text style={[styles.headerSubtitle, { color: colors.muted }]}>Submit your annual state compliance filing documents</Text> */}
-        </View>
-        <View style={styles.topBarSpacer}/>
-      </View>
-
-      <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* ***************** SELECT COMPANY SECTION *********************** */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 20 }]}>        
-          <View style={styles.cardLabelRow}>
-            <Feather name="briefcase" size={15} color={colors.accent}/>
-            <Text style={[styles.cardLabel, { color: colors.text }]}>Select company</Text>
-          </View>
-          <Pressable style={[styles.selectField, { borderColor: colors.border }]} onPress={() => setIsCompanyDropdownOpen(prev => !prev)}>
-            <Text style={[styles.selectFieldText, { color: colors.text }]}>{company}</Text>
-            <Feather name={isCompanyDropdownOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.muted}/>
-          </Pressable>
-          {isCompanyDropdownOpen && (<View style={[styles.dropdownList, { borderColor: colors.border, backgroundColor: colors.surface }]}> 
-              {companyOptions.length > 0 ? (companyOptions.map(option => (<Pressable key={option.id} style={[styles.dropdownItem, { backgroundColor: colors.surface }]} onPress={() => {
-                    setCompany(option.label);
-                    setSelectedCompanyIdState(option.id);
-                    setIsCompanyDropdownOpen(false);
-                }}>
-                    <Text style={[styles.dropdownItemText, { color: colors.text }]}>{option.label}</Text>
-                  </Pressable>))) : (<Text style={[styles.dropdownEmptyText, { color: colors.muted }]}>No companies available</Text>)}
-            </View>)}
-        </View>
-
-
-        {/* ***************** FISCIAL YEAR SECTION *********************** */}
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 10 }]}> 
-          <View style={styles.cardLabelRow}>
-            <Feather name="calendar" size={15} color={colors.primary}/>
-            <Text style={[styles.cardLabel, { color: colors.text }]}>Fiscal year</Text>
-          </View>
-          <Pressable style={[styles.selectField, { marginBottom: 8, borderColor: colors.border }]} onPress={() => setIsTaxYearDropdownOpen(prev => !prev)}>
-            <Text style={[styles.selectFieldText, { color: colors.text }]}>{taxYear}</Text>
-            <Feather name={isTaxYearDropdownOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.muted}/>
-          </Pressable>
-          {isTaxYearDropdownOpen && (<View style={[styles.dropdownList, { borderColor: colors.border, backgroundColor: colors.surface }]}> 
-              {taxYearOptions.map(option => (<Pressable key={option} style={[styles.dropdownItem, { backgroundColor: colors.surface }]} onPress={() => {
-                    setTaxYear(option);
-                    setIsTaxYearDropdownOpen(false);
-                }}>
-                  <Text style={[styles.dropdownItemText, { color: colors.text }]}>{option}</Text>
-                </Pressable>))}
-            </View>)}
-          <Text style={[styles.hintText, { color: colors.muted }]}>Deadline: typically 2-4 months after fiscal year end.</Text>
-        </View>
-        {/* ***************** FISCIAL YEAR SECTION *********************** */}
-        
-        {/* ***************** ANY CHANGE TO REPORT SECTION *********************** */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <View style={styles.cardLabelRowBetween}>
-            <View style={styles.cardLabelRow}>
-              <Feather name="edit-3" size={15} color={colors.accent}/>
-              <Text style={[styles.cardLabel, { color: colors.text }]}>Any changes to report?</Text>
-            </View>
-            <Text style={[styles.requiredText, { color: colors.danger }]}>Required</Text>
-          </View>
-          <View style={styles.choiceRow}>
-            <TouchableOpacity style={[
-            styles.choiceButton,
-            { borderColor: colors.border },
-            hasChanges === true && styles.choiceButtonActive,
-        ]} onPress={() => setHasChanges(true)}>
-              <Text style={[
-            styles.choiceButtonText,
-            { color: colors.text },
-            hasChanges === true && styles.choiceButtonTextActive,
-        ]}>
-                Yes, I have changes
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[
-            styles.choiceButton,
-            { borderColor: colors.border },
-            hasChanges === false && styles.choiceButtonActive,
-        ]} onPress={() => {
-            setHasChanges(false);
-            setChangesMessage('');
-        }}>
-              <Text style={[
-            styles.choiceButtonText,
-            { color: colors.text },
-            hasChanges === false && styles.choiceButtonTextActive,
-        ]}>
-                No, no changes
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {hasChanges === true ? (<View style={{ marginTop: 12 }}>
-              <Text style={[styles.cardLabel, { color: colors.text, marginBottom: 8 }]}>Describe the changes</Text>
-              <TextInput style={[styles.notesInput, { borderColor: colors.border, color: colors.text }]} placeholder="Describe the changes to your annual filing..." placeholderTextColor={colors.muted} multiline value={changesMessage} onChangeText={setChangesMessage}/>
-              <Text style={[styles.hintText, { color: colors.muted }]}>Provide details so our compliance team can review your changes.</Text>
-            </View>) : null}
-        </View>
-
-        {/* ***************** SUPPORTING DOCUMENTS SECTION *********************** */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <View style={styles.cardLabelRowBetween}>
-            <View style={styles.cardLabelRow}>
-              <Feather name="upload-cloud" size={15} color={colors.accent}/>
-              <Text style={[styles.cardLabel, { color: colors.text }]}>Supporting documents</Text>
-            </View>
-            <Text style={[styles.requiredText, { color: colors.danger }]}>Required</Text>
-          </View>
-          <TouchableOpacity style={[styles.uploadBox, { borderColor: colors.border }]} onPress={handlePickSupportingDocuments}>
-            <Feather name="upload" size={20} color={colors.muted}/>
-            <Text style={[styles.uploadTitle, { color: colors.muted }]}>Click to upload documents</Text>
-            <Text style={[styles.uploadHint, { color: colors.muted }]}>Annual report, financial statements, amendment docs</Text>
-            <Text style={[styles.uploadHint, { color: colors.muted }]}>PDF, JPG, PNG, DOC (max 10MB each)</Text>
-          </TouchableOpacity>
-          {supportingDocs.length > 0 ? (<View style={styles.selectedFilesContainer}>
-              {supportingDocs.map((file, index) => (<View key={`${file.uri}-${index}`} style={[styles.selectedFileItem, { borderColor: colors.border, backgroundColor: colors.surface }]}> 
-                  <Text numberOfLines={1} style={[styles.selectedFileText, { color: colors.text, flex: 1 }]}>{file.name}</Text>
-                  <Pressable style={styles.removeFileButton} onPress={() => removeSupportingDocument(index)}>
-                    <Text style={[styles.removeFileButtonText, { color: colors.danger }]}>Remove</Text>
-                  </Pressable>
-                </View>))}
-            </View>) : null}
-        </View>
-       
-        
-        {/* ***************** STATE FILING NOTES SECTION *********************** */}
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <View style={styles.cardLabelRow}>
-            <Feather name="file-text" size={15} color={colors.muted}/>
-            <Text style={[styles.cardLabel, { color: colors.text }]}>State filing notes</Text>
-          </View>
-          <TextInput style={[styles.notesInput, { borderColor: colors.border, color: colors.text }]} placeholder="Any specific instructions or notes for the state filing team..." placeholderTextColor={colors.muted} multiline value={notes} onChangeText={setNotes}/>
-          <Text style={[styles.hintText, { color: colors.muted }]}>Optional - include special requests or clarifications.</Text>
-        </View>
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}> 
-          <Text style={[styles.cardLabel, { marginBottom: 14, color: colors.text }]}>Status tracker</Text>
-          {STEPS.map((step, index) => {
-            const status = progressStatuses[index];
-            return (<View key={step.number} style={styles.stepRow}>
-                <View style={styles.stepIndicatorColumn}>
-                  <StepBullet status={status} number={step.number} colors={colors}/>
-                  {index < STEPS.length - 1 && <View style={[styles.stepConnector, { backgroundColor: colors.border }]}/>}
+    return (<View style={styles.safeArea}>
+        <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            {/* ***************** SELECT COMPANY SECTION *********************** */}
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 20 }]}>
+                <View style={styles.cardLabelRow}>
+                    <Feather name="briefcase" size={15} color={colors.accent} />
+                    <Text style={[styles.cardLabel, { color: colors.text }]}>Select Company</Text>
                 </View>
-                <View style={{ paddingBottom: 16, flex: 1 }}>
-                  <Text style={[
-                    styles.stepTitle,
-                    { color: colors.text },
-                    status === 'active' && { color: colors.primary },
-                    status === 'upcoming' && { color: colors.muted },
-                ]}>
-                    {step.title}
-                  </Text>
-                  <Text style={[styles.stepSubtitle, { color: colors.muted }]}>{step.subtitle}</Text>
-                </View>
-              </View>);
-        })}
-        </View>
+                <Pressable style={[styles.selectField, { borderColor: colors.border }]} onPress={() => setIsCompanyDropdownOpen(prev => !prev)}>
+                    <Text style={[styles.selectFieldText, { color: colors.text }]}>{company}</Text>
+                    <Feather name={isCompanyDropdownOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.muted} />
+                </Pressable>
+                {isCompanyDropdownOpen && (<View style={[styles.dropdownList, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                    {companyOptions.length > 0 ? (companyOptions.map(option => (<Pressable key={option.id} style={[styles.dropdownItem, { backgroundColor: colors.surface }]} onPress={() => {
+                        setCompany(option.label);
+                        setSelectedCompanyIdState(option.id);
+                        setIsCompanyDropdownOpen(false);
+                    }}>
+                        <Text style={[styles.dropdownItemText, { color: colors.text }]}>{option.label}</Text>
+                    </Pressable>))) : (<Text style={[styles.dropdownEmptyText, { color: colors.muted }]}>No companies available</Text>)}
+                </View>)}
+            </View>
 
-    <View style={styles.submitButtonWrapper}>
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: colors.buttonBackground }]} onPress={handleSubmit} disabled={submitting}>
-            <Text style={[styles.submitButtonText, { color: colors.surface }]}>Submit annual filing</Text>
-            <Feather name="send" size={15} style={styles.sendIcon}  color={colors.surface}/>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>);
+
+            {/* ***************** FISCIAL YEAR SECTION *********************** */}
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 10 }]}>
+                <View style={styles.cardLabelRow}>
+                    <Feather name="calendar" size={15} color={colors.primary} />
+                    <Text style={[styles.cardLabel, { color: colors.text }]}>Fiscal year</Text>
+                </View>
+                <Pressable style={[styles.selectField, { marginBottom: 8, borderColor: colors.border }]} onPress={() => setIsTaxYearDropdownOpen(prev => !prev)}>
+                    <Text style={[styles.selectFieldText, { color: colors.text }]}>{taxYear}</Text>
+                    <Feather name={isTaxYearDropdownOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.muted} />
+                </Pressable>
+                {isTaxYearDropdownOpen && (<View style={[styles.dropdownList, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                    {taxYearOptions.map(option => (<Pressable key={option} style={[styles.dropdownItem, { backgroundColor: colors.surface }]} onPress={() => {
+                        setTaxYear(option);
+                        setIsTaxYearDropdownOpen(false);
+                    }}>
+                        <Text style={[styles.dropdownItemText, { color: colors.text }]}>{option}</Text>
+                    </Pressable>))}
+                </View>)}
+                <Text style={[styles.hintText, { color: colors.muted }]}>Deadline: typically 2-4 months after fiscal year end.</Text>
+            </View>
+            {/* ***************** FISCIAL YEAR SECTION *********************** */}
+
+            {/* ***************** ANY CHANGE TO REPORT SECTION *********************** */}
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.cardLabelRowBetween}>
+                    <View style={styles.cardLabelRow}>
+                        <Feather name="edit-3" size={15} color={colors.accent} />
+                        <Text style={[styles.cardLabel, { color: colors.text }]}>Any Changes To Report?</Text>
+                    </View>
+                    <Text style={[styles.requiredText, { color: colors.danger }]}>Required</Text>
+                </View>
+                <View style={styles.choiceRow}>
+                    <TouchableOpacity style={[
+                        styles.choiceButton,
+                        { borderColor: colors.border },
+                        hasChanges === true && styles.choiceButtonActive,
+                    ]} onPress={() => setHasChanges(true)}>
+                        <Text style={[
+                            styles.choiceButtonText,
+                            { color: colors.text },
+                            hasChanges === true && styles.choiceButtonTextActive,
+                        ]}>
+                            Yes, I have changes
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[
+                        styles.choiceButton,
+                        { borderColor: colors.border },
+                        hasChanges === false && styles.choiceButtonActive,
+                    ]} onPress={() => {
+                        setHasChanges(false);
+                        setChangesMessage('');
+                    }}>
+                        <Text style={[
+                            styles.choiceButtonText,
+                            { color: colors.text },
+                            hasChanges === false && styles.choiceButtonTextActive,
+                        ]}>
+                            No, no changes
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                {hasChanges === true ? (<View style={{ marginTop: 12 }}>
+                    <Text style={[styles.cardLabel, { color: colors.text, marginBottom: 8 }]}>Describe the changes</Text>
+                    <TextInput style={[styles.notesInput, { borderColor: colors.border, color: colors.text }]} placeholder="Describe the changes to your annual filing..." placeholderTextColor={colors.muted} multiline value={changesMessage} onChangeText={setChangesMessage} />
+                    <Text style={[styles.hintText, { color: colors.muted }]}>Provide details so our compliance team can review your changes.</Text>
+                </View>) : null}
+            </View>
+
+            {/* ***************** SUPPORTING DOCUMENTS SECTION *********************** */}
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.cardLabelRowBetween}>
+                    <View style={styles.cardLabelRow}>
+                        <Feather name="upload-cloud" size={15} color={colors.accent} />
+                        <Text style={[styles.cardLabel, { color: colors.text }]}>Supporting Documents</Text>
+                    </View>
+                    <Text style={[styles.requiredText, { color: colors.danger }]}>Required</Text>
+                </View>
+                <TouchableOpacity style={[styles.uploadBox, { borderColor: colors.border }]} onPress={handlePickSupportingDocuments}>
+                    <Feather name="upload" size={20} color={colors.muted} />
+                    <Text style={[styles.uploadTitle, { color: colors.muted }]}>Click To Upload Documents</Text>
+                    <Text style={[styles.uploadHint, { color: colors.muted }]}>Annual report, Financial statements, Amendment docs</Text>
+                    <Text style={[styles.uploadHint, { color: colors.muted }]}>PDF, JPG, PNG, DOC (max 10MB each)</Text>
+                </TouchableOpacity>
+                {supportingDocs.length > 0 ? (<View style={styles.selectedFilesContainer}>
+                    {supportingDocs.map((file, index) => (<View key={`${file.uri}-${index}`} style={[styles.selectedFileItem, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+                        <Text numberOfLines={1} style={[styles.selectedFileText, { color: colors.text, flex: 1 }]}>{file.name}</Text>
+                        <Pressable style={styles.removeFileButton} onPress={() => removeSupportingDocument(index)}>
+                            <Text style={[styles.removeFileButtonText, { color: colors.danger }]}>Remove</Text>
+                        </Pressable>
+                    </View>))}
+                </View>) : null}
+            </View>
+
+
+            {/* ***************** STATE FILING NOTES SECTION *********************** */}
+
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.cardLabelRow}>
+                    <Feather name="file-text" size={15} color={colors.muted} />
+                    <Text style={[styles.cardLabel, { color: colors.text }]}>State Filing Notes</Text>
+                </View>
+                <TextInput style={[styles.notesInput, { borderColor: colors.border, color: colors.text }]} placeholder="Any specific instructions or notes for the state filing team..." placeholderTextColor={colors.muted} multiline value={notes} onChangeText={setNotes} />
+                <Text style={[styles.hintText, { color: colors.muted }]}>Optional - include special requests or clarifications.</Text>
+            </View>
+
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.cardLabel, { marginBottom: 14, color: colors.text }]}>Status Tracker</Text>
+                {STEPS.map((step, index) => {
+                    const status = progressStatuses[index];
+                    return (<View key={step.number} style={styles.stepRow}>
+                        <View style={styles.stepIndicatorColumn}>
+                            <StepBullet status={status} number={step.number} colors={colors} />
+                            {index < STEPS.length - 1 && <View style={[styles.stepConnector, { backgroundColor: colors.border }]} />}
+                        </View>
+                        <View style={{ paddingBottom: 16, flex: 1 }}>
+                            <Text style={[
+                                styles.stepTitle,
+                                { color: colors.text },
+                                status === 'active' && { color: colors.primary },
+                                status === 'upcoming' && { color: colors.muted },
+                            ]}>
+                                {step.title}
+                            </Text>
+                            <Text style={[styles.stepSubtitle, { color: colors.muted }]}>{step.subtitle}</Text>
+                        </View>
+                    </View>);
+                })}
+            </View>
+
+            <View style={styles.submitButtonWrapper}>
+                <TouchableOpacity style={[styles.submitButton, { backgroundColor: colors.buttonBackground }]} onPress={handleSubmit} disabled={submitting}>
+                    <Text style={[styles.submitButtonText, { color: colors.surface }]}>Submit State Filing</Text>
+                    <Feather name="send" size={15} style={styles.sendIcon} color={colors.surface} />
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
+    </View>);
 }
 function StepBullet({ status, number, colors }) {
     if (status === 'done') {
-        return (<View style={[styles.stepBullet, { backgroundColor: colors.primary }]}> 
-        <Text style={[styles.stepBulletNumberActive, { color: colors.surface }]}>✓</Text>
-      </View>);
+        return (<View style={[styles.stepBullet, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.stepBulletNumberActive, { color: colors.surface }]}>✓</Text>
+        </View>);
     }
     if (status === 'active') {
-        return (<View style={[styles.stepBullet, { backgroundColor: colors.primary }]}> 
-        <Text style={[styles.stepBulletNumberActive, { color: colors.background }]}>{number}</Text>
-      </View>);
+        return (<View style={[styles.stepBullet, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.stepBulletNumberActive, { color: colors.background }]}>{number}</Text>
+        </View>);
     }
     return (<View style={[
-            styles.stepBullet,
-            { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-        ]}>
-      <Text style={[styles.stepBulletNumber, { color: colors.muted }]}>{number}</Text>
+        styles.stepBullet,
+        { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    ]}>
+        <Text style={[styles.stepBulletNumber, { color: colors.muted }]}>{number}</Text>
     </View>);
 }
 
@@ -474,7 +461,7 @@ function StepBullet({ status, number, colors }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        paddingTop: 50,
+        paddingTop: 0,
     },
     screen: {
         flex: 1,
@@ -483,28 +470,6 @@ const styles = StyleSheet.create({
         padding: 14,
         paddingBottom: 62,
         flexGrow: 1,
-    },
-    topBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-    },
-    topBarText: {
-        flex: 1,
-        marginLeft: 12,
-    },
-    topBarSpacer: {
-        width: 24,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 500,
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        marginTop: 2,
     },
     card: {
         borderWidth: 1,
@@ -515,7 +480,7 @@ const styles = StyleSheet.create({
     cardLabelRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 12,
     },
     cardLabelRowBetween: {
         flexDirection: 'row',
@@ -524,9 +489,9 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     cardLabel: {
-        fontSize: 13,
-        fontWeight: '600',
-        marginBottom: 10,
+        fontSize: font.md,
+        fontWeight: '500',
+        marginBottom: 0,
     },
     requiredText: {
         fontSize: 11,
@@ -539,6 +504,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         paddingVertical: 14,
         paddingHorizontal: 10,
+        marginTop: 8,
     },
     selectFieldText: {
         fontSize: 14,
@@ -590,6 +556,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         textAlignVertical: 'top',
         marginBottom: 6,
+        marginTop: 8,
     },
     selectedFilesContainer: {
         marginTop: 12,
@@ -709,4 +676,4 @@ const styles = StyleSheet.create({
         rotation: '45deg',
         transform: [{ rotate: '20deg' }],
     },
-    });
+});

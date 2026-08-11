@@ -35,9 +35,9 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
     }
     /* ── empty state ─────────────────────────────────────────────── */
     if (!companyData) {
-        return (<View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        return (<View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Company Details</Text>
         </View>
         <View style={styles.emptyState}>
@@ -62,11 +62,11 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         }
     };
     /* ── main render ─────────────────────────────────────────────── */
-    return (<View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    return (<View style={[styles.container, { backgroundColor: colors.background, paddingBottom: insets.bottom }]}>
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
 
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <View style={styles.headerLeft}>
           <BackButton onPress={activeSection ? handleBackPress : onBackPress}/>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
@@ -77,12 +77,6 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
                 : 'Company Info'}
           </Text>
         </View>
-
-        <TouchableOpacity activeOpacity={0.7} style={styles.editBtn}>
-          <Text style={styles.requestChangesText}>
-            {activeSection ? 'Edit' : 'Request Changes'}
-          </Text>
-        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>

@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 10,
+        backgroundColor: '#FFFFFF',
     },
     headerLeft: {
         flexDirection: 'row',
@@ -19,19 +20,11 @@ export const styles = StyleSheet.create({
         flex: 1,
         gap: 12,
     },
-    editBtn: {
-        alignItems: 'flex-end',
-    },
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
         color: '#0F172A',
         textAlign: 'left',
-    },
-    requestChangesText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#00BFA6', // Turquoise color from image
     },
     /* scroll */
     scrollContent: {

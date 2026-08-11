@@ -24,10 +24,18 @@ export async function createServiceRequest({ companyId, serviceSlug, note = '', 
             withCredentials: true,
             timeout: API_REQUEST_TIMEOUT_MS,
         });
+        const body = response.data;
+        if (body && body.success === false) {
+            return {
+                isSuccess: false,
+                error: body.message ?? body.error ?? 'Unable to submit your request. Please try again.',
+                data: body,
+            };
+        }
         return {
             isSuccess: true,
             error: '',
-            data: response.data,
+            data: body,
         };
     }
     catch (error) {

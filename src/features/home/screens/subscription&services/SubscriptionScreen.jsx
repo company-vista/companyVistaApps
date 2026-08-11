@@ -10,8 +10,10 @@ import { useAppSelector } from '../../../../store/hooks';
 import { font } from '../../../../theme/typography';
 function StatBox({ icon, label, value, sub, colors }) {
     return (<View style={[cStatBox, { backgroundColor: colors.surfaceAlt }]}>
-      <FontAwesome name={icon} size={16} color={colors.muted} style={cStatIcon}/>
-      <Text style={[cStatLabel, { color: colors.muted }]}>{label}</Text>
+      <View style={cStatHeader}>
+        <FontAwesome name={icon} size={13} color={colors.muted} style={cStatIcon}/>
+        <Text style={[cStatLabel, { color: colors.muted }]}>{label}</Text>
+      </View>
       <Text style={[cStatValue, { color: colors.text }]}>{value}</Text>
       {sub ? <Text style={[cStatSub, { color: colors.muted }]}>{sub}</Text> : null}
     </View>);
@@ -27,7 +29,7 @@ function TimelineRow({ item, colors }) {
     const icon = timelineIcons[item.label] || 'clock-o';
     return (<View style={[cTimelineItem, { backgroundColor: colors.surfaceAlt, borderColor: overdue ? '#e25c6b' : colors.border }]}>
       <View style={[cTimelineIconBox, { backgroundColor: overdue ? 'rgba(226,92,107,0.12)' : 'rgba(230,168,42,0.12)' }]}>
-        <FontAwesome name={icon} size={14} color={overdue ? '#e25c6b' : '#e6a82a'}/>
+        <FontAwesome name={icon} size={18} color={overdue ? '#e25c6b' : '#e6a82a'}/>
       </View>
       <View style={cTimelineContent}>
         <Text style={[cTimelineLabel, { color: colors.text }]} numberOfLines={1}>{item.label}</Text>
@@ -55,9 +57,9 @@ function CompanyCard({ company, colors }) {
       </View>
 
       <View style={cStatsRow}>
-        <StatBox icon="files-o" label="DOCS LEFT" value={String(company.docsLeft)} sub={`Used ${company.docsUsedOf} of ${company.docsUsedOf}`} colors={colors}/>
+        <StatBox icon="files-o" label="DOCS LEFT" value={String(company.docsLeft)} sub={`Used`} colors={colors}/>
         <StatBox icon="clock-o" label="DAYS LEFT" value={String(company.daysLeft)} sub={company.expiryLabel} colors={colors}/>
-        <StatBox icon="credit-card" label="PLAN" value={company.plan} sub="Renew to continue" colors={colors}/>
+        <StatBox icon="credit-card" label="PLAN" value={company.plan} colors={colors}/>
       </View>
 
       <View style={cUsageRow}>
@@ -108,7 +110,7 @@ function buildCompanyData(selected, apiData) {
             docsLeft: 0,
             docsUsedOf: 0,
             daysLeft: 0,
-            expiryLabel: 'No expiry date',
+            expiryLabel: 'No Active Plan',
             usagePercent: 0,
             timeline: [
                 { label: 'Federal filing', due: formatDateSafe(fed.dueDate), status: toStatus(fed.status) },
@@ -152,7 +154,7 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
         fetchCompliance();
     }, [selectedCompany?.id, token]);
     const companies = buildCompanyData(selectedCompany, complianceData);
-    console.log(companies);
+    // console.log(companies);
     const summary = {
         activeCompanies: companies.length,
         documentsLeft: 0,
@@ -167,17 +169,16 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[cEyebrow, { backgroundColor: 'rgba(230,168,42,0.12)', borderColor: '#6b5320' }]}>
-          <Text style={cEyebrowText}>ACTIVE SERVICES</Text>
+          <Text style={cEyebrowText}>MY SUBSCRIPTIONS</Text>
         </View>
 
       <Text style={[cTitle, { color: colors.text }]}>
-        Subscription overview for{' '}
+        Subscription Overview for{' '}
         <Text style={cTitleAccent}>{userName || 'username not provide'}</Text>
       </Text>
 
       <Text style={[cSubtitle, { color: colors.muted }]}>
-        See each company's active plan, remaining document balance, and
-        renewal status in one place.
+        Manage Plans, Balances & Renewals
       </Text>
 
       <View style={cSummaryRow}>
@@ -188,13 +189,13 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
           </Text>
         </View>
         <View style={[cSummaryBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[cSummaryLabel, { color: colors.text }]}>DOCUMENTS LEFT</Text>
+          <Text style={[cSummaryLabel, { color: colors.text }]}>REMAINING DOCUMENTS</Text>
           <Text style={[cSummaryValue, { color: '#e6a82a' }]}>
             {summary.documentsLeft}
           </Text>
         </View>
         <View style={[cSummaryBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[cSummaryLabel, { color: colors.text }]}>EXPIRED PLANS</Text>
+          <Text style={[cSummaryLabel, { color: colors.text }]}>EXPIRED SUBSCRIPTIONS</Text>
           <Text style={[cSummaryValue, { color: '#e25c6b' }]}>
             {summary.expiredPlans}
           </Text>
@@ -226,6 +227,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
 });
+
 const cEyebrow = {
     alignSelf: 'flex-start',
     borderWidth: 0.5,
@@ -269,15 +271,18 @@ const cSummaryBox = {
     borderRadius: 10,
     borderWidth: 1,
     padding: 10,
+    // alignItems: 'center',
 };
 const cSummaryLabel = {
     fontSize: font.xs,
     letterSpacing: 0.3,
     marginBottom: 4,
+    // textAlign: 'center',
 };
 const cSummaryValue = {
     fontSize: font.hero,
     fontWeight: '500',
+    // textAlign: 'center',
 };
 const cCardsList = {
     gap: 14,
@@ -330,19 +335,23 @@ const cExpiredBadgeText = {
 const cStatsRow = {
     flexDirection: 'row',
     gap: 6,
-    marginBottom: 6,
+    marginBottom: 4,
 };
 const cStatBox = {
     flex: 1,
     borderRadius: 8,
     padding: 8,
 };
+const cStatHeader = {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 4,
+};
 const cStatIcon = {
-    marginBottom: 6,
 };
 const cStatLabel = {
     fontSize: font.base,
-    marginBottom: 3,
     letterSpacing: 0.2,
 };
 const cStatValue = {
@@ -380,33 +389,37 @@ const cTimelineGrid = {
 };
 const cTimelineItem = {
     width: '48%',
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     gap: 8,
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     borderWidth: 1,
 };
 const cTimelineIconBox = {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
 };
 const cTimelineContent = {
     flex: 1,
+    alignItems: 'flex-start',
 };
 const cTimelineLabel = {
-    fontSize: font.base,
+    fontSize: font.md,
     fontWeight: '500',
     marginBottom: 2,
+    textAlign: 'left',
 };
 const cTimelineDue = {
     fontSize: font.sm,
+    textAlign: 'left',
 };
 const cTimelineDueOverdue = {
     fontSize: font.sm,
+    textAlign: 'left',
     fontWeight: '600',
 };

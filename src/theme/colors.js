@@ -2,7 +2,7 @@ import { useAppSelector } from '../store/hooks';
 export const appThemes = {
     light: {
         mode: 'light',
-        background: '#F1F5F9', // f8fafc
+        background: '#F3F4E5', // f8fafc
         backgroundGradient: ['#ccfbf1', '#f1f5f9'],
         authBackground: '#0f172a',
         surface: '#ffffff',
@@ -10,7 +10,7 @@ export const appThemes = {
         sheet: '#f1f5f9',
         text: '#0F172A',
         textOnDark: '#f8fafc',
-        muted: '#64748b',
+        muted: '#576375',
         subtle: '#94a3b8',
         border: '#e5e7ebe5',
         inputBorder: '#334155',

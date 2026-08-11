@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HelpFeedbackScreen.styles';
 import AppInfoScreen from './AppInfoScreen';
 import SendFeedbackScreen from './SendFeedbackScreen';
-import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 const helpItems = [
     {
@@ -33,36 +31,33 @@ const helpItems = [
     },
 ];
 function HelpFeedbackScreen() {
-    const navigation = useNavigation();
-    const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const navigation = useNavigation();
     const isLight = colors.mode === 'light';
     const [activePage, setActivePage] = useState('helpList');
     if (activePage === 'sendFeedback') {
-        return <SendFeedbackScreen onBackPress={() => setActivePage('helpList')}/>;
+        return <SendFeedbackScreen onBackPress={() => {
+            setActivePage('helpList');
+            navigation.setOptions({ headerShown: true });
+        }}/>;
     }
     if (activePage === 'appInfo') {
-        return <AppInfoScreen onBackPress={() => setActivePage('helpList')}/>;
+        return <AppInfoScreen onBackPress={() => {
+            setActivePage('helpList');
+            navigation.setOptions({ headerShown: true });
+        }}/>;
     }
-    return (<View style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top },
-        ]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Help and feedback
-        </Text>
-      </View>
-
+    return (<View style={styles.screen}>
       <View style={styles.list}>
         {helpItems.map(item => (<Pressable key={item.title} onPress={() => {
                 if (item.title === 'Send feedback') {
                     setActivePage('sendFeedback');
+                    navigation.setOptions({ headerShown: false });
                     return;
                 }
                 if (item.title === 'App info') {
                     setActivePage('appInfo');
+                    navigation.setOptions({ headerShown: false });
                 }
             }} style={[styles.itemRow, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
             <View style={styles.itemIcon}>

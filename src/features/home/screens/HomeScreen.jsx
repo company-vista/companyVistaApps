@@ -33,6 +33,7 @@ import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
+import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
 const emptyCompanies = [];
 export default function HomeScreen() {
     const navigation = useNavigation();
@@ -437,7 +438,7 @@ export default function HomeScreen() {
         return (<ExploreServicesScreen onBackPress={closeExploreServicesScreen} selectedCompany={selectedCompany} />);
     }
     if (isServicesHistoryOpen) {
-        return (<ServicesHistoryScreen onBackPress={closeServicesHistoryScreen} />);
+        return (<ServicesHistoryScreen onBackPress={closeServicesHistoryScreen} selectedCompany={selectedCompany} />);
     }
     if (isSubscriptionOpen) {
         return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
@@ -464,6 +465,20 @@ export default function HomeScreen() {
     }
     const HEADER_CONTENT_HEIGHT = 72;
     return (<View style={styles.screen}>
+        {/* Full-screen skeleton overlay (covers fixed header too) */}
+        {isLoadingCompanies ? (<View style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 40,
+            paddingTop: safeAreaInsets.top,
+            backgroundColor: colors.surface,
+        }}>
+            <DashboardSkeleton />
+        </View>) : null}
+
         {/* Fixed header wrapper */}
         <View style={{
             position: 'absolute',
@@ -488,12 +503,12 @@ export default function HomeScreen() {
         <PullToRefresh token={token} selectedCompanyId={selectedCompany?.id} colors={colors} onNotificationCountChange={setNotificationCount} progressViewOffset={safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16} contentContainerStyle={[
             styles.content,
             {
+                flexGrow: 1,
                 paddingTop: safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16, // leave space for fixed header
                 paddingBottom: safeAreaInsets.bottom + 116,
             },
         ]} showsVerticalScrollIndicator={false}>
-            {activeTab === 'home' ? (<HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {
-                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -503,7 +518,7 @@ export default function HomeScreen() {
                     navigation.navigate('HelpDesk');
                 else if (itemId === 'federalFiling')
                     navigation.navigate('FederalFiling');
-            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} colors={colors} />) : null}
+            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })} colors={colors} />) : null}
             {activeTab === 'company' ? (<CompanyTabContent selectedCompany={selectedCompany} onSectionPress={setActiveCompanySection} />) : null}
             {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
                 if (action.id === 'federal_filing')

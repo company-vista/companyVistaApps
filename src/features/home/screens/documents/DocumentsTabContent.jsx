@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Image, Linking, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, Image, Linking, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
@@ -11,6 +11,7 @@ import { fetchCompanyDocuments } from '../../api/clientDocumentApi';
 import { formatDate } from '../../../../constants/dateFormatter';
 import UnlockDocumentModal from './UnlockDocumentModal';
 import ManageSubscriptionModal from './ManageSubscriptionModal';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const HOME_HERO_COLORS = {
     panel: '#0D2137',
     accentBlue: '#85B7EB',
@@ -18,6 +19,13 @@ const HOME_HERO_COLORS = {
     white: '#ffffff',
 };
 const SINGLE_DOCUMENT_UNLOCK_PRICE = 30;
+const SORT_OPTIONS = [
+    { value: 'all', label: 'All' },
+    { value: 'locked', label: 'Locked' },
+    { value: 'free', label: 'Free' },
+    { value: 'mails&letter', label: 'Mails & Letter' },
+    { value: 'docs', label: 'Docs' },
+];
 function getDocumentPalette(colors) {
     const isDark = colors.mode === 'dark';
     return {
@@ -34,6 +42,12 @@ function getDocumentPalette(colors) {
         activeText: HOME_HERO_COLORS.white,
     };
 }
+function isMailDoc(doc) {
+    const src = (doc.sourceGroup ?? '').toLowerCase();
+    const dt = (doc.documentType ?? '').toLowerCase();
+    return src.includes('mail') || dt.includes('mail') || dt.includes('letter');
+}
+
 function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress }) {
     const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
     const createdAt = item?.createdAt || '';
@@ -74,24 +88,19 @@ function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress 
       </View>
     </AnimatedAppear>);
 }
+
 function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState('records');
-    const [mailSubTab, setMailSubTab] = useState('locked');
+    const [sortOption, setSortOption] = useState('all');
+    const [isSortOpen, setIsSortOpen] = useState(false);
     const [documents, setDocuments] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [lockedItems, setLockedItems] = useState([]);
     const [showUnlockModal, setShowUnlockModal] = useState(false);
     const [selectedDocumentIndex, setSelectedDocumentIndex] = useState(0);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-    const [tabBarWidth, setTabBarWidth] = useState(0);
-    const [subTabBarWidth, setSubTabBarWidth] = useState(0);
-    const tabWidth = tabBarWidth > 6 ? (tabBarWidth - 6) / 2 : 0;
-    const subTabWidth = subTabBarWidth > 4 ? (subTabBarWidth - 4) / 2 : 0;
     const token = useAppSelector(state => state.auth.token);
     const colors = useThemeColors();
-    const tabSlideAnim = useRef(new Animated.Value(0)).current;
-    const subTabSlideAnim = useRef(new Animated.Value(0)).current;
     const styles = getStyles(colors);
     const palette = getDocumentPalette(colors);
     // --------------- Document Download Handler function -----------------
@@ -130,8 +139,6 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
         };
     }, [selectedCompany?.id, token]);
     useEffect(() => {
-        if (activeTab !== 'mails')
-            return;
         const companyId = selectedCompany?.id;
         if (!companyId)
             return;
@@ -152,14 +159,14 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
         return () => {
             isMounted = false;
         };
-    }, [activeTab, selectedCompany?.id]);
+    }, [selectedCompany?.id, token]);
     const filteredDocuments = documents.filter(doc => {
-        if (activeTab === 'mails') {
-            const src = (doc.sourceGroup ?? '').toLowerCase();
-            const dt = (doc.documentType ?? '').toLowerCase();
-            if (!src.includes('mail') && !dt.includes('mail') && !dt.includes('letter'))
-                return false;
-        }
+        if (sortOption === 'mails&letter' && !isMailDoc(doc))
+            return false;
+        if (sortOption === 'docs' && isMailDoc(doc))
+            return false;
+        if (sortOption === 'locked' || sortOption === 'free')
+            return false;
         if (!searchQuery)
             return true;
         const lowerQuery = searchQuery.toLowerCase();
@@ -170,13 +177,18 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
             companyName.includes(lowerQuery) ||
             documentType.includes(lowerQuery));
     });
+    const unlockedLockedItems = lockedItems.filter(item => Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0);
+    const stillLockedItems = lockedItems.filter(item => !(Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0));
+    const lockedToShow = sortOption === 'free' ? unlockedLockedItems : sortOption === 'locked' ? stillLockedItems : lockedItems;
+    const showDocsList = sortOption === 'all' || sortOption === 'mails&letter' || sortOption === 'docs';
+    const hasLocked = (sortOption === 'all' || sortOption === 'locked' || sortOption === 'free') && lockedToShow.length > 0;
     return (<View style={styles.container}>
 
-      {/* Header */}
+      {/* **************Header ************** */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View>
-            <Text style={styles.headerTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+            <Text style={styles.headerTitle}>{capitalizeCompanyName(selectedCompany?.name) ?? 'Documents'}</Text>
           </View>
         </View>
         <View style={styles.totalBadge}>
@@ -184,160 +196,84 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
         </View>
       </View>
 
-      {/* Search */}
+      {/* **************Search ************** */}
       <View style={styles.searchContainer}>
         <FontAwesome name="search" size={16} color={palette.accentText}/>
         <TextInput style={styles.searchInput} placeholder="Search by last four digits, company, or type" placeholderTextColor={colors.subtle} value={searchQuery} onChangeText={setSearchQuery}/>
       </View>
 
-      {/* Tabs */}
-      <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]} onLayout={(e) => { const w = e.nativeEvent.layout.width; if (tabBarWidth !== w)
-        setTabBarWidth(w); }}>
-        <Animated.View style={[
-            styles.activeTabIndicator,
-            {
-                backgroundColor: colors.mode === 'dark' ? '#183A5C' : colors.buttonBackground,
-                left: tabSlideAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [3, tabWidth + 3],
-                }),
-                width: tabWidth,
-            },
-        ]}/>
-        <Pressable style={styles.tab} onPress={() => {
-            Animated.spring(tabSlideAnim, { toValue: 0, useNativeDriver: false, tension: 50, friction: 10 }).start();
-            setActiveTab('records');
-        }}>
-          <Text style={[styles.tabText, { color: activeTab === 'records' ? '#fff' : palette.accentText }]}>
-            Company Docs
+      {/* **************Sort by filter **************   */}
+      <View style={styles.filterRow}>
+        <Text style={[styles.sortLabel, { color: colors.muted }]}>Sort by:</Text>
+        <Pressable onPress={() => setIsSortOpen(prev => !prev)} style={styles.sortDropdown}>
+          <Text style={[styles.sortValue, { color: palette.link }]}>
+            {SORT_OPTIONS.find(opt => opt.value === sortOption)?.label}
           </Text>
+          <FontAwesome name={isSortOpen ? 'angle-up' : 'angle-down'} size={18} color={palette.accentText}/>
         </Pressable>
-        <Pressable style={styles.tab} onPress={() => {
-            Animated.spring(tabSlideAnim, { toValue: 1, useNativeDriver: false, tension: 80, friction: 10 }).start();
-            setActiveTab('mails');
-        }}>
-          <Text style={[styles.tabText, { color: activeTab === 'mails' ? '#fff' : palette.accentText }]}>
-            Mails & letters
-          </Text>
-        </Pressable>
+        {isSortOpen ? (<View style={[styles.sortDropdownList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {SORT_OPTIONS.map(option => (<Pressable key={option.value} onPress={() => {
+                    setSortOption(option.value);
+                    setIsSortOpen(false);
+                }} style={styles.sortDropdownItem}>
+                <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '700' }]}>
+                  {option.label}
+                </Text>
+                {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText}/> : null}
+              </Pressable>))}
+          </View>) : null}
       </View>
 
-      {/* Document List */}
+      {/* **************Document List ************** */}
       <View style={styles.listContainer}>
         {isLoading ? (<ActivityIndicator size="large" color={palette.accentText} style={{ marginTop: 40 }}/>) : (<>
-            {activeTab !== 'mails' && (filteredDocuments.length > 0 ? (filteredDocuments.map((doc, index) => (<AnimatedAppear key={doc._id ?? String(index)} index={index}>
-                    <View style={styles.card}>
-                      <View style={styles.cardTop}>
-                        <View style={styles.cardIconContainer}>
-                          <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor}/>
-                        </View>
-                        <View style={styles.cardInfo}>
-                          <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
-                          <Text numberOfLines={1} style={styles.cardSubtitle}>
-                            {doc.originalFileName ?? doc.documentType ?? 'Document'}
-                          </Text>
-                          <Text numberOfLines={1} style={styles.documentTypeText}>
-                            Type: {doc.documentType ?? 'N/A'}
-                          </Text>
-                        </View>
-                        <View style={styles.cardActions}>
-                          <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
-                            <FontAwesome name="download" size={15} color={palette.iconColor}/>
-                          </Pressable>
-                        </View>
-                      </View>
-
-                      <View style={styles.cardDivider}/>
-
-                      <View style={styles.cardBottom}>
-                        <Text style={styles.cardDate}>
-                            Uploaded: {formatDate(doc.uploadedAt)}
-                        </Text>
-                        <Pressable onPress={() => onDocumentViewPress?.(doc)}>
-                          <Text style={styles.cardLink}>View Details</Text>
-                        </Pressable>
-                      </View>
+            {showDocsList && filteredDocuments.map((doc, index) => (<AnimatedAppear key={doc._id ?? String(index)} index={index}>
+                <View style={styles.card}>
+                  <View style={styles.cardTop}>
+                    <View style={styles.cardIconContainer}>
+                      <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor}/>
                     </View>
-                    </AnimatedAppear>))) : (<View style={{ alignItems: 'center', marginTop: 90 }}>
-                    <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90, marginBottom: 12 }} resizeMode="contain"/>
-                    <Text style={{ color: colors.muted }}>No documents found.</Text>
-                  </View>))}
+                    <View style={styles.cardInfo}>
+                      <Text style={styles.cardTitle}>{capitalizeCompanyName(selectedCompany?.name) ?? 'Company'}</Text>
+                      <Text numberOfLines={1} style={styles.cardSubtitle}>
+                        {doc.originalFileName ?? doc.documentType ?? 'Document'}
+                      </Text>
+                      <Text numberOfLines={1} style={styles.documentTypeText}>
+                        Type: {doc.documentType ?? 'N/A'}
+                      </Text>
+                    </View>
+                    <View style={styles.cardActions}>
+                      <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
+                        <FontAwesome name="download" size={15} color={palette.iconColor}/>
+                      </Pressable>
+                    </View>
+                  </View>
 
-            {activeTab === 'mails' && (<>
-                <View style={[styles.subTabBar, { backgroundColor: colors.surface, borderColor: colors.border }]} onLayout={(e) => { const w = e.nativeEvent.layout.width; if (subTabBarWidth !== w)
-                setSubTabBarWidth(w); }}>
-                  <Animated.View style={[
-                    styles.activeSubTabIndicator,
-                    {
-                        backgroundColor: colors.mode === 'dark' ? '#183A5C' : colors.buttonBackground,
-                        left: subTabSlideAnim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [2, subTabWidth + 2],
-                        }),
-                        width: subTabWidth,
-                    },
-                ]}/>
-                  <Pressable style={styles.subTab} onPress={() => {
-                    Animated.spring(subTabSlideAnim, { toValue: 0, useNativeDriver: false, tension: 80, friction: 10 }).start();
-                    setMailSubTab('locked');
-                }}>
-                    <Text style={[styles.subTabText, { color: mailSubTab === 'locked' ? '#fff' : palette.accentText }]}>
-                      Locked
+                  <View style={styles.cardDivider}/>
+
+                  <View style={styles.cardBottom}>
+                    <Text style={styles.cardDate}>
+                        Uploaded: {formatDate(doc.uploadedAt)}
                     </Text>
-                  </Pressable>
-                  <Pressable style={styles.subTab} onPress={() => {
-                    Animated.spring(subTabSlideAnim, { toValue: 1, useNativeDriver: false, tension: 80, friction: 10 }).start();
-                    setMailSubTab('unlocked');
-                }}>
-                    <Text style={[styles.subTabText, { color: mailSubTab === 'unlocked' ? '#fff' : palette.accentText }]}>
-                      Unlocked
-                    </Text>
-                  </Pressable>
+                    <Pressable onPress={() => onDocumentViewPress?.(doc)}>
+                      <Text style={styles.cardLink}>View Details</Text>
+                    </Pressable>
+                  </View>
                 </View>
+                </AnimatedAppear>))}
 
-                {mailSubTab === 'locked' && lockedItems.length > 0 && (<>
-                    {lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
-                        <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }}/>
-                        <Text style={styles.unlockAllBtnText}>Unlock All</Text>
-                      </Pressable>)}
-                    {lockedItems.map((item, idx) => (<LockedDocumentCard key={item._id ?? `locked-${idx}`} item={item} idx={idx} selectedCompany={selectedCompany} colors={colors} onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}/>))}
-                  </>)}
-
-                {mailSubTab === 'unlocked' && (filteredDocuments.length > 0 ? (filteredDocuments.map((doc, index) => (<AnimatedAppear key={doc._id ?? String(index)} index={index}>
-                        <View style={styles.card}>
-                          <View style={styles.cardTop}>
-                            <View style={styles.cardIconContainer}>
-                              <FontAwesome name="file-text-o" size={17} color={palette.fileIconColor}/>
-                            </View>
-                            <View style={styles.cardInfo}>
-                              <Text style={styles.cardTitle}>{doc.companyName ?? 'Company'}</Text>
-                              <Text numberOfLines={1} style={styles.cardSubtitle}>
-                                {doc.originalFileName ?? doc.documentType ?? 'Document'}
-                              </Text>
-                              <Text numberOfLines={1} style={styles.documentTypeText}>
-                                Type: {doc.documentType ?? 'N/A'}
-                              </Text>
-                            </View>
-                            <View style={styles.cardActions}>
-                              <Pressable style={styles.actionButton} onPress={() => handleDownload(doc)}>
-                                <FontAwesome name="download" size={15} color={palette.iconColor}/>
-                              </Pressable>
-                            </View>
-                          </View>
-
-                          <View style={styles.cardDivider}/>
-
-                          <View style={styles.cardBottom}>
-                            <Text style={styles.cardDate}>
-                                Uploaded: {formatDate(doc.uploadedAt)}
-                            </Text>
-                            <Pressable onPress={() => onDocumentViewPress?.(doc)}>
-                              <Text style={styles.cardLink}>View Details</Text>
-                            </Pressable>
-                          </View>
-                        </View>
-                      </AnimatedAppear>))) : (<Text style={{ textAlign: 'center', marginTop: 40, color: colors.muted }}>No documents found.</Text>))}
+            {hasLocked && (<>
+                {sortOption !== 'free' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
+                    <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }}/>
+                    <Text style={styles.unlockAllBtnText}>Unlock All</Text>
+                  </Pressable>)}
+                {lockedToShow.map((item, idx) => (<LockedDocumentCard key={item._id ?? `locked-${idx}`} item={item} idx={idx} selectedCompany={selectedCompany} colors={colors} onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}/>))}
               </>)}
+
+            {filteredDocuments.length === 0 && !hasLocked && (<View style={{ alignItems: 'center', marginTop: 90 }}>
+                <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90, marginBottom: 12 }} resizeMode="contain"/>
+                <Text style={{ color: colors.muted }}>No documents found.</Text>
+              </View>)}
           </>)}
       </View>
 
@@ -367,7 +303,7 @@ const getStyles = (colors) => {
         },
         headerTitle: {
             fontSize: font.heading,
-            fontWeight: '600',
+            fontWeight: '400',
             color: palette.primaryText,
         },
         totalBadge: {
@@ -379,7 +315,7 @@ const getStyles = (colors) => {
         },
         totalBadgeText: {
             fontSize: font.md,
-            fontWeight: '700',
+            fontWeight: '400',
             color: colors.text,
         },
         searchContainer: {
@@ -399,29 +335,50 @@ const getStyles = (colors) => {
             fontSize: font.lg,
             color: palette.primaryText,
         },
-        tabBar: {
+        filterRow: {
             flexDirection: 'row',
-            borderRadius: 24,
-            padding: 3,
-            marginBottom: 20,
-            borderWidth: 1,
-        },
-        tab: {
-            flex: 1,
-            paddingVertical: 12,
-            borderRadius: 24,
+            justifyContent: 'flex-end',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: 8,
+            marginBottom: 16,
+            position: 'relative',
         },
-        tabText: {
+        sortLabel: {
             fontSize: font.md,
-            fontWeight: '600',
+            fontWeight: '700',
         },
-        activeTabIndicator: {
+        sortDropdown: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+        },
+        sortValue: {
+            fontSize: font.md,
+            fontWeight: '900',
+        },
+        sortDropdownList: {
             position: 'absolute',
-            top: 3,
-            bottom: 3,
-            borderRadius: 24,
+            right: 0,
+            top: 32,
+            zIndex: 20,
+            elevation: 6,
+            minWidth: 180,
+            borderWidth: 1,
+            borderRadius: 10,
+            overflow: 'hidden',
+            paddingVertical: 4,
+        },
+        sortDropdownItem: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+        },
+        sortDropdownItemText: {
+            color: palette.primaryText,
+            fontSize: font.md,
         },
         unlockAllBtn: {
             flexDirection: 'row',
@@ -467,7 +424,7 @@ const getStyles = (colors) => {
         },
         cardTitle: {
             fontSize: font.md,
-            fontWeight: '700',
+            fontWeight: '500',
             color: palette.primaryText,
             marginBottom: 2,
         },
@@ -479,7 +436,7 @@ const getStyles = (colors) => {
         documentTypeText: {
             color: palette.documentTypeText,
             fontSize: font.base,
-            fontWeight: '600',
+            fontWeight: '400',
             lineHeight: 16,
             marginBottom: 2,
             marginTop: 2,
@@ -560,30 +517,6 @@ const getStyles = (colors) => {
         },
         dateText: {
             fontSize: font.sm,
-        },
-        subTabBar: {
-            flexDirection: 'row',
-            borderRadius: 20,
-            padding: 2,
-            marginBottom: 12,
-            borderWidth: 1,
-        },
-        activeSubTabIndicator: {
-            position: 'absolute',
-            top: 2,
-            bottom: 2,
-            borderRadius: 20,
-        },
-        subTab: {
-            flex: 1,
-            paddingVertical: 12,
-            borderRadius: 20,
-            alignItems: 'center',
-            justifyContent: 'center',
-        },
-        subTabText: {
-            fontSize: font.sm,
-            fontWeight: '600',
         },
     });
 };

@@ -3,23 +3,29 @@ import { fetchCompanyComplianceHistory } from '../api/clientProfileApi';
 import { useAppSelector } from '../../../store/hooks';
 export const complianceItems = [
     {
-        title: 'Registered Address',
+        id: 'agent_address',
+        title: 'Agent & Address',
+        subtitle: 'Registered agent & address',
         dueDate: 'Jun 1',
-        tag: 'Overdue',
-        icon: 'file-text-o',
-        matchTerms: ['registered address', 'address'],
-        tone: 'red',
-    },
-    {
-        title: 'Registered Agent',
-        dueDate: 'Jul 15',
-        tag: 'Due Jul 15',
-        icon: 'file-text',
-        matchTerms: ['registered agent', 'agent', 'resident'],
+        tag: 'Due',
+        icon: 'building',
+        matchTerms: ['registered address', 'address', 'registered agent', 'agent', 'resident'],
         tone: 'amber',
     },
     {
+        id: 'itin',
+        title: 'ITIN',
+        subtitle: 'Tax identification',
+        dueDate: 'Jul 15',
+        tag: 'Due',
+        icon: 'id-card',
+        matchTerms: ['itin', 'tax id', 'taxpayer id', 'tax identification number'],
+        tone: 'amber',
+    },
+    {
+        id: 'annual_filing',
         title: 'State Filing',
+        subtitle: 'State compliance',
         dueDate: 'Jul 31',
         tag: 'Due Jul 31',
         icon: 'university',
@@ -27,7 +33,9 @@ export const complianceItems = [
         tone: 'amber',
     },
     {
+        id: 'federal_filing',
         title: 'Federal Filing',
+        subtitle: 'Annual federal tax',
         dueDate: 'Jan 31',
         tag: 'Active',
         icon: 'user',
@@ -62,10 +70,13 @@ function getRecordLabel(record) {
 function getComplianceCardTitle(record) {
     const label = normalizeText(record.complianceName ?? record.title);
     const titleByApiKey = {
-        address: 'Registered Address',
-        resident: 'Registered Agent',
+        address: 'Agent & Address',
+        resident: 'Agent & Address',
         'annual filing': 'State Filing',
         'federal tax filing': 'Federal Filing',
+        itin: 'ITIN',
+        'tax id': 'ITIN',
+        'taxpayer id': 'ITIN',
     };
     return titleByApiKey[label];
 }
@@ -171,8 +182,7 @@ export function useCompanyCompliance(companyId) {
             const nextStatuses = result.history.reduce((acc, record) => {
                 const cardTitle = getMatchedTitle(record);
                 const dueDate = getRecordDueDate(record);
-                const usesRenewalWarning = cardTitle === 'Registered Address' ||
-                    cardTitle === 'Registered Agent';
+                const usesRenewalWarning = cardTitle === 'Agent & Address';
                 const usesYearlyFilingStatus = cardTitle === 'State Filing' ||
                     cardTitle === 'Federal Filing';
                 if (cardTitle) {

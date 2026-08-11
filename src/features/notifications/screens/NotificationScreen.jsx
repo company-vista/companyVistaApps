@@ -1,9 +1,9 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useLayoutEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton } from '../../../components/buttons';
+import Toast from 'react-native-toast-message';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
@@ -27,6 +27,13 @@ function NotificationScreen() {
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const hasNotifications = notificationList.length > 0;
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: hasNotifications ? () => (<View style={styles.countBadge}>
+                <Text style={styles.countText}>{getBadgeCount(notificationList.length)}</Text>
+              </View>) : undefined,
+        });
+    }, [navigation, hasNotifications, notificationList.length]);
     const filteredNotifications = useMemo(() => {
         if (activeFilter === 'Unread') {
             return notificationList.filter(item => !item.isRead);
@@ -74,18 +81,8 @@ function NotificationScreen() {
             { paddingBottom: safeAreaInsets.bottom + 24 },
         ]} style={[
             styles.screen,
-            { paddingTop: safeAreaInsets.top + 12 },
+            { paddingTop: 8 },
         ]}>
-        <View style={styles.header}>
-          <View style={styles.titleRow}>
-            <BackButton onPress={() => navigation.goBack()}/>
-            <Text style={[styles.title, { color: colors.text }]}>Notifications</Text>
-          </View>
-          {hasNotifications ? (<View style={styles.countBadge}>
-              <Text style={styles.countText}>{getBadgeCount(notificationList.length)}</Text>
-            </View>) : null}
-        </View>
-
         {isLoadingNotifications ? (<NotificationPageSkeleton />) : hasNotifications ? (<>
             <View style={styles.filterRow}>
               {notificationFilters.map(filter => {
@@ -107,12 +104,22 @@ function NotificationScreen() {
             </View>
 
             {filteredNotifications.length > 0 ? (<View style={[styles.listCard,]}>
-                {filteredNotifications.map(item => (<Pressable key={item.id} onPress={() => {
+                {filteredNotifications.map(item => (<Pressable key={item.id} onPress={async () => {
                         if (!item.isRead) {
                             setNotificationList(prev => prev.map(notification => notification.id === item.id
                                 ? { ...notification, isRead: true }
                                 : notification));
-                            markNotificationAsRead({ token, notificationId: item.id });
+                            const result = await markNotificationAsRead({ token, notificationId: item.id });
+                            if (!result.isSuccess) {
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Failed to mark as read',
+                                    text2: result.error,
+                                });
+                                setNotificationList(prev => prev.map(notification => notification.id === item.id
+                                    ? { ...notification, isRead: false }
+                                    : notification));
+                            }
                         }
                         navigation.navigate('NotificationDetail', { notification: item });
                     }} onLongPress={() => {
@@ -184,12 +191,21 @@ function NotificationScreen() {
             <View style={styles.modalActions}>
               <Pressable onPress={async () => {
             if (selectedNotification) {
-                await deleteNotification({
+                const result = await deleteNotification({
                     token,
                     notificationId: selectedNotification.id,
                     companyId,
                 });
-                setNotificationList(prev => prev.filter(n => n.id !== selectedNotification.id));
+                if (result.isSuccess) {
+                    setNotificationList(prev => prev.filter(n => n.id !== selectedNotification.id));
+                }
+                else {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Failed to delete notification',
+                        text2: result.error,
+                    });
+                }
             }
             setIsDeleteModalVisible(false);
             setSelectedNotification(null);
@@ -233,8 +249,8 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
     countBadge: {
-        minWidth: 34,
-        height: 34,
+        minWidth: 30,
+        height: 30,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 17,
@@ -256,8 +272,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 1,
         borderRadius: 22,
-        paddingHorizontal: 28,
-        paddingVertical: 12
+        paddingHorizontal: 24,
+        paddingVertical: 10
     },
     activeFilterButton: {},
     filterButtonText: {

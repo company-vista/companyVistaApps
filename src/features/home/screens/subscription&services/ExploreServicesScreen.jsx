@@ -23,16 +23,16 @@ const categoryItems = [
         tone: 'purple',
     },
     {
-        category: 'Corporate Changes & Legal Documentation',
+        category: 'Company Updates & Documents',
         icon: 'file-text-o',
         tone: 'red',
     },
 ];
 const screenMap = {
     'Tax & Accounting Services': 'TaxAccounting',
-    'Business Compliance & Registrations': 'BusinessCompliance',
+    'Business Compliance & Regis.': 'BusinessCompliance',
     'Banking & Owner Services': 'BankingOwner',
-    'Corporate Changes & Legal Documentation': 'CorporateChanges',
+    'Company Updates & Documents': 'CorporateChanges',
 };
 const toneStyles = {
     amber: { iconBg: '#FEF3C7', iconColor: '#B45309' },
@@ -45,8 +45,9 @@ function ExploreServicesScreen({ onBackPress, selectedCompany }) {
     const colors = useThemeColors();
     const safeAreaInsets = useSafeAreaInsets();
     const categories = getServiceCategories();
-    return (<View style={[styles.screen, { paddingTop: safeAreaInsets.top + 12 }]}>
-      <View style={styles.header}>
+    const headerBg = colors.mode === 'light' ? '#ffffff' : colors.background;
+    return (<View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: headerBg, paddingTop: safeAreaInsets.top + 12 }]}>
         <BackButton onPress={onBackPress}/>
         <Text style={[styles.title, { color: colors.text }]}>Request a Services</Text>
       </View>
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
+        paddingBottom: 12,
         gap: 12,
         marginBottom: 20,
     },

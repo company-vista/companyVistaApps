@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: font.xl,
-        fontWeight: '700',
+        fontWeight: '500',
     },
     profileCard: {
         flexDirection: 'row',

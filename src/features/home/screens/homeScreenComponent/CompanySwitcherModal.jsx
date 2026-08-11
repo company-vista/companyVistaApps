@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, selectedCompany, companySwitcherOpacity, companySwitcherTranslateY, onSelectCompany, onClose, colors, safeAreaInsets, }) {
     if (!isOpen)
         return null;
@@ -60,7 +61,7 @@ export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, select
                 </View>
                 <View style={styles.companySwitcherCopy}>
                   <Text numberOfLines={1} style={[styles.companySwitcherName, { color: colors.text }]}>
-                    {company.name}
+                    {capitalizeCompanyName(company.name)}
                   </Text>
                   <Text numberOfLines={1} style={[styles.companySwitcherMeta, { color: colors.muted }]}>
                     {company.companyType} - EIN {company.ein}

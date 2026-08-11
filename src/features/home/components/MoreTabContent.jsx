@@ -74,7 +74,7 @@ function MoreTabContent({ onFollowUsPress, onHelpFeedbackPress, onSupportPress, 
         <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
       </Pressable>
 
-      <Pressable onPress={onHelpFeedbackPress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+      <Pressable onPress={onHelpFeedbackPress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(247, 248, 250, 0.5)' : 'rgba(255,255,255,0.07)' }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="life-ring" size={17} color={colors.accent}/>
         </View>

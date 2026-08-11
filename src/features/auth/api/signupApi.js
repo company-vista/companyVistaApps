@@ -3,8 +3,69 @@ import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
 const SIGNUP_STEP1_ROUTE = `${API_BASE_URL}/api/signup/step1`;
 const RESEND_VERIFICATION_ROUTE = `${API_BASE_URL}/api/signup/resend-verification`;
+const API_REQUEST_TIMEOUT_MS = 10000;
 function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+const TOKEN_KEYS = [
+    'token',
+    'accessToken',
+    'access_token',
+    'authToken',
+    'auth_token',
+    'bearerToken',
+    'clientToken',
+    'client_token',
+    'idToken',
+    'id_token',
+    'jwt',
+];
+const CLIENT_ID_KEYS = [
+    'clientId',
+    'client_id',
+    'userId',
+    'user_id',
+    'id',
+    '_id',
+];
+function isApiRecord(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+function findDeepValue(value, keys, depth = 0) {
+    if (!isApiRecord(value) || depth > 4) {
+        return '';
+    }
+    for (const key of keys) {
+        const candidate = value[key];
+        if (typeof candidate === 'string' && candidate.trim()) {
+            return candidate;
+        }
+    }
+    for (const nestedValue of Object.values(value)) {
+        const nested = findDeepValue(nestedValue, keys, depth + 1);
+        if (nested) {
+            return nested;
+        }
+    }
+    return '';
+}
+function getHeaderToken(headers) {
+    const authorizationHeader = headers?.Authorization ?? headers?.authorization ?? headers?.['x-auth-token'];
+    const cookieHeader = headers?.['set-cookie'];
+    if (typeof authorizationHeader !== 'string') {
+        if (Array.isArray(cookieHeader)) {
+            return getCookieToken(cookieHeader.join('; '));
+        }
+        if (typeof cookieHeader === 'string') {
+            return getCookieToken(cookieHeader);
+        }
+        return '';
+    }
+    return authorizationHeader.replace(/^Bearer\s+/i, '').trim();
+}
+function getCookieToken(cookieHeader) {
+    const tokenMatch = cookieHeader.match(/(?:^|;\s*)clientToken=([^;]+)/);
+    return tokenMatch?.[1] ? decodeURIComponent(tokenMatch[1]) : '';
 }
 export async function handleSignupApi({ firstName, lastName, email, phoneNumber, countryCode, companyName, address, }) {
     const errors = {};
@@ -58,9 +119,9 @@ export async function handleSignupApi({ firstName, lastName, email, phoneNumber,
             countryCode,
             companyName,
             address,
-        });
-        const token = response.data?.token || '';
-        const clientId = response.data?.clientId || response.data?.client_id || '';
+        }, { timeout: API_REQUEST_TIMEOUT_MS });
+        const token = findDeepValue(response.data, TOKEN_KEYS) || getHeaderToken(response.headers);
+        const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);
         Toast.show({
             type: 'success',
             text1: 'Account created',
@@ -102,7 +163,7 @@ export async function handleResendVerificationApi(email) {
     try {
         const response = await axios.post(RESEND_VERIFICATION_ROUTE, {
             email: trimmedEmail,
-        });
+        }, { timeout: API_REQUEST_TIMEOUT_MS });
         return {
             isSuccess: true,
             message: response.data?.message || 'Verification email sent successfully.',

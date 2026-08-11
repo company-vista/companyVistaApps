@@ -8,6 +8,21 @@ import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
 import styles from './TabPlaceholder.styles';
 import { formatDate } from '../../../constants/dateFormatter';
+import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
+const STATUS_ORDER = ['Expired', 'Pending', 'Client Managed', 'Active', 'Completed'];
+function getWorstStatus(...statuses) {
+    let worst = statuses[0];
+    for (const status of statuses) {
+        const a = STATUS_ORDER.indexOf(status);
+        const b = STATUS_ORDER.indexOf(worst);
+        const rankA = a === -1 ? Infinity : a;
+        const rankB = b === -1 ? Infinity : b;
+        if (rankA < rankB) {
+            worst = status;
+        }
+    }
+    return worst;
+}
 function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Compliance', companyId, selectedCompanyName, onOpenRenewPage, onOpenComplianceHistory, }) {
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
@@ -100,6 +115,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const residentData = apiData?.data?.resident || {};
     const addressData = apiData?.data?.Address || {};
     const annualFilingData = apiData?.data?.annualFiling || {};
+    const itinData = apiData?.data?.itin || {};
     const derivedActions = [];
     const shouldShowRenewButton = (action) => {
         return action.status === 'Pending' || action.status === 'Expired';
@@ -130,39 +146,42 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
             years: action.years,
         });
     };
-    // Agent Renewal
+    const residentStatus = mapAgentAddressStatus(residentData.status);
+    const addressStatus = mapAgentAddressStatus(addressData.status, 'Client Managed');
+    // Agent & Address
     derivedActions.push({
-        id: 'resident',
-        title: 'Agent Renewal Services',
-        subtitle: 'Registered agent',
-        status: mapAgentAddressStatus(residentData.status),
-        date: formatDate(residentData.dueDate),
-        icon: 'clock-o',
+        id: 'agent_address',
+        title: 'Agent & Address',
+        subtitle: 'Registered agent & address',
+        status: getWorstStatus(residentStatus, addressStatus),
+        date: formatDate(addressData.dueDate || residentData.dueDate),
+        icon: 'building',
         details: [
             { label: 'Info', value: residentData.name || 'N/A', icon: 'user' },
             { label: 'Email', value: residentData.email || 'N/A', icon: 'envelope' },
             { label: 'Phone', value: residentData.phone || 'N/A', icon: 'phone' },
-            { label: 'Due Date', value: formatDate(residentData.dueDate), icon: 'calendar' },
-            { label: 'Last Filed', value: formatDate(residentData.lastDate), icon: 'history' },
-        ],
-        price: 149,
-        years: 1,
-    });
-    // Address Renewal
-    derivedActions.push({
-        id: 'address',
-        title: 'Address Renewal Services',
-        subtitle: 'Registered address',
-        status: mapAgentAddressStatus(addressData.status, 'Client Managed'),
-        date: formatDate(addressData.dueDate),
-        icon: 'clock-o',
-        details: [
             { label: 'Street Address', value: addressData.address || 'N/A', icon: 'map-marker' },
             { label: 'State', value: addressData.state || 'N/A', icon: 'map' },
             { label: 'Postal Code', value: addressData.postalCode || 'N/A', icon: 'map-pin' },
             { label: 'Country', value: addressData.country || 'N/A', icon: 'globe' },
-            { label: 'Due Date', value: formatDate(addressData.dueDate), icon: 'calendar' },
-            { label: 'Last Filed', value: formatDate(addressData.lastDate), icon: 'history' },
+            { label: 'Due Date', value: formatDate(addressData.dueDate || residentData.dueDate), icon: 'calendar' },
+            { label: 'Last Filed', value: formatDate(addressData.lastDate || residentData.lastDate), icon: 'history' },
+        ],
+        price: 99,
+        years: 1,
+    });
+    // ITIN
+    derivedActions.push({
+        id: 'itin',
+        title: 'ITIN',
+        subtitle: 'Tax identification',
+        status: mapFederalAnnualStatus(itinData.status),
+        date: formatDate(itinData.dueDate),
+        icon: 'id-card',
+        details: [
+            { label: 'ITIN Number', value: itinData.itin || itinData.number || 'N/A', icon: 'id-card' },
+            { label: 'Due Date', value: formatDate(itinData.dueDate), icon: 'calendar' },
+            { label: 'Last Filed', value: formatDate(itinData.lastDate), icon: 'history' },
         ],
         price: 99,
         years: 1,
@@ -183,7 +202,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     // Annual Filing
     derivedActions.push({
         id: 'annual_filing',
-        title: 'Annual Filing Services',
+        title: 'State Filing',
         subtitle: 'State compliance',
         status: mapFederalAnnualStatus(annualFilingData.status),
         date: formatDate(annualFilingData.dueDate),
@@ -214,7 +233,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                 </View>
                 <View style={styles.userInfo}>
                     <Text style={[styles.userName, { color: colors.text }]}>
-                        {selectedCompanyName ?? residentData?.name ?? 'Loading...'}
+                        {capitalizeCompanyName(selectedCompanyName) ?? residentData?.name ?? 'Loading...'}
                     </Text>
                     <Text style={[styles.userEmail, { color: colors.muted }]}>
                         {residentData?.email || 'Email not added'}
@@ -236,13 +255,13 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                     ]} />
                 </View>
                 <Text style={[styles.healthSubtext, { color: colors.muted }]}>
-                    {doneCount} of {totalCount} actions complete
+                    {doneCount} of {totalCount} Actions Complete
                 </Text>
             </View>
         </AnimatedAppear>
 
         <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitleText, { color: colors.text }]}>COMPLIANCE ACTIONS</Text>
+            <Text style={[styles.sectionTitleText, { color: colors.text }]}>Compliance Actions</Text>
         </View>
 
         {loading ? (<ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />) : (derivedActions.map((action, idx) => {

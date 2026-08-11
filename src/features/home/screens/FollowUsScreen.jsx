@@ -1,8 +1,6 @@
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 const socialItems = [
@@ -35,18 +33,9 @@ const socialItems = [
     },
 ];
 function FollowUsScreen() {
-    const navigation = useNavigation();
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
-    return (<View style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 22 },
-        ]}>
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Follow Us</Text>
-      </View>
-
+    return (<View style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },

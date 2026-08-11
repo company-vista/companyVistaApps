@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     headerTitle: {
+        flex: 1,
         fontSize: font.heading,
         fontWeight: '600',
     },

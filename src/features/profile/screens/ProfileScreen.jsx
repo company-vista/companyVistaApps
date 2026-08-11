@@ -3,7 +3,6 @@ import { Image, Modal, Pressable, ScrollView, Text, TextInput, View } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton } from '../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { logoutUser, updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
@@ -85,25 +84,9 @@ function ProfileScreen() {
             {
                 backgroundColor: colors.background,
                 paddingBottom: Math.max(safeAreaInsets.bottom, 24),
-                paddingTop: safeAreaInsets.top + 22,
+                paddingTop: 22,
             },
         ]} style={styles.screen}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <BackButton onPress={() => navigation.goBack()}/>
-          <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
-        </View>
-        <Pressable onPress={() => navigation.navigate('EditProfile')} style={[
-            styles.editButton,
-            {
-                backgroundColor: colors.accentSoft,
-                borderColor: colors.mode === 'dark' ? colors.accent : colors.accentSoft,
-            },
-        ]}>
-          <FontAwesome name="pencil" size={16} color={colors.accent}/>
-          <Text style={[styles.editText, { color: colors.accent }]}>Edit</Text>
-        </Pressable>
-      </View>
 
       <View style={[styles.profileCard, { backgroundColor: colors.surface }]}>
         {profileImage ? (<View style={styles.coverWrap}>
@@ -236,7 +219,7 @@ function ProfileScreen() {
           <FontAwesome name="map-marker" size={17} color={colors.accent}/>
         </View>
         <View style={styles.detailCopy}>
-          <Text style={[styles.detailLabel, { color: colors.subtle }]}>Address</Text>
+          <Text style={[styles.detailLabel, { color: colors.subtle }]}>Address & Edit</Text>
           <Text style={[styles.detailValue, { color: colors.text }]}>{addressSummary}</Text>
         </View>
         <FontAwesome name="angle-right" size={22} color={colors.muted}/>

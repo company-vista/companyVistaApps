@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, Switch, SafeAreaView, Alert, Pressable, } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import BackButton from '../../../../components/buttons/BackButton';
+import { StyleSheet, Text, View, ScrollView, TextInput, Switch, Alert, Pressable, } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { pick, types } from '@react-native-documents/picker';
 import axios from 'axios';
@@ -11,7 +10,6 @@ import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
 export default function FederalTaxFiling() {
-    const navigation = useNavigation();
     const route = useRoute();
     const selectedAction = route.params?.selectedAction;
     const colors = useThemeColors();
@@ -221,16 +219,7 @@ export default function FederalTaxFiling() {
             setSubmitting(false);
         }
     };
-    return (<SafeAreaView style={styles.container}>
-      <View style={[styles.topBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <View style={styles.topBarText}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{selectedAction?.title ?? 'Federal Tax Filing'}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>{selectedAction?.subtitle ?? 'Submit your annual federal tax return documents'}</Text>
-        </View>
-        <View style={styles.topBarSpacer}/>
-      </View>
-
+    return (<View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
@@ -399,52 +388,22 @@ export default function FederalTaxFiling() {
         </Text>
 
       </ScrollView>
-    </SafeAreaView>);
+    </View>);
 }
 // Mobile Responsive Styling
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 18
+        paddingTop: 0
     },
     scrollContainer: {
         padding: 16,
         paddingBottom: 40,
         paddingTop: 4
     },
-    topBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingTop: 40,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-    },
-    topBarText: {
-        flex: 1,
-        marginLeft: 12,
-    },
-    topBarSpacer: {
-        width: 24,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-        marginTop: 10,
-    },
-    headerIconContainer: {
-        padding: 10,
-        borderRadius: 12,
-        marginRight: 12,
-    },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 500,
-    },
-    headerSubtitle: {
-        fontSize: 12,
-        marginTop: 2,
+        fontWeight: '400',
     },
     card: {
         borderRadius: 18,

@@ -16,19 +16,7 @@ function QuickAccessScreen() {
     const navigation = useNavigation();
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
-    return (<View style={[
-            styles.screen,
-            { paddingTop: safeAreaInsets.top + 22 },
-        ]}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <Pressable onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: colors.surface }]}>
-            <FontAwesome name="arrow-left" size={18} color={colors.text}/>
-          </Pressable>
-          <Text style={[styles.title, { color: colors.text }]}>Quick Access</Text>
-        </View>
-      </View>
-
+    return (<View style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },

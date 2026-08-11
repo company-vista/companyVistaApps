@@ -1,9 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { BackButton } from '../../../components/buttons';
 import { deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
@@ -12,10 +10,24 @@ function NotificationDetailScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const { notification } = route.params;
-    const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const [isDropdownVisible, setIsDropdownVisible] = React.useState(false);
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (<View style={styles.moreWrapper}>
+                <Pressable style={styles.moreButton} onPress={() => setIsDropdownVisible(prev => !prev)}>
+                  <FontAwesome name="ellipsis-v" size={18} color={colors.muted}/>
+                </Pressable>
+                {isDropdownVisible ? (<View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                      <Pressable onPress={handleDelete} style={[styles.dropdownOption, { borderBottomColor: colors.border }]}>
+                        <FontAwesome name="trash-o" size={14} color={colors.danger}/>
+                        <Text style={[styles.dropdownOptionText, { color: colors.danger }]}>Delete</Text>
+                      </Pressable>
+                    </View>) : null}
+              </View>),
+        });
+    }, [navigation, isDropdownVisible]);
     async function handleDelete() {
         setIsDropdownVisible(false);
         await deleteNotification({
@@ -27,25 +39,8 @@ function NotificationDetailScreen() {
     }
     return (<View style={[
             styles.screen,
-            { paddingTop: safeAreaInsets.top + 12 },
+            { paddingTop: 8 },
         ]}>
-      <View style={styles.header}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Notification</Text>
-        <View style={{ flex: 1 }}/>
-        <View style={styles.moreWrapper}>
-          <Pressable style={styles.moreButton} onPress={() => setIsDropdownVisible(prev => !prev)}>
-            <FontAwesome name="ellipsis-v" size={18} color={colors.muted}/>
-          </Pressable>
-          {isDropdownVisible ? (<View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Pressable onPress={handleDelete} style={[styles.dropdownOption, { borderBottomColor: colors.border }]}>
-                  <FontAwesome name="trash-o" size={14} color={colors.danger}/>
-                  <Text style={[styles.dropdownOptionText, { color: colors.danger }]}>Delete</Text>
-                </Pressable>
-              </View>) : null}
-        </View>
-      </View>
-
       <View style={[styles.detailCard, { backgroundColor: colors.surface }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.surfaceAlt }]}>
           <FontAwesome name={notification.icon} size={24} color={colors.accent}/>

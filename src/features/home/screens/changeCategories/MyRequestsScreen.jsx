@@ -193,18 +193,18 @@ const MyRequestsScreen = ({ companyId, refreshKey }) => {
           <StatusDonut pendingShare={pendingShare} colors={colors} mode={mode}/>
           <View>
             <Text style={[styles.statusLabel, { color: colors.textSecondary }]}>
-              Overall status
+              Overall Status
             </Text>
             <View style={styles.statusRow}>
               <View style={[styles.dot, { backgroundColor: colors.gold }]}/>
               <Text style={[styles.statusRowText, { color: colors.textPrimary }]}>
-                {pendingCount}/{total} pending review
+                {pendingCount}/{total} Pending Review
               </Text>
             </View>
             <View style={styles.statusRow}>
               <View style={[styles.dot, { backgroundColor: colors.purple }]}/>
               <Text style={[styles.statusRowText, { color: colors.textPrimary }]}>
-                {submittedCount}/{total} submitted
+                {submittedCount}/{total} Submitted
               </Text>
             </View>
           </View>

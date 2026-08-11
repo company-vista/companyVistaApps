@@ -1,3 +1,4 @@
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { formatAmount } from './InvoiceDetailScreen';
 export function buildInvoiceHtml(p) {
     return `<!DOCTYPE html>
@@ -46,13 +47,13 @@ export function buildInvoiceHtml(p) {
     <div class="details-grid">
       <div class="column">
         <h3>From</h3>
-        <div style="font-weight: bold; color: #1e1b4b; margin-bottom: 4px;">${p.companyName}</div>
+        <div style="font-weight: bold; color: #1e1b4b; margin-bottom: 4px;">${capitalizeCompanyName(p.companyName)}</div>
         <div style="color: #64748b; line-height: 1.4;">${p.fromAddress}</div>
         <div style="color: #6d28d9; margin-top: 5px;">${p.companyEmail}</div>
       </div>
       <div class="column">
         <h3>Bill To</h3>
-        <div style="font-weight: bold; color: #1e1b4b; margin-bottom: 4px;">${p.clientName}</div>
+        <div style="font-weight: bold; color: #1e1b4b; margin-bottom: 4px;">${capitalizeCompanyName(p.clientName)}</div>
         <div style="color: #64748b; line-height: 1.4;">${p.clientAddress}</div>
         <div style="color: #64748b; mt: 3px;">${p.clientCountry}</div>
       </div>
@@ -61,7 +62,7 @@ export function buildInvoiceHtml(p) {
         <div class="info-row"><span class="info-label">Invoice No.</span><span class="info-value">${p.invoiceNumber}</span></div>
         <div class="info-row"><span class="info-label">Date</span><span class="info-value">${p.invDate}</span></div>
         <div class="info-row"><span class="info-label">Due Date</span><span class="info-value">${p.dueDate}</span></div>
-        <div class="info-row"><span class="info-label">Currency</span><span class="info-value">${p.currency} — US Dollar</span></div>
+        <div class="info-row"><span class="info-label">Currency</span><span class="info-value">${p.currency} — ${p.currency === 'INR' ? 'Rupees' : 'Doller'}</span></div>
       </div>
     </div>
 

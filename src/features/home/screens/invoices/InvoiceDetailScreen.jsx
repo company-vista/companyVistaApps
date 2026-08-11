@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { generatePDF } from 'react-native-html-to-pdf';
@@ -7,13 +7,12 @@ import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import logo from "../../../../assets/images/logoR.png";
-import BackButton from '../../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { formatDate } from '../../../../constants/dateFormatter';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
 import { buildInvoiceHtml } from './invoiceHtmlTemplate';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 function getStringValue(...values) {
     const value = values.find(candidate => typeof candidate === 'string' && candidate.trim().length > 0);
     return typeof value === 'string' ? value.trim() : '';
@@ -98,8 +97,16 @@ function InvoiceDetailScreen() {
     const navigation = useNavigation();
     const route = useRoute();
     const { invoice } = route.params;
-    const colors = useThemeColors();
     const insets = useSafeAreaInsets();
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Pressable onPress={handleDownload} style={[styles.topDownloadBtn, { backgroundColor: '#eef2ff' }]}>
+                    <FontAwesome name="download" size={14} color="#4f46e5"/>
+                </Pressable>
+            ),
+        });
+    }, [navigation]);
     // डेटा पार्सिंग
     const paymentStatus = getStringValue(invoice.paymentStatus).toLowerCase();
     const isPaid = paymentStatus === 'paid';
@@ -216,26 +223,6 @@ function InvoiceDetailScreen() {
         }
     }
     return (<View style={styles.screen}>
-      {/* शीर्ष ऐप बार */}
-      <View style={[
-            styles.header,
-            {
-                backgroundColor: colors.surface,
-                borderBottomColor: colors.border,
-                borderBottomWidth: 1,
-                paddingTop: insets.top + 10,
-                paddingBottom: 14,
-            },
-        ]}>
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Invoice Details
-        </Text>
-        <Pressable onPress={handleDownload} style={styles.topDownloadBtn}>
-          <FontAwesome name="download" size={14} color="#4f46e5"/>
-        </Pressable>
-      </View>
-
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
         {/* कॉर्पोरेट डार्क बैनर स्टाइल हेडर */}
         <View style={styles.corporateHeader}>
@@ -268,14 +255,14 @@ function InvoiceDetailScreen() {
         <View style={styles.detailsGrid}>
           <View style={styles.gridColumn}>
             <Text style={styles.columnLabel}>FROM</Text>
-            <Text style={styles.companyNameText}>{companyName}</Text>
+            <Text style={styles.companyNameText}>{capitalizeCompanyName(companyName)}</Text>
             <Text style={styles.addressText}>{fromAddress}</Text>
             <Text style={styles.emailText}>{companyEmail}</Text>
           </View>
 
           <View style={styles.gridColumn}>
             <Text style={styles.columnLabel}>BILL TO</Text>
-            <Text style={styles.companyNameText}>{clientName}</Text>
+            <Text style={styles.companyNameText}>{capitalizeCompanyName(clientName)}</Text>
             <Text style={styles.addressText}>{clientAddress}</Text>
             <Text style={styles.addressText}>{clientCountry}</Text>
           </View>
@@ -296,7 +283,7 @@ function InvoiceDetailScreen() {
             </View>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>Currency</Text>
-              <Text style={styles.metaValue}>{currency} — USD</Text>
+              <Text style={styles.metaValue}>{currency} — {currency === 'INR' ? 'Rupees' : 'Doller'}</Text>
             </View>
           </View>
         </View>
@@ -465,13 +452,6 @@ function InvoiceDetailScreen() {
 }
 const styles = StyleSheet.create({
     screen: { flex: 1 },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-    },
-    headerTitle: { fontSize: font.heading, fontWeight: '600' },
     topDownloadBtn: { paddingLeft: 16, paddingRight: 16, paddingBottom: 10, paddingTop: 10, backgroundColor: '#eef2ff', borderRadius: 8 },
     corporateHeader: {
         backgroundColor: '#1e1b4b',
@@ -542,8 +522,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
     },
-    metaLabel: { fontSize: font.base, color: '#94a3b8' },
-    metaValue: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
+    metaLabel: { fontSize: font.base, color: '#212325' },
+    metaValue: { fontSize: font.base, fontWeight: '400', color: '#1e1b4b' },
     tableHeaderRow: {
         backgroundColor: '#231f4f',
         paddingVertical: 10,
@@ -623,9 +603,9 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
         marginBottom: 8,
     },
-    bankRow: { flexDirection: 'row', marginBottom: 4 },
+    bankRow: { flexDirection: 'row', marginBottom: 4, justifyContent: 'space-between', alignItems: 'center' },
     bankLabel: { width: 95, fontSize: font.sm, color: '#94a3b8' },
-    bankValue: { flex: 1, fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
+    bankValue: { flex: 1, fontSize: font.sm, fontWeight: '400', color: '#1e1b4b' },
     termsText: { fontSize: font.sm, color: '#64748b', marginBottom: 2 },
     summaryRow: {
         flexDirection: 'row',
