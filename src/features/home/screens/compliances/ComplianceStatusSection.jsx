@@ -70,18 +70,38 @@ function getStatusTone(value) {
     }
     return 'amber';
 }
-function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory }) {
+function getDaysRemaining(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((date.getTime() - today.getTime()) / 86400000);
+}
+function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     const { rs } = useResponsive();
-    const complianceCards = useMemo(() => complianceItems.map(item => ({
-        ...item,
-        dueDate: dueDatesByTitle[item.title] ?? (isLoadingDueDates ? 'Loading...' : 'Not available'),
-        tag: isLoadingDueDates
-            ? 'Loading...'
-            : formatStatus(statusesByTitle[item.title]),
-        tone: getStatusTone(statusesByTitle[item.title]),
-    })), [dueDatesByTitle, isLoadingDueDates, statusesByTitle]);
+    const complianceCards = useMemo(() => complianceItems.map(item => {
+        const days = getDaysRemaining(rawDueDatesByTitle[item.title]);
+        return {
+            ...item,
+            dueDate: dueDatesByTitle[item.title] ?? (isLoadingDueDates ? 'Loading...' : 'Not available'),
+            tag: isLoadingDueDates
+                ? 'Loading...'
+                : formatStatus(statusesByTitle[item.title]),
+            tone: getStatusTone(statusesByTitle[item.title]),
+            daysBadge: isLoadingDueDates
+                ? 'Loading...'
+                : days === null
+                    ? 'N/A'
+                    : days < 0
+                        ? 'Overdue'
+                        : `${days} days`,
+            daysTone: days !== null && days > 30 ? 'ok' : 'soon',
+        };
+    }), [dueDatesByTitle, rawDueDatesByTitle, isLoadingDueDates, statusesByTitle]);
     const tileWidth = useMemo(() => {
         const GAP = rs(8);
         const PADDING = rs(40);
@@ -112,14 +132,27 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, statusesByTi
                   <View style={[styles.statusIcon, tone.icon]}>
                     <FontAwesome name={item.icon} size={18} style={tone.iconText}/>
                   </View>
-                  <View style={[styles.tag, tone.tag]}>
-                    <Text style={[styles.tagText, tone.tagText]}>{item.tag}</Text>
+                  <View style={[
+                    styles.tag,
+                    item.daysTone === 'ok' ? styles.daysBadgeOk : styles.daysBadgeSoon,
+                ]}>
+                    <Text style={[
+                    styles.tagText,
+                    item.daysTone === 'ok' ? styles.daysBadgeOkText : styles.daysBadgeSoonText,
+                ]}>
+                      {item.daysBadge}
+                    </Text>
                   </View>
                 </View>
                 <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
                 <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
                   {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
+                <View style={styles.tileStatusRow}>
+                  <View style={[styles.statusPill, tone.tag]}>
+                    <Text style={[styles.statusPillText, tone.tagText]}>{item.tag}</Text>
+                  </View>
+                </View>
               </View>
             </Pressable>);
         })}
@@ -201,6 +234,32 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
     },
     tagText: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    daysBadgeOk: {
+        backgroundColor: '#D1FAE5',
+    },
+    daysBadgeOkText: {
+        color: '#047857',
+    },
+    daysBadgeSoon: {
+        backgroundColor: '#FEF3C7',
+    },
+    daysBadgeSoonText: {
+        color: '#B45309',
+    },
+    tileStatusRow: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginTop: 8,
+    },
+    statusPill: {
+        borderRadius: 20,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+    },
+    statusPillText: {
         fontSize: 11,
         fontWeight: '600',
     },

@@ -12,7 +12,7 @@ import Toast, { type ToastConfig } from 'react-native-toast-message';
 import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
-import logoImage from './src/assets/images/logoR.png';
+import logoImage from './src/assets/images/logo.jpg';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';
 import { store } from './src/store';
@@ -85,7 +85,6 @@ function AppContent() {
 }
 
 function SplashScreen() {
-  const colors = useThemeColors();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.7)).current;
   const riseAnim = useRef(new Animated.Value(24)).current;
@@ -112,7 +111,7 @@ function SplashScreen() {
   }, [fadeAnim, riseAnim, scaleAnim]);
 
   return (
-    <View style={[styles.splashScreen, { backgroundColor: colors.authBackground }]}>
+    <View style={[styles.splashScreen, { backgroundColor: '#ffffff' }]}>
       <Animated.View
         style={[
           styles.logo,

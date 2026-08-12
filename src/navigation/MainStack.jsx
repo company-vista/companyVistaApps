@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../theme/colors';
 import { font } from '../theme/typography';
@@ -59,9 +59,8 @@ export default function MainStack() {
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => ({
         title: 'Profile',
-        headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <FontAwesome name="pencil" size={15} color={colors.accent}/>
-          <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '900' }}>Edit</Text>
+        headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' }}>
+          <FontAwesome name="pencil" size={17} color={colors.accent}/>
         </Pressable>),
       })}/>
       <Stack.Screen name="ProfileAddress" component={ProfileAddressScreen} options={{ title: 'Address & Edit' }}/>

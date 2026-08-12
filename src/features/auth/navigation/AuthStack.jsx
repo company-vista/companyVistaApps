@@ -8,7 +8,7 @@ import { useThemeColors } from '../../../theme/colors';
 const Stack = createNativeStackNavigator();
 export default function AuthStack() {
     const colors = useThemeColors();
-    return (<Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.authBackground } }}>
+    return (<Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#ffffff' } }}>
       <Stack.Screen name="Login" component={LoginScreen}/>
       <Stack.Screen name="Signup" component={SignupScreen}/>
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>

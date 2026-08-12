@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logoR.png';
+import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 export default function OtpVerifyScreen() {
@@ -67,10 +67,10 @@ export default function OtpVerifyScreen() {
     }
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
             styles.screen,
-            { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
+            { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 40 }]}>
+      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 80 }]}>
         <View style={styles.brandMark}>
           <Image source={logoImage} style={styles.brandLogo}/>
         </View>
@@ -103,7 +103,7 @@ export default function OtpVerifyScreen() {
             styles.button,
             { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
         ]}>
-            {loading ? (<ActivityIndicator color={colors.primaryText} size="small"/>) : (<Text style={[styles.buttonText, { color: colors.primaryText }]}>
+            {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
                 Verify OTP
               </Text>)}
           </Pressable>

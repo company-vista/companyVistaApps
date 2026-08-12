@@ -7,12 +7,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 250,
-    height: 66,
+    width: 150,
+    height: 150,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    borderRadius: 4,
+    borderRadius: 75,
     marginBottom: 48,
     padding: 2,
     // backgroundColor: '#0f766e',
@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    borderRadius: 75,
   },
   appName: {
     color: '#f8fafc',

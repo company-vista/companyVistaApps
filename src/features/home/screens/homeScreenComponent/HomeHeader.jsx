@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import logoImage from '../../../../assets/images/logo.jpg';
+import logoImage from '../../../../assets/images/logos.png';
 import styles from '../HomeScreen.styles';
 
 export function HomeHeader({ displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress, colors, }) {

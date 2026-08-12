@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logoR.png';
+import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 export default function ResetPasswordScreen() {
     const navigation = useNavigation();
@@ -52,7 +52,7 @@ export default function ResetPasswordScreen() {
     }
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
             styles.screen,
-            { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
+            { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 40 }]}>
@@ -107,7 +107,7 @@ export default function ResetPasswordScreen() {
                 styles.button,
                 { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
             ]}>
-                {loading ? (<ActivityIndicator color={colors.primaryText} size="small"/>) : (<Text style={[styles.buttonText, { color: colors.primaryText }]}>
+                {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
                     Reset Password
                   </Text>)}
               </Pressable>

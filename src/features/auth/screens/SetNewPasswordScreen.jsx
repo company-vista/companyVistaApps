@@ -161,19 +161,19 @@ const styles = StyleSheet.create({
     title: {
         fontSize: font.title,
         fontWeight: '500',
-        color: '#f8fafc',
+        color: '#0f172a',
         textAlign: 'center',
         marginBottom: 6,
     },
     subtitle: {
         fontSize: font.lg,
-        color: '#94a3b8',
+        color: '#576375',
         textAlign: 'center',
         marginBottom: 4,
     },
     emailHighlight: {
         fontSize: font.lg,
-        color: '#f8fafc',
+        color: '#0f172a',
         fontWeight: '700',
     },
     stepContainer: {
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
     stepTextDone: {
         fontSize: font.sm,
         fontWeight: '600',
-        color: '#f8fafc',
+        color: '#0f172a',
     },
     stepTextActive: {
         fontSize: font.sm,
         fontWeight: '600',
-        color: '#f8fafc',
+        color: '#0f172a',
     },
     stepLineDone: {
         flex: 1.2,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: font.sm,
-        color: '#f8fafc',
+        color: '#0f172a',
         marginLeft: 4,
         fontWeight: '500',
     },

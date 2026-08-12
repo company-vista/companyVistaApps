@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#0f172a',
+        borderColor: '#ffffff',
         borderRadius: 4,
         padding: 2,
         marginBottom: 14,

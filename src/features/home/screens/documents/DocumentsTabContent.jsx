@@ -92,6 +92,7 @@ function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress 
 function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOption, setSortOption] = useState('all');
+    const [activeTab, setActiveTab] = useState('registered');
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [documents, setDocuments] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -161,6 +162,10 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
         };
     }, [selectedCompany?.id, token]);
     const filteredDocuments = documents.filter(doc => {
+        if (activeTab === 'registered' && isMailDoc(doc))
+            return false;
+        if (activeTab === 'other' && !isMailDoc(doc))
+            return false;
         if (sortOption === 'mails&letter' && !isMailDoc(doc))
             return false;
         if (sortOption === 'docs' && isMailDoc(doc))
@@ -180,8 +185,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     const unlockedLockedItems = lockedItems.filter(item => Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0);
     const stillLockedItems = lockedItems.filter(item => !(Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0));
     const lockedToShow = sortOption === 'free' ? unlockedLockedItems : sortOption === 'locked' ? stillLockedItems : lockedItems;
-    const showDocsList = sortOption === 'all' || sortOption === 'mails&letter' || sortOption === 'docs';
-    const hasLocked = (sortOption === 'all' || sortOption === 'locked' || sortOption === 'free') && lockedToShow.length > 0;
+    const showDocsList = activeTab === 'registered' && (sortOption === 'all' || sortOption === 'mails&letter' || sortOption === 'docs');
+    const hasLocked = activeTab === 'other' && lockedToShow.length > 0;
     return (<View style={styles.container}>
 
       {/* **************Header ************** */}
@@ -222,6 +227,20 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                 {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText}/> : null}
               </Pressable>))}
           </View>) : null}
+      </View>
+
+      {/* **************Registered / Other Docs tabs ************** */}
+      <View style={styles.tabsRow}>
+        <Pressable onPress={() => setActiveTab('registered')} style={[styles.tab, activeTab === 'registered' && styles.tabActive]}>
+          <Text style={[styles.tabText, activeTab === 'registered' && styles.tabTextActive]}>
+            Registered Docs
+          </Text>
+        </Pressable>
+        <Pressable onPress={() => setActiveTab('other')} style={[styles.tab, activeTab === 'other' && styles.tabActive]}>
+          <Text style={[styles.tabText, activeTab === 'other' && styles.tabTextActive]}>
+            Other Docs
+          </Text>
+        </Pressable>
       </View>
 
       {/* **************Document List ************** */}
@@ -379,6 +398,34 @@ const getStyles = (colors) => {
         sortDropdownItemText: {
             color: palette.primaryText,
             fontSize: font.md,
+        },
+        tabsRow: {
+            flexDirection: 'row',
+            gap: 8,
+            marginBottom: 16,
+        },
+        tab: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 10,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+        },
+        tabActive: {
+            backgroundColor: palette.actionSurface,
+            borderColor: palette.actionBorder,
+        },
+        tabText: {
+            fontSize: font.md,
+            fontWeight: '600',
+            color: colors.muted,
+        },
+        tabTextActive: {
+            color: palette.primaryText,
+            fontWeight: '800',
         },
         unlockAllBtn: {
             flexDirection: 'row',

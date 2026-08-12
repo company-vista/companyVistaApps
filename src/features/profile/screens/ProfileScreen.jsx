@@ -88,11 +88,8 @@ function ProfileScreen() {
             },
         ]} style={styles.screen}>
 
-      <View style={[styles.profileCard, { backgroundColor: colors.surface }]}>
-        {profileImage ? (<View style={styles.coverWrap}>
-            <Image source={{ uri: profileImage }} style={styles.coverImage}/>
-          </View>) : null}
-        <View style={[styles.avatarWrap, !profileImage && styles.avatarWrapNoCover]}>
+      <View style={[styles.profileCard, { backgroundColor: 'transparent' }]}>
+        <View style={styles.avatarWrapNoCover}>
           <View style={[
             styles.avatar,
             { backgroundColor: colors.surfaceAlt, borderColor: colors.accentSoft },

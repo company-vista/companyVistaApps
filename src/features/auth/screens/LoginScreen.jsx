@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
 import styles from './LoginScreen.styles';
 import Toast from 'react-native-toast-message';
-import logoImage from '../../../assets/images/logoR.png';
+import logoImage from '../../../assets/images/logo.jpg';
 GoogleSignin.configure({
     webClientId: '1080172574320-193qhf74d29aa4b7fuf2f01h70ahjsic.apps.googleusercontent.com',
     offlineAccess: true,
@@ -88,7 +88,7 @@ function LoginScreen() {
     }
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
             styles.screen,
-            { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
+            { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
@@ -147,7 +147,7 @@ function LoginScreen() {
             { backgroundColor: colors.primary },
             isLoading ? styles.buttonDisabled : null,
         ]}>
-            <Text style={[styles.buttonText, { color: colors.primaryText }]}>
+            <Text style={[styles.buttonText, { color: '#ffffff' }]}>
               {isLoading ? 'Logging in...' : 'Login'}
             </Text>
           </Pressable>

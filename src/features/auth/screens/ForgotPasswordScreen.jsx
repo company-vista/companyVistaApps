@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logoR.png';
+import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 import { forgotPassword } from '../api/forgotPasswordApi';
 const checkEmail = 'Email not found';
@@ -43,10 +43,10 @@ export default function ForgotPasswordScreen() {
     }
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
             styles.screen,
-            { backgroundColor: colors.authBackground, paddingTop: safeAreaInsets.top },
+            { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 40 }]}>
+        <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 80 }]}>
         <View style={styles.brandMark}>
           <Image source={logoImage} style={styles.brandLogo}/>
         </View>
@@ -78,7 +78,7 @@ export default function ForgotPasswordScreen() {
             styles.button,
             { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
         ]}>
-            {loading ? (<ActivityIndicator color={colors.primaryText} size="small"/>) : (<Text style={[styles.buttonText, { color: colors.primaryText }]}>
+            {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
                 Send Reset Link
               </Text>)}
           </Pressable>
