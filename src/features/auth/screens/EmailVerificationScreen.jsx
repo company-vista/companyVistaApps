@@ -5,10 +5,12 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../../../theme/typography';
 import { API_BASE_URL } from '../../../config/api';
+import { useThemeColors } from '../../../theme/colors';
 export default function EmailVerificationScreen({ email, signupToken, signupClientId, onEditPress, onResend, onOtpVerified, isResending, }) {
     const [countdown, setCountdown] = useState(27);
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [verifying, setVerifying] = useState(false);
+    const colors = useThemeColors();
     const inputs = useRef([]);
     useEffect(() => {
         if (countdown <= 0)
@@ -102,22 +104,22 @@ export default function EmailVerificationScreen({ email, signupToken, signupClie
         </View>
 
         <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={[styles.otpInput, digit ? styles.otpInputFilled : null]} keyboardType="number-pad" maxLength={1} onChangeText={text => handleOtpChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0}/>))}
+          {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={[styles.otpInput, { backgroundColor: digit ? colors.accentSoft : colors.inputBackground, borderColor: digit ? colors.primary : colors.inputBorder, color: colors.inputText }]} keyboardType="number-pad" maxLength={1} onChangeText={text => handleOtpChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0}/>))}
         </View>
 
-        <TouchableOpacity style={[styles.verifyBtn, verifying && styles.verifyBtnDisabled]} disabled={verifying} onPress={handleVerifyOtp}>
-          {verifying ? (<ActivityIndicator color="#042f2e" size="small"/>) : (<Text style={styles.verifyBtnText}>Verify OTP</Text>)}
+        <TouchableOpacity style={[styles.verifyBtn, { backgroundColor: colors.buttonBackground }, verifying && styles.verifyBtnDisabled]} disabled={verifying} onPress={handleVerifyOtp}>
+          {verifying ? (<ActivityIndicator color={colors.buttonText} size="small"/>) : (<Text style={[styles.verifyBtnText, { color: colors.buttonText }]}>Verify OTP</Text>)}
         </TouchableOpacity>
 
         <Text style={styles.timerText}>
           Resend will be available in 0:{countdown < 10 ? `0${countdown}` : countdown}.
         </Text>
 
-        <TouchableOpacity style={[styles.resendBtn, (countdown > 0 || isResending) && styles.resendBtnDisabled]} disabled={countdown > 0 || isResending} onPress={() => {
+        <TouchableOpacity style={[styles.resendBtn, { backgroundColor: colors.buttonBackground, borderColor: colors.border }, (countdown > 0 || isResending) && styles.resendBtnDisabled]} disabled={countdown > 0 || isResending} onPress={() => {
             onResend();
             setCountdown(27);
         }}>
-          <Text style={styles.resendBtnText}>{isResending ? 'Sending...' : 'Resend Verification Email'}</Text>
+          <Text style={[styles.resendBtnText, { color: colors.buttonText }]}>{isResending ? 'Sending...' : 'Resend Verification Email'}</Text>
         </TouchableOpacity>
 
         <Text style={styles.spamNotice}>
@@ -247,23 +249,16 @@ const styles = StyleSheet.create({
         width: 46,
         height: 54,
         borderWidth: 1,
-        borderColor: '#334155',
         borderRadius: 12,
-        backgroundColor: '#111827',
-        color: '#f8fafc',
         fontSize: font.heading,
         fontWeight: '700',
         textAlign: 'center',
     },
-    otpInputFilled: {
-        borderColor: '#14b8a6',
-        backgroundColor: '#0f2e2a',
-    },
+
     verifyBtn: {
         width: '100%',
-        height: 48,
-        backgroundColor: '#14b8a6',
-        borderRadius: 12,
+        height: 46,
+        borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
@@ -272,9 +267,8 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     verifyBtnText: {
-        color: '#042f2e',
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '500',
     },
     timerText: {
         fontSize: font.md,
@@ -284,10 +278,8 @@ const styles = StyleSheet.create({
     resendBtn: {
         width: '100%',
         height: 46,
-        backgroundColor: '#1e293b',
         borderWidth: 1,
-        borderColor: '#334155',
-        borderRadius: 10,
+        borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
@@ -296,9 +288,8 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     resendBtnText: {
-        color: '#94a3b8',
         fontSize: font.md,
-        fontWeight: '600',
+        fontWeight: '500',
     },
     spamNotice: {
         fontSize: font.sm,

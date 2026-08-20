@@ -128,9 +128,9 @@ function NotificationScreen() {
                     }} delayLongPress={500} style={[styles.notificationRow, { borderBottomColor: colors.border }]}>
                     <View style={[
                         styles.notificationIcon,
-                        { backgroundColor: colors.surfaceAlt },
+                        { backgroundColor: colors.accentSoft },
                     ]}>
-                      <FontAwesome name={item.icon} size={18} color={colors.accent}/>
+                      <FontAwesome name="user" size={18} color={colors.accent}/>
                     </View>
                     <View style={styles.notificationCopy}>
                       <View style={styles.notificationTitleRow}>
@@ -209,8 +209,8 @@ function NotificationScreen() {
             }
             setIsDeleteModalVisible(false);
             setSelectedNotification(null);
-        }} style={styles.deleteButton}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
+        }} style={[styles.deleteButton, { backgroundColor: colors.buttonBackground }]}>
+                <Text style={[styles.deleteButtonText, { color: colors.buttonText }]}>Delete</Text>
               </Pressable>
 
               <Pressable onPress={() => {
@@ -283,14 +283,12 @@ const styles = StyleSheet.create({
     activeFilterButtonText: {},
     listCard: {
         borderRadius: 18,
-        // backgroundColor: '#ffffff',
         marginTop: 16,
         paddingHorizontal: 4,
     },
     emptyCard: {
         alignItems: 'center',
         borderRadius: 18,
-        // backgroundColor: '#ffffff',
         marginTop: 24,
         paddingHorizontal: 24,
         paddingVertical: 40,
@@ -329,8 +327,8 @@ const styles = StyleSheet.create({
         height: 44,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 13,
-        backgroundColor: '#ecfeff',
+        borderRadius: 22,
+        backgroundColor: '#180f0f',
     },
     notificationCopy: {
         flex: 1,
@@ -382,7 +380,7 @@ const styles = StyleSheet.create({
         width: 62,
         height: 62,
         borderRadius: 36,
-        backgroundColor: '#fee2e2',
+        backgroundColor: '#180f0f',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -423,7 +421,7 @@ const styles = StyleSheet.create({
     deleteButtonText: {
         color: '#ffffff',
         fontSize: font.xl,
-        fontWeight: 'bold',
+        fontWeight: '400',
     },
     cancelButton: {
         width: '100%',
@@ -436,7 +434,7 @@ const styles = StyleSheet.create({
     },
     cancelButtonText: {
         fontSize: font.xxl,
-        fontWeight: 'bold',
+        fontWeight: '500',
     },
 });
 export default NotificationScreen;

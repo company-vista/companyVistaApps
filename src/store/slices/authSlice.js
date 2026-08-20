@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { handleLoginApi, handleGoogleLoginApi, } from '../../features/auth/api/loginApi';
 import { handleSignupApi, handleResendVerificationApi, } from '../../features/auth/api/signupApi';
+import { deactivateAccount as deactivateAccountApi } from '../../features/auth/api/deactivateApi';
 const AUTH_STORAGE_KEY = 'vista.auth';
 const initialState = {
     user: null,
@@ -101,6 +102,15 @@ export const resendVerification = createAsyncThunk('auth/resendVerification', as
 export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
     await clearAuthSession();
 });
+export const deactivateAccountThunk = createAsyncThunk('auth/deactivateAccount', async (password, { getState, rejectWithValue }) => {
+    const { auth } = getState();
+    const result = await deactivateAccountApi(auth.token, password);
+    if (!result.isSuccess) {
+        return rejectWithValue({ message: result.message });
+    }
+    await clearAuthSession();
+    return { message: result.message };
+});
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -182,12 +192,19 @@ const authSlice = createSlice({
             state.signupErrors = action.payload?.errors ?? {};
         })
             .addCase(logoutUser.fulfilled, state => {
-            state.user = null;
-            state.token = null;
-            state.isAuthenticated = false;
-            state.loginErrors = {};
-            state.signupErrors = {};
-        });
+                state.user = null;
+                state.token = null;
+                state.isAuthenticated = false;
+                state.loginErrors = {};
+                state.signupErrors = {};
+            })
+            .addCase(deactivateAccountThunk.fulfilled, state => {
+                state.user = null;
+                state.token = null;
+                state.isAuthenticated = false;
+                state.loginErrors = {};
+                state.signupErrors = {};
+            });
     },
 });
 export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, } = authSlice.actions;

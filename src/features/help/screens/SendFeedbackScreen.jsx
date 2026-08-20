@@ -120,12 +120,12 @@ export default function SendFeedbackScreen({ onBackPress }) {
         <Pressable disabled={!canSend} style={[
             styles.sendButton,
             {
-                backgroundColor: canSend ? colors.primary : colors.border,
+                backgroundColor: canSend ? colors.buttonBackground : colors.border,
             },
         ]}>
           <Text style={[
             styles.sendButtonText,
-            { color: canSend ? colors.primaryText : colors.subtle },
+            { color: canSend ? colors.buttonText : colors.subtle },
         ]}>
             Send
           </Text>

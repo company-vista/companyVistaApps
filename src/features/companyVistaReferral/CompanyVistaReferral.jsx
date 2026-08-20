@@ -7,30 +7,25 @@ const CompanyVistaReferral = () => {
     return (<View style={styles.cardContainer}>
 
       {/* Header Section */}
-      <View style={styles.headerContainer}>
-        <View style={styles.titleRow}>
-          <Text style={[styles.headerI, { color: colors.text }]}>I</Text>
-          <Text style={styles.heartIcon}>❤️</Text>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Company Vista</Text>
-        </View>
-      </View>
+     
 
       {/* Illustration Area */}
-      <View style={styles.imageWrapper}>
-        <Image source={require('../../assets/images/referals.png')} style={styles.illustration} resizeMode="contain"/>
-      </View>
+      {/* <View style={styles.imageWrapper}>
+        <Image source={require('../../assets/images/thanks.png')} style={styles.illustration} resizeMode="contain"/>
+      </View> */}
 
     </View>);
 };
 const styles = StyleSheet.create({
     cardContainer: {
-        borderRadius: 24,
-        paddingTop: 30,
-        paddingBottom: 8,
-        paddingHorizontal: 20,
+        borderRadius: 44,
+        paddingTop: 0,
+        paddingBottom: 0,
+        paddingHorizontal: 10,
         alignItems: 'center',
         justifyContent: 'space-between',
-        margin: 16,
+        margin: 4,
+        opacity: 0.4,
     },
     headerContainer: {
         alignItems: 'center',
@@ -55,13 +50,14 @@ const styles = StyleSheet.create({
     },
     imageWrapper: {
         width: '100%',
-        height: width * 0.45,
+        height: width * 1.1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 2,
+        marginTop: -20,
+        marginBottom: 2,
     },
     illustration: {
-        width: '95%',
+        width: '100%',
         height: '100%',
     },
 });

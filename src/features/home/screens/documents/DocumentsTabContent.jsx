@@ -164,7 +164,7 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     const filteredDocuments = documents.filter(doc => {
         if (activeTab === 'registered' && isMailDoc(doc))
             return false;
-        if (activeTab === 'other' && !isMailDoc(doc))
+        if (activeTab === 'locked' || activeTab === 'unlocked')
             return false;
         if (sortOption === 'mails&letter' && !isMailDoc(doc))
             return false;
@@ -184,9 +184,16 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     });
     const unlockedLockedItems = lockedItems.filter(item => Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0);
     const stillLockedItems = lockedItems.filter(item => !(Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0));
-    const lockedToShow = sortOption === 'free' ? unlockedLockedItems : sortOption === 'locked' ? stillLockedItems : lockedItems;
+    const lockedToShow = activeTab === 'unlocked'
+        ? unlockedLockedItems
+        : activeTab === 'locked'
+            ? stillLockedItems
+            : sortOption === 'free' ? unlockedLockedItems : sortOption === 'locked' ? stillLockedItems : lockedItems;
     const showDocsList = activeTab === 'registered' && (sortOption === 'all' || sortOption === 'mails&letter' || sortOption === 'docs');
-    const hasLocked = activeTab === 'other' && lockedToShow.length > 0;
+    const hasLocked = (activeTab === 'locked' || activeTab === 'unlocked') && lockedToShow.length > 0;
+    const registeredDocsCount = documents.filter(doc => !isMailDoc(doc)).length;
+    const lockedCount = stillLockedItems.length;
+    const unlockedCount = unlockedLockedItems.length;
     return (<View style={styles.container}>
 
       {/* **************Header ************** */}
@@ -195,9 +202,6 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
           <View>
             <Text style={styles.headerTitle}>{capitalizeCompanyName(selectedCompany?.name) ?? 'Documents'}</Text>
           </View>
-        </View>
-        <View style={styles.totalBadge}>
-          <Text style={styles.totalBadgeText}>{documents.length} Docs</Text>
         </View>
       </View>
 
@@ -229,17 +233,34 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
           </View>) : null}
       </View>
 
-      {/* **************Registered / Other Docs tabs ************** */}
+      {/* **************Registered / Locked / Unlocked tabs ************** */}
       <View style={styles.tabsRow}>
         <Pressable onPress={() => setActiveTab('registered')} style={[styles.tab, activeTab === 'registered' && styles.tabActive]}>
+          <FontAwesome name="file-text-o" size={12} color={activeTab === 'registered' ? palette.link : colors.muted} style={styles.tabIcon}/>
           <Text style={[styles.tabText, activeTab === 'registered' && styles.tabTextActive]}>
-            Registered Docs
+            Company Docs
           </Text>
+          <View style={[styles.tabCount, activeTab === 'registered' && styles.tabCountActive]}>
+            <Text style={[styles.tabCountText, activeTab === 'registered' && styles.tabCountTextActive]}>{registeredDocsCount}</Text>
+          </View>
         </Pressable>
-        <Pressable onPress={() => setActiveTab('other')} style={[styles.tab, activeTab === 'other' && styles.tabActive]}>
-          <Text style={[styles.tabText, activeTab === 'other' && styles.tabTextActive]}>
-            Other Docs
+        <Pressable onPress={() => setActiveTab('locked')} style={[styles.tab, activeTab === 'locked' && styles.tabActive]}>
+          <FontAwesome name="lock" size={12} color={activeTab === 'locked' ? palette.link : colors.muted} style={styles.tabIcon}/>
+          <Text style={[styles.tabText, activeTab === 'locked' && styles.tabTextActive]}>
+            Locked
           </Text>
+          <View style={[styles.tabCount, activeTab === 'locked' && styles.tabCountActive]}>
+            <Text style={[styles.tabCountText, activeTab === 'locked' && styles.tabCountTextActive]}>{lockedCount}</Text>
+          </View>
+        </Pressable>
+        <Pressable onPress={() => setActiveTab('unlocked')} style={[styles.tab, activeTab === 'unlocked' && styles.tabActive]}>
+          <FontAwesome name="unlock-alt" size={12} color={activeTab === 'unlocked' ? palette.link : colors.muted} style={styles.tabIcon}/>
+          <Text style={[styles.tabText, activeTab === 'unlocked' && styles.tabTextActive]}>
+            Unlocked
+          </Text>
+          <View style={[styles.tabCount, activeTab === 'unlocked' && styles.tabCountActive]}>
+            <Text style={[styles.tabCountText, activeTab === 'unlocked' && styles.tabCountTextActive]}>{unlockedCount}</Text>
+          </View>
         </Pressable>
       </View>
 
@@ -275,14 +296,14 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                         Uploaded: {formatDate(doc.uploadedAt)}
                     </Text>
                     <Pressable onPress={() => onDocumentViewPress?.(doc)}>
-                      <Text style={styles.cardLink}>View Details</Text>
+                      <Text style={styles.cardLink}>View Docs</Text>
                     </Pressable>
                   </View>
                 </View>
                 </AnimatedAppear>))}
 
             {hasLocked && (<>
-                {sortOption !== 'free' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
+                {activeTab === 'locked' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
                     <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }}/>
                     <Text style={styles.unlockAllBtnText}>Unlock All</Text>
                   </Pressable>)}
@@ -324,18 +345,6 @@ const getStyles = (colors) => {
             fontSize: font.heading,
             fontWeight: '400',
             color: palette.primaryText,
-        },
-        totalBadge: {
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 16,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        totalBadgeText: {
-            fontSize: font.md,
-            fontWeight: '400',
-            color: colors.text,
         },
         searchContainer: {
             flexDirection: 'row',
@@ -401,7 +410,8 @@ const getStyles = (colors) => {
         },
         tabsRow: {
             flexDirection: 'row',
-            gap: 8,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
             marginBottom: 16,
         },
         tab: {
@@ -409,22 +419,47 @@ const getStyles = (colors) => {
             alignItems: 'center',
             justifyContent: 'center',
             paddingVertical: 10,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colors.border,
-            backgroundColor: colors.surface,
+            flexDirection: 'row',
+            gap: 2,
         },
         tabActive: {
-            backgroundColor: palette.actionSurface,
-            borderColor: palette.actionBorder,
+            borderBottomWidth: 2,
+            borderBottomColor: palette.link,
         },
         tabText: {
-            fontSize: font.md,
+            fontSize: font.sm,
             fontWeight: '600',
             color: colors.muted,
         },
+        tabIcon: {
+            marginRight: 1,
+        },
+        tabCount: {
+            minWidth: 20,
+            height: 18,
+            borderRadius: 9,
+            paddingHorizontal: 5,
+            marginLeft: 2,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.border,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        tabCountActive: {
+            backgroundColor: palette.link,
+            borderColor: palette.link,
+        },
+        tabCountText: {
+            fontSize: font.xs,
+            fontWeight: '700',
+            color: colors.muted,
+        },
+        tabCountTextActive: {
+            color: '#ffffff',
+        },
         tabTextActive: {
-            color: palette.primaryText,
+            color: palette.link,
             fontWeight: '800',
         },
         unlockAllBtn: {

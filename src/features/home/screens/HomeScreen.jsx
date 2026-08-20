@@ -505,7 +505,7 @@ export default function HomeScreen() {
             {
                 flexGrow: 1,
                 paddingTop: safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16, // leave space for fixed header
-                paddingBottom: safeAreaInsets.bottom + 116,
+                paddingBottom: safeAreaInsets.bottom + 75,
             },
         ]} showsVerticalScrollIndicator={false}>
             {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
@@ -563,7 +563,7 @@ export default function HomeScreen() {
                         <FontAwesome name="close" size={18} color={colors.text} />
                     </Pressable>
                 </View>
-                <MoreTabContent onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} />
+                <MoreTabContent onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} />
             </Animated.View>
         </View>) : null}
 

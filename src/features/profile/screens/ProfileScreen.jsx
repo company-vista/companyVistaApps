@@ -159,7 +159,7 @@ function ProfileScreen() {
                             setEditingEmail('');
                         }
                     }} style={[styles.emailInputSubmit, { backgroundColor: colors.accent }]}>
-                        <FontAwesome name="check" size={14} color="#fff"/>
+                        <FontAwesome name="check" size={14} color={colors.buttonText}/>
                       </Pressable>
                       <Pressable onPress={() => { setEditingIndex(null); setEditingEmail(''); }} style={[styles.emailInputClose, { backgroundColor: colors.surface }]}>
                         <FontAwesome name="times" size={14} color={colors.muted}/>
@@ -190,7 +190,7 @@ function ProfileScreen() {
                         setIsAddingEmail(false);
                     }
                 }} style={[styles.emailInputSubmit, { backgroundColor: colors.accent }]}>
-                    <FontAwesome name="check" size={14} color="#fff"/>
+                    <FontAwesome name="check" size={14} color={colors.buttonText}/>
                   </Pressable>
                   <Pressable onPress={() => { setNewEmail(''); setIsAddingEmail(false); }} style={[styles.emailInputClose, { backgroundColor: colors.surface }]}>
                     <FontAwesome name="times" size={14} color={colors.muted}/>
@@ -222,13 +222,13 @@ function ProfileScreen() {
         <FontAwesome name="angle-right" size={22} color={colors.muted}/>
       </Pressable>
 
-      <Pressable onPress={() => dispatch(logoutUser())} style={styles.logoutButton}>
-        <FontAwesome name="sign-out" size={18} color="#ffffff"/>
-        <Text style={styles.logoutText}>Logout</Text>
+      <Pressable onPress={() => dispatch(logoutUser())} style={[styles.logoutButton, { backgroundColor: colors.buttonBackground }]}>
+        <FontAwesome name="sign-out" size={18} color={colors.buttonText}/>
+        <Text style={[styles.logoutText, { color: colors.buttonText }]}>Logout</Text>
       </Pressable>
 
       <Text style={[styles.versionText, { color: colors.subtle }]}>
-        Company Vista v0.0.4
+        Company Vista Inc
       </Text>
 
       <Modal animationType="slide" transparent visible={isSwitchSheetVisible} onRequestClose={() => setIsSwitchSheetVisible(false)}>

@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 export default function ResetPasswordScreen() {
     const navigation = useNavigation();
@@ -55,15 +54,12 @@ export default function ResetPasswordScreen() {
             { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 40 }]}>
-        <View style={styles.brandMark}>
-          <Image source={logoImage} style={styles.brandLogo}/>
-        </View>
+      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 24 }]}>
 
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Reset Password</Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Enter your new password below.
+            Enter Your New Password Below.
           </Text>
         </View>
 
@@ -105,9 +101,9 @@ export default function ResetPasswordScreen() {
 
               <Pressable onPress={handleReset} disabled={loading} style={[
                 styles.button,
-                { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
+                { backgroundColor: colors.buttonBackground, opacity: loading ? 0.7 : 1 },
             ]}>
-                {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
+                {loading ? (<ActivityIndicator color={colors.buttonText} size="small"/>) : (<Text style={[styles.buttonText, { color: colors.buttonText }]}>
                     Reset Password
                   </Text>)}
               </Pressable>

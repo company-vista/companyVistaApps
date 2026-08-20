@@ -5,6 +5,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../../../theme/typography';
 import { API_BASE_URL } from '../../../config/api';
+import { useThemeColors } from '../../../theme/colors';
 export default function SetNewPasswordScreen({ email, clientId, token, onPasswordSet, onBackPress, }) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,6 +14,7 @@ export default function SetNewPasswordScreen({ email, clientId, token, onPasswor
     const [loading, setLoading] = useState(false);
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    const colors = useThemeColors();
     function validate() {
         let valid = true;
         setPasswordError('');
@@ -113,8 +115,8 @@ export default function SetNewPasswordScreen({ email, clientId, token, onPasswor
           {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
         </View>
 
-        <TouchableOpacity style={[styles.setBtn, loading && styles.setBtnDisabled]} disabled={loading} onPress={handleSetPassword}>
-          {loading ? (<ActivityIndicator color="#042f2e" size="small"/>) : (<Text style={styles.setBtnText}>Set Password & Continue</Text>)}
+        <TouchableOpacity style={[styles.setBtn, { backgroundColor: colors.buttonBackground }, loading && styles.setBtnDisabled]} disabled={loading} onPress={handleSetPassword}>
+          {loading ? (<ActivityIndicator color={colors.buttonText} size="small"/>) : (<Text style={[styles.setBtnText, { color: colors.buttonText }]}>Set Password & Continue</Text>)}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={onBackPress}>
@@ -233,9 +235,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 48,
         borderWidth: 1,
-        borderColor: '#334155',
+        borderColor: '#cbd5e1',
         borderRadius: 10,
-        backgroundColor: '#111827',
+        backgroundColor: '#f8fafc',
         paddingHorizontal: 12,
         gap: 10,
     },
@@ -245,7 +247,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: font.md,
-        color: '#f8fafc',
+        color: '#0f172a',
         padding: 0,
     },
     toggleText: {
@@ -262,7 +264,6 @@ const styles = StyleSheet.create({
     setBtn: {
         width: '100%',
         height: 48,
-        backgroundColor: '#14b8a6',
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
@@ -272,7 +273,6 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     setBtnText: {
-        color: '#042f2e',
         fontSize: font.lg,
         fontWeight: '700',
     },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     divider: {
         width: '100%',
         height: 1,
-        backgroundColor: '#334155',
+        backgroundColor: '#e5e7eb',
         marginBottom: 16,
     },
     footerRow: {

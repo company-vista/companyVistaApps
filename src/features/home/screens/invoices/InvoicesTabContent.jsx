@@ -213,7 +213,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
             <View>
                 {/* <Text style={styles.title}>Invoices</Text> */}
                 <Text style={styles.companyName}>
-                    Company Name: {capitalizeCompanyName(selectedCompany?.name) ?? 'All companies'}
+                    {capitalizeCompanyName(selectedCompany?.name) ?? 'All companies'}
                 </Text>
             </View>
         </View>

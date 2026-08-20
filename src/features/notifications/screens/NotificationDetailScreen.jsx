@@ -42,8 +42,8 @@ function NotificationDetailScreen() {
             { paddingTop: 8 },
         ]}>
       <View style={[styles.detailCard, { backgroundColor: colors.surface }]}>
-        <View style={[styles.iconWrap, { backgroundColor: colors.surfaceAlt }]}>
-          <FontAwesome name={notification.icon} size={24} color={colors.accent}/>
+        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+          <FontAwesome name="user" size={24} color={colors.accent}/>
         </View>
         <Text style={[styles.title, { color: colors.text }]}>
           {notification.title}
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         height: 56,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 16,
+        borderRadius: 28,
         backgroundColor: '#ecfeff',
     },
     title: {
@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
     },
     time: {
         color: '#94a3b8',
-        fontSize: font.md,
-        fontWeight: '700',
+        fontSize: font.sm,
+        fontWeight: '500',
         marginTop: 8,
     },
     divider: {

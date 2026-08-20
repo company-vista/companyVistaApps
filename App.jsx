@@ -122,6 +122,16 @@ function SplashScreen() {
         ]}>
         <Image source={logoImage} style={styles.logoImage} />
       </Animated.View>
+      <Animated.Text
+        style={[
+          styles.appName,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }, { translateY: riseAnim }],
+          },
+        ]}>
+        Welcome To Company Vista
+      </Animated.Text>
     </View>
   );
 }

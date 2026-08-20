@@ -8,6 +8,7 @@ import { useThemeColors } from '../../../../theme/colors';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import { font } from '../../../../theme/typography';
+import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 function StatBox({ icon, label, value, sub, colors }) {
     return (<View style={[cStatBox, { backgroundColor: colors.surfaceAlt }]}>
       <View style={cStatHeader}>
@@ -21,8 +22,8 @@ function StatBox({ icon, label, value, sub, colors }) {
 const timelineIcons = {
     'Federal filing': 'file-text-o',
     'Annual filing': 'calendar',
-    'Agent renewal': 'refresh',
-    'Address renewal': 'home',
+    'Agent & Address': 'building',
+    ITIN: 'id-card',
 };
 function TimelineRow({ item, colors }) {
     const overdue = item.status === 'overdue';
@@ -47,7 +48,7 @@ function CompanyCard({ company, colors }) {
             <Text style={cIconGlyph}>{'\u{1F3E2}'}</Text>
           </View>
           <View>
-            <Text style={[cCompanyName, { color: colors.text }]}>{company.name}</Text>
+            <Text style={[cCompanyName, { color: colors.text }]}>{capitalizeCompanyName(company.name)}</Text>
             <Text style={[cCompanyPlan, { color: colors.muted }]}>{company.plan}</Text>
           </View>
         </View>
@@ -68,7 +69,7 @@ function CompanyCard({ company, colors }) {
       </View>
 
       <View style={[cTimelineBlock, { backgroundColor: colors.surfaceAlt }]}>
-        <Text style={[cTimelineTitle, { color: colors.text }]}>Compliance timeline</Text>
+        <Text style={[cTimelineTitle, { color: colors.text }]}>Compliance Timeline</Text>
         <View style={cTimelineGrid}>
           {company.timeline.map((item, idx) => (<TimelineRow item={item} key={idx} colors={colors}/>))}
         </View>
@@ -103,6 +104,7 @@ function buildCompanyData(selected, apiData) {
     const annual = data.annualFiling || {};
     const resident = data.resident || {};
     const address = data.Address || {};
+    const itin = data.itin || {};
     return [
         {
             name: selected.name,
@@ -115,8 +117,12 @@ function buildCompanyData(selected, apiData) {
             timeline: [
                 { label: 'Federal filing', due: formatDateSafe(fed.dueDate), status: toStatus(fed.status) },
                 { label: 'Annual filing', due: formatDateSafe(annual.dueDate), status: toStatus(annual.status) },
-                { label: 'Agent renewal', due: formatDateSafe(resident.dueDate), status: toStatus(resident.status) },
-                { label: 'Address renewal', due: formatDateSafe(address.dueDate), status: toStatus(address.status) },
+                {
+                    label: 'Agent & Address',
+                    due: formatDateSafe(address.dueDate || resident.dueDate),
+                    status: toStatus(resident.status) || toStatus(address.status),
+                },
+                { label: 'ITIN', due: formatDateSafe(itin.dueDate), status: toStatus(itin.status) },
             ],
         },
     ];

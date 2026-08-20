@@ -151,19 +151,19 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     logoutButton: {
-        height: 54,
+        height: 50,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 10,
-        borderRadius: 14,
-        backgroundColor: '#dc2626',
+        borderRadius: 34,
+        // backgroundColor: '#e8c96a',
         marginTop: 36,
     },
     logoutText: {
-        color: '#ffffff',
+        // color: '#000',
         fontSize: 16,
-        fontWeight: '900',
+        fontWeight: '500',
     },
     detailRow: {
         flexDirection: 'row',
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     detailLabel: {
         color: '#94a3b8',
         fontSize: 12,
-        fontWeight: '700',
+        fontWeight: '500',
     },
     detailValue: {
         color: '#111827',

@@ -18,10 +18,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#ffffff',
         borderRadius: s(60),
-        padding: 2,
+        padding: 0,
         marginBottom: s(32),
     },
     brandLogo: {
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(10),
         borderWidth: 1,
-        borderColor: '#334155',
+        borderColor: '#0d1116',
         borderRadius: s(20),
         backgroundColor: '#111827',
         paddingHorizontal: s(14),
@@ -91,23 +89,23 @@ const styles = StyleSheet.create({
     errorText: {
         color: '#fca5a5',
         fontSize: font.base,
-        fontWeight: '700',
+        fontWeight: '500',
     },
     button: {
         alignItems: 'center',
         justifyContent: 'center',
         height: s(50),
         borderRadius: s(22),
-        backgroundColor: '#14b8a6',
+        // backgroundColor: '#2563eb',
         marginTop: 8,
     },
     buttonDisabled: {
         opacity: 0.7,
     },
     buttonText: {
-        color: '#042f2e',
+        // color: '#042f2e',
         fontSize: s(16),
-        fontWeight: '800',
+        fontWeight: '400',
     },
     dividerRow: {
         flexDirection: 'row',
@@ -121,7 +119,7 @@ const styles = StyleSheet.create({
     },
     dividerText: {
         color: '#cbd5e1',
-        fontSize: s(13),
+        fontSize: s(15),
         fontWeight: '700',
     },
     googleAuthButton: {
@@ -137,8 +135,8 @@ const styles = StyleSheet.create({
     },
     googleAuthText: {
         color: '#475569',
-        fontSize: s(13),
-        fontWeight: '700',
+        fontSize: s(15),
+        fontWeight: '500',
     },
     authLinkText: {
         color: '#94a3b8',
@@ -148,15 +146,15 @@ const styles = StyleSheet.create({
     },
     authLink: {
         color: '#5eead4',
-        fontWeight: '800',
+        fontWeight: '500',
     },
     forgotPassword: {
         alignSelf: 'flex-end',
-        marginTop: -2,
+        marginTop: -4,
     },
     forgotPasswordText: {
-        fontSize: s(12),
-        fontWeight: '600',
+        fontSize: s(14),
+        fontWeight: '500',
     },
     socialSection: {
         alignItems: 'center',

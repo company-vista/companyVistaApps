@@ -144,10 +144,10 @@ function LoginScreen() {
 
           <Pressable disabled={isLoading} onPress={handleLogin} style={[
             styles.button,
-            { backgroundColor: colors.primary },
+            { backgroundColor: colors.buttonBackground },
             isLoading ? styles.buttonDisabled : null,
         ]}>
-            <Text style={[styles.buttonText, { color: '#ffffff' }]}>
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>
               {isLoading ? 'Logging in...' : 'Login'}
             </Text>
           </Pressable>

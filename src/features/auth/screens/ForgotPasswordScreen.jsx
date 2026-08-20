@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 import { forgotPassword } from '../api/forgotPasswordApi';
 const checkEmail = 'Email not found';
@@ -46,10 +45,7 @@ export default function ForgotPasswordScreen() {
             { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
         ]}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 80 }]}>
-        <View style={styles.brandMark}>
-          <Image source={logoImage} style={styles.brandLogo}/>
-        </View>
+        <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 24 }]}>
 
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>Forgot Password?</Text>
@@ -76,9 +72,9 @@ export default function ForgotPasswordScreen() {
 
           <Pressable onPress={handleReset} disabled={loading} style={[
             styles.button,
-            { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
+            { backgroundColor: colors.buttonBackground, opacity: loading ? 0.7 : 1 },
         ]}>
-            {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
+            {loading ? (<ActivityIndicator color={colors.buttonText} size="small"/>) : (<Text style={[styles.buttonText, { color: colors.buttonText }]}>
                 Send Reset Link
               </Text>)}
           </Pressable>

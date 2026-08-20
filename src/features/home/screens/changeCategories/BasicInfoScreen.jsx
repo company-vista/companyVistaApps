@@ -313,7 +313,7 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
 
               <TouchableOpacity style={styles(colors).submitBtn} onPress={handleSubmit} activeOpacity={0.8} disabled={submitting} // Disable button when submitting
         >
-                {submitting ? (<ActivityIndicator color="#FFFFFF"/>) : (<Text style={styles(colors).submitBtnText}>Submit update</Text>)}
+                {submitting ? (<ActivityIndicator color={colors.buttonText}/>) : (<Text style={[styles(colors).submitBtnText, { color: colors.buttonText }]}>Submit update</Text>)}
               </TouchableOpacity>
             </View>)}
         </ScrollView>
@@ -422,7 +422,7 @@ const styles = (colors) => StyleSheet.create({
     // Form area
     formArea: {
         rowGap: 16,
-        padding: 2
+        padding: 14
     },
     fieldBlock: {
         rowGap: 6,
@@ -448,7 +448,7 @@ const styles = (colors) => StyleSheet.create({
     fieldInputMulti: {
         minHeight: 72,
         textAlignVertical: 'top',
-        paddingTop: 9,
+        paddingTop: 8,
     },
     // Shareholder card
     shCard: {
@@ -476,9 +476,9 @@ const styles = (colors) => StyleSheet.create({
     },
     // Submit Button
     submitBtn: {
-        backgroundColor: colors.primary,
-        borderRadius: 12,
-        paddingVertical: 16,
+        backgroundColor: colors.buttonBackground,
+        borderRadius: 24,
+        paddingVertical: 12,
         alignItems: 'center',
         width: '100%',
         marginTop: 3,
@@ -520,8 +520,8 @@ const styles = (colors) => StyleSheet.create({
     },
     successBtn: {
         backgroundColor: colors.primary,
-        borderRadius: 12,
-        paddingVertical: 14,
+        borderRadius: 24,
+        paddingVertical: 12,
         paddingHorizontal: 32,
         alignItems: 'center',
         shadowColor: colors.primary,

@@ -212,8 +212,8 @@ export default function ContactSupport({ onBackPress }) {
             </View>)}
         </View>
 
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend} activeOpacity={0.85}>
-          <Text style={styles.sendButtonText}>Send Message</Text>
+        <TouchableOpacity style={[styles.sendButton, { backgroundColor: colors.buttonBackground }]} onPress={handleSend} activeOpacity={0.85}>
+          <Text style={[styles.sendButtonText , { color: colors.buttonText }]}>Send Message</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -381,14 +381,14 @@ const styles = StyleSheet.create({
         fontSize: font.xs,
     },
     sendButton: {
-        backgroundColor: '#e6a82a',
-        borderRadius: 8,
+        // backgroundColor: colors.buttonBackground,
+        borderRadius: 24,
         paddingVertical: 12,
         alignItems: 'center',
         marginTop: 0,
     },
     sendButtonText: {
-        color: '#1a1204',
+        // color: colors.buttonText,
         fontSize: font.md,
         fontWeight: '600',
     },

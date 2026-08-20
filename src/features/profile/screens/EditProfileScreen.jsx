@@ -198,12 +198,14 @@ function EditProfileScreen() {
                 <ProfileInput icon="id-card-o" label="Passport Number" autoCapitalize="characters" onChangeText={setPassportNumber} value={passportNumber} />
             </View>
 
-            <SaveButton isLoading={isSavingProfile} onPress={handleSavePress} />
+            <SaveButton isLoading={isSavingProfile} label="Profile Update" onPress={handleSavePress} />
         </ScrollView>
 
         <ProfileDatePickerModal onClose={() => setIsDatePickerVisible(false)} onConfirm={handleConfirmDate} value={dateOfBirth} visible={isDatePickerVisible} />
     </KeyboardAvoidingView>);
 }
+
+
 function ProfileInput({ autoCapitalize = 'sentences', editable = true, icon, keyboardType = 'default', label, onChangeText, placeholder, value, }) {
     const colors = useThemeColors();
     return (<View style={styles.inputGroup}>
@@ -217,6 +219,7 @@ function ProfileInput({ autoCapitalize = 'sentences', editable = true, icon, key
         </View>
     </View>);
 }
+
 function DateProfileInput({ icon, label, onPress, placeholder, value, }) {
     const colors = useThemeColors();
     return (<Pressable accessibilityRole="button" onPress={onPress} style={styles.inputGroup}>

@@ -15,6 +15,7 @@ const SearchScreen = lazy(() => import('../features/home/screens/SearchScreen'))
 const HelpFeedbackScreen = lazy(() => import('../features/help/screens/HelpFeedbackScreen'));
 const SupportScreen = lazy(() => import('../features/support/screens/SupportScreen'));
 const FollowUsScreen = lazy(() => import('../features/home/screens/FollowUsScreen'));
+const SettingsScreen = lazy(() => import('../features/settings/screens/SettingsScreen'));
 const QuickAccessScreen = lazy(() => import('../features/home/screens/QuickAccessScreen'));
 const CompanyProfileScreen = lazy(() => import('../features/home/screens/quickAccess/CompanyProfileScreen'));
 const InvoiceCenterScreen = lazy(() => import('../features/home/screens/quickAccess/InvoiceCenterScreen'));
@@ -33,6 +34,8 @@ const BankingOwnerScreen = lazy(() => import('../features/home/screens/exploreSe
 const CorporateChangesScreen = lazy(() => import('../features/home/screens/exploreServices/CorporateChangesScreen'));
 const BookkeepingScreen = lazy(() => import('../features/home/screens/exploreServices/BookkeepingScreen'));
 const ComplianceCheckScreen = lazy(() => import('../features/home/screens/exploreServices/ComplianceCheckScreen'));
+const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/DeactivateAccountScreen'));
+const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +74,7 @@ export default function MainStack() {
       <Stack.Screen name="HelpFeedback" component={HelpFeedbackScreen} options={{ title: 'Help and feedback', headerTitleStyle: { fontSize: font.hero, color: colors.text } }}/>
       <Stack.Screen name="Support" component={SupportScreen} options={{ title: 'Support' }}/>
       <Stack.Screen name="FollowUs" component={FollowUsScreen} options={{ title: 'Follow Us' }}/>
+      <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }}/>
       <Stack.Screen name="QuickAccess" component={QuickAccessScreen} options={{ title: 'Quick Access' }}/>
       <Stack.Screen name="CompanyProfile" component={CompanyProfileScreen} options={{ title: 'Company Profile' }}/>
       <Stack.Screen name="InvoiceCenter" component={InvoiceCenterScreen} options={{ title: 'Invoice Center' }}/>
@@ -89,6 +93,8 @@ export default function MainStack() {
       <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen} options={{ title: 'Company Updates & Documents' }}/>
       <Stack.Screen name="Bookkeeping" component={BookkeepingScreen} options={{ title: 'Bookkeeping' }}/>
       <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen} options={{ title: 'Compliance Check' }}/>
+      <Stack.Screen name="DeactivateAccount" component={DeactivateAccountScreen} options={{ title: 'Deactivate Account' }}/>
+      <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
     </Stack.Navigator>
     </Suspense>);
 }

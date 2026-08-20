@@ -7,30 +7,26 @@ function SaveButton({ disabled = false, isLoading = false, label = 'Save', onPre
     return (<Pressable accessibilityRole="button" disabled={isDisabled} onPress={onPress} style={[
             styles.button,
             {
-                backgroundColor: colors.mode === 'dark' ? colors.accentSoft : colors.danger,
+                backgroundColor: colors.buttonBackground,
                 borderColor: colors.accent,
+                
             },
             isDisabled ? styles.disabled : null,
         ]}>
-      {isLoading ? (<ActivityIndicator size="small" color="#ffffff"/>) : (<Text style={styles.text}>{label}</Text>)}
+      {isLoading ? (<ActivityIndicator size="small" color={colors.buttonText}/>) : (<Text style={[styles.text, { color: colors.buttonText }]}>{label}</Text>)}
     </Pressable>);
 }
 const styles = StyleSheet.create({
     button: {
-        height: 54,
+        height: 50,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 0.2,
-        borderRadius: 14,
+        borderRadius: 24,
         marginTop: 24,
     },
     disabled: {
         opacity: 0.72,
-    },
-    text: {
-        color: '#ffffff',
-        fontSize: font.xxl,
-        fontWeight: '900',
     },
 });
 export default SaveButton;

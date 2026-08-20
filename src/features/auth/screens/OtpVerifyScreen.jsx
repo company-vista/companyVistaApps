@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import styles from './LoginScreen.styles';
-import logoImage from '../../../assets/images/logo.jpg';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 export default function OtpVerifyScreen() {
@@ -66,56 +65,53 @@ export default function OtpVerifyScreen() {
         }
     }
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
-            styles.screen,
-            { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
-        ]}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-      <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 80 }]}>
-        <View style={styles.brandMark}>
-          <Image source={logoImage} style={styles.brandLogo}/>
-        </View>
+        styles.screen,
+        { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
+    ]}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <View style={[styles.container, { justifyContent: 'flex-start', paddingTop: 24 }]}>
 
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Verify OTP</Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Enter the 6-digit code sent to{'\n'}
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{email}</Text>
-          </Text>
-        </View>
+                <View style={styles.header}>
+                    <Text style={[styles.title, { color: colors.text }]}>Verify OTP</Text>
+                    <Text style={[styles.subtitle, { color: colors.muted }]}>
+                        Enter the 6-digit code sent to{'\n'}
+                        <Text style={{ color: colors.text, fontWeight: '700' }}>{email}</Text>
+                    </Text>
+                </View>
 
-        <View style={styles.form}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={{
-                width: 44,
-                height: 52,
-                borderWidth: 1,
-                borderColor: digit ? colors.primary : colors.inputBorder,
-                borderRadius: 10,
-                backgroundColor: colors.inputBackground,
-                color: colors.inputText,
-                fontSize: font.heading,
-                fontWeight: '700',
-                textAlign: 'center',
-            }} keyboardType="number-pad" maxLength={1} onChangeText={text => handleChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0}/>))}
-          </View>
+                <View style={styles.form}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+                        {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={{
+                            width: 44,
+                            height: 52,
+                            borderWidth: 1,
+                            borderColor: digit ? '#2563eb' : '#cbd5e1',
+                            borderRadius: 10,
+                            backgroundColor: '#f1f5f9',
+                            color: '#0f172a',
+                            fontSize: font.heading,
+                            fontWeight: '700',
+                            textAlign: 'center',
+                        }} keyboardType="number-pad" maxLength={1} onChangeText={text => handleChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0} />))}
+                    </View>
 
-          <Pressable onPress={handleVerify} disabled={loading} style={[
-            styles.button,
-            { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 },
-        ]}>
-            {loading ? (<ActivityIndicator color="#ffffff" size="small"/>) : (<Text style={[styles.buttonText, { color: '#ffffff' }]}>
-                Verify OTP
-              </Text>)}
-          </Pressable>
+                    <Pressable onPress={handleVerify} disabled={loading} style={[
+                        styles.button,
+                        { backgroundColor: colors.buttonBackground, opacity: loading ? 0.7 : 1 },
+                    ]}>
+                        {loading ? (<ActivityIndicator color={colors.buttonText} size="small" />) : (<Text style={[styles.buttonText, { color: colors.buttonText }]}>
+                            Verify OTP
+                        </Text>)}
+                    </Pressable>
 
-          <Pressable onPress={() => navigation.goBack()}>
-            <Text style={[styles.authLinkText, { color: colors.subtle, textAlign: 'center' }]}>
-              Back to{' '}
-              <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>
-            </Text>
-          </Pressable>
-        </View>
-      </View>
-      </ScrollView>
+                    <Pressable onPress={() => navigation.goBack()}>
+                        <Text style={[styles.authLinkText, { color: colors.subtle, textAlign: 'center' }]}>
+                            Back to{' '}
+                            <Text style={[styles.authLink, { color: colors.accent }]}>Login</Text>
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
+        </ScrollView>
     </KeyboardAvoidingView>);
 }

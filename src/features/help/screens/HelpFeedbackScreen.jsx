@@ -18,10 +18,6 @@ const helpItems = [
         subtitle: 'Report technical issues',
     },
     {
-        icon: 'file-text-o',
-        title: 'Terms and Privacy Policy',
-    },
-    {
         icon: 'exclamation-circle',
         title: 'Channel reports',
     },
@@ -33,7 +29,6 @@ const helpItems = [
 function HelpFeedbackScreen() {
     const colors = useThemeColors();
     const navigation = useNavigation();
-    const isLight = colors.mode === 'light';
     const [activePage, setActivePage] = useState('helpList');
     if (activePage === 'sendFeedback') {
         return <SendFeedbackScreen onBackPress={() => {
@@ -59,7 +54,7 @@ function HelpFeedbackScreen() {
                     setActivePage('appInfo');
                     navigation.setOptions({ headerShown: false });
                 }
-            }} style={[styles.itemRow, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+            }} style={styles.itemRow}>
             <View style={styles.itemIcon}>
               <FontAwesome name={item.icon} size={25} color={colors.muted}/>
             </View>
