@@ -56,6 +56,7 @@ export default function HomeScreen() {
     const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+    const [searchOpenedScreen, setSearchOpenedScreen] = useState(null);
     const [isExploreServicesOpen, setIsExploreServicesOpen] = useState(false);
     const [isServicesHistoryOpen, setIsServicesHistoryOpen] = useState(false);
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
@@ -82,12 +83,21 @@ export default function HomeScreen() {
     useEffect(() => {
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
+            setSearchOpenedScreen('subscription');
         }
         else if (routePendingHomeAction === 'addCompany') {
             setIsAddCompanyOpen(true);
         }
         else if (routePendingHomeAction === 'manageOptions') {
             setIsManageOptionsOpen(true);
+        }
+        else if (routePendingHomeAction === 'requestService') {
+            setIsExploreServicesOpen(true);
+            setSearchOpenedScreen('exploreServices');
+        }
+        else if (routePendingHomeAction === 'servicesHistory') {
+            setIsServicesHistoryOpen(true);
+            setSearchOpenedScreen('servicesHistory');
         }
         else if (routePendingHomeAction === 'transactions') {
             navigation.navigate('Transactions', { companyId: selectedCompany?.id });
@@ -360,6 +370,11 @@ export default function HomeScreen() {
     }
     function closeExploreServicesScreen() {
         setIsExploreServicesOpen(false);
+        if (searchOpenedScreen === 'exploreServices') {
+            setSearchOpenedScreen(null);
+            navigation.navigate('Search', { companyId: selectedCompany?.id });
+            return;
+        }
         setIsServicesOpen(true);
     }
     function openServicesHistoryScreen() {
@@ -368,6 +383,11 @@ export default function HomeScreen() {
     }
     function closeServicesHistoryScreen() {
         setIsServicesHistoryOpen(false);
+        if (searchOpenedScreen === 'servicesHistory') {
+            setSearchOpenedScreen(null);
+            navigation.navigate('Search', { companyId: selectedCompany?.id });
+            return;
+        }
         setIsServicesOpen(true);
     }
     function openRegistrationTrackingScreen() {
@@ -399,6 +419,11 @@ export default function HomeScreen() {
     }
     function closeSubscriptionScreen() {
         setIsSubscriptionOpen(false);
+        if (searchOpenedScreen === 'subscription') {
+            setSearchOpenedScreen(null);
+            navigation.navigate('Search', { companyId: selectedCompany?.id });
+            return;
+        }
         setIsServicesOpen(true);
     }
     function selectCompanyFromSwitcher(company) {
@@ -406,7 +431,7 @@ export default function HomeScreen() {
         closeCompanySwitcher();
     }
     if (activeCompanySection) {
-        return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} onBackPress={() => setActiveCompanySection(null)} />);
+        return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);
     }
     if (isAddCompanyOpen) {
         return (<AddCompanyScreen onBackPress={() => { setIsAddCompanyOpen(false); setEditingCompanyId(null); }} onSubmit={(companyId) => {

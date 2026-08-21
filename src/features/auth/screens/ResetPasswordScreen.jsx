@@ -71,7 +71,7 @@ export default function ResetPasswordScreen() {
                 styles.inputWrap,
                 {
                     backgroundColor: colors.inputBackground,
-                    borderColor: colors.inputBorder,
+                    borderColor: '#94a3b8',
                 },
             ]}>
                   <FontAwesome name="lock" size={16} color={colors.inputPlaceholder}/>
@@ -88,7 +88,7 @@ export default function ResetPasswordScreen() {
                 styles.inputWrap,
                 {
                     backgroundColor: colors.inputBackground,
-                    borderColor: colors.inputBorder,
+                    borderColor: '#94a3b8',
                 },
             ]}>
                   <FontAwesome name="lock" size={16} color={colors.inputPlaceholder}/>

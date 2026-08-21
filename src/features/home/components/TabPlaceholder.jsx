@@ -38,7 +38,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         alignItems: 'center',
     }
     const mainCardStyle = {
-        backgroundColor: colors.surface,
+        backgroundColor: colors.cardHighlight,
         borderColor: colors.border,
         marginBottom: 12,
     }
@@ -243,7 +243,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         </View>
 
         <AnimatedAppear index={3}>
-            <View style={[styles.healthCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.healthCard, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
                 <View style={styles.healthHeader}>
                     <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance Health</Text>
                     <Text style={[styles.healthPercentage, { color: colors.text }]}>{healthPercentage}%</Text>
@@ -299,7 +299,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
 
                     <View style={styles.bottomRow}>
                         {shouldShowRenewButton(action) ? (<Pressable onPress={() => handleRenewPress(action)} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
-                            <Text style={[styles.renewButtonText, { color: colors.textOnDark }]}>Renew Now</Text>
+                            <Text style={[styles.renewButtonText, { color: colors.buttonText }]}>Renew Now</Text>
                             {/* <FontAwesome name="chevron-right" size={14} color={colors.muted} style={styles.arrowIcon}/> */}
                         </Pressable>) : null}
                     </View>

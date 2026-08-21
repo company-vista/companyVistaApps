@@ -42,9 +42,9 @@ function SignupScreen() {
   const [signupToken, setSignupToken] = useState('');
   const [signupClientId, setSignupClientId] = useState('');
   const [isResending, setIsResending] = useState(false);
-  const firstNameBorderColor = errors.firstName ? '#f87171' : '#cbd5e1';
-  const lastNameBorderColor = errors.lastName ? '#f87171' : '#cbd5e1';
-  const emailBorderColor = errors.email ? '#f87171' : '#cbd5e1';
+  const firstNameBorderColor = errors.firstName ? '#f87171' : '#94a3b8';
+  const lastNameBorderColor = errors.lastName ? '#f87171' : '#94a3b8';
+  const emailBorderColor = errors.email ? '#f87171' : '#94a3b8';
   const countryList = getAllCountries().map((c) => ({
     label: `${c.flag} ${c.name.common} (${c.idd.root})`,
     value: c.idd.root,
@@ -158,7 +158,7 @@ function SignupScreen() {
                 height: 48,
                 justifyContent: 'center',
                 borderWidth: 1,
-                borderColor: '#cbd5e1',
+                borderColor: '#94a3b8',
                 borderRadius: 12,
                 backgroundColor: colors.inputBackground,
                 overflow: 'hidden',
@@ -172,7 +172,7 @@ function SignupScreen() {
                 {
                   flex: 1,
                   backgroundColor: colors.inputBackground,
-                  borderColor: '#cbd5e1',
+                  borderColor: '#94a3b8',
                 },
               ]}>
                 <TextInput autoCapitalize="none" keyboardType="number-pad" maxLength={15} onChangeText={(text) => setPhoneNumber(text.replace(/[^0-9]/g, ''))} placeholder="Phone number" placeholderTextColor="#9ca3af" style={[styles.input, { color: colors.inputText }]} value={phoneNumber} />
@@ -184,7 +184,7 @@ function SignupScreen() {
                 styles.inputWrap,
                 {
                   backgroundColor: colors.inputBackground,
-                  borderColor: '#cbd5e1',
+                  borderColor: '#94a3b8',
                 },
               ]}>
                 <FontAwesome name="building" size={16} color="#9ca3af" />
@@ -197,7 +197,7 @@ function SignupScreen() {
                 styles.inputWrap,
                 {
                   backgroundColor: colors.inputBackground,
-                  borderColor: '#cbd5e1',
+                  borderColor: '#94a3b8',
                 },
               ]}>
                 <FontAwesome name="globe" size={18} color="#9ca3af" />

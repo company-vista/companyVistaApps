@@ -3,7 +3,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../theme/colors';
 function BackButton({ onPress }) {
     const colors = useThemeColors();
-    return (<Pressable accessibilityRole="button" onPress={onPress} style={[styles.button, { backgroundColor: colors.surface }]}>
+    return (<Pressable accessibilityRole="button" onPress={onPress} style={[styles.button, { backgroundColor: colors.accentSoft }]}>
       <FontAwesome name="angle-left" size={34} color={colors.text}/>
     </Pressable>);
 }

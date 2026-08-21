@@ -61,7 +61,7 @@ export default function ForgotPasswordScreen() {
             styles.inputWrap,
             {
                 backgroundColor: colors.inputBackground,
-                borderColor: error ? '#ef4444' : colors.inputBorder,
+                borderColor: error ? '#ef4444' : '#94a3b8',
             },
         ]}>
               <FontAwesome name="envelope" size={16} color={colors.inputPlaceholder}/>

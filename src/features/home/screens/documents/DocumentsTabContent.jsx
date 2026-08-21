@@ -349,7 +349,7 @@ const getStyles = (colors) => {
         searchContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: colors.surface,
+            backgroundColor: colors.cardHighlight,
             borderRadius: 28,
             paddingHorizontal: 16,
             height: 50,
@@ -479,7 +479,7 @@ const getStyles = (colors) => {
             gap: 16,
         },
         card: {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.cardHighlight,
             borderRadius: 16,
             padding: 12,
             borderWidth: 1,
@@ -558,7 +558,7 @@ const getStyles = (colors) => {
             color: palette.link,
         },
         lockedCard: {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.cardHighlight,
             borderRadius: 10,
             padding: 6,
             borderWidth: 1,

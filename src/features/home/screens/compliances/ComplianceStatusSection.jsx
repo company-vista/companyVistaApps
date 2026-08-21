@@ -127,7 +127,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                 price: item.price,
                 years: item.years,
             })} style={[styles.tileWrapper, { width: tileWidth }]}>
-              <View style={[styles.complianceTile, isLight ? { backgroundColor: '#ffffff' } : styles.complianceTileDark]}>
+              <View style={[styles.complianceTile, { backgroundColor: colors.cardHighlight }]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
                     <FontAwesome name={item.icon} size={18} style={tone.iconText}/>

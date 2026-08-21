@@ -104,7 +104,7 @@ export default function EmailVerificationScreen({ email, signupToken, signupClie
         </View>
 
         <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={[styles.otpInput, { backgroundColor: digit ? colors.accentSoft : colors.inputBackground, borderColor: digit ? colors.primary : colors.inputBorder, color: colors.inputText }]} keyboardType="number-pad" maxLength={1} onChangeText={text => handleOtpChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0}/>))}
+          {otp.map((digit, index) => (<TextInput key={index} ref={ref => { inputs.current[index] = ref; }} style={[styles.otpInput, { backgroundColor: digit ? colors.accentSoft : colors.inputBackground, borderColor: digit ? colors.primary : '#94a3b8', color: colors.inputText }]} keyboardType="number-pad" maxLength={1} onChangeText={text => handleOtpChange(text, index)} onKeyPress={e => handleKeyPress(e, index)} value={digit} autoFocus={index === 0}/>))}
         </View>
 
         <TouchableOpacity style={[styles.verifyBtn, { backgroundColor: colors.buttonBackground }, verifying && styles.verifyBtnDisabled]} disabled={verifying} onPress={handleVerifyOtp}>

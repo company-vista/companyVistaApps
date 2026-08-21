@@ -221,7 +221,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
         <View style={styles.searchRow}>
             <View style={[
                 styles.searchBox,
-                { backgroundColor: colors.surface, borderColor: colors.border },
+                { backgroundColor: colors.cardHighlight, borderColor: colors.border },
             ]}>
                 <FontAwesome name="search" size={17} color={palette.accentText} />
                 <TextInput editable={!isLoading} placeholder="Search by invoice no. or amount" placeholderTextColor={colors.muted} value={searchQuery} onChangeText={setSearchQuery} style={styles.searchInput} />
@@ -250,7 +250,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                             setSortOption(option.value);
                             setIsSortOpen(false);
                         }} style={styles.sortDropdownItem}>
-                            <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '700' }]}>
+                            <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '600' }]}>
                                 {option.label}
                             </Text>
                             {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText} /> : null}
@@ -283,7 +283,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                     <View style={[
                         styles.invoiceCard,
                         {
-                            backgroundColor: colors.surface,
+                            backgroundColor: colors.cardHighlight,
                             borderColor: colors.border,
                         },
                     ]}>

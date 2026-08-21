@@ -83,32 +83,32 @@ function ProfileAddressScreen() {
         }
     };
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
             { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },
         ]}>
-        <View style={[styles.formCard, { backgroundColor: colors.surface }]}>
-          <AddressInput icon="map-marker" label="Street" onChangeText={setStreet} value={street}/>
-          <AddressInput icon="building-o" label="City & State" onChangeText={setCityState} placeholder="City, State" value={cityState}/>
-          <AddressInput icon="envelope-o" label="Postal Code" onChangeText={setPostalCode} value={postalCode}/>
-          <AddressInput icon="globe" label="Country" onChangeText={setCountry} value={country}/>
-        </View>
+            <View style={[styles.formCard, { backgroundColor: colors.cardHighlight }]}>
+                <AddressInput icon="map-marker" label="Street" onChangeText={setStreet} value={street} />
+                <AddressInput icon="building-o" label="City & State" onChangeText={setCityState} placeholder="City, State" value={cityState} />
+                <AddressInput icon="envelope-o" label="Postal Code" onChangeText={setPostalCode} value={postalCode} />
+                <AddressInput icon="globe" label="Country" onChangeText={setCountry} value={country} />
+            </View>
 
-        <SaveButton isLoading={isSaving} onPress={handleSavePress}/>
-      </ScrollView>
+            <SaveButton isLoading={isSaving} onPress={handleSavePress} />
+        </ScrollView>
     </KeyboardAvoidingView>);
 }
 function AddressInput({ icon, label, onChangeText, placeholder, value, }) {
     const colors = useThemeColors();
     return (<View style={styles.inputGroup}>
-      <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
-      <View style={[
+        <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
+        <View style={[
             styles.inputRow,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+            { backgroundColor: colors.cardHighlight, borderColor: colors.border },
         ]}>
-        <FontAwesome name={icon} size={16} color={colors.accent}/>
-        <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]}/>
-      </View>
+            <FontAwesome name={icon} size={16} color={colors.accent} />
+            <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]} />
+        </View>
     </View>);
 }
 export default ProfileAddressScreen;

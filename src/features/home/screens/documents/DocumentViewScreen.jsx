@@ -39,7 +39,7 @@ function getStyles(colors) {
             flexDirection: 'row',
             paddingBottom: 12,
             paddingHorizontal: 16,
-            backgroundColor: colors.surface,
+            backgroundColor: colors.cardHighlight,
         },
         headerTitle: {
             color: colors.text,
@@ -53,7 +53,7 @@ function getStyles(colors) {
             gap: 16,
         },
         card: {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.cardHighlight,
             borderRadius: 12,
             padding: 16,
             borderWidth: 1,
@@ -62,7 +62,7 @@ function getStyles(colors) {
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
             shadowRadius: 4,
-            elevation: 2,
+            // elevation: 2,
         },
         topCard: {
             alignItems: 'center',
@@ -142,77 +142,77 @@ function DocumentViewScreen({ documentItem, onBackPress }) {
     const fileSize = formatBytes(documentItem.fileSize);
     const uploadDate = formatDate(documentItem.uploadedAt);
     return (<View style={styles.root}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={styles.header.backgroundColor}/>
+        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={styles.header.backgroundColor} />
 
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <BackButton onPress={onBackPress}/>
-        <Text numberOfLines={1} style={styles.headerTitle}>Document Details</Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Top Card */}
-        <View style={[styles.card, styles.topCard]}>
-          <View style={styles.iconContainer}>
-            <FontAwesome name="file-text-o" size={32} color="#FF4D6D"/>
-          </View>
-          <Text style={styles.filename}>{documentItem.originalFileName ?? documentItem.fileName ?? 'Document'}</Text>
-          <Text style={styles.metaText}>
-            {documentItem.mimeType ?? 'Unknown Type'} • {fileSize}
-          </Text>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+            <BackButton onPress={onBackPress} />
+            <Text numberOfLines={1} style={styles.headerTitle}>Document Details</Text>
         </View>
 
-        {/* Document Information Card */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Document Information</Text>
-          
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Company Name</Text>
-            <Text style={styles.rowValue}>{capitalizeCompanyName(documentItem.companyName) ?? 'N/A'}</Text>
-          </View>
-          
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Document Type</Text>
-            <Text style={styles.rowValue}>{documentItem.documentType ?? 'N/A'}</Text>
-          </View>
-          
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Uploaded By</Text>
-            <Text style={styles.rowValue}>{documentItem.uploadedBy ?? 'N/A'}</Text>
-          </View>
-          
-          <View style={styles.row}>
-            <Text style={styles.rowLabel}>Upload Date</Text>
-            <Text style={styles.rowValue}>{uploadDate}</Text>
-          </View>
-          
-          <View style={[styles.row, styles.rowNoBorder]}>
-            <Text style={styles.rowLabel}>Country</Text>
-            <Text style={styles.rowValue}>{documentItem.country ?? 'N/A'}</Text>
-          </View>
-          
-          <View style={styles.stackedRow}>
-            <Text style={styles.stackedLabel}>Original File Name</Text>
-            <Text style={styles.stackedValue}>{documentItem.originalFileName ?? 'N/A'}</Text>
-          </View>
-        </View>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            {/* Top Card */}
+            <View style={[styles.card, styles.topCard]}>
+                <View style={styles.iconContainer}>
+                    <FontAwesome name="file-text-o" size={32} color="#FF4D6D" />
+                </View>
+                <Text style={styles.filename}>{documentItem.originalFileName ?? documentItem.fileName ?? 'Document'}</Text>
+                <Text style={styles.metaText}>
+                    {documentItem.mimeType ?? 'Unknown Type'} • {fileSize}
+                </Text>
+            </View>
 
-        {/* System Details Card */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>System Details</Text>
-          
-          <View style={[styles.row, styles.rowNoBorder]}>
-            <Text style={styles.rowLabel}>Source Group</Text>
-            <Text style={styles.rowValue}>{documentItem.sourceGroup ?? 'N/A'}</Text>
-          </View>
-          
-          <View style={styles.stackedRow}>
-            <Text style={styles.stackedLabel}>Company ID</Text>
-            <Text style={[styles.stackedValue, { color: colors.muted, fontSize: font.base }]}>
-              {documentItem.companyId ?? 'N/A'}
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
+            {/* Document Information Card */}
+            <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Document Information</Text>
+
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Company Name</Text>
+                    <Text style={styles.rowValue}>{capitalizeCompanyName(documentItem.companyName) ?? 'N/A'}</Text>
+                </View>
+
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Document Type</Text>
+                    <Text style={styles.rowValue}>{documentItem.documentType ?? 'N/A'}</Text>
+                </View>
+
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Uploaded By</Text>
+                    <Text style={styles.rowValue}>{documentItem.uploadedBy ?? 'N/A'}</Text>
+                </View>
+
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Upload Date</Text>
+                    <Text style={styles.rowValue}>{uploadDate}</Text>
+                </View>
+
+                <View style={[styles.row, styles.rowNoBorder]}>
+                    <Text style={styles.rowLabel}>Country</Text>
+                    <Text style={styles.rowValue}>{documentItem.country ?? 'N/A'}</Text>
+                </View>
+
+                <View style={styles.stackedRow}>
+                    <Text style={styles.stackedLabel}>Original File Name</Text>
+                    <Text style={styles.stackedValue}>{documentItem.originalFileName ?? 'N/A'}</Text>
+                </View>
+            </View>
+
+            {/* System Details Card */}
+            <View style={styles.card}>
+                <Text style={styles.sectionTitle}>System Details</Text>
+
+                <View style={[styles.row, styles.rowNoBorder]}>
+                    <Text style={styles.rowLabel}>Source Group</Text>
+                    <Text style={styles.rowValue}>{documentItem.sourceGroup ?? 'N/A'}</Text>
+                </View>
+
+                <View style={styles.stackedRow}>
+                    <Text style={styles.stackedLabel}>Company ID</Text>
+                    <Text style={[styles.stackedValue, { color: colors.muted, fontSize: font.base }]}>
+                        {documentItem.companyId ?? 'N/A'}
+                    </Text>
+                </View>
+            </View>
+        </ScrollView>
     </View>);
 }
 export default DocumentViewScreen;

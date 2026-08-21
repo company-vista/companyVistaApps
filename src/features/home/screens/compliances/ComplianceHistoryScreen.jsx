@@ -267,7 +267,7 @@ const ComplianceHistoryScreen = () => {
                         else if (selectedAction.id === 'federal_filing')
                             navigation.navigate('FederalFiling', { selectedAction });
                     }}>
-                        <Text style={[styles.renewButtonText, { color: colors.surface }]}>Renew Now</Text>
+                        <Text style={[styles.renewButtonText, { color: colors.buttonText }]}>Renew Now</Text>
                     </Pressable>) : null}
                 </View>
                 {historyError ? (<Text style={[styles.errorText, { color: colors.danger }]}>{historyError}</Text>) : null}

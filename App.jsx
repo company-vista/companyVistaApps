@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
+  Pressable,
   StatusBar,
   Text,
   View,
@@ -9,6 +10,7 @@ import {
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
@@ -21,20 +23,41 @@ import { useThemeColors } from './src/theme/colors';
 const toastConfig: ToastConfig = {
   success: ({ text1, text2 }) => (
     <View style={[styles.toastCard, styles.successToast]}>
-      <Text style={styles.toastTitle}>{text1}</Text>
-      {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+      <View style={styles.toastContent}>
+        <View style={styles.toastTextWrap}>
+          <Text style={styles.toastTitle}>{text1}</Text>
+          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+        </View>
+        <Pressable onPress={() => Toast.hide()} hitSlop={8}>
+          <Ionicons name="close" size={20} color="#64748b" />
+        </Pressable>
+      </View>
     </View>
   ),
   error: ({ text1, text2 }) => (
     <View style={[styles.toastCard, styles.errorToast]}>
-      <Text style={styles.toastTitle}>{text1}</Text>
-      {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+      <View style={styles.toastContent}>
+        <View style={styles.toastTextWrap}>
+          <Text style={styles.toastTitle}>{text1}</Text>
+          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+        </View>
+        <Pressable onPress={() => Toast.hide()} hitSlop={8}>
+          <Ionicons name="close" size={20} color="#64748b" />
+        </Pressable>
+      </View>
     </View>
   ),
   info: ({ text1, text2 }) => (
     <View style={[styles.toastCard]}>
-      <Text style={styles.toastTitle}>{text1}</Text>
-      {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+      <View style={styles.toastContent}>
+        <View style={styles.toastTextWrap}>
+          <Text style={styles.toastTitle}>{text1}</Text>
+          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+        </View>
+        <Pressable onPress={() => Toast.hide()} hitSlop={8}>
+          <Ionicons name="close" size={20} color="#64748b" />
+        </Pressable>
+      </View>
     </View>
   ),
 };
@@ -76,8 +99,8 @@ function AppContent() {
         ) : (
           <RootStack />
         )}
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, elevation: 9999 }}>
-          <Toast config={toastConfig} topOffset={50} />
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 9999, elevation: 9999 }}>
+          <Toast config={toastConfig} position="bottom" bottomOffset={80} />
         </View>
       </View>
     </SafeAreaProvider>

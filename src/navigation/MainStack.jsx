@@ -61,13 +61,13 @@ export default function MainStack() {
     }}>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => ({
-        title: 'Profile',
+        headerShown: false,
         headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' }}>
           <FontAwesome name="pencil" size={17} color={colors.accent}/>
         </Pressable>),
       })}/>
       <Stack.Screen name="ProfileAddress" component={ProfileAddressScreen} options={{ title: 'Address & Edit' }}/>
-      <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }}/>
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerShown: false }}/>
       <Stack.Screen name="Notifications" component={NotificationScreen} options={{ title: 'Notifications' }}/>
       <Stack.Screen name="NotificationDetail" component={NotificationDetailScreen} options={{ title: 'Notification' }}/>
       <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search' }}/>

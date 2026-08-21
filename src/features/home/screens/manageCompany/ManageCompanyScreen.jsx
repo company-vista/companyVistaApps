@@ -137,7 +137,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
                 {
                     backgroundColor: selectedUrgency === level.id
                         ? level.color + '20'
-                        : colors.surface,
+                        : colors.cardHighlight,
                     borderColor: selectedUrgency === level.id
                         ? level.color
                         : colors.border,
@@ -175,7 +175,7 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
                 {
                     backgroundColor: selectedCategories.includes(category.id)
                         ? category.color + '15'
-                        : colors.surface,
+                        : colors.cardHighlight,
                     borderColor: selectedCategories.includes(category.id)
                         ? category.color
                         : colors.border,

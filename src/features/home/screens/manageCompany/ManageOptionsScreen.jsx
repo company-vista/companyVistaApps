@@ -48,7 +48,7 @@ const ManageOptionsScreen = ({ onBackPress, onRequestChangePress, }) => {
 
       <View style={styles.body}>
         {options.map((option, index) => (<AnimatedAppear key={option.id} index={index}>
-            <Pressable style={[styles.optionCard, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => handleOptionPress(option.id)}>
+            <Pressable style={[styles.optionCard, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]} onPress={() => handleOptionPress(option.id)}>
               <View style={[styles.optionIconWrap, { backgroundColor: `${option.color}15` }]}>
                 <FontAwesome name={option.icon} size={22} color={option.color}/>
               </View>

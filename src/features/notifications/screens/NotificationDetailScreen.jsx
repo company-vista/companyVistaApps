@@ -17,15 +17,15 @@ function NotificationDetailScreen() {
         navigation.setOptions({
             headerRight: () => (<View style={styles.moreWrapper}>
                 <Pressable style={styles.moreButton} onPress={() => setIsDropdownVisible(prev => !prev)}>
-                  <FontAwesome name="ellipsis-v" size={18} color={colors.muted}/>
+                    <FontAwesome name="ellipsis-v" size={18} color={colors.muted} />
                 </Pressable>
                 {isDropdownVisible ? (<View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                      <Pressable onPress={handleDelete} style={[styles.dropdownOption, { borderBottomColor: colors.border }]}>
-                        <FontAwesome name="trash-o" size={14} color={colors.danger}/>
+                    <Pressable onPress={handleDelete} style={[styles.dropdownOption, { borderBottomColor: colors.border }]}>
+                        <FontAwesome name="trash-o" size={14} color={colors.danger} />
                         <Text style={[styles.dropdownOptionText, { color: colors.danger }]}>Delete</Text>
-                      </Pressable>
-                    </View>) : null}
-              </View>),
+                    </Pressable>
+                </View>) : null}
+            </View>),
         });
     }, [navigation, isDropdownVisible]);
     async function handleDelete() {
@@ -38,24 +38,24 @@ function NotificationDetailScreen() {
         navigation.navigate('Notifications');
     }
     return (<View style={[
-            styles.screen,
-            { paddingTop: 8 },
-        ]}>
-      <View style={[styles.detailCard, { backgroundColor: colors.surface }]}>
-        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-          <FontAwesome name="user" size={24} color={colors.accent}/>
+        styles.screen,
+        { paddingTop: 8 },
+    ]}>
+        <View style={[styles.detailCard, { backgroundColor: colors.cardHighlight }]}>
+            <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+                <FontAwesome name="user" size={24} color={colors.accent} />
+            </View>
+            <Text style={[styles.title, { color: colors.text }]}>
+                {notification.title}
+            </Text>
+            <Text style={[styles.time, { color: colors.subtle }]}>
+                {notification.time}
+            </Text>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <Text style={[styles.message, { color: colors.muted }]}>
+                {notification.message}
+            </Text>
         </View>
-        <Text style={[styles.title, { color: colors.text }]}>
-          {notification.title}
-        </Text>
-        <Text style={[styles.time, { color: colors.subtle }]}>
-          {notification.time}
-        </Text>
-        <View style={[styles.divider, { backgroundColor: colors.border }]}/>
-        <Text style={[styles.message, { color: colors.muted }]}>
-          {notification.message}
-        </Text>
-      </View>
     </View>);
 }
 const styles = StyleSheet.create({

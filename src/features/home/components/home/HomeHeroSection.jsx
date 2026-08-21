@@ -16,14 +16,14 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     const heroCompanyDate = selectedCompany?.date ?? 'Not available';
     const isActive = String(heroCompanyStatus).trim().toLowerCase() === 'active';
     const cardStyle = {
-        backgroundColor: isLight ? '#ffffff' : 'rgba(255,255,255,0.08)',
+        backgroundColor: colors.cardHighlight,
         borderWidth: isLight ? 0 : 1,
         borderColor: 'rgba(255,255,255,0.1)',
         shadowColor: isLight ? '#0D2137' : '#000000',
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: isLight ? 0.08 : 0.2,
         shadowRadius: 12,
-        elevation: isLight ? 3 : 1,
+        elevation: 0,
     };
     const heroEyebrowStyle = { color: isLight ? colors.accent : '#85B7EB' };
     const heroCompanySwitcherStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.12)', backgroundColor: isLight ? '#F8FAFC' : 'rgba(255,255,255,0.06)' };

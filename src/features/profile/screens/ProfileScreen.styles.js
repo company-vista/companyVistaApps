@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         marginTop: 24,
         paddingHorizontal: 0,
+        paddingTop: 24,
         paddingBottom: 24,
     },
     coverWrap: {

@@ -34,8 +34,8 @@ function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const emailBorderColor = errors.email ? '#f87171' : colors.inputBorder;
-    const passwordBorderColor = errors.password ? '#f87171' : colors.inputBorder;
+    const emailBorderColor = errors.email ? '#f87171' : '#94a3b8';
+    const passwordBorderColor = errors.password ? '#f87171' : '#94a3b8';
     async function handleLogin() {
         if (isLoading) {
             return;

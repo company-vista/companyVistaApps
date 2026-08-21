@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, ScrollView, StatusBar, TouchableOpacity, } from 'react-native';
+import { Text, View, ScrollView, StatusBar, TouchableOpacity, ActivityIndicator, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from "./CompanyDetailScreenStyle";
 // Vector icons badal kar image ke style se match kiya
@@ -12,7 +12,7 @@ const menuItems = [
     { id: 'companyInfo', label: 'Company Information', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
     { id: 'shareholders', label: 'Shareholders', icon: 'users', iconBg: '#E6F4EA', iconColor: '#137333' },
 ];
-const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPress, onSectionPress, selectedCompany, }) => {
+const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPress, onSectionPress, selectedCompany, isLoading, }) => {
     const colors = useThemeColors();
     const insets = useSafeAreaInsets();
     const companyData = selectedCompany;
@@ -41,7 +41,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
           <Text style={[styles.headerTitle, { color: colors.text }]}>Company Details</Text>
         </View>
         <View style={styles.emptyState}>
-          <Text style={[styles.emptyText, { color: colors.muted }]}>No company selected</Text>
+          {isLoading ? (<ActivityIndicator size="large" color={colors.mode === 'dark' ? '#93C5FD' : '#4F46E5'}/>) : (<Text style={[styles.emptyText, { color: colors.muted }]}>No company selected</Text>)}
         </View>
       </View>);
     }
@@ -82,7 +82,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         {/* ── HERO CARD ─────────────────────────────────────── */}
-        <View style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.heroCard, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
           {/* Avatar */}
           <View style={[styles.avatarCircle, { backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#EEF2FF' }]}>
             <Text style={[styles.avatarText, { color: colors.mode === 'dark' ? '#93C5FD' : '#4F46E5' }]}>
@@ -126,7 +126,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         {activeSection ? (<View style={styles.sectionContent}>{renderSection()}</View>) : (
         /* Image ke jaisa separated floating card style list */
         <View style={styles.menuCard}>
-            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={[styles.menuRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={[styles.menuRow, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
 
                 {/* Icon bubble */}
                 <View style={[styles.iconBubble, { backgroundColor: colors.mode === 'dark' ? 'rgba(79,70,229,0.15)' : item.iconBg }]}>

@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         backgroundColor: '#ffffff',
         padding: 24,
+        marginTop: 28,
     },
     avatarWrap: {
         position: 'relative',

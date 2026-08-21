@@ -31,7 +31,7 @@ function NotificationScreen() {
         navigation.setOptions({
             headerRight: hasNotifications ? () => (<View style={styles.countBadge}>
                 <Text style={styles.countText}>{getBadgeCount(notificationList.length)}</Text>
-              </View>) : undefined,
+            </View>) : undefined,
         });
     }, [navigation, hasNotifications, notificationList.length]);
     const filteredNotifications = useMemo(() => {
@@ -76,35 +76,35 @@ function NotificationScreen() {
         };
     }, [companyId]);
     return (<>
-      <ScrollView contentContainerStyle={[
+        <ScrollView contentContainerStyle={[
             styles.scrollContent,
             { paddingBottom: safeAreaInsets.bottom + 24 },
         ]} style={[
             styles.screen,
             { paddingTop: 8 },
         ]}>
-        {isLoadingNotifications ? (<NotificationPageSkeleton />) : hasNotifications ? (<>
-            <View style={styles.filterRow}>
-              {notificationFilters.map(filter => {
-                const isActive = activeFilter === filter;
-                return (<Pressable key={filter} onPress={() => setActiveFilter(filter)} style={[
-                        styles.filterButton,
-                        { backgroundColor: colors.surface, borderColor: colors.border },
-                        isActive ? { borderColor: colors.accent } : null,
-                    ]}>
-                    <Text style={[
-                        styles.filterButtonText,
-                        { color: colors.text },
-                        isActive ? [styles.activeFilterButtonText, { color: colors.accent }] : null,
-                    ]}>
-                      {filter} ({notificationFilterCounts[filter]})
-                    </Text>
-                  </Pressable>);
-            })}
-            </View>
+            {isLoadingNotifications ? (<NotificationPageSkeleton />) : hasNotifications ? (<>
+                <View style={styles.filterRow}>
+                    {notificationFilters.map(filter => {
+                        const isActive = activeFilter === filter;
+                        return (<Pressable key={filter} onPress={() => setActiveFilter(filter)} style={[
+                            styles.filterButton,
+                            { backgroundColor: colors.cardHighlight, borderColor: colors.border },
+                            isActive ? { borderColor: colors.accent } : null,
+                        ]}>
+                            <Text style={[
+                                styles.filterButtonText,
+                                { color: colors.text },
+                                isActive ? [styles.activeFilterButtonText, { color: colors.accent }] : null,
+                            ]}>
+                                {filter} ({notificationFilterCounts[filter]})
+                            </Text>
+                        </Pressable>);
+                    })}
+                </View>
 
-            {filteredNotifications.length > 0 ? (<View style={[styles.listCard,]}>
-                {filteredNotifications.map(item => (<Pressable key={item.id} onPress={async () => {
+                {filteredNotifications.length > 0 ? (<View style={[styles.listCard,]}>
+                    {filteredNotifications.map(item => (<Pressable key={item.id} onPress={async () => {
                         if (!item.isRead) {
                             setNotificationList(prev => prev.map(notification => notification.id === item.id
                                 ? { ...notification, isRead: true }
@@ -126,103 +126,103 @@ function NotificationScreen() {
                         setSelectedNotification(item);
                         setIsDeleteModalVisible(true);
                     }} delayLongPress={500} style={[styles.notificationRow, { borderBottomColor: colors.border }]}>
-                    <View style={[
-                        styles.notificationIcon,
-                        { backgroundColor: colors.accentSoft },
-                    ]}>
-                      <FontAwesome name="user" size={18} color={colors.accent}/>
+                        <View style={[
+                            styles.notificationIcon,
+                            { backgroundColor: colors.accentSoft },
+                        ]}>
+                            <FontAwesome name="user" size={18} color={colors.accent} />
+                        </View>
+                        <View style={styles.notificationCopy}>
+                            <View style={styles.notificationTitleRow}>
+                                <Text style={[styles.notificationTitle, { color: item.isRead ? colors.text : colors.danger }]}>
+                                    {item.title}
+                                </Text>
+                                {!item.isRead ? <View style={styles.unreadDot} /> : null}
+                            </View>
+                            <Text style={[styles.notificationMessage, { color: colors.muted }]}>
+                                {item.message}
+                            </Text>
+                            <Text style={[styles.notificationTime, { color: colors.subtle }]}>
+                                {item.time}
+                            </Text>
+                        </View>
+                    </Pressable>))}
+                </View>) : (<View style={[styles.emptyCard, { backgroundColor: colors.surface }]}>
+                    <View style={[styles.emptyIcon, { backgroundColor: colors.surfaceAlt }]}>
+                        <FontAwesome name="bell-o" size={30} color={colors.accent} />
                     </View>
-                    <View style={styles.notificationCopy}>
-                      <View style={styles.notificationTitleRow}>
-                        <Text style={[styles.notificationTitle, { color: item.isRead ? colors.text : colors.danger }]}>
-                          {item.title}
-                        </Text>
-                        {!item.isRead ? <View style={styles.unreadDot}/> : null}
-                      </View>
-                      <Text style={[styles.notificationMessage, { color: colors.muted }]}>
-                        {item.message}
-                      </Text>
-                      <Text style={[styles.notificationTime, { color: colors.subtle }]}>
-                        {item.time}
-                      </Text>
-                    </View>
-                  </Pressable>))}
-              </View>) : (<View style={[styles.emptyCard, { backgroundColor: colors.surface }]}>
+                    <Text style={[styles.emptyTitle, { color: colors.text }]}>
+                        No {activeFilter.toLowerCase()} notifications
+                    </Text>
+                    <Text style={[styles.emptyText, { color: colors.muted }]}>
+                        Matching notifications will appear here.
+                    </Text>
+                </View>)}
+            </>) : (<View style={[styles.emptyCard, { backgroundColor: colors.surface }]}>
                 <View style={[styles.emptyIcon, { backgroundColor: colors.surfaceAlt }]}>
-                  <FontAwesome name="bell-o" size={30} color={colors.accent}/>
+                    <FontAwesome name="bell-o" size={30} color={colors.accent} />
                 </View>
-                <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                  No {activeFilter.toLowerCase()} notifications
-                </Text>
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>No notifications</Text>
                 <Text style={[styles.emptyText, { color: colors.muted }]}>
-                  Matching notifications will appear here.
+                    You are all caught up. New updates will appear here.
                 </Text>
-              </View>)}
-          </>) : (<View style={[styles.emptyCard, { backgroundColor: colors.surface }]}>
-            <View style={[styles.emptyIcon, { backgroundColor: colors.surfaceAlt }]}>
-              <FontAwesome name="bell-o" size={30} color={colors.accent}/>
+            </View>)}
+        </ScrollView>
+
+        <Modal animationType="fade" transparent visible={isDeleteModalVisible} onRequestClose={() => setIsDeleteModalVisible(false)}>
+            <View style={styles.modalOverlay}>
+                <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
+                    <View style={styles.iconCircleOuter}>
+                        <View style={styles.iconCircleInner}>
+                            <FontAwesome name="trash" size={24} color="#ffffff" />
+                        </View>
+                    </View>
+
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>
+                        Are you sure you want to delete ?
+                    </Text>
+
+                    <Text style={[styles.modalSubtitle, { color: colors.muted }]}>
+                        Deleting this will result to permanent removal. You can archive instead
+                    </Text>
+
+
+                    {/* ---- delete popup model---- */}
+                    <View style={styles.modalActions}>
+                        <Pressable onPress={async () => {
+                            if (selectedNotification) {
+                                const result = await deleteNotification({
+                                    token,
+                                    notificationId: selectedNotification.id,
+                                    companyId,
+                                });
+                                if (result.isSuccess) {
+                                    setNotificationList(prev => prev.filter(n => n.id !== selectedNotification.id));
+                                }
+                                else {
+                                    Toast.show({
+                                        type: 'error',
+                                        text1: 'Failed to delete notification',
+                                        text2: result.error,
+                                    });
+                                }
+                            }
+                            setIsDeleteModalVisible(false);
+                            setSelectedNotification(null);
+                        }} style={[styles.deleteButton, { backgroundColor: colors.buttonBackground }]}>
+                            <Text style={[styles.deleteButtonText, { color: colors.buttonText }]}>Delete</Text>
+                        </Pressable>
+
+                        <Pressable onPress={() => {
+                            setIsDeleteModalVisible(false);
+                            setSelectedNotification(null);
+                        }} style={[styles.cancelButton, { borderColor: colors.accent }]}>
+                            <Text style={[styles.cancelButtonText, { color: colors.accent }]}>Cancel</Text>
+                        </Pressable>
+                    </View>
+                </View>
             </View>
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>No notifications</Text>
-            <Text style={[styles.emptyText, { color: colors.muted }]}>
-              You are all caught up. New updates will appear here.
-            </Text>
-          </View>)}
-      </ScrollView>
-
-      <Modal animationType="fade" transparent visible={isDeleteModalVisible} onRequestClose={() => setIsDeleteModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
-            <View style={styles.iconCircleOuter}>
-              <View style={styles.iconCircleInner}>
-                <FontAwesome name="trash" size={24} color="#ffffff"/>
-              </View>
-            </View>
-
-            <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Are you sure you want to delete ?
-            </Text>
-
-            <Text style={[styles.modalSubtitle, { color: colors.muted }]}>
-              Deleting this will result to permanent removal. You can archive instead
-            </Text>
-
-
-              {/* ---- delete popup model---- */}
-            <View style={styles.modalActions}>
-              <Pressable onPress={async () => {
-            if (selectedNotification) {
-                const result = await deleteNotification({
-                    token,
-                    notificationId: selectedNotification.id,
-                    companyId,
-                });
-                if (result.isSuccess) {
-                    setNotificationList(prev => prev.filter(n => n.id !== selectedNotification.id));
-                }
-                else {
-                    Toast.show({
-                        type: 'error',
-                        text1: 'Failed to delete notification',
-                        text2: result.error,
-                    });
-                }
-            }
-            setIsDeleteModalVisible(false);
-            setSelectedNotification(null);
-        }} style={[styles.deleteButton, { backgroundColor: colors.buttonBackground }]}>
-                <Text style={[styles.deleteButtonText, { color: colors.buttonText }]}>Delete</Text>
-              </Pressable>
-
-              <Pressable onPress={() => {
-            setIsDeleteModalVisible(false);
-            setSelectedNotification(null);
-        }} style={[styles.cancelButton, { borderColor: colors.accent }]}>
-                <Text style={[styles.cancelButtonText, { color: colors.accent }]}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        </Modal>
     </>);
 }
 const styles = StyleSheet.create({

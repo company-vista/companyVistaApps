@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 54,
-        borderRadius: 14,
+        borderRadius: 24,
         marginTop: 8,
     },
     buttonDisabled: {

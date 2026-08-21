@@ -14,7 +14,7 @@ function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, sel
     return (<View style={styles.wrapper}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Links</Text>
       <View style={styles.grid}>
-        {recentActivities.map(item => (<Pressable key={item.title} style={[styles.card, { backgroundColor: isLight ? '#ffffff' : 'rgba(255,255,255,0.07)', borderColor: item.borderColor }]} onPress={item.onItemPress}>
+        {recentActivities.map(item => (<Pressable key={item.title} style={[styles.card, { backgroundColor: colors.cardHighlight, borderColor: item.borderColor }]} onPress={item.onItemPress}>
             <View style={[styles.iconContainer]}>
               <FontAwesome name={item.icon} size={20} color={item.iconColor}/>
             </View>

@@ -92,8 +92,7 @@ function ProgressTrack({ stage, colors, }) {
     </>);
 }
 function RequestCard({ item, colors, }) {
-    const isLight = colors.mode === 'light';
-    return (<View style={[styles.card, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+    return (<View style={[styles.card, { backgroundColor: colors.cardHighlight }]}>
       <View style={styles.cardHead}>
         <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
           {item.title}

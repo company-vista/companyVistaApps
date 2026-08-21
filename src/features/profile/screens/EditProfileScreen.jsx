@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { SaveButton } from '../../../components/buttons';
+import BackButton from '../../../components/buttons/BackButton';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
@@ -171,13 +172,18 @@ function EditProfileScreen() {
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
-            { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },
+            { paddingBottom: Math.max(safeAreaInsets.bottom, 24), paddingTop: safeAreaInsets.top + 12 },
         ]}>
-            <View style={[styles.avatarCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.titleRow}>
+                <BackButton onPress={() => navigation.goBack()}/>
+                <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
+            </View>
+
+            <View style={[styles.avatarCard, { backgroundColor: colors.cardHighlight }]}>
                 <View style={styles.avatarWrap}>
                     <View style={[
                         styles.avatar,
-                        { backgroundColor: colors.surfaceAlt, borderColor: colors.accentSoft },
+                        { backgroundColor: colors.cardHighlight, borderColor: colors.accentSoft },
                     ]}>
                         {profileImage ? (<Image onError={event => console.log('Edit profile avatar failed', event.nativeEvent.error, profileImage)} source={{ uri: profileImage }} style={styles.avatarImage} />) : (<FontAwesome name="user" size={42} color={colors.accent} />)}
                     </View>
@@ -190,7 +196,7 @@ function EditProfileScreen() {
                 </View>
             </View>
 
-            <View style={[styles.formCard, { backgroundColor: colors.surface }]}>
+            <View style={[styles.formCard, { backgroundColor: colors.cardHighlight }]}>
                 <ProfileInput icon="user-o" label="Name" onChangeText={setName} value={name} />
                 <ProfileInput icon="envelope-o" label="Email" editable={false} keyboardType="email-address" onChangeText={setEmail} value={email} />
                 <ProfileInput icon="phone" label="Phone" keyboardType="phone-pad" onChangeText={setPhone} value={phone} />
@@ -212,7 +218,7 @@ function ProfileInput({ autoCapitalize = 'sentences', editable = true, icon, key
         <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
         <View style={[
             styles.inputRow,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+            { backgroundColor: colors.cardHighlight, borderColor: colors.border },
         ]}>
             <FontAwesome name={icon} size={16} color={colors.accent} />
             <TextInput autoCapitalize={autoCapitalize} editable={editable} value={value} onChangeText={onChangeText} keyboardType={keyboardType} placeholder={placeholder} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]} />
@@ -226,7 +232,7 @@ function DateProfileInput({ icon, label, onPress, placeholder, value, }) {
         <Text style={[styles.inputLabel, { color: colors.subtle }]}>{label}</Text>
         <View style={[
             styles.inputRow,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
+            { backgroundColor: colors.cardHighlight, borderColor: colors.border },
         ]}>
             <FontAwesome name={icon} size={16} color={colors.accent} />
             <Text numberOfLines={1} style={[

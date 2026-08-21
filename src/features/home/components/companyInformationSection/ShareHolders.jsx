@@ -81,7 +81,7 @@ const ShareHolders = ({ companyId }) => {
                 <View style={[
                     styles.shareholderCard,
                     {
-                        backgroundColor: colors.surface,
+                        backgroundColor: colors.cardHighlight,
                         borderColor: colors.border,
                         shadowColor: palette.cardShadow,
                     },

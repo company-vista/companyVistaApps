@@ -67,9 +67,9 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
     const token = useAppSelector(state => state.auth.token);
     const CATEGORY_FIELDS = {
         'Company info': ['name', 'web', 'act', 'intro'],
-        'ShareHolder/Director': ['sh'],
+        'Shareholder/Director': ['sh'],
         'Local address': ['addr'],
-        'Local representative': ['rep'],
+        'Local Rep.': ['rep'],
     };
     const initialFields = selectedCategory ? CATEGORY_FIELDS[selectedCategory] : undefined;
     const [selected, setSelected] = useState(() => initialFields ? new Set(initialFields) : new Set());

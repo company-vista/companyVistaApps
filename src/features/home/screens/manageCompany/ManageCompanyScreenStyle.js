@@ -100,7 +100,7 @@ export const styles = StyleSheet.create({
     },
     urgencyLabel: {
         fontSize: font.base,
-        fontWeight: '600',
+        fontWeight: '400',
     },
     categoriesGrid: {
         flexDirection: 'row',
@@ -124,13 +124,13 @@ export const styles = StyleSheet.create({
     },
     categoryTitle: {
         fontSize: font.xs,
-        fontWeight: '700',
+        fontWeight: '500',
         textAlign: 'center',
         marginBottom: 2,
     },
     categoryFields: {
         fontSize: font.xs,
-        fontWeight: '600',
+        fontWeight: '400',
         marginBottom: 2,
     },
     nextButton: {

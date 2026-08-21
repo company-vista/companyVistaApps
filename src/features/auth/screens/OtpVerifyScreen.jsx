@@ -85,7 +85,7 @@ export default function OtpVerifyScreen() {
                             width: 44,
                             height: 52,
                             borderWidth: 1,
-                            borderColor: digit ? '#2563eb' : '#cbd5e1',
+                            borderColor: digit ? '#2563eb' : '#94a3b8',
                             borderRadius: 10,
                             backgroundColor: '#f1f5f9',
                             color: '#0f172a',

@@ -5,7 +5,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
-import { getServiceCategories } from '../../../constants/exploreServicesData';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 const quickActions = [
     { id: 'companyInfo', label: 'Company Information', icon: 'building-o', color: '#4F46E5' },
@@ -14,29 +13,13 @@ const quickActions = [
     { id: 'transactions', label: 'Transactions', icon: 'exchange', color: '#0891b2' },
     { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
 ];
-const exploreServiceMeta = {
-    'Tax & Accounting Services': { id: 'TaxAccounting', icon: 'calculator', color: '#B45309', label: 'Tax & Accounting' },
-    'Business Compliance & Registrations': { id: 'BusinessCompliance', icon: 'briefcase', color: '#DC2626', label: 'Business Compliance' },
-    'Banking & Owner Services': { id: 'BankingOwner', icon: 'university', color: '#1D4ED8', label: 'Banking & Owner' },
-    'Corporate Changes & Legal Documentation': { id: 'CorporateChanges', icon: 'file-text-o', color: '#7C3AED', label: 'Corporate & Legal' },
-};
-const orderServices = getServiceCategories().map((category) => {
-    const meta = exploreServiceMeta[category] ?? {
-        id: category,
-        icon: 'cube',
-        color: '#6B7280',
-        label: category,
-    };
-    return {
-        id: meta.id,
-        label: meta.label,
-        icon: meta.icon,
-        color: meta.color,
-    };
-});
+const serviceActions = [
+    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
+    { id: 'requestService', label: 'Request a Services', icon: 'plus-circle', color: '#0891b2' },
+    { id: 'servicesHistory', label: 'Services History', icon: 'history', color: '#7C3AED' },
+];
 const complianceActions = [
-    { id: 'agentRenewal', label: 'Agent Renewal', icon: 'refresh', color: '#dc2626' },
-    { id: 'addressRenewal', label: 'Address Renewal', icon: 'map-marker', color: '#ea580c' },
+    { id: 'agentAddress', label: 'Agent & Address', icon: 'building', color: '#ea580c' },
     { id: 'federalFiling', label: 'Federal Filing', icon: 'file-text', color: '#B45309' },
     { id: 'annualFiling', label: 'Annual Filing', icon: 'calendar', color: '#0891b2' },
 ];
@@ -66,7 +49,7 @@ export default function SearchScreen({ route }) {
                 navigation.navigate('Home', { pendingHomeAction: 'manageOptions' });
                 break;
             case 'transactions':
-                navigation.navigate('Home', { pendingHomeAction: 'transactions' });
+                navigation.navigate('Transactions', { companyId: route.params?.companyId });
                 break;
             case 'subscription':
                 navigation.navigate('Home', { pendingHomeAction: 'subscription' });
@@ -75,30 +58,22 @@ export default function SearchScreen({ route }) {
     }
     function handleServicePress(serviceId) {
         switch (serviceId) {
-            case 'TaxAccounting':
-                navigation.navigate('TaxAccounting');
+            case 'subscription':
+                navigation.navigate('Home', { pendingHomeAction: 'subscription' });
                 break;
-            case 'BusinessCompliance':
-                navigation.navigate('BusinessCompliance');
+            case 'requestService':
+                navigation.navigate('Home', { pendingHomeAction: 'requestService' });
                 break;
-            case 'BankingOwner':
-                navigation.navigate('BankingOwner');
-                break;
-            case 'CorporateChanges':
-                navigation.navigate('CorporateChanges');
+            case 'servicesHistory':
+                navigation.navigate('Home', { pendingHomeAction: 'servicesHistory' });
                 break;
         }
     }
     function handleCompliancePress(actionId) {
         switch (actionId) {
-            case 'agentRenewal':
-                navigation.navigate('RenewCompliance', {
-                    selectedAction: { id: 'resident', title: 'Agent Renewal', subtitle: '', status: '', date: '', details: [], price: 149, years: 1 },
-                });
-                break;
-            case 'addressRenewal':
-                navigation.navigate('AddressRenewal', {
-                    selectedAction: { id: 'address', title: 'Address Renewal', subtitle: '', status: '', date: '', details: [] },
+            case 'agentAddress':
+                navigation.navigate('ComplianceHistory', {
+                    selectedAction: { id: 'agent_address', title: 'Agent & Address', subtitle: '', status: '', date: '', details: [], companyId: route.params?.companyId },
                 });
                 break;
             case 'federalFiling':
@@ -133,9 +108,9 @@ export default function SearchScreen({ route }) {
     }, [query]);
     const filteredServices = useMemo(() => {
         if (!query.trim())
-            return orderServices;
+            return serviceActions;
         const q = query.toLowerCase();
-        return orderServices.filter(s => s.label.toLowerCase().includes(q));
+        return serviceActions.filter(s => s.label.toLowerCase().includes(q));
     }, [query]);
     const filteredComplianceActions = useMemo(() => {
         if (!query.trim())
@@ -156,11 +131,14 @@ export default function SearchScreen({ route }) {
         return helpAndSupport.filter(h => h.label.toLowerCase().includes(q));
     }, [query]);
     if (isRegistrationTrackingOpen) {
-        return (<RegistrationTrackingScreen onBackPress={() => setIsRegistrationTrackingOpen(false)} companyId={route.params?.companyId}/>);
+        return (<RegistrationTrackingScreen onBackPress={() => {
+            setIsRegistrationTrackingOpen(false);
+            navigation.setOptions({ headerShown: true });
+        }} companyId={route.params?.companyId}/>);
     }
     return (<View style={styles.container}>
       <AnimatedAppear index={0}>
-        <View style={[styles.searchInputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.searchInputWrap, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
           <FontAwesome name="search" size={18} color={colors.subtle} style={styles.searchIcon}/>
           <TextInput style={[styles.searchInput, { color: colors.text }]} placeholder="Search..." placeholderTextColor={colors.inputPlaceholder} value={query} onChangeText={setQuery} autoFocus/>
         </View>
@@ -182,7 +160,7 @@ export default function SearchScreen({ route }) {
           </AnimatedAppear>
 
           <AnimatedAppear index={2}>
-            {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>EXPLORE SERVICES</Text>}
+            {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>SERVICES</Text>}
             <View style={styles.settingsList}>
               {filteredServices.map((service) => (<TouchableOpacity key={service.id} style={styles.settingsRow} onPress={() => handleServicePress(service.id)}>
                   <View style={[styles.settingsIcon, { backgroundColor: `${service.color}15` }]}>
@@ -210,7 +188,10 @@ export default function SearchScreen({ route }) {
           <AnimatedAppear index={4}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>}
             <View style={styles.settingsList}>
-              {filteredTrackingActions.map((item) => (<TouchableOpacity key={item.id} style={styles.settingsRow} onPress={() => setIsRegistrationTrackingOpen(true)}>
+              {filteredTrackingActions.map((item) => (<TouchableOpacity key={item.id} style={styles.settingsRow} onPress={() => {
+                  navigation.setOptions({ headerShown: false });
+                  setIsRegistrationTrackingOpen(true);
+              }}>
                   <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
                     <FontAwesome name={item.icon} size={18} color={item.color}/>
                   </View>
@@ -254,7 +235,7 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         flex: 1,
-        height: 54,
+        height: 50,
         fontSize: font.xl,
     },
     sectionWrap: {
