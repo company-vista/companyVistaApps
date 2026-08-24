@@ -99,7 +99,7 @@ function ProfileScreen() {
       </Pressable>
     </View>
 
-    <View style={[styles.profileCard, { backgroundColor: colors.cardHighlight }]}>
+    <View style={[styles.profileCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight }]}>
       <View style={styles.avatarWrapNoCover}>
         <View style={[
           styles.avatar,
@@ -133,7 +133,7 @@ function ProfileScreen() {
       <FontAwesome name="angle-right" size={22} color={colors.muted} />
     </Pressable>
 
-    <View style={[styles.detailsCard, { backgroundColor: colors.cardHighlight }]}>
+    <View style={[styles.detailsCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight }]}>
       <Text style={[styles.sectionTitle, { color: colors.muted }]}>
         Contact information
       </Text>
@@ -222,7 +222,7 @@ function ProfileScreen() {
       </View>
     </View>
 
-    <Pressable onPress={() => navigation.navigate('ProfileAddress')} style={[styles.addressCard, { backgroundColor: colors.cardHighlight }]}>
+    <Pressable onPress={() => navigation.navigate('ProfileAddress')} style={[styles.addressCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight }]}>
       <View style={[styles.detailIcon, { backgroundColor: colors.cardHighlight }]}>
         <FontAwesome name="map-marker" size={17} color={colors.accent} />
       </View>

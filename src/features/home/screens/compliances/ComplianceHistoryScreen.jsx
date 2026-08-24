@@ -192,7 +192,10 @@ const ComplianceHistoryScreen = () => {
 
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, {
+                backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
+                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            }]}>
                 <View style={styles.cardTitleRow}>
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{selectedAction.title}</Text>
                     <View style={[styles.statusBadge, { backgroundColor: badgeStyle.backgroundColor }]}>
@@ -218,7 +221,10 @@ const ComplianceHistoryScreen = () => {
                 </View>) : null}
             </View>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, {
+                backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
+                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            }]}>
                 <Text style={[styles.sectionHeading, { color: colors.text }]}>Action details</Text>
                 <View style={styles.detailGrid}>
                     {selectedAction.details.map((detail, index) => (<View key={`${detail.label}-${index}`} style={[styles.detailCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
@@ -233,7 +239,10 @@ const ComplianceHistoryScreen = () => {
                 </View>
             </View>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, {
+                backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
+                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            }]}>
                 <View style={styles.sectionHeaderRow}>
                     <Text style={[styles.historyHeading, { color: colors.text }]}>History</Text>
                     <Text style={[styles.historySubtext, { color: colors.muted }]}>Recent Status & Renewal</Text>

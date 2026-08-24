@@ -127,32 +127,29 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                 price: item.price,
                 years: item.years,
             })} style={[styles.tileWrapper, { width: tileWidth }]}>
-              <View style={[styles.complianceTile, { backgroundColor: colors.cardHighlight }]}>
+              <View style={[styles.complianceTile, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderWidth: isLight ? 0 : 1, borderColor: 'rgba(255,255,255,0.08)' }]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
                     <FontAwesome name={item.icon} size={18} style={tone.iconText}/>
                   </View>
-                  <View style={[
-                    styles.tag,
-                    item.daysTone === 'ok' ? styles.daysBadgeOk : styles.daysBadgeSoon,
-                ]}>
-                    <Text style={[
-                    styles.tagText,
-                    item.daysTone === 'ok' ? styles.daysBadgeOkText : styles.daysBadgeSoonText,
-                ]}>
-                      {item.daysBadge}
-                    </Text>
+                  <View style={styles.headerBadges}>
+                    <View style={styles.tag}>
+                      <Text style={[
+                      styles.tagText,
+                      item.daysTone === 'ok' ? styles.daysBadgeOkText : styles.daysBadgeSoonText,
+                  ]}>
+                        {item.daysBadge}
+                      </Text>
+                    </View>
+                    <View style={styles.statusPill}>
+                      <Text style={[styles.statusPillText, tone.tagText]}>{item.tag}</Text>
+                    </View>
                   </View>
                 </View>
                 <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
                 <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
                   {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
-                <View style={styles.tileStatusRow}>
-                  <View style={[styles.statusPill, tone.tag]}>
-                    <Text style={[styles.statusPillText, tone.tagText]}>{item.tag}</Text>
-                  </View>
-                </View>
               </View>
             </Pressable>);
         })}
@@ -249,10 +246,10 @@ const styles = StyleSheet.create({
     daysBadgeSoonText: {
         color: '#B45309',
     },
-    tileStatusRow: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        marginTop: 8,
+    headerBadges: {
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        gap: 5,
     },
     statusPill: {
         borderRadius: 20,

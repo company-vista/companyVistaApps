@@ -155,7 +155,7 @@ export default StyleSheet.create({
     },
     renewButton: {
         paddingHorizontal: 13,
-        paddingVertical: 12,
+        paddingVertical: 7,
         borderRadius: 28,
         flexDirection: 'row',
         alignItems: 'center',
@@ -168,15 +168,18 @@ export default StyleSheet.create({
         // textTransform: 'uppercase',
     },
     bottomRow: {
-        flexDirection: 'column',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         gap: 8,
-        marginTop: 12,
+        marginTop: 0,
     },
     expandedDetails: {
         marginTop: 12,
     },
     divider: {
         height: 1,
+        marginTop: 12,
         marginBottom: 12,
     },
     detailLabel: {

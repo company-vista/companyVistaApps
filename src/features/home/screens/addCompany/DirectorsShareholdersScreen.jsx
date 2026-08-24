@@ -236,7 +236,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue })
               <View style={styles.halfInput}>
                 <Text style={[styles.addressLabel, { color: colors.subtle }]}>Country</Text>
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-                  <TextInput style={[styles.input, { color: colors.text }]} value={address.country}/>
+                  <TextInput style={[styles.input, { color: colors.text }]} value={address.country} onChangeText={t => setAddress({ ...address, country: t })}/>
                 </View>
               </View>
             </View>
@@ -256,7 +256,7 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue })
                 <Text style={[styles.uploadHint, { color: colors.subtle }]}>JPG, PNG or PDF — max 10MB each</Text>
               </View>
               <View style={styles.halfInput}>
-                <Text style={[styles.fieldLabel, { color: colors.muted }]}>PROOF OF ADDRESS</Text>
+                <Text style={[styles.fieldLabel, { color: colors.muted }]}>PROOF OF ADDRESS <Text style={styles.required}>*</Text></Text>
                 <TouchableOpacity style={[styles.uploadBox, { borderColor: '#6b5320', backgroundColor: colors.mode === 'dark' ? 'rgba(15,23,42,0.6)' : colors.surfaceAlt }]} activeOpacity={0.7} onPress={() => pickFile(setAddressProofFile)}>
                   <Text style={styles.uploadIcon}>{'\u2601'}</Text>
                   <Text style={[styles.uploadMainText, { color: colors.text }]}>{addressProofFile ? addressProofFile.name : 'Click or drag address proof'}</Text>
@@ -283,6 +283,9 @@ export default function DirectorsShareholdersScreen({ onBackPress, onContinue })
                 return;
             }
             if (isNaN(ownershipNum) || ownershipNum <= 0 || ownershipNum > 100) {
+                return;
+            }
+            if (!passportFile || !addressProofFile) {
                 return;
             }
             dispatch(setDirectors([{

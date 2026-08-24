@@ -20,6 +20,11 @@ const STEPS = [
 ];
 export default function AnnualStateFilingScreen() {
     const colors = useThemeColors();
+    const cardBgStyle = {
+        backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
+        borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+        borderWidth: 1,
+    };
     const token = useAppSelector(state => state.auth.token);
     const authUserId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? []);
@@ -278,7 +283,7 @@ export default function AnnualStateFilingScreen() {
     return (<View style={styles.safeArea}>
         <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
             {/* ***************** SELECT COMPANY SECTION *********************** */}
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 20 }]}>
+            <View style={[styles.card, cardBgStyle, { zIndex: 20 }]}>
                 <View style={styles.cardLabelRow}>
                     <Feather name="briefcase" size={15} color={colors.accent} />
                     <Text style={[styles.cardLabel, { color: colors.text }]}>Select Company</Text>
@@ -300,7 +305,7 @@ export default function AnnualStateFilingScreen() {
 
 
             {/* ***************** FISCIAL YEAR SECTION *********************** */}
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, zIndex: 10 }]}>
+            <View style={[styles.card, cardBgStyle, { zIndex: 10 }]}>
                 <View style={styles.cardLabelRow}>
                     <Feather name="calendar" size={15} color={colors.primary} />
                     <Text style={[styles.cardLabel, { color: colors.text }]}>Fiscal year</Text>
@@ -322,7 +327,7 @@ export default function AnnualStateFilingScreen() {
             {/* ***************** FISCIAL YEAR SECTION *********************** */}
 
             {/* ***************** ANY CHANGE TO REPORT SECTION *********************** */}
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, cardBgStyle]}>
                 <View style={styles.cardLabelRowBetween}>
                     <View style={styles.cardLabelRow}>
                         <Feather name="edit-3" size={15} color={colors.accent} />
@@ -369,7 +374,7 @@ export default function AnnualStateFilingScreen() {
             </View>
 
             {/* ***************** SUPPORTING DOCUMENTS SECTION *********************** */}
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, cardBgStyle]}>
                 <View style={styles.cardLabelRowBetween}>
                     <View style={styles.cardLabelRow}>
                         <Feather name="upload-cloud" size={15} color={colors.accent} />
@@ -396,7 +401,7 @@ export default function AnnualStateFilingScreen() {
 
             {/* ***************** STATE FILING NOTES SECTION *********************** */}
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, cardBgStyle]}>
                 <View style={styles.cardLabelRow}>
                     <Feather name="file-text" size={15} color={colors.muted} />
                     <Text style={[styles.cardLabel, { color: colors.text }]}>State Filing Notes</Text>
@@ -405,7 +410,7 @@ export default function AnnualStateFilingScreen() {
                 <Text style={[styles.hintText, { color: colors.muted }]}>Optional - include special requests or clarifications.</Text>
             </View>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, cardBgStyle]}>
                 <Text style={[styles.cardLabel, { marginBottom: 14, color: colors.text }]}>Status Tracker</Text>
                 {STEPS.map((step, index) => {
                     const status = progressStatuses[index];

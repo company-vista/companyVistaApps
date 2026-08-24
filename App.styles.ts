@@ -32,10 +32,10 @@ const styles = StyleSheet.create({
   },
   toastCard: {
     width: '80%',
-    borderRadius: 6,
+    borderRadius: 24,
     paddingHorizontal: 18,
     paddingVertical: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#fffffff8',
     borderWidth: 0.3,
     borderColor: '#2325294d',
     // shadowColor: '#000000',

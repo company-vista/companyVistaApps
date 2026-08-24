@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
-import InvoiceScreenSkeleton from '../../../../components/skeletons/InvoiceScreen';
 import { fetchInvoicesForCompany, selectHasLoadedInvoicesForCompany, selectInvoicesForCompany, } from '../../../../store/slices/invoicesSlice';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const HOME_HERO_COLORS = {
@@ -206,9 +205,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
         }
         dispatch(fetchInvoicesForCompany({ companyId: selectedCompany.id, token }));
     }, [dispatch, hasLoadedInvoices, selectedCompany?.id, token]);
-    return (isLoading || (selectedCompany?.id && !hasLoadedInvoices && !errorMessage) ? (<View style={[styles.container, { flex: 1 }]}>
-        <InvoiceScreenSkeleton />
-    </View>) : <View style={styles.container}>
+    return (<View style={styles.container}>
         <View style={styles.titleRow}>
             <View>
                 {/* <Text style={styles.title}>Invoices</Text> */}
@@ -221,7 +218,10 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
         <View style={styles.searchRow}>
             <View style={[
                 styles.searchBox,
-                { backgroundColor: colors.cardHighlight, borderColor: colors.border },
+                {
+                    backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
+                    borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                },
             ]}>
                 <FontAwesome name="search" size={17} color={palette.accentText} />
                 <TextInput editable={!isLoading} placeholder="Search by invoice no. or amount" placeholderTextColor={colors.muted} value={searchQuery} onChangeText={setSearchQuery} style={styles.searchInput} />
@@ -276,15 +276,12 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                 const statusColor = invoice.status === 'paid' ? '#16a34a' :
                     invoice.status === 'partial' ? '#d97706' :
                         '#dc2626';
-                const statusBackground = invoice.status === 'paid' ? '#dcfce7' :
-                    invoice.status === 'partial' ? '#fef3c7' :
-                        '#fee2e2';
                 return (<AnimatedAppear key={invoice.id} index={index}>
                     <View style={[
                         styles.invoiceCard,
                         {
-                            backgroundColor: colors.cardHighlight,
-                            borderColor: colors.border,
+                            backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
+                            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
                         },
                     ]}>
                         <View style={styles.invoiceTopRow}>
@@ -332,7 +329,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                                     <Text style={[styles.statusText, { color: '#ffffff' }]}>
                                         Pay Now
                                     </Text>
-                                </Pressable>) : (<View style={[styles.statusPill, { backgroundColor: statusBackground }]}>
+                                </Pressable>) : (<View style={styles.statusPill}>
                                     <Text style={[styles.statusText, { color: statusColor }]}>
                                         {invoice.status === 'paid' ? 'Paid' : 'Partial'}
                                     </Text>

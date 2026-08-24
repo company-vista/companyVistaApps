@@ -13,6 +13,11 @@ export default function FederalTaxFiling() {
     const route = useRoute();
     const selectedAction = route.params?.selectedAction;
     const colors = useThemeColors();
+    const cardBgStyle = {
+        backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
+        borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+        borderWidth: 1,
+    };
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? []);
     const token = useAppSelector(state => state.auth.token);
     const authUserId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
@@ -234,7 +239,7 @@ export default function FederalTaxFiling() {
         </View> */}
 
         {/* Status Tracker */}
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={[styles.card, cardBgStyle]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>Status Tracker</Text>
           <View style={styles.trackerContainer}>
             <View style={styles.stepRow}>
@@ -255,7 +260,7 @@ export default function FederalTaxFiling() {
         </View>
 
         {/* Select Company Dropdown */}
-        <View style={[styles.card, { backgroundColor: colors.surface, zIndex: 20 }]}>
+        <View style={[styles.card, cardBgStyle, { zIndex: 20 }]}>
           <View style={styles.labelRow}>
             <FontAwesome name="building" color={colors.accent} size={18} style={styles.fieldIcon}/>
             <Text style={[styles.fieldLabel, { color: colors.text }]}>Select Company</Text>
@@ -278,7 +283,7 @@ export default function FederalTaxFiling() {
         </View>
 
         {/* Tax Year Dropdown */}
-        <View style={[styles.card, { backgroundColor: colors.surface, zIndex: 10 }]}>
+        <View style={[styles.card, cardBgStyle, { zIndex: 10 }]}>
           <View style={styles.labelRow}>
             <FontAwesome name="calendar" color={colors.accent} size={18} style={styles.fieldIcon}/>
             <Text style={[styles.fieldLabel, { color: colors.text }]}>Tax Year</Text>
@@ -300,7 +305,7 @@ export default function FederalTaxFiling() {
         </View>
 
         {/* Bookkeeping Service Switch */}
-        <View style={[styles.card, styles.rowBetween, { backgroundColor: colors.surface }]}>
+        <View style={[styles.card, styles.rowBetween, cardBgStyle]}>
           <View style={{ flex: 1, paddingRight: 10 }}>
             <View style={styles.labelRow}>
               <FontAwesome name="book" color={colors.accent} size={18} style={styles.fieldIcon}/>
@@ -312,7 +317,7 @@ export default function FederalTaxFiling() {
         </View>
 
         {/* Bank Statements Upload Area */}
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={[styles.card, cardBgStyle]}>
           <View style={styles.rowBetween}>
             <View style={styles.labelRow}>
               <FontAwesome name="upload" color={colors.accent} size={18} style={styles.fieldIcon}/>
@@ -340,7 +345,7 @@ export default function FederalTaxFiling() {
         </View>
 
         {/* Financial Statements (Conditional) */}
-        {bookkeeping ? (<View style={[styles.card, { backgroundColor: colors.surface }]}>
+        {bookkeeping ? (<View style={[styles.card, cardBgStyle]}>
             <View style={styles.rowBetween}>
               <View style={styles.labelRow}>
                 <FontAwesome name="file-text" color={colors.accent} size={18} style={styles.fieldIcon}/>
@@ -368,7 +373,7 @@ export default function FederalTaxFiling() {
           </View>) : null}
 
         {/* Additional Notes Input */}
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={[styles.card, cardBgStyle]}>
           <View style={styles.labelRow}>
             <FontAwesome name="file-text" color={colors.accent} size={18} style={styles.fieldIcon}/>
             <Text style={[styles.fieldLabel, { color: colors.text }]}>Additional Notes</Text>

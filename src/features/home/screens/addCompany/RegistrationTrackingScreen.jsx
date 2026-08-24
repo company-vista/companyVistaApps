@@ -193,7 +193,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </TouchableOpacity>)}
         </View>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: safeAreaInsets.bottom + 24 }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                 <View style={styles.headerRow}>
                     <View style={[styles.iconContainer, { backgroundColor: colors.surfaceAlt }]}>
                         <FontAwesome name="file-text-o" color={colors.primary} size={24} />
@@ -227,7 +227,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </View>
 
             <View style={styles.metaContainer}>
-                <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, flex: 1, marginBottom: 12 }]}>
+                <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border, flex: 1, marginBottom: 12 }]}>
                     <Text style={[styles.sectionLabel, { color: colors.subtle }]}>Selected Package</Text>
                     <View style={styles.packageHeader}>
                         <Text style={[styles.packageMainText, { color: colors.text }]}>{selectedPkg.charAt(0).toUpperCase() + selectedPkg.slice(1)}</Text>
@@ -238,7 +238,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                     {pkgTimes.map((t, i) => (<Text key={i} style={[styles.metaDetailText, { color: colors.muted }]}>{t}</Text>))}
                 </View>
 
-                <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                     <Text style={[styles.sectionLabel, { color: colors.subtle }]}>Company Details</Text>
 
                     <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
@@ -264,7 +264,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                 </View>
             </View>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                 <View style={styles.packageHeader}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>Registration Process</Text>
                     <View style={[styles.timeBadge, { backgroundColor: colors.surfaceAlt }]}>
@@ -280,7 +280,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                 {steps.map((step, index) => (<TimelineStep key={index} title={step.title} description={step.description} timeframe={step.timeframe} status={getStepStatus(index)} />))}
             </View>
 
-            <View style={[styles.helpCard, { backgroundColor: colors.mode === 'dark' ? colors.surfaceAlt : colors.primary }]}>
+            <View style={[styles.helpCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.primary }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <FontAwesome name="question-circle" color={colors.mode === 'dark' ? colors.accent : colors.primaryText} size={20} style={{ marginRight: 8 }} />
                     <Text style={[styles.helpTitle, { color: colors.mode === 'dark' ? colors.text : colors.primaryText }]}>Need Help?</Text>
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
     },
     helpButton: {
         paddingVertical: 12,
-        borderRadius: 10,
+        borderRadius: 24,
         alignItems: 'center',
     },
     helpButtonText: {

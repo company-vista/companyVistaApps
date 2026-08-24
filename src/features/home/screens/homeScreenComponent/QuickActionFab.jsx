@@ -58,7 +58,9 @@ export function QuickActionFab({ isFabMenuOpen, fabMenuOpacity, fabMenuScale, fa
       <Pressable onPress={onToggleMenu} style={[
             styles.fab,
             {
-                backgroundColor: colors.buttonBackground,
+                backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.buttonBackground,
+                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                borderWidth: 1,
                 bottom: safeAreaInsets.bottom + 104,
             },
         ]}>

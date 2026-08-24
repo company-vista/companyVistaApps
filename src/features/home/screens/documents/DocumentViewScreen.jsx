@@ -53,11 +53,11 @@ function getStyles(colors) {
             gap: 16,
         },
         card: {
-            backgroundColor: colors.cardHighlight,
+            backgroundColor: isDark ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 12,
             padding: 16,
             borderWidth: 1,
-            borderColor: colors.border,
+            borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,

@@ -179,7 +179,7 @@ function EditProfileScreen() {
                 <Text style={[styles.title, { color: colors.text }]}>Edit Profile</Text>
             </View>
 
-            <View style={[styles.avatarCard, { backgroundColor: colors.cardHighlight }]}>
+            <View style={[styles.avatarCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight }]}>
                 <View style={styles.avatarWrap}>
                     <View style={[
                         styles.avatar,
@@ -196,7 +196,7 @@ function EditProfileScreen() {
                 </View>
             </View>
 
-            <View style={[styles.formCard, { backgroundColor: colors.cardHighlight }]}>
+            <View style={[styles.formCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight }]}>
                 <ProfileInput icon="user-o" label="Name" onChangeText={setName} value={name} />
                 <ProfileInput icon="envelope-o" label="Email" editable={false} keyboardType="email-address" onChangeText={setEmail} value={email} />
                 <ProfileInput icon="phone" label="Phone" keyboardType="phone-pad" onChangeText={setPhone} value={phone} />

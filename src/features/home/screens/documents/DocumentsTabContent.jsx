@@ -349,13 +349,13 @@ const getStyles = (colors) => {
         searchContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: colors.cardHighlight,
+            backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 28,
             paddingHorizontal: 16,
             height: 50,
             marginBottom: 20,
             borderWidth: 1,
-            borderColor: colors.border,
+            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
         },
         searchInput: {
             flex: 1,
@@ -440,23 +440,17 @@ const getStyles = (colors) => {
             borderRadius: 9,
             paddingHorizontal: 5,
             marginLeft: 2,
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
         },
-        tabCountActive: {
-            backgroundColor: palette.link,
-            borderColor: palette.link,
-        },
+        tabCountActive: {},
         tabCountText: {
             fontSize: font.xs,
             fontWeight: '700',
             color: colors.muted,
         },
         tabCountTextActive: {
-            color: '#ffffff',
+            color: palette.link,
         },
         tabTextActive: {
             color: palette.link,
@@ -479,11 +473,11 @@ const getStyles = (colors) => {
             gap: 16,
         },
         card: {
-            backgroundColor: colors.cardHighlight,
+            backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 16,
             padding: 12,
             borderWidth: 1,
-            borderColor: colors.border,
+            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
         },
         cardTop: {
             flexDirection: 'row',
@@ -558,7 +552,7 @@ const getStyles = (colors) => {
             color: palette.link,
         },
         lockedCard: {
-            backgroundColor: colors.cardHighlight,
+            backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 10,
             padding: 6,
             borderWidth: 1,

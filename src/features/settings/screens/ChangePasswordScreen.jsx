@@ -12,6 +12,7 @@ function ChangePasswordScreen() {
     const navigation = useNavigation();
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
+    const email = useAppSelector(state => state.auth.user?.email);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -41,16 +42,16 @@ function ChangePasswordScreen() {
         }
         setLoading(true);
         try {
-            await fetch(`${API_BASE_URL}/api/client/change-password`, {
+            await fetch(`${API_BASE_URL}/api/client/auth/change-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                     'x-auth-token': token,
                 },
-                body: JSON.stringify({ currentPassword, newPassword }),
+                body: JSON.stringify({ email, currentPassword, newPassword }),
             });
-            Toast.show({ type: 'success', text1: 'Password changed successfully' });
+            Toast.show({ type: 'success', text1: 'Password changed success' });
             navigation.goBack();
         } catch (err) {
             Toast.show({ type: 'error', text1: err?.message || 'Failed to change password' });
@@ -61,8 +62,8 @@ function ChangePasswordScreen() {
 
     return (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(90,110,230,0.15)' }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
+                <View style={[styles.iconContainer, { backgroundColor: colors.cardElevated }]}>
                     <FontAwesome name="lock" size={28} color={colors.accent} />
                 </View>
                 <Text style={[styles.heading, { color: colors.text }]}>Change Password</Text>
@@ -71,12 +72,12 @@ function ChangePasswordScreen() {
                 </Text>
             </View>
 
-            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                 <Text style={[styles.label, { color: colors.text }]}>Current Password</Text>
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                     <FontAwesome name="lock" size={16} color={colors.muted} style={styles.inputIcon} />
                     <TextInput
-                        style={[styles.input, { color: colors.text }]}
+                        style={[styles.input, { color: colors.inputText }]}
                         placeholder="Enter current password"
                         placeholderTextColor={colors.inputPlaceholder}
                         value={currentPassword}
@@ -93,7 +94,7 @@ function ChangePasswordScreen() {
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                     <FontAwesome name="lock" size={16} color={colors.muted} style={styles.inputIcon} />
                     <TextInput
-                        style={[styles.input, { color: colors.text }]}
+                        style={[styles.input, { color: colors.inputText }]}
                         placeholder="Enter new password"
                         placeholderTextColor={colors.inputPlaceholder}
                         value={newPassword}
@@ -110,7 +111,7 @@ function ChangePasswordScreen() {
                 <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                     <FontAwesome name="lock" size={16} color={colors.muted} style={styles.inputIcon} />
                     <TextInput
-                        style={[styles.input, { color: colors.text }]}
+                        style={[styles.input, { color: colors.inputText }]}
                         placeholder="Re-enter new password"
                         placeholderTextColor={colors.inputPlaceholder}
                         value={confirmPassword}

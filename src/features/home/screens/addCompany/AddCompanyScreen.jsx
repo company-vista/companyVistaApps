@@ -169,7 +169,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit, 
           Let's set up your <Text style={styles.titleAccent}>business.</Text>
         </Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          This form adapts to your selected country and takes less than 3 minutes to complete.
+          Takes less than 3 minutes to fill.
         </Text>
 
         <StepProgress total={TOTAL_STEPS} current={CURRENT_STEP}/>
@@ -178,7 +178,7 @@ export default function AddCompanyScreen({ onBackPress, onSubmit: onFormSubmit, 
           Who's <Text style={styles.titleAccent}>applying</Text> today?
         </Text>
         <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
-          This helps us address the right person and route the application correctly.
+          Helps us route your application to the right person.
         </Text>
 
         <View style={styles.labelRow}>
