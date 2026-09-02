@@ -10,7 +10,6 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 12,
         gap: 16,
-        backgroundColor: '#ffffff',
         justifyContent: 'space-between',
     },
     title: {
@@ -101,7 +100,6 @@ export const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#eef2ff',
         justifyContent: 'center',
         alignItems: 'center',
     },

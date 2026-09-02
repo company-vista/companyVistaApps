@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
 import styles from './HelpFeedbackScreen.styles';
-import logoImage from '../../../assets/images/logo.jpg';
+import logoImage from '../../../assets/images/Logo1.png';
 const appInfoItems = [
     { label: 'App name', value: 'Company Vista' },
     { label: 'Version', value: '0.0.1' },

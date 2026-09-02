@@ -35,6 +35,7 @@ const CorporateChangesScreen = lazy(() => import('../features/home/screens/explo
 const BookkeepingScreen = lazy(() => import('../features/home/screens/exploreServices/BookkeepingScreen'));
 const ComplianceCheckScreen = lazy(() => import('../features/home/screens/exploreServices/ComplianceCheckScreen'));
 const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/DeactivateAccountScreen'));
+const DeleteAccountScreen = lazy(() => import('../features/settings/screens/DeleteAccountScreen'));
 const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
 
 const Stack = createNativeStackNavigator();
@@ -94,6 +95,7 @@ export default function MainStack() {
       <Stack.Screen name="Bookkeeping" component={BookkeepingScreen} options={{ title: 'Bookkeeping' }}/>
       <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen} options={{ title: 'Compliance Check' }}/>
       <Stack.Screen name="DeactivateAccount" component={DeactivateAccountScreen} options={{ title: 'Deactivate Account' }}/>
+      <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Delete Account' }}/>
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
     </Stack.Navigator>
     </Suspense>);

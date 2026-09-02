@@ -18,7 +18,7 @@ export const appThemes = {
         inputBorder: '#e5e7eb',
         inputBackground: '#ffffff',
         inputText: '#0f172a',
-        inputPlaceholder: '#9ca3af',
+        inputPlaceholder: '#868e9b',
         primary: '#14b8a6',
         primaryText: '#042f2e',
         buttonBackground: '#e8c96a', // 276897

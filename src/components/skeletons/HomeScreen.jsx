@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
+import { useThemeColors } from '../../theme/colors';
 
 // Reusable Animated Skeleton Item Component
 const SkeletonItem = ({ style }) => {
+  const colors = useThemeColors();
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -22,12 +24,13 @@ const SkeletonItem = ({ style }) => {
     ).start();
   }, [opacity]);
 
-  return <Animated.View style={[styles.skeleton, style, { opacity }]} />;
+  return <Animated.View style={[styles.skeleton, { backgroundColor: colors.skeleton }, style, { opacity }]} />;
 };
 
 export default function DashboardSkeleton() {
+  const colors = useThemeColors();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* 1. Top Header Skeleton */}
       <View style={styles.header}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -41,7 +44,7 @@ export default function DashboardSkeleton() {
       </View>
 
       {/* 2. Main Company Card Skeleton */}
-      <View style={styles.mainCard}>
+      <View style={[styles.mainCard, { backgroundColor: colors.surface, borderWidth: colors.mode === 'dark' ? 1 : 0, borderColor: colors.border }]}>
         {/* Country & Date Header */}
         <View style={styles.rowBetween}>
           <SkeletonItem style={{ width: 120, height: 14 }} />
@@ -82,7 +85,7 @@ export default function DashboardSkeleton() {
       {/* 4. Compliance Grid Skeleton (2x2 Cards) */}
       <View style={styles.gridContainer}>
         {[1, 2, 3, 4].map((item) => (
-          <View key={item} style={styles.gridCard}>
+          <View key={item} style={[styles.gridCard, { backgroundColor: colors.surface, borderWidth: colors.mode === 'dark' ? 1 : 0, borderColor: colors.border }]}>
             <View style={styles.rowBetween}>
               <SkeletonItem style={{ width: 40, height: 40, borderRadius: 8 }} />
               <SkeletonItem style={{ width: 70, height: 20, borderRadius: 10 }} />

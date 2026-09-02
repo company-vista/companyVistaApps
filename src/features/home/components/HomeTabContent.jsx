@@ -8,7 +8,7 @@ import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onOpenComplianceHistory, selectedCompany, colors, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOpenComplianceHistory, selectedCompany, colors, }) {
   const compliance = useCompanyCompliance(selectedCompany?.id);
 
   return (<View style={styles.container}>
@@ -25,7 +25,7 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onComp
     </AnimatedAppear>
 
     <AnimatedAppear index={3}>
-      <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} selectedCompany={selectedCompany} />
+      <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} onRegistrationTrackingPress={onRegistrationTrackingPress} selectedCompany={selectedCompany} />
     </AnimatedAppear>
     <AnimatedAppear index={4}>
       <CompanyVistaReferral />

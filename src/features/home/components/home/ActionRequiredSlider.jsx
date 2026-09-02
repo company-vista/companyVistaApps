@@ -175,8 +175,8 @@ function ActionRequiredSlider() {
                                         {alert.text}
                                     </Text>
                                 </View>
-                                <Pressable accessibilityRole="button" style={[styles.alertActionButton, { backgroundColor: tone.action }]}>
-                                    <Text style={styles.alertActionText}>{alert.action}</Text>
+                                <Pressable accessibilityRole="button" style={[styles.alertActionButton, !isDark && { borderWidth: 1, borderColor: tone.action }]}>
+                                    <Text style={[styles.alertActionText, !isDark && { color: tone.action }]}>{alert.action}</Text>
                                 </Pressable>
                             </View>
                         </View>

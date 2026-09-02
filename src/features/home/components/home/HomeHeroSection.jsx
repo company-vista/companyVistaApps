@@ -4,7 +4,7 @@ import { font } from '../../../../theme/typography';
 import { useThemeColors } from '../../../../theme/colors';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 
-function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, selectedCompany, }) {
+function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, selectedCompany, }) {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const heroCompanyName = capitalizeCompanyName(selectedCompany?.name) ?? (isLoadingCompanies ? 'Loading company...' : 'No company available');
@@ -80,15 +80,13 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     </View>
     <View style={styles.heroStats}>
 
-      <View style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isActive ? 'rgba(52,211,153,0.15)' : 'rgba(240,149,149,0.15)' }]}>
-          <FontAwesome name={isActive ? 'check-circle' : 'exclamation-circle'} size={16} color={isActive ? '#34D399' : '#F09595'} />
+      <Pressable onPress={onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
+        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#EFF6FF' : 'rgba(37,99,235,0.18)' }]}>
+          <FontAwesome name="plus" size={14} color={isLight ? '#2563eb' : '#60A5FA'} />
         </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileNumber, heroStatusNumberStyle]}>
-          {heroCompanyStatus}
-        </Text>
-        <Text style={[styles.heroTileLabel, heroTileLabelStyle]}>Status</Text>
-      </View>
+        <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Add</Text>
+        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
+      </Pressable>
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>
           <FontAwesome name="cog" size={16} color={isLight ? colors.accent : '#85B7EB'} />
@@ -192,7 +190,7 @@ const styles = StyleSheet.create({
   },
   heroStats: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     marginTop: 14,
   },
   heroTile: {

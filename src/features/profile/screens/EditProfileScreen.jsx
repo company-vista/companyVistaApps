@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { SaveButton } from '../../../components/buttons';
 import BackButton from '../../../components/buttons/BackButton';
@@ -107,33 +107,25 @@ function EditProfileScreen() {
             return;
         }
         try {
-            if (Platform.OS === 'android' && Platform.Version >= 33) {
-                // Android 13+ may prompt for media access before the picker opens.
-            }
-            const response = await launchImageLibrary({
+            const image = await ImagePicker.openPicker({
+                width: 400,
+                height: 400,
+                cropping: true,
+                cropperCircleOverlay: true,
                 mediaType: 'photo',
-                quality: 1,
-                selectionLimit: 1,
+                compressImageQuality: 1,
             });
-            if (response.didCancel) {
-                return;
-            }
-            if (response.errorMessage) {
-                Alert.alert('Gallery error', response.errorMessage);
-                return;
-            }
-            const asset = response.assets?.[0];
-            if (!asset?.uri) {
+            if (!image?.path) {
                 Alert.alert('Image missing', 'Please select another image.');
                 return;
             }
-            setLocalAvatarUri(asset.uri);
+            setLocalAvatarUri(image.path);
             setIsUploadingAvatar(true);
             const result = await uploadClientAvatar({
                 file: {
-                    name: asset.fileName,
-                    type: asset.type,
-                    uri: asset.uri,
+                    name: image.filename || 'avatar.jpg',
+                    type: image.mime,
+                    uri: image.path,
                 },
                 token,
             });
@@ -141,7 +133,7 @@ function EditProfileScreen() {
                 Alert.alert('Upload failed', result.error);
                 return;
             }
-            const nextAvatar = withImageCacheBust(result.avatar ?? asset.uri);
+            const nextAvatar = withImageCacheBust(result.avatar ?? image.path);
             dispatch(updateProfileUser({
                 ...(user ?? { email: '' }),
                 avatar: nextAvatar,
@@ -153,6 +145,9 @@ function EditProfileScreen() {
             setLocalAvatarUri(nextAvatar);
         }
         catch (error) {
+            if (error?.code === 'E_PICKER_CANCELLED') {
+                return;
+            }
             const message = error instanceof Error
                 ? error.message
                 : 'Unable to update profile image right now.';
@@ -191,7 +186,7 @@ function EditProfileScreen() {
                         styles.cameraButton,
                         { backgroundColor: colors.accent, borderColor: colors.surface },
                     ]}>
-                        {isUploadingAvatar ? (<ActivityIndicator size="small" color="#ffffff" />) : (<FontAwesome name="camera" size={22} color="#ffffff" />)}
+                        {isUploadingAvatar ? (<ActivityIndicator size="small" color="#f0e8e8" />) : (<FontAwesome name="camera" size={22} color="#f8f2f2" />)}
                     </Pressable>
                 </View>
             </View>

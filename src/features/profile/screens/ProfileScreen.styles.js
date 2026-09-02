@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     avatar: {
-        width: 116,
-        height: 116,
+        width: 148,
+        height: 148,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 3,
@@ -91,6 +91,95 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '400',
         marginTop: 5,
+    },
+    progressCard: {
+        borderRadius: 18,
+        borderWidth: 1,
+        backgroundColor: '#ffffff',
+        marginTop: 14,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+    },
+    progressHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    progressTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    progressTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#111827',
+    },
+    progressBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 10,
+        backgroundColor: '#ecfeff',
+    },
+    progressBadgeText: {
+        fontSize: 12,
+        fontWeight: '800',
+    },
+    progressSubRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 6,
+    },
+    progressPercent: {
+        fontSize: 13,
+        fontWeight: '800',
+    },
+    progressSubText: {
+        fontSize: 11,
+        fontWeight: '500',
+        flex: 1,
+    },
+    progressTrack: {
+        height: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginTop: 10,
+        backgroundColor: '#e5e7eb',
+    },
+    progressFill: {
+        height: '100%',
+        borderRadius: 8,
+    },
+    progressFieldsRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+        marginTop: 12,
+    },
+    progressFieldItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    progressDot: {
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    progressFieldLabel: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    progressCta: {
+        marginTop: 10,
+        alignSelf: 'flex-start',
+    },
+    progressCtaText: {
+        fontSize: 12,
+        fontWeight: '700',
     },
     switchAccountButton: {
         minHeight: 70,

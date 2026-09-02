@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Easing,
   Image,
   Pressable,
   StatusBar,
@@ -11,10 +12,13 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FastImage from 'react-native-fast-image';
 import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
-import logoImage from './src/assets/images/logo.jpg';
+// import logoImage from './src/assets/images/Logo1.png';
+import companyLogo from './src/assets/images/company-vista-logo.gif';
+import logoR from './src/assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';
 import { store } from './src/store';
@@ -108,53 +112,77 @@ function AppContent() {
 }
 
 function SplashScreen() {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.7)).current;
-  const riseAnim = useRef(new Animated.Value(24)).current;
+  const spinValue = useRef(new Animated.Value(0)).current;
+  const pulseValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
+    Animated.loop(
+      Animated.timing(spinValue, {
         toValue: 1,
-        duration: 700,
+        duration: 22000,
+        easing: Easing.linear,
         useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
+      })
+    ).start();
+
+    Animated.loop(
+      Animated.timing(pulseValue, {
         toValue: 1,
-        friction: 5,
-        tension: 80,
+        duration: 3000,
+        easing: Easing.out(Easing.ease),
         useNativeDriver: true,
-      }),
-      Animated.timing(riseAnim, {
-        toValue: 0,
-        duration: 700,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, riseAnim, scaleAnim]);
+      })
+    ).start();
+  }, [spinValue, pulseValue]);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const pulseScale = pulseValue.interpolate({
+    inputRange: [0, 0.7, 1],
+    outputRange: [0.7, 2.2, 2.2],
+  });
+
+  const pulseOpacity = pulseValue.interpolate({
+    inputRange: [0, 0.7, 1],
+    outputRange: [0.9, 0, 0],
+  });
 
   return (
-    <View style={[styles.splashScreen, { backgroundColor: '#ffffff' }]}>
+    <View style={[styles.splashScreen, { backgroundColor: '#050710' }]}>
+      <StatusBar barStyle="light-content" />
+
       <Animated.View
         style={[
-          styles.logo,
+          styles.pulseRing,
           {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }, { translateY: riseAnim }],
+            transform: [{ scale: pulseScale }],
+            opacity: pulseOpacity,
           },
-        ]}>
-        <Image source={logoImage} style={styles.logoImage} />
-      </Animated.View>
-      <Animated.Text
+        ]}
+      />
+
+      <Animated.View
         style={[
-          styles.appName,
+          styles.orbitalRing,
           {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }, { translateY: riseAnim }],
+            transform: [{ rotate: spin }],
           },
-        ]}>
-        Welcome To Company Vista
-      </Animated.Text>
+        ]}
+      />
+
+      <View style={styles.globeContainer}>
+        <View style={styles.glowHalo} />
+        <FastImage
+          source={companyLogo}
+          style={styles.globeImage}
+          resizeMode={FastImage.resizeMode.contain}
+        />
+        <Image source={logoR} style={{ position: 'absolute', bottom: -55, width: 210, height: 46, resizeMode: 'contain' }} />
+        <Text style={{ position: 'absolute', bottom: -82, color: 'rgba(201,168,76,0.4)', fontSize: 13, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 300 }}>Global Business Registration</Text>
+      </View>
     </View>
   );
 }

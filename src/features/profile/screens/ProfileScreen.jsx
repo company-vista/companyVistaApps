@@ -72,6 +72,23 @@ function ProfileScreen() {
   const postalCode = user?.address?.postalCode ?? user?.postalCode;
   const country = user?.address?.country ?? user?.country;
   const addressSummary = [street, cityState, postalCode, country].filter(Boolean).join(', ') || 'Add address';
+  // Profile completion: email, phone, DOB, passport, address
+  const isEmailFilled = Boolean(user?.email && user.email !== 'N/A' && user.email.trim() !== '');
+  const isPhoneFilled = Boolean(phone && phone !== 'N/A' && String(phone).trim() !== '');
+  const isDobFilled = Boolean(dateOfBirth && dateOfBirth !== 'N/A');
+  const isPassportFilled = Boolean(passportNumber && passportNumber !== 'N/A' && String(passportNumber).trim() !== '');
+  const isAddressFilled = Boolean(addressSummary !== 'Add address');
+  const completionFields = [
+    { key: 'email', label: 'Email', filled: isEmailFilled },
+    { key: 'phone', label: 'Phone No', filled: isPhoneFilled },
+    { key: 'dob', label: 'Date of Birth', filled: isDobFilled },
+    { key: 'passport', label: 'Passport No', filled: isPassportFilled },
+    { key: 'address', label: 'Address', filled: isAddressFilled },
+  ];
+  const filledCount = completionFields.filter(f => f.filled).length;
+  const totalCount = completionFields.length;
+  const completionPercent = Math.round((filledCount / totalCount) * 100);
+  const missingLabels = completionFields.filter(f => !f.filled).map(f => f.label);
   const switchSheetBackground = colors.mode === 'dark' ? '#1f1f22' : colors.surface;
   function handleSwitchAccountPress() {
     setIsSwitchSheetVisible(true);
@@ -108,9 +125,51 @@ function ProfileScreen() {
           {profileImage ? (<Image onError={event => console.log('Profile avatar failed', event.nativeEvent.error, profileImage)} source={{ uri: profileImage }} style={styles.avatarImage} />) : (<FontAwesome name="user" size={42} color={colors.accent} />)}
         </View>
       </View>
-      <Text style={[styles.name, { color: colors.text }]}>{user?.name ?? 'N/A'}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+        <Text style={[styles.name, { color: colors.text, marginTop: 0, lineHeight: 30 }]}>{user?.name ?? 'N/A'}</Text>
+        {filledCount === totalCount && (
+          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+            <FontAwesome name="check" size={10} color="#FFF" />
+          </View>
+        )}
+      </View>
       <Text style={[styles.subtitle, { color: colors.muted }]}>Client Portal Account</Text>
     </View>
+
+    {/* Profile Completion Progress - hide when all fields filled */}
+    {filledCount < totalCount ? (
+      <View style={[styles.progressCard, { backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight, borderColor: colors.border }]}>
+        <View style={styles.progressHeader}>
+          <View style={styles.progressTitleRow}>
+            <FontAwesome name="tasks" size={14} color={colors.accent} />
+            <Text style={[styles.progressTitle, { color: colors.text }]}>Profile Complete</Text>
+          </View>
+          <View style={[styles.progressBadge, { backgroundColor: colors.accentSoft }]}>
+            <Text style={[styles.progressBadgeText, { color: colors.accent }]}>{filledCount}/{totalCount}</Text>
+          </View>
+        </View>
+        <View style={styles.progressSubRow}>
+          <Text style={[styles.progressPercent, { color: colors.accent }]}>{completionPercent}%</Text>
+          <Text style={[styles.progressSubText, { color: colors.subtle }]}>{`${missingLabels.join(', ')} pending`}</Text>
+        </View>
+        <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+          <View style={[styles.progressFill, { width: `${completionPercent}%`, backgroundColor: colors.accent }]} />
+        </View>
+        <View style={styles.progressFieldsRow}>
+          {completionFields.map(f => (
+            <View key={f.key} style={styles.progressFieldItem}>
+              <View style={[styles.progressDot, { backgroundColor: f.filled ? '#10B981' : colors.border }]}>
+                {f.filled && <FontAwesome name="check" size={7} color="#FFF" />}
+              </View>
+              <Text style={[styles.progressFieldLabel, { color: f.filled ? colors.text : colors.muted }]}>{f.label}</Text>
+            </View>
+          ))}
+        </View>
+        <Pressable onPress={() => navigation.navigate('EditProfile')} style={styles.progressCta}>
+          <Text style={[styles.progressCtaText, { color: colors.accent }]}>Complete now →</Text>
+        </Pressable>
+      </View>
+    ) : null}
 
     <Pressable onPress={handleSwitchAccountPress} style={[
       styles.switchAccountButton,
@@ -239,7 +298,7 @@ function ProfileScreen() {
     </Pressable>
 
     <Text style={[styles.versionText, { color: colors.subtle }]}>
-      Company Vista Inc
+      App version 1.4.1
     </Text>
 
     <Modal animationType="slide" transparent visible={isSwitchSheetVisible} onRequestClose={() => setIsSwitchSheetVisible(false)}>

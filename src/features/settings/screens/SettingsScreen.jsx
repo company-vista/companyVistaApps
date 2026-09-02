@@ -192,6 +192,21 @@ function SettingsScreen() {
 
         <FontAwesome name="angle-right" size={22} color={colors.subtle} />
       </Pressable>
+
+      <Pressable onPress={() => navigation.navigate('DeleteAccount')} style={styles.menuItem}>
+        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+          <FontAwesome name="trash-o" size={17} color={colors.danger} />
+        </View>
+
+        <View style={styles.copy}>
+          <Text style={[styles.title, { color: colors.text }]}>Delete Account</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Permanently delete your account
+          </Text>
+        </View>
+
+        <FontAwesome name="angle-right" size={22} color={colors.subtle} />
+      </Pressable>
     </View>
   </ScrollView>);
 }

@@ -130,7 +130,7 @@ function NotificationScreen() {
                             styles.notificationIcon,
                             { backgroundColor: colors.accentSoft },
                         ]}>
-                            <FontAwesome name="user" size={18} color={colors.accent} />
+                            <FontAwesome name="bell-o" size={18} color={colors.accent} />
                         </View>
                         <View style={styles.notificationCopy}>
                             <View style={styles.notificationTitleRow}>
@@ -139,9 +139,6 @@ function NotificationScreen() {
                                 </Text>
                                 {!item.isRead ? <View style={styles.unreadDot} /> : null}
                             </View>
-                            <Text style={[styles.notificationMessage, { color: colors.muted }]}>
-                                {item.message}
-                            </Text>
                             <Text style={[styles.notificationTime, { color: colors.subtle }]}>
                                 {item.time}
                             </Text>

@@ -195,11 +195,11 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
     };
     return (<View style={styles.screen}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: safeAreaInsets.top + 8 }]}>
+      <View style={[styles.header, { paddingTop: safeAreaInsets.top + 8, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
         <BackButton onPress={onBackPress}/>
         <Text style={[styles.title, { color: colors.text }]}>Transaction Details</Text>
-        <Pressable style={styles.downloadButton} onPress={handleDownload}>
-          <FontAwesome name="download" size={18} color="#000"/>
+        <Pressable style={[styles.downloadButton, { backgroundColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#eef2ff', borderWidth: 1, borderColor: colors.border }]} onPress={handleDownload}>
+          <FontAwesome name="download" size={18} color={colors.text}/>
         </Pressable>
       </View>
 

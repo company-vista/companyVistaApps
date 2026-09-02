@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
+import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 const CLIENT_PROFILE_ROUTE = `${API_BASE_URL}/api/client/auth/profile`;
 function getErrorMessage(error) {
     const axiosError = error;
@@ -20,12 +21,16 @@ function splitName(name) {
 function getResponseUser(data) {
     const user = data.user ?? data.client ?? data.data?.user ?? data.data?.client;
     const companies = user?.companies ?? data.companies ?? data.data?.companies;
-    return user
-        ? {
-            ...user,
-            companies,
-        }
-        : undefined;
+    if (!user) return undefined;
+    const rawName = user.name ?? ([user.firstName, user.lastName].filter(Boolean).join(' ') || undefined);
+    const capitalizedName = rawName ? capitalizeCompanyName(rawName) : rawName;
+    return {
+        ...user,
+        name: capitalizedName,
+        firstName: user.firstName ? capitalizeCompanyName(user.firstName) : user.firstName,
+        lastName: user.lastName ? capitalizeCompanyName(user.lastName) : user.lastName,
+        companies,
+    };
 }
 export async function fetchClientProfile(token) {
     if (!token) {

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, Text, View, } from 'react-native';
+import { Animated, BackHandler, Easing, Pressable, StyleSheet, Text, View, } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
-import { useAppSelector } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { logoutUser, setPendingAddCompany, setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 // Import subcomponents
 import { HomeHeader } from './homeScreenComponent/HomeHeader';
@@ -27,7 +29,7 @@ import ServicesScreen from './subscription&services/ServicesScreen';
 import SubscriptionScreen from './subscription&services/SubscriptionScreen';
 import ExploreServicesScreen from './subscription&services/ExploreServicesScreen';
 import ServicesHistoryScreen from './subscription&services/ServicesHistoryScreen';
-import AddCompanyScreen from './addCompany/AddCompanyScreen';
+import ReviewSubmitScreen from './addCompany/ReviewSubmitScreen';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
@@ -41,10 +43,12 @@ export default function HomeScreen() {
     const { initialTab, pendingCompanySection: routePendingCompanySection, pendingHomeAction: routePendingHomeAction } = route.params ?? {};
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.auth.user);
     const token = useAppSelector(state => state.auth.token);
     const userId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? emptyCompanies);
+    const pendingAddCompany = useAppSelector(state => state.auth.pendingAddCompany);
     const [activeTab, setActiveTab] = useState(initialTab ?? 'home');
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
@@ -60,6 +64,7 @@ export default function HomeScreen() {
     const [isExploreServicesOpen, setIsExploreServicesOpen] = useState(false);
     const [isServicesHistoryOpen, setIsServicesHistoryOpen] = useState(false);
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
+    const [trackingCompanyId, setTrackingCompanyId] = useState(null);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [supportFromRegistrationTracking, setSupportFromRegistrationTracking] = useState(false);
     const [editingCompanyId, setEditingCompanyId] = useState(null);
@@ -103,6 +108,23 @@ export default function HomeScreen() {
             navigation.navigate('Transactions', { companyId: selectedCompany?.id });
         }
     }, [routePendingHomeAction]);
+    // Signup flow: after login, open AddCompany directly without showing Home (per requirement)
+    useEffect(() => {
+        if (pendingAddCompany) {
+            setIsAddCompanyOpen(true);
+            dispatch(setPendingAddCompany(false));
+        }
+    }, [pendingAddCompany, dispatch]);
+    const isAddCompanyMandatory = isAddCompanyOpen && !editingCompanyId && companyOptions.length === 0 && user?.isCompleteRegistration === false;
+    useEffect(() => {
+        if (!isAddCompanyMandatory) return;
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            dispatch(setRedirectToLogin(true));
+            dispatch(logoutUser());
+            return true;
+        });
+        return () => sub.remove();
+    }, [isAddCompanyMandatory, dispatch]);
     useEffect(() => {
         Animated.loop(Animated.sequence([
             Animated.timing(bellAnim, {
@@ -194,6 +216,10 @@ export default function HomeScreen() {
                     }
                     return mappedCompanies[0] ?? null;
                 });
+                // Auto-open Add Company only if registration incomplete (fresh signup) and no companies
+                if (mappedCompanies.length === 0 && !isLoadingCompanies && user?.isCompleteRegistration === false) {
+                    setIsAddCompanyOpen(true);
+                }
             })
             .finally(() => {
                 if (isMounted) {
@@ -204,6 +230,18 @@ export default function HomeScreen() {
             isMounted = false;
         };
     }, [token, userCompanies, userId]);
+    // Registration incomplete (false) -> dashboard block, force ReviewSubmitScreen (chahe companies ho ya na ho)
+    useEffect(() => {
+        if (user?.isCompleteRegistration === false && !isAddCompanyOpen && !isRegistrationTrackingOpen && token) {
+            setIsAddCompanyOpen(true);
+        }
+    }, [user?.isCompleteRegistration, isAddCompanyOpen, isRegistrationTrackingOpen, token]);
+    // Ensure onboarding AddCompany auto-opens only for incomplete registration with no companies
+    useEffect(() => {
+        if (!isLoadingCompanies && companyOptions.length === 0 && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && user?.isCompleteRegistration === false) {
+            setIsAddCompanyOpen(true);
+        }
+    }, [isLoadingCompanies, companyOptions.length, isAddCompanyOpen, isRegistrationTrackingOpen, token, user?.isCompleteRegistration]);
     useEffect(() => {
         if (!selectedCompany?.id) {
             return;
@@ -391,7 +429,7 @@ export default function HomeScreen() {
         setIsServicesOpen(true);
     }
     function openRegistrationTrackingScreen() {
-        closeFabMenu();
+        setTrackingCompanyId(selectedCompany?.id ?? null);
         setIsRegistrationTrackingOpen(true);
     }
     const refreshCompanies = useCallback((selectCompanyId) => {
@@ -411,6 +449,7 @@ export default function HomeScreen() {
     }, [token, userId, userCompanies]);
     function closeRegistrationTrackingScreen() {
         setIsRegistrationTrackingOpen(false);
+        setTrackingCompanyId(null);
         refreshCompanies();
     }
     function openSubscriptionScreen() {
@@ -432,14 +471,6 @@ export default function HomeScreen() {
     }
     if (activeCompanySection) {
         return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);
-    }
-    if (isAddCompanyOpen) {
-        return (<AddCompanyScreen onBackPress={() => { setIsAddCompanyOpen(false); setEditingCompanyId(null); }} onSubmit={(companyId) => {
-            setIsAddCompanyOpen(false);
-            setEditingCompanyId(null);
-            setIsRegistrationTrackingOpen(true);
-            refreshCompanies(companyId);
-        }} companyId={editingCompanyId} />);
     }
     if (isManageOptionsOpen) {
         return (<ManageOptionsScreen onBackPress={() => setIsManageOptionsOpen(false)} onRequestChangePress={() => {
@@ -469,7 +500,7 @@ export default function HomeScreen() {
         return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
     }
     if (isRegistrationTrackingOpen) {
-        return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={selectedCompany?.id} onRefreshCompanies={() => refreshCompanies(selectedCompany?.id)} onEditPress={(companyId) => {
+        return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={trackingCompanyId ?? selectedCompany?.id} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={(companyId) => {
             setIsRegistrationTrackingOpen(false);
             setEditingCompanyId(companyId || selectedCompany?.id || null);
             setIsAddCompanyOpen(true);
@@ -533,7 +564,7 @@ export default function HomeScreen() {
                 paddingBottom: safeAreaInsets.bottom + 75,
             },
         ]} showsVerticalScrollIndicator={false}>
-            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onRegistrationTrackingPress={openRegistrationTrackingScreen} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -593,5 +624,41 @@ export default function HomeScreen() {
         </View>) : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} colors={colors} safeAreaInsets={safeAreaInsets} />
+
+        {isAddCompanyOpen && (
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}>
+                <Pressable onPress={() => {
+                    // First time (false) + no company -> mandatory -> back = logout to login
+                    if (user?.isCompleteRegistration === false && !editingCompanyId && companyOptions.length === 0) {
+                        dispatch(setRedirectToLogin(true));
+                        dispatch(logoutUser());
+                        return;
+                    }
+                    // true wale (already registered) -> back = just close form
+                    setIsAddCompanyOpen(false); setEditingCompanyId(null);
+                }} style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.55)' }} />
+                <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 16, paddingTop: safeAreaInsets.top + 12, paddingBottom: safeAreaInsets.bottom + 12 }}>
+                    <View style={{ flex: 1, maxHeight: '92%', backgroundColor: colors.surface, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 20 }}>
+                        <ReviewSubmitScreen onBackPress={() => {
+                            if (user?.isCompleteRegistration === false && !editingCompanyId && companyOptions.length === 0) {
+                                dispatch(setRedirectToLogin(true));
+                                dispatch(logoutUser());
+                                return;
+                            }
+                            setIsAddCompanyOpen(false); setEditingCompanyId(null);
+                        }} onSubmit={(companyId) => {
+                            setIsAddCompanyOpen(false);
+                            setEditingCompanyId(null);
+                            setTrackingCompanyId(companyId ?? selectedCompany?.id ?? null);
+                            setIsRegistrationTrackingOpen(true);
+                            refreshCompanies(companyId);
+                        }} companyId={editingCompanyId} />
+                    </View>
+                </View>
+            </View>
+        )}
+        {isAddCompanyOpen && (
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 49, backgroundColor: 'rgba(6,9,19,0.35)' }} />
+        )}
     </View>);
 }

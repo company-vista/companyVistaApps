@@ -6,9 +6,10 @@ import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { resetCompanyRegistration } from '../../../../store/slices/companyRegistrationSlice';
+import { resetCompanyRegistration, setApplicantInfo } from '../../../../store/slices/companyRegistrationSlice';
 import { submitCompanyRegistration, updateCompanyRegistration } from '../../api/companyRegistrationApi';
 export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplicant, onEditJurisdiction, onEditCompanyName, onEditOwnership, onEditAddress, onEditDirectors, onEditBusinessActivity, companyId }) {
+    const handleEditJurisdiction = onEditJurisdiction ?? onEditCompanyName;
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const dispatch = useAppDispatch();
@@ -19,93 +20,39 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
     const [isSubmitting, setIsSubmitting] = useState(false);
     const reg = useAppSelector(state => state.companyRegistration);
     const token = useAppSelector(state => state.auth.token);
-    // const user = useAppSelector(state => state.auth.user);
-    // const clientId = user?._id || user?.id || '';
+    const user = useAppSelector(state => state.auth.user);
     const today = new Date();
     const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}/${today.getFullYear()}`;
-    const holdingSummary = reg.holdingCompanies.length > 0
-        ? reg.holdingCompanies.map((h, i) => `${h.legalName || '—'} (${h.ownershipPercent || '0'}%)`).join(', ')
-        : '—';
-    const directorsSummary = reg.directors.length > 0
-        ? reg.directors.map((d, i) => `${d.firstName} ${d.lastName} — ${d.ownership}%`).join(', ')
-        : '—';
-    const totalOwnership = reg.directors.reduce((sum, d) => sum + (parseFloat(d.ownership) || 0), 0);
-    const localAddressSummary = reg.hasAddress === 'yes'
-        ? [reg.localAddress.line1, reg.localAddress.city, reg.localAddress.state, reg.localAddress.postalCode, reg.localAddress.country].filter(Boolean).join(', ') || '—'
-        : reg.hasAddress === 'no' ? 'CompanyVista arranged' : '—';
-    const agentSummary = reg.hasAgent === 'yes'
-        ? `${reg.agentDetails.firstName} ${reg.agentDetails.lastName}`.trim() || '—'
-        : reg.hasAgent === 'no' ? 'CompanyVista arranged' : '—';
-    const reviewSections = [
-        {
-            title: 'Applicant',
-            rows: [
-                { label: 'I am the', value: reg.applicantType },
-                { label: 'Contact', value: `${reg.firstName} ${reg.lastName}`.trim() || '—' },
-                { label: 'Email', value: reg.email || '—' },
-                { label: 'Phone', value: reg.phone || '—' },
-            ],
-        },
-        {
-            title: 'Jurisdiction & Entity',
-            rows: [
-                { label: 'Country', value: reg.jurisdictionName || reg.jurisdiction || '—' },
-                { label: 'State', value: reg.stateOfIncorporation === '-- Select --' ? '—' : reg.stateOfIncorporation },
-                { label: 'Entity type', value: reg.entityType === '-- Select --' ? '—' : reg.entityType },
-            ],
-        },
-        {
-            title: 'Company Name',
-            rows: [
-                { label: 'Desired name', value: reg.companyName || '—' },
-                { label: 'Alternate name', value: reg.alternateName || '—' },
-            ],
-        },
-        {
-            title: 'Ownership',
-            rows: [
-                { label: 'Structure', value: reg.ownershipType },
-                { label: 'Holding companies', value: holdingSummary },
-            ],
-        },
-        {
-            title: 'Address & Representative',
-            rows: [
-                { label: 'Local address', value: localAddressSummary },
-                { label: 'Local representative', value: agentSummary },
-            ],
-        },
-        {
-            title: 'Directors & Shareholders',
-            rows: [
-                { label: 'People', value: directorsSummary },
-                { label: 'Total shareholding', value: `${totalOwnership}%` },
-            ],
-        },
-        {
-            title: 'Business Activity',
-            rows: [
-                { label: 'Website', value: reg.website || '—' },
-                { label: 'Reason', value: reg.establishReason === '-- Select --' ? '—' : reg.establishReason },
-                { label: 'Activity', value: reg.principalActivity === '-- Select --' ? '—' : reg.principalActivity },
-                { label: 'Introduction', value: reg.briefIntroduction ? (reg.briefIntroduction.length > 60 ? reg.briefIntroduction.substring(0, 60) + '...' : reg.briefIntroduction) : '—' },
-            ],
-        },
-    ];
+    const nameParts = (user?.name ?? '').split(' ');
+    const userFirstName = user?.firstName ?? nameParts[0] ?? '';
+    const userLastName = user?.lastName ?? nameParts.slice(1).join(' ') ?? '';
+    const [firstName, setFirstName] = useState(reg.firstName || userFirstName);
+    const [lastName, setLastName] = useState(reg.lastName || userLastName);
+    const [email, setEmail] = useState(reg.email || user?.email || '');
+    const [phone, setPhone] = useState(reg.phone || user?.phone || user?.phoneNumber || user?.mobile || '');
+    const [companyNameVal, setCompanyNameVal] = useState(reg.companyName || '');
+    const [alternateNameVal, setAlternateNameVal] = useState(reg.alternateName || '');
+    const [countryName, setCountryName] = useState(reg.jurisdictionName || reg.jurisdiction || '');
+    const [stateName, setStateName] = useState(reg.stateOfIncorporation && reg.stateOfIncorporation !== '-- Select --' ? reg.stateOfIncorporation : '');
     const handleSubmit = async () => {
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim() || !companyNameVal.trim() || !countryName.trim() || !stateName.trim()) {
+            Toast.show({ type: 'error', text1: 'All fields required', text2: 'Please fill all fields including country and state' });
+            return;
+        }
+        dispatch(setApplicantInfo({ applicantType: reg.applicantType || 'owner', firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), phone: phone.trim() }));
         setIsSubmitting(true);
         const payload = {
-            applicantType: reg.applicantType,
-            firstName: reg.firstName,
-            lastName: reg.lastName,
-            email: reg.email,
-            phone: reg.phone,
-            countryOfIncorporation: reg.jurisdictionName || reg.jurisdiction,
-            jurisdictionName: reg.jurisdictionName,
-            stateOfRegistration: reg.stateOfIncorporation,
+            applicantType: reg.applicantType || 'owner',
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+            companyName: companyNameVal.trim(),
+            countryOfIncorporation: countryName.trim(),
+            jurisdictionName: countryName.trim(),
+            stateOfRegistration: stateName.trim(),
             companyType: reg.entityType,
-            companyName: reg.companyName,
-            alternateCompanyName: reg.alternateName,
+            alternateCompanyName: alternateNameVal.trim() || reg.alternateName,
             ownershipType: reg.ownershipType,
             holdingCompanies: reg.holdingCompanies,
             hasLocalAddress: reg.hasAddress === 'yes',
@@ -126,6 +73,11 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
         }
         if (reg.otherFiles && reg.otherFiles.length > 0) {
             payload.otherFiles = reg.otherFiles;
+        }
+        if (!token) {
+            Toast.show({ type: 'error', text1: 'Session expired', text2: 'Please login again' });
+            setIsSubmitting(false);
+            return;
         }
         try {
             const result = isEditing && companyId
@@ -158,29 +110,54 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
       <View style={styles.body}>
         <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Please check your details below. Tap "Edit" next to any section to make changes.
+            Please fill your applicant details to continue.
           </Text>
 
-          {reviewSections.map((section, index) => (<View key={index} style={[styles.sectionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <View style={[styles.cardHeader, { borderBottomColor: colors.border }]}>
-                <Text style={[styles.cardTitle, { color: '#e6a82a' }]}>{section.title}</Text>
-                <TouchableOpacity activeOpacity={0.6} onPress={index === 0 ? onEditApplicant
-                : index === 1 ? onEditJurisdiction
-                    : index === 2 ? onEditCompanyName
-                        : index === 3 ? onEditOwnership
-                            : index === 4 ? onEditAddress
-                                : index === 5 ? onEditDirectors
-                                    : index === 6 ? onEditBusinessActivity
-                                        : undefined}>
-                  <Text style={styles.editButtonText}>EDIT</Text>
-                </TouchableOpacity>
+          <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.cardTitle, { color: '#e6a82a', marginBottom: 12 }]}>Applicant</Text>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Full Name <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={`${firstName} ${lastName}`.trim()} onChangeText={(val) => { const parts = val.trim().split(/\s+/); setFirstName(parts[0] || ''); setLastName(parts.slice(1).join(' ') || ''); }} placeholder="Enter full name" placeholderTextColor={colors.inputPlaceholder} />
               </View>
-
-              {section.rows.map((row, rowIdx) => (<View key={rowIdx} style={styles.cardRow}>
-                  <Text style={[styles.rowLabel, { color: colors.subtle }]}>{row.label}</Text>
-                  <Text style={[styles.rowValue, { color: colors.text }]}>{row.value}</Text>
-                </View>))}
-            </View>))}
+            </View>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Email <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={colors.inputPlaceholder} keyboardType="email-address" autoCapitalize="none" />
+              </View>
+            </View>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Phone Number <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={phone} onChangeText={setPhone} placeholder="Phone number" placeholderTextColor={colors.inputPlaceholder} keyboardType="phone-pad" />
+              </View>
+            </View>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Company Name <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={companyNameVal} onChangeText={setCompanyNameVal} placeholder="Enter company name" placeholderTextColor={colors.inputPlaceholder} />
+              </View>
+            </View>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Alternate Name</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={alternateNameVal} onChangeText={setAlternateNameVal} placeholder="Enter alternate name (optional)" placeholderTextColor={colors.inputPlaceholder} />
+              </View>
+            </View>
+            <View style={{ marginBottom: 14 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Country Name <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={countryName} onChangeText={setCountryName} placeholder="Enter country name" placeholderTextColor={colors.inputPlaceholder} />
+              </View>
+            </View>
+            <View style={{ marginBottom: 4 }}>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>State Name <Text style={styles.required}>*</Text></Text>
+              <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                <TextInput style={[styles.input, { color: colors.text }]} value={stateName} onChangeText={setStateName} placeholder="Enter state name" placeholderTextColor={colors.inputPlaceholder} />
+              </View>
+            </View>
+          </View>
 
           <View style={[styles.declarationBox, { borderColor: '#e6a82a', backgroundColor: colors.surface }]}>
             <Text style={[styles.declarationTitle, { color: colors.text }]}>Authorization & Declaration</Text>
@@ -221,7 +198,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
 
           <View style={styles.inputsRow}>
             <View style={[styles.formGroup, { flex: 1.2, marginRight: 12 }]}>
-              <Text style={[styles.inputLabel, { color: colors.muted }]}>SIGNATURE (TYPE YOUR FULL LEGAL NAME) <Text style={styles.required}>*</Text></Text>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Signature <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: !signature ? '#ef4444' : colors.inputBorder }]}>
                 <TextInput placeholder="Type your full name" placeholderTextColor={colors.inputPlaceholder} style={[styles.input, { color: colors.text }]} value={signature} onChangeText={setSignature}/>
               </View>
@@ -229,7 +206,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
             </View>
 
             <View style={[styles.formGroup, { flex: 0.8 }]}>
-              <Text style={[styles.inputLabel, { color: colors.muted }]}>DATE <Text style={styles.required}>*</Text></Text>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Date <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput style={[styles.input, { color: colors.text }]} value={dateStr} editable={false}/>
               </View>
@@ -238,7 +215,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
         </ScrollView>
 
         <View style={[styles.footerColumn, { paddingBottom: safeAreaInsets.bottom + 8 }]}>
-          <ContinueButton label={isEditing ? 'UPDATE REGISTRATION' : 'SUBMIT REGISTRATION'} onPress={handleSubmit} disabled={!isChecked || !signature} loading={isSubmitting}/>
+          <ContinueButton label={isEditing ? 'Update Registration' : 'Submit Registration'} onPress={handleSubmit} disabled={!isChecked || !signature} loading={isSubmitting}/>
         </View>
       </View>
     </View>);
@@ -251,8 +228,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 12,
-        gap: 12,
+        paddingBottom: 8,
+        gap: 10,
         borderBottomWidth: 1,
     },
     headerTitle: {
@@ -262,13 +239,14 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
-        padding: 16,
+        padding: 10,
+        paddingBottom: 6,
     },
     scrollArea: {
         flex: 1,
     },
     scrollContent: {
-        paddingBottom: 8,
+        paddingBottom: 4,
     },
     title: {
         fontSize: font.xxl,
@@ -282,13 +260,13 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: font.base,
-        marginBottom: 16,
+        marginBottom: 10,
     },
     sectionCard: {
         borderWidth: 0.5,
         borderRadius: 8,
-        padding: 14,
-        marginBottom: 14,
+        padding: 10,
+        marginBottom: 10,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -326,17 +304,17 @@ const styles = StyleSheet.create({
     declarationBox: {
         borderWidth: 0.5,
         borderRadius: 6,
-        padding: 12,
-        marginBottom: 16,
+        padding: 10,
+        marginBottom: 10,
     },
     declarationTitle: {
         fontSize: font.md,
         fontWeight: '700',
-        marginBottom: 10,
+        marginBottom: 6,
     },
     declarationItem: {
         flexDirection: 'row',
-        marginBottom: 8,
+        marginBottom: 6,
         gap: 8,
     },
     declarationBullet: {
@@ -351,7 +329,7 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginBottom: 16,
+        marginBottom: 10,
     },
     checkbox: {
         width: 16,
@@ -375,7 +353,7 @@ const styles = StyleSheet.create({
     },
     inputsRow: {
         flexDirection: 'row',
-        marginBottom: 8,
+        marginBottom: 4,
     },
     formGroup: {
         justifyContent: 'flex-start',
@@ -383,7 +361,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         fontSize: font.xs,
         fontWeight: '600',
-        marginBottom: 6,
+        marginBottom: 4,
         letterSpacing: 0.3,
     },
     required: {

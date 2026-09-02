@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Share, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../components/AnimatedAppear';
+import { ScreenWrapper } from '../../../components/ScreenWrapper';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
@@ -136,15 +137,16 @@ export default function SearchScreen({ route }) {
             navigation.setOptions({ headerShown: true });
         }} companyId={route.params?.companyId}/>);
     }
-    return (<View style={styles.container}>
-      <AnimatedAppear index={0}>
-        <View style={[styles.searchInputWrap, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
-          <FontAwesome name="search" size={18} color={colors.subtle} style={styles.searchIcon}/>
-          <TextInput style={[styles.searchInput, { color: colors.text }]} placeholder="Search..." placeholderTextColor={colors.inputPlaceholder} value={query} onChangeText={setQuery} autoFocus/>
-        </View>
-      </AnimatedAppear>
+    return (<ScreenWrapper>
+      <View style={styles.container}>
+        <AnimatedAppear index={0}>
+          <View style={[styles.searchInputWrap, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
+            <FontAwesome name="search" size={18} color={colors.subtle} style={styles.searchIcon}/>
+            <TextInput style={[styles.searchInput, { color: colors.text }]} placeholder="Search..." placeholderTextColor={colors.inputPlaceholder} value={query} onChangeText={setQuery} autoFocus/>
+          </View>
+        </AnimatedAppear>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.listContent}>
+        <View style={styles.listContent}>
         <View style={styles.sectionWrap}>
           <AnimatedAppear index={1}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>QUICK ACTIONS</Text>}
@@ -215,8 +217,9 @@ export default function SearchScreen({ route }) {
           </AnimatedAppear>
 
         </View>
-      </ScrollView>
-    </View>);
+        </View>
+      </View>
+    </ScreenWrapper>);
 }
 const styles = StyleSheet.create({
     container: {

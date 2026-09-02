@@ -141,6 +141,14 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
         fetchCompany(true);
         onRefreshCompanies?.();
     }, [fetchCompany, onRefreshCompanies]);
+    const status = company?.registrationStatus || 'pending';
+    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_');
+    const selectedPkg = company?.selectedPackage || 'standard';
+    const steps = STATUS_STEPS[selectedPkg] || STATUS_STEPS.standard;
+    const statusIdx = company ? getStatusIndex(status) : 0;
+    const progress = company ? getProgressPercent(status) : 0;
+    const pkgLabel = PACKAGE_LABELS[selectedPkg] || PACKAGE_LABELS.standard;
+    // Auto-redirect removed - completed companies should stay on tracking page, user will manually go back
     if (loading) {
         return (<View style={styles.container}>
             <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
@@ -168,13 +176,6 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </View>
         </View>);
     }
-    const status = company.registrationStatus || 'pending';
-    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_');
-    const selectedPkg = company.selectedPackage || 'standard';
-    const steps = STATUS_STEPS[selectedPkg] || STATUS_STEPS.standard;
-    const statusIdx = getStatusIndex(status);
-    const progress = getProgressPercent(status);
-    const pkgLabel = PACKAGE_LABELS[selectedPkg] || PACKAGE_LABELS.standard;
     const pkgTimes = PACKAGE_TIMES[selectedPkg] || PACKAGE_TIMES.standard;
     const getStepStatus = (index) => {
         if (index < statusIdx)

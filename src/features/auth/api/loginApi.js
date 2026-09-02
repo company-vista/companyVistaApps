@@ -2,6 +2,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
 import { getNetworkErrorMessage } from '../../../utils/errorMessages';
+import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 const CLIENT_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/login`;
 const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google/login`;
 const API_REQUEST_TIMEOUT_MS = 8000;
@@ -79,7 +80,8 @@ function getImageUrl(value, baseUrl = API_BASE_URL) {
 }
 function getUserName(user) {
     const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
-    return user?.name ?? (fullName || undefined);
+    const rawName = user?.name ?? (fullName || undefined);
+    return rawName ? capitalizeCompanyName(rawName) : rawName;
 }
 function getUserCompany(user) {
     const firstCompany = user?.companies?.[0];
@@ -174,9 +176,9 @@ export async function handleLoginApi({ email, password, }) {
             dob: user?.dob,
             email: user?.email ?? trimmedEmail,
             id: user?.id,
-            firstName: user?.firstName,
+            firstName: user?.firstName ? capitalizeCompanyName(user.firstName) : user?.firstName,
             image: getImageUrl(user?.image),
-            lastName: user?.lastName,
+            lastName: user?.lastName ? capitalizeCompanyName(user.lastName) : user?.lastName,
             legalName: user?.legalName,
             mobile: user?.mobile,
             name: getUserName(user),
@@ -191,13 +193,17 @@ export async function handleLoginApi({ email, password, }) {
             role: user?.role,
             state: user?.state,
             street: user?.street,
+            isCompleteRegistration: user?.isCompleteRegistration,
         };
+        // Login success even if incomplete - dashboard will be blocked via RootStack
+        // isCompleteRegistration === false => login ho jayega but dashboard nahi dikhega
         return {
             errors,
             isSuccess: true,
             email: loginUser.email,
             token,
             user: loginUser,
+            isRegistrationIncomplete: loginUser.isCompleteRegistration === false,
         };
     }
     catch (error) {
@@ -265,9 +271,9 @@ export async function handleGoogleLoginApi({ idToken, }) {
             dob: user?.dob,
             email: user?.email ?? '',
             id: user?.id,
-            firstName: user?.firstName,
+            firstName: user?.firstName ? capitalizeCompanyName(user.firstName) : user?.firstName,
             image: getImageUrl(user?.image),
-            lastName: user?.lastName,
+            lastName: user?.lastName ? capitalizeCompanyName(user.lastName) : user?.lastName,
             legalName: user?.legalName,
             mobile: user?.mobile,
             name: getUserName(user),
@@ -282,6 +288,7 @@ export async function handleGoogleLoginApi({ idToken, }) {
             role: user?.role,
             state: user?.state,
             street: user?.street,
+            isCompleteRegistration: user?.isCompleteRegistration,
         };
         return {
             errors: {},
@@ -289,6 +296,7 @@ export async function handleGoogleLoginApi({ idToken, }) {
             email: loginUser.email,
             token,
             user: loginUser,
+            isRegistrationIncomplete: loginUser.isCompleteRegistration === false,
         };
     }
     catch (error) {

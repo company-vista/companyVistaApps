@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 import { API_BASE_URL } from '../../../config/api';
 const COMPANY_REGISTRATION_ROUTE = `${API_BASE_URL}/api/company/public-register`;
-const API_REQUEST_TIMEOUT_MS = 10000;
+const API_REQUEST_TIMEOUT_MS = 30000;
 export function getCompanyRegistrationUpdateRoute(companyId) {
     return `${API_BASE_URL}/api/companies/${companyId}/registration`;
 }
@@ -52,7 +52,7 @@ export async function submitCompanyRegistration(payload, token) {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'x-auth-token': token,
-                'Content-Type': 'multipart/form-data',
+                // Let axios set Content-Type with boundary automatically for FormData
             },
             timeout: API_REQUEST_TIMEOUT_MS,
         });
@@ -72,10 +72,18 @@ export async function submitCompanyRegistration(payload, token) {
     }
     catch (error) {
         const axiosError = error;
+        console.log('[submitCompanyRegistration] error:', {
+            message: axiosError.message,
+            code: axiosError.code,
+            status: axiosError.response?.status,
+            data: axiosError.response?.data,
+            url: COMPANY_REGISTRATION_ROUTE,
+        });
+        const isNetworkError = !axiosError.response && axiosError.message === 'Network Error';
         return {
             error: axiosError.response?.data?.message ??
                 axiosError.response?.data?.error ??
-                axiosError.message ??
+                (isNetworkError ? 'Network error. Please check your internet and try again.' : axiosError.message) ??
                 'Registration failed. Please try again.',
             isSuccess: false,
         };
@@ -125,10 +133,17 @@ export async function updateCompanyRegistration(companyId, payload, token) {
     }
     catch (error) {
         const axiosError = error;
+        console.log('[updateCompanyRegistration] error:', {
+            message: axiosError.message,
+            code: axiosError.code,
+            status: axiosError.response?.status,
+            data: axiosError.response?.data,
+        });
+        const isNetworkError = !axiosError.response && axiosError.message === 'Network Error';
         return {
             error: axiosError.response?.data?.message ??
                 axiosError.response?.data?.error ??
-                axiosError.message ??
+                (isNetworkError ? 'Network error. Please check your internet and try again.' : axiosError.message) ??
                 'Update failed. Please try again.',
             isSuccess: false,
         };

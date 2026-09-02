@@ -2,7 +2,7 @@ import { s } from './responsive';
 export const font = {
     xs: s(10),
     sm: s(12),
-    base: s(14),
+    base: s(12),
     md: s(15),
     lg: s(14),
     xl: s(16), // 15

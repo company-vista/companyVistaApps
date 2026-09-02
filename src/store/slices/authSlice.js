@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { handleLoginApi, handleGoogleLoginApi, } from '../../features/auth/api/loginApi';
 import { handleSignupApi, handleResendVerificationApi, } from '../../features/auth/api/signupApi';
 import { deactivateAccount as deactivateAccountApi } from '../../features/auth/api/deactivateApi';
+import { deleteAccount as deleteAccountApi } from '../../features/auth/api/deleteAccountApi';
 const AUTH_STORAGE_KEY = 'vista.auth';
 const initialState = {
     user: null,
@@ -12,6 +13,8 @@ const initialState = {
     isRestoring: true,
     loginErrors: {},
     signupErrors: {},
+    pendingAddCompany: false,
+    redirectToLogin: false,
 };
 async function saveAuthSession(session) {
     try {
@@ -42,6 +45,9 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (payload, { re
         return rejectWithValue({
             errors: result.errors,
             email: result.email,
+            isRegistrationIncomplete: result.isRegistrationIncomplete || false,
+            message: result.message,
+            user: result.user,
         });
     }
     const session = {
@@ -61,6 +67,9 @@ export const googleLoginUser = createAsyncThunk('auth/googleLoginUser', async (p
         return rejectWithValue({
             errors: result.errors,
             email: result.email,
+            isRegistrationIncomplete: result.isRegistrationIncomplete || false,
+            message: result.message,
+            user: result.user,
         });
     }
     const session = {
@@ -111,6 +120,15 @@ export const deactivateAccountThunk = createAsyncThunk('auth/deactivateAccount',
     await clearAuthSession();
     return { message: result.message };
 });
+export const deleteAccountThunk = createAsyncThunk('auth/deleteAccount', async (password, { getState, rejectWithValue }) => {
+    const { auth } = getState();
+    const result = await deleteAccountApi(auth.token, password);
+    if (!result.isSuccess) {
+        return rejectWithValue({ message: result.message });
+    }
+    await clearAuthSession();
+    return { message: result.message };
+});
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -130,6 +148,24 @@ const authSlice = createSlice({
                 ...state.user,
                 ...action.payload,
             };
+        },
+        setAuthSession(state, action) {
+            state.user = action.payload.user;
+            state.token = action.payload.token;
+            state.isAuthenticated = true;
+            state.isRestoring = false;
+            saveAuthSession({ user: action.payload.user, token: action.payload.token });
+        },
+        setOnboardingComplete(state, action) {
+            if (state.user) state.user.hasCompletedOnboarding = true;
+            const session = { user: { ...state.user, hasCompletedOnboarding: true }, token: state.token };
+            saveAuthSession(session);
+        },
+        setPendingAddCompany(state, action) {
+            state.pendingAddCompany = action.payload;
+        },
+        setRedirectToLogin(state, action) {
+            state.redirectToLogin = action.payload;
         },
     },
     extraReducers: builder => {
@@ -197,6 +233,8 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.loginErrors = {};
                 state.signupErrors = {};
+                state.pendingAddCompany = false;
+                // keep redirectToLogin flag intact so AuthStack can read it
             })
             .addCase(deactivateAccountThunk.fulfilled, state => {
                 state.user = null;
@@ -204,8 +242,17 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.loginErrors = {};
                 state.signupErrors = {};
+                state.pendingAddCompany = false;
+            })
+            .addCase(deleteAccountThunk.fulfilled, state => {
+                state.user = null;
+                state.token = null;
+                state.isAuthenticated = false;
+                state.loginErrors = {};
+                state.signupErrors = {};
+                state.pendingAddCompany = false;
             });
     },
 });
-export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, } = authSlice.actions;
+export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setRedirectToLogin } = authSlice.actions;
 export default authSlice.reducer;

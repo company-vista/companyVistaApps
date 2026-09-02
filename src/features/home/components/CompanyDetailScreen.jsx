@@ -35,9 +35,9 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
     }
     /* ── empty state ─────────────────────────────────────────────── */
     if (!companyData) {
-        return (<View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        return (<View style={[styles.container, { backgroundColor: colors.background, paddingBottom: insets.bottom }]}>
         <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
-        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets.top + 12 }]}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Company Details</Text>
         </View>
         <View style={styles.emptyState}>
@@ -66,7 +66,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
       <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
 
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets.top + 12 }]}>
         <View style={styles.headerLeft}>
           <BackButton onPress={activeSection ? handleBackPress : onBackPress}/>
           <Text style={[styles.headerTitle, { color: colors.text }]}>

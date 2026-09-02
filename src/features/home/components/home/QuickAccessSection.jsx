@@ -16,7 +16,7 @@ function QuickAccessSection({ onItemPress, onViewAllPress, }) {
                 { backgroundColor: colors.surface, borderColor: colors.border },
             ]}>
             <View style={[styles.iconCircle, { backgroundColor: item.color + '18' }]}>
-              <FontAwesome name={item.icon} size={22} color={item.color}/>
+              <FontAwesome name={item.icon} size={16} color={item.color}/>
             </View>
             <Text style={[styles.favouriteTitle, { color: colors.text }]}>
               {item.title}
@@ -52,29 +52,30 @@ const styles = StyleSheet.create({
     favouritesGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 14,
+        gap: 8,
+        justifyContent: 'space-between',
     },
     favouriteCard: {
-        width: '47.8%',
-        minHeight: 92,
+        width: '22.5%',
+        minHeight: 70,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderRadius: 12,
-        padding: 10,
+        borderRadius: 10,
+        padding: 5,
     },
     iconCircle: {
-        width: 48,
-        height: 48,
+        width: 32,
+        height: 32,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 24,
+        borderRadius: 16,
     },
     favouriteTitle: {
-        fontSize: font.md,
+        fontSize: 10,
         fontWeight: '600',
-        lineHeight: 18,
-        marginTop: 8,
+        lineHeight: 12,
+        marginTop: 5,
         textAlign: 'center',
     },
 });

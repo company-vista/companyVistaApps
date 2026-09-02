@@ -41,16 +41,20 @@ function NotificationDetailScreen() {
         styles.screen,
         { paddingTop: 8 },
     ]}>
-        <View style={[styles.detailCard, { backgroundColor: colors.cardHighlight }]}>
-            <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-                <FontAwesome name="user" size={24} color={colors.accent} />
+        <View style={[styles.detailCard, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft, width: 42, height: 42, borderRadius: 21 }]}>
+                    <FontAwesome name="bell-o" size={16} color={colors.accent} />
+                </View>
+                <View style={{ flex: 1 }}>
+                    <Text style={[styles.title, { color: colors.text, marginTop: 0, fontSize: font.lg }]}>
+                        {notification.title}
+                    </Text>
+                    <Text style={[styles.time, { color: colors.subtle, fontSize: font.xs }]}>
+                        {notification.time}
+                    </Text>
+                </View>
             </View>
-            <Text style={[styles.title, { color: colors.text }]}>
-                {notification.title}
-            </Text>
-            <Text style={[styles.time, { color: colors.subtle }]}>
-                {notification.time}
-            </Text>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <Text style={[styles.message, { color: colors.muted }]}>
                 {notification.message}
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
     },
     detailCard: {
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        // backgroundColor: '#ffffff',
         marginTop: 24,
         paddingHorizontal: 20,
         paddingVertical: 24,

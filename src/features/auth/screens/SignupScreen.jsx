@@ -7,10 +7,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getAllCountries } from 'react-native-international-phone-number';
 import Toast from 'react-native-toast-message';
 import styles from './SignupScreen.styles';
-import logoImage from '../../../assets/images/logo.jpg';
-import { clearSignupError, signupUser, resendVerification, } from '../../../store/slices/authSlice';
+import logoImage from '../../../assets/images/Logo1.png';
+import { clearSignupError, signupUser, resendVerification, setPendingAddCompany, } from '../../../store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { useThemeColors } from '../../../theme/colors';
+import { appThemes } from '../../../theme/colors';
 import EmailVerificationScreen from './EmailVerificationScreen';
 import SetNewPasswordScreen from './SetNewPasswordScreen';
 const socialLinks = {
@@ -26,7 +26,7 @@ function SignupScreen() {
   const navigation = useNavigation();
   const safeAreaInsets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
-  const colors = useThemeColors();
+  const colors = appThemes.light;
   const { isLoading, signupErrors: errors } = useAppSelector(state => state.auth);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -84,7 +84,7 @@ function SignupScreen() {
   }
   return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
     styles.screen,
-    { backgroundColor: '#ffffff', paddingTop: safeAreaInsets.top },
+    { backgroundColor: colors.background, paddingTop: safeAreaInsets.top },
   ]}>
     <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
@@ -95,7 +95,13 @@ function SignupScreen() {
         <View style={styles.header} />
 
         <View style={styles.form}>
-          {showSetPassword ? (<SetNewPasswordScreen email={email} clientId={verifiedClientId} token={verifiedToken} onPasswordSet={() => navigation.navigate('Login')} onBackPress={() => {
+          {showSetPassword ? (<SetNewPasswordScreen email={email} clientId={verifiedClientId} token={verifiedToken} onPasswordSet={() => {
+              dispatch(setPendingAddCompany(true));
+              setShowSetPassword(false);
+              setShowVerification(false);
+              navigation.reset({ index: 0, routes: [{ name: 'Login', params: { fromSignup: true, email } }] });
+              Toast.show({ type: 'success', text1: 'Password set successfully', text2: 'Please login to continue' });
+            }} onBackPress={() => {
             setShowSetPassword(false);
             setShowVerification(false);
           }} />) : showVerification ? (<EmailVerificationScreen email={email} signupToken={signupToken} signupClientId={signupClientId} onEditPress={() => setShowVerification(false)} onResend={handleResend} onOtpVerified={(data) => {
@@ -108,7 +114,7 @@ function SignupScreen() {
                 <View style={[
                   styles.inputWrap,
                   {
-                    backgroundColor: colors.inputBackground,
+                    backgroundColor: colors.background,
                     borderColor: firstNameBorderColor,
                   },
                 ]}>
@@ -123,7 +129,7 @@ function SignupScreen() {
                 <View style={[
                   styles.inputWrap,
                   {
-                    backgroundColor: colors.inputBackground,
+                    backgroundColor: colors.background,
                     borderColor: lastNameBorderColor,
                   },
                 ]}>
@@ -139,7 +145,7 @@ function SignupScreen() {
               <View style={[
                 styles.inputWrap,
                 {
-                  backgroundColor: colors.inputBackground,
+                  backgroundColor: colors.background,
                   borderColor: emailBorderColor,
                 },
               ]}>
@@ -160,7 +166,7 @@ function SignupScreen() {
                 borderWidth: 1,
                 borderColor: '#94a3b8',
                 borderRadius: 12,
-                backgroundColor: colors.inputBackground,
+                backgroundColor: colors.background,
                 overflow: 'hidden',
               }}>
                 <Picker mode="dropdown" selectedValue={countryCode} onValueChange={(value) => setCountryCode(value)} style={{ color: colors.inputText }} dropdownIconColor="#9ca3af">
@@ -171,7 +177,7 @@ function SignupScreen() {
                 styles.inputWrap,
                 {
                   flex: 1,
-                  backgroundColor: colors.inputBackground,
+                  backgroundColor: colors.background,
                   borderColor: '#94a3b8',
                 },
               ]}>
@@ -183,7 +189,7 @@ function SignupScreen() {
               <View style={[
                 styles.inputWrap,
                 {
-                  backgroundColor: colors.inputBackground,
+                  backgroundColor: colors.background,
                   borderColor: '#94a3b8',
                 },
               ]}>
@@ -196,7 +202,7 @@ function SignupScreen() {
               <View style={[
                 styles.inputWrap,
                 {
-                  backgroundColor: colors.inputBackground,
+                  backgroundColor: colors.background,
                   borderColor: '#94a3b8',
                 },
               ]}>
