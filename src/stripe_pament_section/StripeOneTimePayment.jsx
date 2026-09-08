@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
 import { useAppSelector } from '../store/hooks';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const API_REQUEST_TIMEOUT_MS = 10000;
 let paymentStatusInterval = null;
 function getAuthHeaders(token) {
@@ -59,7 +60,16 @@ function pollPaymentStatus({ referenceId, token, onPaid, onGiveUp }) {
         }
     }, 5000);
 }
-export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitiated, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
+export default function StripeOneTimePayment(props) {
+    const routeInvoice = props?.route?.params?.invoice;
+    const routePaymentType = props?.route?.params?.paymentType;
+    const routeLabel = props?.route?.params?.label;
+    const invoice = props.invoice || routeInvoice || {};
+    const onSuccess = props.onSuccess || props?.route?.params?.onSuccess;
+    const onInitiated = props.onInitiated || props?.route?.params?.onInitiated;
+    const paymentType = props.paymentType || routePaymentType || 'invoice';
+    const label = props.label || routeLabel || 'Pay Now';
+    const buttonStyle = props.buttonStyle;
     const [loading, setLoading] = useState(false);
     const token = useAppSelector(state => state.auth.token);
     useEffect(() => {
@@ -67,10 +77,8 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
     }, []);
     const handlePayment = async () => {
         console.log(invoice, 'invoice');
-        if (!token) {
-            Toast.show({ type: 'error', text1: 'Please login to continue' });
-            return;
-        }
+        // bina login ke payment allow - token optional rakha hai
+        // agar token nahi hai to bina Auth header ke API call hogi
         const companyId = invoice?.companyId || invoice?.company?._id;
         const amount = Number(invoice?.amount || 0);
         if (!companyId) {
@@ -134,8 +142,7 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
                 withCredentials: true,
                 timeout: API_REQUEST_TIMEOUT_MS,
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    'x-auth-token': token,
+                    ...getAuthHeaders(token),
                 },
             });
             onInitiated?.(data);
@@ -152,6 +159,19 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
                     onPaid: (statusData) => {
                         Toast.show({ type: 'success', text1: 'Payment successful!' });
                         onSuccess?.(statusData || data);
+                        // navigate to dynamic StatusScreen on payment success
+                        const nav = props?.navigation;
+                        if (nav?.navigate) {
+                          nav.navigate('Status', {
+                            isPaid: true,
+                            companyName: props?.route?.params?.companyName || invoice?.companyId || 'Meridian Global Ventures GmbH',
+                            country: props?.route?.params?.selectedState || 'Germany',
+                            userEmail: props?.route?.params?.email || 'rajesh@meridianglobal.com',
+                            orderId: referenceId,
+                            amountPaid: `$${invoice?.amount || ''}`,
+                            amount: invoice?.amount,
+                          });
+                        }
                     },
                     onGiveUp: () => {
                         Toast.show({ type: 'info', text1: 'Payment not confirmed', text2: 'Your payment may still be processing. Check Transactions shortly.' });
@@ -173,17 +193,53 @@ export default function StripeOneTimePayment({ invoice = {}, onSuccess, onInitia
             setLoading(false);
         }
     };
-    return (<Pressable onPress={handlePayment} disabled={loading} style={({ pressed }) => [
+    const isScreen = !!props?.route || !!props?.navigation;
+    const navigation = props?.navigation;
+
+    const button = (
+      <Pressable onPress={handlePayment} disabled={loading} style={({ pressed }) => [
         styles.button,
         buttonStyle,
         loading && styles.buttonDisabled,
         pressed && !loading && styles.buttonPressed,
-    ]}>
+      ]}>
         {loading ? (<ActivityIndicator size="small" color="#ffffff" />) : null}
         <Text style={styles.buttonText}>
             {loading ? 'Processing...' : label}
         </Text>
-    </Pressable>);
+      </Pressable>
+    );
+
+    if (!isScreen) return button;
+
+    const amount = invoice?.amount || props?.route?.params?.runningTotal || 0;
+    const companyName = props?.route?.params?.companyName || invoice?.companyId || '';
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#080E18" />
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack?.()}>
+            <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Stripe Payment</Text>
+          <View style={{ width: 36 }} />
+        </View>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Amount to Pay</Text>
+            <Text style={styles.amountText}>${amount}</Text>
+            {companyName ? <Text style={styles.companyText}>{companyName}</Text> : null}
+            <Text style={styles.descText}>You will be redirected to Stripe checkout to complete the payment securely. We never store your card details.</Text>
+          </View>
+          <View style={styles.secureRow}>
+            <Ionicons name="shield-checkmark" size={16} color="#10B981" />
+            <Text style={styles.secureText}> Secured by Stripe</Text>
+          </View>
+          {button}
+        </ScrollView>
+      </SafeAreaView>
+    );
 }
 const styles = StyleSheet.create({
     button: {
@@ -213,4 +269,16 @@ const styles = StyleSheet.create({
         fontSize: font.lg,
         fontWeight: '600',
     },
+    container: { flex: 1, backgroundColor: '#080E18' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 34, paddingBottom: 16 },
+    backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    headerTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+    scrollContent: { paddingHorizontal: 16, paddingBottom: 24, paddingTop: 10 },
+    card: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', padding: 20, alignItems: 'center', marginBottom: 16 },
+    cardLabel: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8 },
+    amountText: { color: '#D4AF37', fontSize: 32, fontWeight: '800', marginBottom: 6 },
+    companyText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', marginBottom: 10, textAlign: 'center' },
+    descText: { color: '#8E9BAE', fontSize: 12, lineHeight: 18, textAlign: 'center' },
+    secureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(16,185,129,0.08)', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)' },
+    secureText: { color: '#10B981', fontSize: 12, fontWeight: '600' },
 });

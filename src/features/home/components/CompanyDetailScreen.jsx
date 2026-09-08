@@ -8,13 +8,16 @@ import { useThemeColors } from '../../../theme/colors';
 import BackButton from '../../../components/buttons/BackButton';
 import CompanyInfo from './companyInformationSection/CompanyInfo';
 import ShareHolders from './companyInformationSection/ShareHolders';
+import { useNavigation } from '@react-navigation/native';
 const menuItems = [
-    { id: 'companyInfo', label: 'Company Information', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
+    { id: 'companyInfo', label: 'Company Info', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
     { id: 'shareholders', label: 'Shareholders', icon: 'users', iconBg: '#E6F4EA', iconColor: '#137333' },
+    { id: 'orders', label: 'Orders', icon: 'shopping-cart', iconBg: '#FFF7ED', iconColor: '#C2410C' },
 ];
 const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPress, onSectionPress, selectedCompany, isLoading, }) => {
     const colors = useThemeColors();
     const insets = useSafeAreaInsets();
+    const nav = useNavigation();
     const companyData = selectedCompany;
     const [localActiveSection, setLocalActiveSection] = useState(null);
     const activeSection = controlledActiveSection ?? localActiveSection;
@@ -27,6 +30,10 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         setLocalActiveSection(null);
     }
     function handleSectionPress(section) {
+        if (section === 'orders') {
+            nav.navigate('YourOrder', { companyName: companyData?.name, selectedState: companyData?.state, orderId: companyData?.orderId });
+            return;
+        }
         if (onSectionPress) {
             onSectionPress(section);
             return;
@@ -57,6 +64,13 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
                 return <CompanyInfo companyData={companyData}/>;
             case 'shareholders':
                 return <ShareHolders companyId={companyData.id}/>;
+            case 'orders':
+                return (
+                  <View style={{ padding: 16, alignItems: 'center' }}>
+                    <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>Orders</Text>
+                    <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>No orders yet</Text>
+                  </View>
+                );
             default:
                 return null;
         }
@@ -74,7 +88,9 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
             ? 'Company Information'
             : activeSection === 'shareholders'
                 ? 'Shareholders'
-                : 'Company Info'}
+                : activeSection === 'orders'
+                    ? 'Orders'
+                    : 'Company Info'} 
           </Text>
         </View>
       </View>
@@ -133,13 +149,10 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
                   <FontAwesome name={item.icon} size={16} color={colors.mode === 'dark' ? '#93C5FD' : item.iconColor}/>
                 </View>
 
-                {/* Label */}
-                <Text style={[styles.menuLabel, { color: colors.text }]}>
+                {/* Label - short text */}
+                <Text style={[styles.menuLabel, { color: colors.text }]} numberOfLines={1}>
                   {item.label}
                 </Text>
-
-                {/* Arrow Right */}
-                <FontAwesome name="angle-right" size={20} color={colors.muted}/>
               </TouchableOpacity>))}
           </View>)}
       </ScrollView>

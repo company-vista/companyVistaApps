@@ -211,11 +211,11 @@ export default function TransactionsScreen() {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Success':
-                return '#16a34a'; // ग्रीन कलर फॉर सक्सेस
+                return '#fff'; // ग्रीन कलर फॉर सक्सेस
             case 'Pending':
-                return '#ca8a04'; // येलो कलर फॉर पेंडिंग
+                return '#fff'; // येलो कलर फॉर पेंडिंग
             case 'Failed':
-                return '#dc2626'; // रेड कलर फॉर फ़ील्ड
+                return '#fff'; // रेड कलर फॉर फ़ील्ड
             default:
                 return '#2563eb';
         }
@@ -223,13 +223,13 @@ export default function TransactionsScreen() {
     const getStatusBg = (status) => {
         switch (status) {
             case 'Success':
-                return '#f0fdf4';
+                return '#16a34a';
             case 'Pending':
-                return '#fef9c3';
+                return '#ca8a04';
             case 'Failed':
                 return '#fef2f2';
             default:
-                return '#ebf8ff';
+                return '#dc2626';
         }
     };
     if (selectedTransaction && selectedTransaction.details) {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 20,
     },
-    statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+    statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, marginTop: 4 },
     statusText: { fontSize: font.xs, fontWeight: '800' },
     emptyContainer: {
         padding: 40,

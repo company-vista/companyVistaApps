@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     shadowColor: '#3B82F6',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowRadius: 10, 
     // elevation: 3,
   },
   tealCardBorder: {

@@ -10,6 +10,6 @@ export const font = {
     title: s(17), // 17
     heading: s(17), // 17
     hero: s(20),
-    display: s(22),
+    display: s(20),
     large: s(22),
 };

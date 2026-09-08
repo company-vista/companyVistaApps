@@ -7,7 +7,8 @@ import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, selectedCompany, }) {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
-  const heroCompanyName = capitalizeCompanyName(selectedCompany?.name) ?? (isLoadingCompanies ? 'Loading company...' : 'No company available');
+  const hasCompany = !!selectedCompany;
+  const heroCompanyName = hasCompany ? (capitalizeCompanyName(selectedCompany?.name) ?? selectedCompany?.name) : (isLoadingCompanies ? 'Loading company...' : 'Register Company Now');
   const heroCompanyCountry = selectedCompany?.countryOfIncorporation ?? (isLoadingCompanies ? 'Fetching profile' : 'Company profile');
   const heroCompanyEin = selectedCompany?.ein ?? 'Not available';
   const heroCompanyFormationDate = selectedCompany?.formationDate ?? 'Not available';
@@ -48,12 +49,12 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
       <View style={{ flex: 1 }} />
       <Text style={[styles.heroAdded, heroMetaStyle]}>Created: {heroCompanyDate}</Text>
     </View>
-    <Pressable onPress={onCompanySwitcherPress} style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
+    <Pressable onPress={hasCompany ? onCompanySwitcherPress : (onAddToCompanyPress ?? onCompanySwitcherPress)} style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
       <Text numberOfLines={1} style={[styles.heroCompany, heroCompanyStyle]}>
-        {capitalizeCompanyName(heroCompanyName)}
+        {hasCompany ? capitalizeCompanyName(heroCompanyName) : heroCompanyName}
       </Text>
       <View style={[styles.heroSwitchIcon, heroSwitchIconStyle]}>
-        <FontAwesome name="exchange" size={14} color={isLight ? colors.text : '#ffffff'} />
+        <FontAwesome name={hasCompany || isLoadingCompanies ? "exchange" : "plus"} size={14} color={isLight ? colors.text : '#ffffff'} />
       </View>
     </Pressable>
     <View style={styles.heroMetaRow}>
@@ -80,12 +81,24 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     </View>
     <View style={styles.heroStats}>
 
-      <Pressable onPress={onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#EFF6FF' : 'rgba(37,99,235,0.18)' }]}>
-          <FontAwesome name="plus" size={14} color={isLight ? '#2563eb' : '#60A5FA'} />
-        </View>
-        <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Add</Text>
-        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
+      <Pressable onPress={hasCompany ? onCompanyInfoPress : onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
+        {hasCompany ? (
+          <>
+            <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FEF3C7' : 'rgba(249,197,106,0.18)' }]}>
+              <FontAwesome name="clock-o" size={14} color={isLight ? '#B45309' : '#F9C56A'} />
+            </View>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, { color: isLight ? '#B45309' : '#F9C56A' }]}>Pending</Text>
+            <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Status</Text>
+          </>
+        ) : (
+          <>
+            <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#EFF6FF' : 'rgba(37,99,235,0.18)' }]}>
+              <FontAwesome name="plus" size={14} color={isLight ? '#2563eb' : '#60A5FA'} />
+            </View>
+            <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Add</Text>
+            <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
+          </>
+        )}
       </Pressable>
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>

@@ -132,6 +132,18 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           companyName: displayCompanyName,
           companyLocation: `${selectedState} · ${selectedStructure}`,
           from: 'FounderDetails',
+          // onboarding params forward to ReviewAndConfirm after password set
+          selectedStructure,
+          selectedState,
+          selectedEnding,
+          selectedCountry: countryOfResidence,
+          selectedAddOns: route.params?.selectedAddOns,
+          addOnsTotal: route.params?.addOnsTotal,
+          runningTotal: route.params?.runningTotal,
+          fullName: fullName.trim(),
+          phone: phone.trim(),
+          countryOfResidence,
+          countryCode,
         });
       } else {
         const msg = result.payload?.errors?.email || result.payload?.message || 'Failed to send OTP';

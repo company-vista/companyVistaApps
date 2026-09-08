@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         alignItems: 'center',
     },
-    helpButtonText: {
+    helpButtonText: { 
         fontSize: font.lg,
         fontWeight: '600',
     },

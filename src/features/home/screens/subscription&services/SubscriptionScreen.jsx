@@ -28,13 +28,13 @@ const timelineIcons = {
 function TimelineRow({ item, colors }) {
     const overdue = item.status === 'overdue';
     const icon = timelineIcons[item.label] || 'clock-o';
-    return (<View style={[cTimelineItem, { backgroundColor: colors.surfaceAlt, borderColor: overdue ? '#e25c6b' : colors.border }]}>
+    return (<View style={[cTimelineItem, { backgroundColor: colors.surface, borderColor: overdue ? '#e25c6b' : colors.border }]}>
       <View style={[cTimelineIconBox, { backgroundColor: overdue ? 'rgba(226,92,107,0.12)' : 'rgba(230,168,42,0.12)' }]}>
         <FontAwesome name={icon} size={18} color={overdue ? '#e25c6b' : '#e6a82a'}/>
       </View>
       <View style={cTimelineContent}>
         <Text style={[cTimelineLabel, { color: colors.text }]} numberOfLines={1}>{item.label}</Text>
-        <Text style={overdue ? [cTimelineDueOverdue, { color: '#e25c6b' }] : [cTimelineDue, { color: colors.muted }]}>
+        <Text style={overdue ? [cTimelineDueOverdue, { color: colors.text }] : [cTimelineDue, { color: colors.muted }]}>
           {item.due}
         </Text>
       </View>
@@ -44,7 +44,7 @@ function CompanyCard({ company, colors }) {
     return (<View style={[cCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={cCardHeader}>
         <View style={cCardHeaderLeft}>
-          <View style={[cIconBox, { backgroundColor: colors.surfaceAlt }]}>
+          <View style={[cIconBox, { backgroundColor: colors.surface }]}>
             <Text style={cIconGlyph}>{'\u{1F3E2}'}</Text>
           </View>
           <View>
@@ -52,7 +52,7 @@ function CompanyCard({ company, colors }) {
             <Text style={[cCompanyPlan, { color: colors.muted }]}>{company.plan}</Text>
           </View>
         </View>
-        <View style={[cExpiredBadge, { backgroundColor: 'rgba(226,92,107,0.12)' }]}>
+        <View style={[cExpiredBadge, { backgroundColor: colors.surface }]}>
           <Text style={cExpiredBadgeText}>Expired</Text>
         </View>
       </View>

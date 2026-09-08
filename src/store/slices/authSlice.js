@@ -15,6 +15,7 @@ const initialState = {
     signupErrors: {},
     pendingAddCompany: false,
     redirectToLogin: false,
+    pendingOrderData: null,
 };
 async function saveAuthSession(session) {
     try {
@@ -164,6 +165,9 @@ const authSlice = createSlice({
         setPendingAddCompany(state, action) {
             state.pendingAddCompany = action.payload;
         },
+        setPendingOrderData(state, action) {
+            state.pendingOrderData = action.payload;
+        },
         setRedirectToLogin(state, action) {
             state.redirectToLogin = action.payload;
         },
@@ -234,6 +238,7 @@ const authSlice = createSlice({
                 state.loginErrors = {};
                 state.signupErrors = {};
                 state.pendingAddCompany = false;
+                state.pendingOrderData = null;
                 // keep redirectToLogin flag intact so AuthStack can read it
             })
             .addCase(deactivateAccountThunk.fulfilled, state => {
@@ -254,5 +259,5 @@ const authSlice = createSlice({
             });
     },
 });
-export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setRedirectToLogin } = authSlice.actions;
+export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, setRedirectToLogin } = authSlice.actions;
 export default authSlice.reducer;

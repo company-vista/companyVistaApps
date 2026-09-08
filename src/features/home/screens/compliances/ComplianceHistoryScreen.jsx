@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     statusBadge: {
-        borderRadius: 999,
+        borderRadius: 8,
         paddingHorizontal: 10,
         paddingVertical: 6,
     },

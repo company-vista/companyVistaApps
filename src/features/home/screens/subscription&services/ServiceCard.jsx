@@ -2,9 +2,10 @@ import React from 'react';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { font } from '../../../../theme/typography';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useThemeColors } from '../../../../theme/colors';
 
 const STATUS_META = {
-  pending: { label: 'Pending Review', icon: 'time-outline', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.12)', border: '#B45309' },
+  pending: { label: 'Pending Review', icon: 'time-outline', color: '#f59f0bb6', bg: 'rgba(245, 158, 11, 0.12)', border: '#B45309' },
   quoted: { label: 'Quote Ready', icon: 'document-text-outline', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
   paid: { label: 'Paid', icon: 'checkmark-circle', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)', border: '#059669' },
   'in-progress': { label: 'In Progress', icon: 'refresh', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
@@ -24,6 +25,7 @@ function ServiceCard({
   isLight,
 }) {
   const meta = STATUS_META[status] || STATUS_META.pending;
+  const colors = useThemeColors();
   return (
     <Pressable
       onPress={onPress}
@@ -31,7 +33,7 @@ function ServiceCard({
     >
       <View style={styles.topRow}>
         <View style={[styles.iconBox, isLight ? styles.iconBoxLight : styles.iconBoxDark]}>
-          <Ionicons name={icon} size={20} color="#F59E0B" />
+          <Ionicons name={icon} size={20} color={colors.primary} />
         </View>
 
         <View style={styles.titleWrap}>
@@ -39,12 +41,12 @@ function ServiceCard({
             {title}
           </Text>
           <Text style={[styles.subInfo, isLight ? styles.subLight : styles.subDark]} numberOfLines={1}>
-            <Ionicons name="business-outline" size={14} color="#6B7280" /> {companyName}
+            <Ionicons name="business-outline" size={14} color={colors.muted} /> {companyName}
           </Text>
         </View>
 
         <View style={styles.topRight}>
-        <View style={[styles.statusBadge, { backgroundColor: meta.bg, borderColor: meta.border }]}>
+        <View style={[styles.statusBadge, { backgroundColor: colors.surface, borderColor: meta.border }]}>
           <Ionicons name={meta.icon} size={12} color={meta.color} />
           <Text style={[styles.statusText, { color: meta.color }]}>{meta.label}</Text>
         </View>

@@ -37,6 +37,7 @@ const ComplianceCheckScreen = lazy(() => import('../features/home/screens/explor
 const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/DeactivateAccountScreen'));
 const DeleteAccountScreen = lazy(() => import('../features/settings/screens/DeleteAccountScreen'));
 const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
+const YourOrderScreen = lazy(() => import('../features/home/screens/YourOrderScreen'));
 
 const Stack = createNativeStackNavigator();
 
@@ -97,6 +98,7 @@ export default function MainStack() {
       <Stack.Screen name="DeactivateAccount" component={DeactivateAccountScreen} options={{ title: 'Deactivate Account' }}/>
       <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Delete Account' }}/>
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
+      <Stack.Screen name="YourOrder" component={YourOrderScreen} options={{ title: 'Your Order', headerShown: false }}/>
     </Stack.Navigator>
     </Suspense>);
 }

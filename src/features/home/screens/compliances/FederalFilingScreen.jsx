@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     submitButton: {
-        borderRadius: 18,
+        borderRadius: 24,
         paddingVertical: 16,
         alignItems: 'center',
         shadowOffset: { width: 0, height: 4 },

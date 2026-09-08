@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useThemeColors } from '../../../../theme/colors';
@@ -8,6 +8,8 @@ import { BackButton, ContinueButton } from '../../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { resetCompanyRegistration, setApplicantInfo } from '../../../../store/slices/companyRegistrationSlice';
 import { submitCompanyRegistration, updateCompanyRegistration } from '../../api/companyRegistrationApi';
+import { fetchClientProfile } from '../../../profile/api/clientProfileDetailsApi';
+import { updateProfileUser } from '../../../../store/slices/authSlice';
 export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplicant, onEditJurisdiction, onEditCompanyName, onEditOwnership, onEditAddress, onEditDirectors, onEditBusinessActivity, companyId }) {
     const handleEditJurisdiction = onEditJurisdiction ?? onEditCompanyName;
     const safeAreaInsets = useSafeAreaInsets();
@@ -26,14 +28,91 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
     const nameParts = (user?.name ?? '').split(' ');
     const userFirstName = user?.firstName ?? nameParts[0] ?? '';
     const userLastName = user?.lastName ?? nameParts.slice(1).join(' ') ?? '';
+    // helpers to extract signup fields from auth client (database)
+    const getUserCompanyName = () => user?.companyName ?? user?.company ?? user?.businessName ?? user?.legalName ?? user?.companies?.[0]?.companyName ?? '';
+    const getUserCountryOfResidence = () => user?.countryOfResidence ?? user?.registrationCountry ?? user?.country ?? user?.residenceCountry ?? user?.address?.country ?? '';
+    const getUserCountryCode = () => user?.countryCode ?? '';
+    const getUserPhone = () => user?.phone ?? user?.phoneNumber ?? user?.mobile ?? '';
+    const getUserState = () => user?.state ?? user?.stateOfIncorporation ?? '';
+
     const [firstName, setFirstName] = useState(reg.firstName || userFirstName);
     const [lastName, setLastName] = useState(reg.lastName || userLastName);
     const [email, setEmail] = useState(reg.email || user?.email || '');
-    const [phone, setPhone] = useState(reg.phone || user?.phone || user?.phoneNumber || user?.mobile || '');
-    const [companyNameVal, setCompanyNameVal] = useState(reg.companyName || '');
+    const [phone, setPhone] = useState(reg.phone || getUserPhone() || '');
+    const [countryCodeVal, setCountryCodeVal] = useState(getUserCountryCode() || '');
+    const [countryOfResidenceVal, setCountryOfResidenceVal] = useState(getUserCountryOfResidence() || '');
+    const [companyNameVal, setCompanyNameVal] = useState(reg.companyName || getUserCompanyName() || '');
     const [alternateNameVal, setAlternateNameVal] = useState(reg.alternateName || '');
-    const [countryName, setCountryName] = useState(reg.jurisdictionName || reg.jurisdiction || '');
-    const [stateName, setStateName] = useState(reg.stateOfIncorporation && reg.stateOfIncorporation !== '-- Select --' ? reg.stateOfIncorporation : '');
+    const [countryName, setCountryName] = useState(reg.jurisdictionName || reg.jurisdiction || getUserCountryOfResidence() || '');
+    const [stateName, setStateName] = useState(reg.stateOfIncorporation && reg.stateOfIncorporation !== '-- Select --' ? reg.stateOfIncorporation : getUserState() || '');
+    const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+    // Total cost logic same as FounderDetailsScreen
+    const entityTypeForPrice = reg.entityType && reg.entityType !== '-- Select --' ? reg.entityType : 'LLC';
+    const summaryPrice = entityTypeForPrice === 'LLC' ? '$299' : entityTypeForPrice === 'C-Corp' ? '$399' : '$299';
+    const totalCostLabel = `${summaryPrice} + $90 state fee`;
+    // Heading: dashboard pe dubara company banane par "Create New Company", first-time onboarding pe "Review & submit"
+    const isDashboardCreateMode = user?.isCompleteRegistration === true && !isEditing;
+
+    // Auto-fill from database (auth client) when user changes or on mount fetch latest profile
+    useEffect(() => {
+        if (user?.firstName || user?.name) {
+            const np = (user?.name ?? '').split(' ');
+            const f = user?.firstName ?? np[0] ?? '';
+            const l = user?.lastName ?? np.slice(1).join(' ') ?? '';
+            if (f && !reg.firstName) setFirstName(f);
+            if (l && !reg.lastName) setLastName(l);
+        }
+        if (user?.email && !reg.email) setEmail(user.email);
+        const up = getUserPhone();
+        if (up && !reg.phone) setPhone(up);
+        const cc = getUserCountryCode();
+        if (cc) setCountryCodeVal(cc);
+        const cr = getUserCountryOfResidence();
+        if (cr) {
+            setCountryOfResidenceVal(cr);
+            if (!reg.jurisdictionName && !reg.jurisdiction) setCountryName(cr);
+        }
+        const cn = getUserCompanyName();
+        if (cn && !reg.companyName) setCompanyNameVal(cn);
+        const st = getUserState();
+        if (st && (!reg.stateOfIncorporation || reg.stateOfIncorporation === '-- Select --')) setStateName(st);
+    }, [user]);
+
+    // Fetch fresh profile from DB (auth client) on mount - ensures latest signup data auto shown
+    useEffect(() => {
+        let mounted = true;
+        const loadProfile = async () => {
+            if (!token) return;
+            setIsLoadingProfile(true);
+            const res = await fetchClientProfile(token);
+            if (mounted && res.isSuccess && res.user) {
+                dispatch(updateProfileUser(res.user));
+                // sync form fields directly from fresh DB data
+                const fresh = res.user;
+                const np = (fresh?.name ?? '').split(' ');
+                const f = fresh?.firstName ?? np[0] ?? '';
+                const l = fresh?.lastName ?? np.slice(1).join(' ') ?? '';
+                if (f) setFirstName(prev => prev || f);
+                if (l) setLastName(prev => prev || l);
+                if (fresh?.email) setEmail(prev => prev || fresh.email);
+                const p = fresh?.phone ?? fresh?.phoneNumber ?? fresh?.mobile ?? '';
+                if (p) setPhone(prev => prev || p);
+                if (fresh?.countryCode) setCountryCodeVal(fresh.countryCode);
+                const crFresh = fresh?.countryOfResidence ?? fresh?.registrationCountry ?? fresh?.country ?? fresh?.residenceCountry ?? '';
+                if (crFresh) {
+                    setCountryOfResidenceVal(crFresh);
+                    setCountryName(prev => prev || crFresh);
+                }
+                const cnFresh = fresh?.companyName ?? fresh?.company ?? fresh?.businessName ?? '';
+                if (cnFresh) setCompanyNameVal(prev => prev || cnFresh);
+                const stFresh = fresh?.state ?? '';
+                if (stFresh) setStateName(prev => prev || stFresh);
+            }
+            if (mounted) setIsLoadingProfile(false);
+        };
+        loadProfile();
+        return () => { mounted = false; };
+    }, [token]);
     const handleSubmit = async () => {
         if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim() || !companyNameVal.trim() || !countryName.trim() || !stateName.trim()) {
             Toast.show({ type: 'error', text1: 'All fields required', text2: 'Please fill all fields including country and state' });
@@ -41,39 +120,22 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
         }
         dispatch(setApplicantInfo({ applicantType: reg.applicantType || 'owner', firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), phone: phone.trim() }));
         setIsSubmitting(true);
+        // Sirf form me jo fields dikh rahe hain wahi payload me bhejna hai - first/last ki jagah fullName + signature/date
         const payload = {
-            applicantType: reg.applicantType || 'owner',
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
+            fullName: `${firstName.trim()} ${lastName.trim()}`.trim(),
             email: email.trim(),
             phone: phone.trim(),
+            countryCode: countryCodeVal.trim(),
+            countryOfResidence: countryOfResidenceVal.trim(),
+            registrationCountry: countryOfResidenceVal.trim(),
             companyName: companyNameVal.trim(),
+            alternateCompanyName: alternateNameVal.trim(),
             countryOfIncorporation: countryName.trim(),
             jurisdictionName: countryName.trim(),
             stateOfRegistration: stateName.trim(),
-            companyType: reg.entityType,
-            alternateCompanyName: alternateNameVal.trim() || reg.alternateName,
-            ownershipType: reg.ownershipType,
-            holdingCompanies: reg.holdingCompanies,
-            hasLocalAddress: reg.hasAddress === 'yes',
-            localAddress: reg.localAddress,
-            hasLocalRepresentative: reg.hasAgent === 'yes',
-            agentDetails: reg.agentDetails,
-            agentAddress: reg.agentAddress,
-            directors: reg.directors,
-            companyWebsite: reg.website,
-            establishReason: reg.establishReason,
-            principalActivity: reg.principalActivity,
-            companyIntroduction: reg.briefIntroduction,
-            additionalInfo: reg.additionalInfo,
-            representativePhone: reg.phone,
+            signature: signature.trim(),
+            date: dateStr,
         };
-        if (reg.holdingFiles && reg.holdingFiles.length > 0) {
-            payload.holdingFiles = reg.holdingFiles;
-        }
-        if (reg.otherFiles && reg.otherFiles.length > 0) {
-            payload.otherFiles = reg.otherFiles;
-        }
         if (!token) {
             Toast.show({ type: 'error', text1: 'Session expired', text2: 'Please login again' });
             setIsSubmitting(false);
@@ -102,35 +164,57 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
         }
     };
     return (<View style={styles.screen}>
-      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: safeAreaInsets.top }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: Math.max(6, safeAreaInsets.top - 10) }]}>
         <BackButton onPress={onBackPress}/>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Review & <Text style={styles.titleAccent}>{isEditing ? 'update' : 'submit'}</Text></Text>
+        {isDashboardCreateMode ? (
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Create New <Text style={styles.titleAccent}>Company</Text></Text>
+        ) : (
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Review & <Text style={styles.titleAccent}>{isEditing ? 'update' : 'submit'}</Text></Text>
+        )}
       </View>
 
       <View style={styles.body}>
         <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Please fill your applicant details to continue.
+            {isDashboardCreateMode ? 'Add your new company details to continue.' : 'Please fill your applicant details to continue.'}
           </Text>
 
           <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.cardTitle, { color: '#e6a82a', marginBottom: 12 }]}>Applicant</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={[styles.cardTitle, { color: '#e6a82a' }]}>Applicant — Founder Details</Text>
+              {isLoadingProfile && <ActivityIndicator size="small" color="#e6a82a" />}
+            </View>
+
             <View style={{ marginBottom: 14 }}>
               <Text style={[styles.inputLabel, { color: colors.muted }]}>Full Name <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-                <TextInput style={[styles.input, { color: colors.text }]} value={`${firstName} ${lastName}`.trim()} onChangeText={(val) => { const parts = val.trim().split(/\s+/); setFirstName(parts[0] || ''); setLastName(parts.slice(1).join(' ') || ''); }} placeholder="Enter full name" placeholderTextColor={colors.inputPlaceholder} />
+                <TextInput style={[styles.input, { color: colors.text }]} value={`${firstName} ${lastName}`.trim()} onChangeText={(val) => { const parts = val.trim().split(/\s+/); setFirstName(parts[0] || ''); setLastName(parts.slice(1).join(' ') || ''); }} placeholder="Enter full name (as per passport)" placeholderTextColor={colors.inputPlaceholder} />
               </View>
             </View>
             <View style={{ marginBottom: 14 }}>
-              <Text style={[styles.inputLabel, { color: colors.muted }]}>Email <Text style={styles.required}>*</Text></Text>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Email Address <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput style={[styles.input, { color: colors.text }]} value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={colors.inputPlaceholder} keyboardType="email-address" autoCapitalize="none" />
               </View>
             </View>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+              <View style={{ flex: 0.45 }}>
+                <Text style={[styles.inputLabel, { color: colors.muted }]}>Country Code <Text style={styles.required}>*</Text></Text>
+                <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                  <TextInput style={[styles.input, { color: colors.text }]} value={countryCodeVal} onChangeText={setCountryCodeVal} placeholder="+91" placeholderTextColor={colors.inputPlaceholder} keyboardType="phone-pad" />
+                </View>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.inputLabel, { color: colors.muted }]}>Phone Number <Text style={styles.required}>*</Text></Text>
+                <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
+                  <TextInput style={[styles.input, { color: colors.text }]} value={phone} onChangeText={setPhone} placeholder="Phone number" placeholderTextColor={colors.inputPlaceholder} keyboardType="phone-pad" />
+                </View>
+              </View>
+            </View>
             <View style={{ marginBottom: 14 }}>
-              <Text style={[styles.inputLabel, { color: colors.muted }]}>Phone Number <Text style={styles.required}>*</Text></Text>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Country of Residence <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
-                <TextInput style={[styles.input, { color: colors.text }]} value={phone} onChangeText={setPhone} placeholder="Phone number" placeholderTextColor={colors.inputPlaceholder} keyboardType="phone-pad" />
+                <TextInput style={[styles.input, { color: colors.text }]} value={countryOfResidenceVal} onChangeText={(val) => { setCountryOfResidenceVal(val); setCountryName(val); }} placeholder="e.g. India" placeholderTextColor={colors.inputPlaceholder} />
               </View>
             </View>
             <View style={{ marginBottom: 14 }}>
@@ -146,7 +230,7 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
               </View>
             </View>
             <View style={{ marginBottom: 14 }}>
-              <Text style={[styles.inputLabel, { color: colors.muted }]}>Country Name <Text style={styles.required}>*</Text></Text>
+              <Text style={[styles.inputLabel, { color: colors.muted }]}>Country Name (Jurisdiction) <Text style={styles.required}>*</Text></Text>
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput style={[styles.input, { color: colors.text }]} value={countryName} onChangeText={setCountryName} placeholder="Enter country name" placeholderTextColor={colors.inputPlaceholder} />
               </View>
@@ -157,6 +241,18 @@ export default function ReviewSubmitScreen({ onBackPress, onSubmit, onEditApplic
                 <TextInput style={[styles.input, { color: colors.text }]} value={stateName} onChangeText={setStateName} placeholder="Enter state name" placeholderTextColor={colors.inputPlaceholder} />
               </View>
             </View>
+          </View>
+
+          {/* Total Cost Summary - same logic as FounderDetailsScreen */}
+          <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderColor: '#e6a82a', borderWidth: 0.8 }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View>
+                <Text style={[styles.inputLabel, { color: colors.muted, marginBottom: 2 }]}>TOTAL COST</Text>
+                <Text style={{ color: colors.muted, fontSize: font.xs }}>{companyNameVal || 'Your Company'} • {stateName || 'Delaware'} · {entityTypeForPrice}</Text>
+              </View>
+              <Text style={{ color: '#e6a82a', fontSize: font.md, fontWeight: '700' }}>{totalCostLabel}</Text>
+            </View>
+            <Text style={{ color: colors.muted, fontSize: font.xs, marginTop: 8 }}>No payment required now · Invoice auto-generated</Text>
           </View>
 
           <View style={[styles.declarationBox, { borderColor: '#e6a82a', backgroundColor: colors.surface }]}>
@@ -228,8 +324,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 8,
-        gap: 10,
+        paddingBottom: 6,
+        gap: 8,
         borderBottomWidth: 1,
     },
     headerTitle: {
@@ -261,6 +357,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: font.base,
         marginBottom: 10,
+        marginLeft: 6,
     },
     sectionCard: {
         borderWidth: 0.5,

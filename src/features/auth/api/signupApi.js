@@ -67,7 +67,7 @@ function getCookieToken(cookieHeader) {
     const tokenMatch = cookieHeader.match(/(?:^|;\s*)clientToken=([^;]+)/);
     return tokenMatch?.[1] ? decodeURIComponent(tokenMatch[1]) : '';
 }
-export async function handleSignupApi({ firstName, lastName, email, phoneNumber, countryCode, companyName, address, }) {
+export async function handleSignupApi({ firstName, lastName, email, phoneNumber, countryCode, companyName, address, registrationCountry, }) {
     const errors = {};
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
@@ -111,6 +111,7 @@ export async function handleSignupApi({ firstName, lastName, email, phoneNumber,
         };
     }
     try {
+        const addr = (address || registrationCountry || '').trim();
         const response = await axios.post(SIGNUP_STEP1_ROUTE, {
             firstName: trimmedFirstName,
             lastName: trimmedLastName,
@@ -118,7 +119,9 @@ export async function handleSignupApi({ firstName, lastName, email, phoneNumber,
             phoneNumber: trimmedPhone,
             countryCode,
             companyName,
-            address,
+            address: addr,
+            registrationCountry: addr,
+            countryOfResidence: addr,
         }, { timeout: API_REQUEST_TIMEOUT_MS });
         const token = findDeepValue(response.data, TOKEN_KEYS) || getHeaderToken(response.headers);
         const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);

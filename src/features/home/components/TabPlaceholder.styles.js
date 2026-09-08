@@ -156,7 +156,7 @@ export default StyleSheet.create({
     renewButton: {
         paddingHorizontal: 13,
         paddingVertical: 7,
-        borderRadius: 28,
+        borderRadius: 8,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

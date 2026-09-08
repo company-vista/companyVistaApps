@@ -161,7 +161,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
 
         {/* Action Buttons */}
         <View style={styles.authContainer}>
-          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8} onPress={() => navigation.navigate('CountrySelection')}>
+          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8} onPress={() => navigation.navigate('RegisterJurisdiction')}>
             <Text style={styles.primaryBtnText}>🏢   Start My Company   →</Text>
           </TouchableOpacity>
 

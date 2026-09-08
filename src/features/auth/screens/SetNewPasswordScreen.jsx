@@ -75,10 +75,31 @@ export default function SetNewPasswordScreen(props) {
         onPasswordSet();
       } else {
         dispatch(setPendingAddCompany(true));
-        if (navigation?.reset) {
-          navigation.reset({ index: 0, routes: [{ name: 'Login', params: { fromSignup: true, email } }] });
-        } else if (navigation?.navigate) {
-          navigation.navigate('Login', { fromSignup: true, email });
+        const from = route?.params?.from;
+        if (from === 'FounderDetails') {
+          // FounderDetails flow: after password -> ReviewAndConfirm
+          if (navigation?.navigate) {
+            navigation.navigate('ReviewAndConfirm', {
+              selectedStructure: route?.params?.selectedStructure,
+              selectedState: route?.params?.selectedState,
+              selectedEnding: route?.params?.selectedEnding,
+              selectedCountry: route?.params?.selectedCountry,
+              selectedAddOns: route?.params?.selectedAddOns,
+              addOnsTotal: route?.params?.addOnsTotal,
+              runningTotal: route?.params?.runningTotal,
+              companyName: route?.params?.companyName,
+              email,
+              fullName: route?.params?.fullName,
+              countryOfResidence: route?.params?.countryOfResidence,
+              phone: route?.params?.phone,
+            });
+          }
+        } else {
+          if (navigation?.reset) {
+            navigation.reset({ index: 0, routes: [{ name: 'Login', params: { fromSignup: true, email } }] });
+          } else if (navigation?.navigate) {
+            navigation.navigate('Login', { fromSignup: true, email });
+          }
         }
       }
     } catch (error) {

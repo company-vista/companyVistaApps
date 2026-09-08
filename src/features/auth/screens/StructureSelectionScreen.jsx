@@ -16,7 +16,7 @@ import logoR from '../../../assets/images/logoR.png';
 
 const StructureSelectionScreen = ({ navigation, route }) => {
   const { companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
-  const [selectedStructure, setSelectedStructure] = useState('LLC');
+  const [selectedStructure, setSelectedStructure] = useState(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -147,8 +147,15 @@ const StructureSelectionScreen = ({ navigation, route }) => {
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.continueBtn} activeOpacity={0.85} onPress={() => navigation.navigate('FounderDetails', { selectedStructure, companyName, selectedEnding, selectedState, selectedCountry })}>
-          <Text style={styles.continueBtnText}>Continue with {selectedItem?.title || 'LLC'}  →</Text>
+        <TouchableOpacity
+          style={[styles.continueBtn, !selectedStructure && styles.continueBtnDisabled]}
+          activeOpacity={0.85}
+          disabled={!selectedStructure}
+          onPress={() => navigation.navigate('WhatsIncluded', { selectedStructure, companyName, selectedEnding, selectedState, selectedCountry })}
+        >
+          <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
+            {selectedStructure ? `Continue with ${selectedItem.title}  →` : 'Select a structure to continue'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -211,5 +218,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
   continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: 14, alignItems: 'center' },
+  continueBtnDisabled: { backgroundColor: 'rgba(212,175,55,0.35)' },
   continueBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
+  continueBtnTextDisabled: { color: 'rgba(6,9,19,0.5)' },
 });

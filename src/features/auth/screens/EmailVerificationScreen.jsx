@@ -93,11 +93,29 @@ const VerifyEmailScreen = (props) => {
       if (token) {
         Toast.show({ type: 'success', text1: 'Verified', text2: 'Email verified successfully! Set your password.' });
         onOtpVerified?.({ token, clientId });
-        // Verify ke baad SetNewPasswordScreen open karo, password set ke baad Login par jayega
-        // Agar SignupScreen ke andar embedded hai (onOtpVerified prop), toh wahi handle karega
-        // Warna FounderDetails flow ke liye navigation se SetNewPassword par bhejo
+        // Verify ke baad SetNewPasswordScreen open karo
+        // Agar embedded hai (onOtpVerified prop), toh wahi handle karega
+        // Warna FounderDetails flow ke liye navigation se SetNewPassword par bhejo (with onboarding params)
         if (!onOtpVerified) {
-          navigation.navigate('SetNewPassword', { email, clientId, token });
+          navigation.navigate('SetNewPassword', {
+            email,
+            clientId,
+            token,
+            from: route?.params?.from,
+            selectedStructure: route?.params?.selectedStructure,
+            selectedState: route?.params?.selectedState,
+            selectedEnding: route?.params?.selectedEnding,
+            selectedCountry: route?.params?.selectedCountry,
+            selectedAddOns: route?.params?.selectedAddOns,
+            addOnsTotal: route?.params?.addOnsTotal,
+            runningTotal: route?.params?.runningTotal,
+            companyName: route?.params?.companyName,
+            companyLocation: route?.params?.companyLocation,
+            fullName: route?.params?.fullName,
+            phone: route?.params?.phone,
+            countryOfResidence: route?.params?.countryOfResidence,
+            countryCode: route?.params?.countryCode,
+          });
         }
       } else {
         Toast.show({ type: 'error', text1: 'Verification failed' });
