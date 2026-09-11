@@ -2,9 +2,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { font } from '../../../../theme/typography';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 
-function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, selectedCompany, }) {
+function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const hasCompany = !!selectedCompany;
@@ -81,24 +82,12 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     </View>
     <View style={styles.heroStats}>
 
-      <Pressable onPress={hasCompany ? onCompanyInfoPress : onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
-        {hasCompany ? (
-          <>
-            <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FEF3C7' : 'rgba(249,197,106,0.18)' }]}>
-              <FontAwesome name="clock-o" size={14} color={isLight ? '#B45309' : '#F9C56A'} />
-            </View>
-            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, { color: isLight ? '#B45309' : '#F9C56A' }]}>Pending</Text>
-            <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Status</Text>
-          </>
-        ) : (
-          <>
-            <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#EFF6FF' : 'rgba(37,99,235,0.18)' }]}>
-              <FontAwesome name="plus" size={14} color={isLight ? '#2563eb' : '#60A5FA'} />
-            </View>
-            <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Add</Text>
-            <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
-          </>
-        )}
+      <Pressable onPress={onOrderPress ?? onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
+        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FFF7ED' : 'rgba(249,115,22,0.18)' }]}>
+          <FontAwesome name="shopping-cart" size={14} color={isLight ? '#EA580C' : '#FB923C'} />
+        </View>
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Your</Text>
+        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Order</Text>
       </Pressable>
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>
@@ -122,7 +111,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 18,
     backgroundColor: '#0D2137',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingTop: 16,
     paddingBottom: 14,
     marginTop: -14,
@@ -161,7 +150,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
     borderRadius: 14,
     backgroundColor: 'transparent',
-    paddingHorizontal: 12,
+    paddingHorizontal: s(12),
     paddingVertical: 8,
   },
   heroSwitchIcon: {
@@ -212,7 +201,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.07)',
-    paddingHorizontal: 6,
+    paddingHorizontal: s(6),
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',

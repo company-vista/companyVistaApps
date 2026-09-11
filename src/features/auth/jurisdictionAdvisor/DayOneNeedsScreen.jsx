@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import { s } from '../../../theme/responsive';
 import {
   StyleSheet,
   Text,
@@ -147,7 +148,7 @@ export default function DayOneNeedsScreen({ navigation, route }) {
         })}
 
         {/* SECTION 2: PLANNED WITHIN 12 MONTHS */}
-        <View style={[styles.sectionHeader, { marginTop: 12 }]}>
+        <View style={[styles.sectionHeader, { marginTop: s(12) }]}>
           <Text style={styles.sectionTitle}>PLANNED WITHIN 12 MONTHS</Text>
           <View style={styles.sectionDivider} />
         </View>
@@ -208,15 +209,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0B0E17',
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 24,
+    gap: s(8),
+    paddingHorizontal: s(16),
+    paddingVertical: s(12),
+    marginTop: s(24),
   },
   iconButton: {
     width: 38,
@@ -243,36 +244,36 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 7,
     letterSpacing: 1.2,
-    marginTop: 1,
+    marginTop: s(1),
   },
   progressContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    marginTop: 4,
-    marginBottom: 20,
+    paddingHorizontal: s(16),
+    marginTop: s(4),
+    marginBottom: s(20),
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
   },
   progressStep: {
     flex: 1,
     height: 3,
     backgroundColor: '#1E2638',
-    marginHorizontal: 3,
+    marginHorizontal: s(3),
     borderRadius: 2,
   },
   progressActive: {
     backgroundColor: '#8B5CF6',
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: s(20),
+    paddingBottom: s(20),
   },
   questionStepText: {
     color: '#8B5CF6',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
-    marginBottom: 8,
+    marginBottom: s(8),
   },
   title: {
     fontSize: font.display,
@@ -288,21 +289,21 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#64748B',
-    marginTop: 8,
-    marginBottom: 20,
+    marginTop: s(8),
+    marginBottom: s(20),
     lineHeight: 18,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: s(16),
   },
   sectionTitle: {
     color: '#64748B',
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1.2,
-    marginRight: 12,
+    marginRight: s(12),
   },
   sectionDivider: {
     flex: 1,
@@ -316,8 +317,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#1E2638',
-    padding: 16,
-    marginBottom: 12,
+    padding: s(16),
+    marginBottom: s(12),
   },
   optionCardSelected: {
     borderColor: '#D1A253',
@@ -330,20 +331,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E2638',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: s(14),
   },
   optionIcon: {
     fontSize: 18,
   },
   textContainer: {
     flex: 1,
-    paddingRight: 8,
+    paddingRight: s(8),
   },
   optionTitle: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: s(4),
   },
   optionDescription: {
     color: '#64748B',
@@ -370,8 +371,8 @@ const styles = StyleSheet.create({
   },
   alwaysOnBadge: {
     backgroundColor: '#D1A253',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: s(8),
+    paddingVertical: s(4),
     borderRadius: 6,
   },
   alwaysOnText: {
@@ -381,9 +382,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   bottomContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 20,
+    paddingHorizontal: s(16),
+    paddingTop: s(12),
+    paddingBottom: s(20),
     backgroundColor: '#0B0E17',
   },
   submitButton: {

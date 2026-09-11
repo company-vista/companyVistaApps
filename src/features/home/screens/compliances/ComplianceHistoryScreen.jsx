@@ -8,6 +8,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
 import { formatDate } from '../../../../constants/dateFormatter';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { s } from '../../../../theme/responsive';
 const ComplianceHistoryScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     },
     statusBadge: {
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 6,
     },
     statusBadgeText: {

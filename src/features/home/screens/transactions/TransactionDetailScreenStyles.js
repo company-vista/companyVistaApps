@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { s } from "../../../../theme/responsive";
 import { font } from "../../../../theme/typography";
 export const styles = StyleSheet.create({
     screen: {
@@ -7,9 +8,9 @@ export const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 12,
-        gap: 16,
+        paddingHorizontal: s(20),
+        paddingBottom: s(12),
+        gap: s(16),
         justifyContent: 'space-between',
     },
     title: {
@@ -17,47 +18,47 @@ export const styles = StyleSheet.create({
         fontWeight: '500',
     },
     amountCard: {
-        padding: 32,
+        padding: s(32),
         borderRadius: 16,
         borderWidth: 1,
-        marginBottom: 24,
+        marginBottom: s(24),
         alignItems: 'center',
-        marginTop: 12,
+        marginTop: s(12),
     },
     amountLabel: {
         fontSize: font.base,
         fontWeight: '600',
-        marginBottom: 8,
+        marginBottom: s(8),
     },
     amountRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: s(8),
     },
     amountValue: {
         fontSize: font.display,
         fontWeight: '800',
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     amountBracket: {
         fontSize: font.base,
         fontWeight: '700',
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     statusBadge: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
+        paddingHorizontal: s(16),
+        paddingVertical: s(6),
         borderRadius: 8,
     },
     amountModeTag: {
         position: 'absolute',
-        right: 12,
-        bottom: 12,
+        right: s(12),
+        bottom: s(12),
         fontSize: font.sm,
         fontWeight: '700',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
+        paddingHorizontal: s(8),
+        paddingVertical: s(3),
         borderRadius: 6,
         overflow: 'hidden',
     },
@@ -66,23 +67,23 @@ export const styles = StyleSheet.create({
         fontWeight: '700',
     },
     section: {
-        marginBottom: 24,
+        marginBottom: s(24),
     },
     sectionTitle: {
         fontSize: font.lg,
         fontWeight: '700',
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     sectionCard: {
         borderRadius: 16,
         borderWidth: 1,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
     },
     detailRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: s(12),
         borderBottomWidth: 1,
     },
     detailLabel: {

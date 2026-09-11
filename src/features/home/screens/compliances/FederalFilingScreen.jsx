@@ -9,6 +9,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 export default function FederalTaxFiling() {
     const route = useRoute();
     const selectedAction = route.params?.selectedAction;
@@ -449,7 +450,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 18,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 12,
     },
     dropdownList: {
@@ -459,7 +460,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     dropdownItem: {
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 14,
         borderBottomWidth: 1,
     },
@@ -509,7 +510,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 8,
         marginTop: 6,
     },

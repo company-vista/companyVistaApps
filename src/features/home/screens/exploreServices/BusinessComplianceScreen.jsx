@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatPrice, getCategoryServices } from '../../../../constants/exploreServicesData';
+import { s } from '../../../../theme/responsive';
 import { ServiceCard } from './ServicesCard';
 const CATEGORY_NAME = 'Business Compliance & Regis.';
 const SERVICES = getCategoryServices(CATEGORY_NAME);
@@ -18,7 +19,7 @@ function BusinessComplianceScreen({ route }) {
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     list: {
         gap: 16,

@@ -9,6 +9,7 @@ import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import { font } from '../../../../theme/typography';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { s } from '../../../../theme/responsive';
 function StatBox({ icon, label, value, sub, colors }) {
     return (<View style={[cStatBox, { backgroundColor: colors.surfaceAlt }]}>
       <View style={cStatHeader}>
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 18,
+        paddingHorizontal: s(18),
         gap: 12,
     },
     headerArea: {
@@ -238,7 +239,7 @@ const cEyebrow = {
     alignSelf: 'flex-start',
     borderWidth: 0.5,
     borderRadius: 6,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 6,
     marginBottom: 10,
     marginTop: 8,
@@ -330,7 +331,7 @@ const cCompanyPlan = {
 };
 const cExpiredBadge = {
     borderRadius: 12,
-    paddingHorizontal: 9,
+    paddingHorizontal: s(9),
     paddingVertical: 3,
 };
 const cExpiredBadgeText = {
@@ -400,7 +401,7 @@ const cTimelineItem = {
     gap: 8,
     borderRadius: 10,
     paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingHorizontal: s(12),
     borderWidth: 1,
 };
 const cTimelineIconBox = {

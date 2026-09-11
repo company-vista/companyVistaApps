@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useState, useMemo } from 'react';
+import { Pressable, Text, View, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import styles from './HelpFeedbackScreen.styles';
+import { createStyles } from './HelpFeedbackScreen.styles';
 import AppInfoScreen from './AppInfoScreen';
 import SendFeedbackScreen from './SendFeedbackScreen';
 import { useThemeColors } from '../../../theme/colors';
+import { useResponsive } from '../../../hooks/useResponsive';
+
 const helpItems = [
     {
         icon: 'question-circle-o',
@@ -29,6 +31,8 @@ const helpItems = [
 function HelpFeedbackScreen() {
     const colors = useThemeColors();
     const navigation = useNavigation();
+    const { rs, rvs, rms, width, height, isLandscape } = useResponsive();
+    const styles = useMemo(() => createStyles({ rs, rvs, rms, width, height }), [rs, rvs, rms, width, height]);
     const [activePage, setActivePage] = useState('helpList');
     if (activePage === 'sendFeedback') {
         return <SendFeedbackScreen onBackPress={() => {
@@ -42,9 +46,12 @@ function HelpFeedbackScreen() {
             navigation.setOptions({ headerShown: true });
         }}/>;
     }
-    return (<View style={styles.screen}>
-      <View style={styles.list}>
-        {helpItems.map(item => (<Pressable key={item.title} onPress={() => {
+    return (
+    <View style={styles.screen}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        <View style={styles.list}>
+            {helpItems.map(item => (
+            <Pressable key={item.title} onPress={() => {
                 if (item.title === 'Send feedback') {
                     setActivePage('sendFeedback');
                     navigation.setOptions({ headerShown: false });
@@ -54,9 +61,9 @@ function HelpFeedbackScreen() {
                     setActivePage('appInfo');
                     navigation.setOptions({ headerShown: false });
                 }
-            }} style={styles.itemRow}>
+            }} style={({ pressed }) => [styles.itemRow, { backgroundColor: pressed ? colors.surface : 'transparent', opacity: pressed ? 0.9 : 1 }]}>
             <View style={styles.itemIcon}>
-              <FontAwesome name={item.icon} size={25} color={colors.muted}/>
+              <FontAwesome name={item.icon} size={rms(25)} color={colors.muted}/>
             </View>
             <View style={styles.itemCopy}>
               <Text style={[styles.itemTitle, { color: colors.text }]}>
@@ -66,9 +73,10 @@ function HelpFeedbackScreen() {
                   {item.subtitle}
                 </Text>) : null}
             </View>
-            <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
+            <FontAwesome name="angle-right" size={rms(22)} color={colors.subtle}/>
           </Pressable>))}
-      </View>
+        </View>
+      </ScrollView>
     </View>);
 }
 export default HelpFeedbackScreen;

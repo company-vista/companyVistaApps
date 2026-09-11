@@ -3,6 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { font } from '../../../../theme/typography';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 
 const AUTO_SLIDE_MS = 4000;
 const SLIDE_ANIMATION_MS = 300;
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     slide: {
         borderRadius: 10,
         borderWidth: 1,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 9,
     },
     alert: {
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     alertActionButton: {
         alignSelf: 'flex-start',
         borderRadius: 14,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 7,
         marginTop: 2,
     },

@@ -13,6 +13,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import logoR from '../../../assets/images/logoR.png';
 import BackButton from '../../../components/buttons/BackButton';
 import { Image } from 'react-native';
+import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 
 const BusinessServicesScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -20,6 +22,7 @@ const BusinessServicesScreen = ({ navigation }) => {
   const float1 = useRef(new Animated.Value(0)).current;
   const float2 = useRef(new Animated.Value(0)).current;
   const float3 = useRef(new Animated.Value(0)).current;
+  const colors = useThemeColors();
 
   useEffect(() => {
     Animated.parallel([
@@ -149,7 +152,7 @@ const BusinessServicesScreen = ({ navigation }) => {
             <View style={styles.dotInactive} />
           </View>
 
-          <TouchableOpacity style={styles.continueBtn} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
+          <TouchableOpacity style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
             <Text style={styles.continueBtnText}>Continue →</Text>
           </TouchableOpacity>
 
@@ -171,24 +174,24 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: s(24),
     paddingTop: -10,
-    paddingBottom: 40,
+    paddingBottom: s(40),
     justifyContent: 'center',
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 20, marginTop: 30 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(20), marginTop: s(30) },
   cardsContainer: {
-    marginBottom: 30,
-    marginTop: 35,
+    marginBottom: s(30),
+    marginTop: s(35),
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 28,
-    padding: 10,
-    marginBottom: 14,
+    padding: s(10),
+    marginBottom: s(14),
     borderWidth: 0.5,
   },
   goldCardBorder: {
@@ -221,49 +224,49 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: s(12),
   },
   goldIconBg: { backgroundColor: 'rgba(201, 168, 76, 0.15)' },
   blueIconBg: { backgroundColor: 'rgba(59, 130, 246, 0.15)' },
   tealIconBg: { backgroundColor: 'rgba(20, 184, 166, 0.15)' },
   cardTextContent: { flex: 1 },
   cardTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  cardSubtitle: { color: '#94A3B8', fontSize: 11, marginTop: 3 },
+  cardSubtitle: { color: '#94A3B8', fontSize: 11, marginTop: s(3) },
   greenBadge: {
     backgroundColor: 'rgba(34, 197, 94, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: s(10),
+    paddingVertical: s(5),
     borderRadius: 12,
-    marginRight: 8,
+    marginRight: s(8),
   },
   greenBadgeText: { color: '#4ADE80', fontSize: 11, fontWeight: '600' },
   blueBadge: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: s(10),
+    paddingVertical: s(5),
     borderRadius: 12,
-    marginRight: 8,
+    marginRight: s(8),
   },
   blueBadgeText: { color: '#60A5FA', fontSize: 11, fontWeight: '600' },
   tealBadge: {
     backgroundColor: 'rgba(20, 184, 166, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: s(10),
+    paddingVertical: s(5),
     borderRadius: 12,
-    marginRight: 8,
+    marginRight: s(8),
   },
   tealBadgeText: { color: '#2DD4BF', fontSize: 11, fontWeight: '600' },
   pillsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: s(12),
+    paddingVertical: s(8),
     borderWidth: 1,
   },
   pillText: { fontSize: 11, fontWeight: '500' },
@@ -273,58 +276,58 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(201, 168, 76, 0.08)',
     borderRadius: 12,
-    paddingVertical: 10,
+    paddingVertical: s(10),
     borderWidth: 1,
     borderColor: 'rgba(201, 168, 76, 0.3)',
-    marginTop: 8
+    marginTop: s(8)
   },
   bannerText: { color: '#CBD5E1', fontSize: 12, fontWeight: '500' },
-  contentSection: { marginTop: 24 },
-  sectionTagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  goldLine: { width: 16, height: 2, backgroundColor: '#C9A84C', marginRight: 8 },
+  contentSection: { marginTop: s(24) },
+  sectionTagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
+  goldLine: { width: 16, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
   sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
     lineHeight: 32,
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic' },
   description: {
     color: '#94A3B8',
     fontSize: 12,
     lineHeight: 22,
-    marginBottom: 30,
+    marginBottom: s(30),
   },
   paginationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: s(32),
   },
   dotInactive: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginRight: 6,
+    marginRight: s(6),
   },
   dashActive: {
     width: 24,
     height: 4,
     borderRadius: 2,
     backgroundColor: '#C9A84C',
-    marginRight: 6,
+    marginRight: s(6),
   },
   continueBtn: {
     backgroundColor: '#D4AF37',
     borderRadius: 25,
-    paddingVertical: 16,
+    paddingVertical: s(16),
     alignItems: 'center',
-    marginBottom: 16,
-    marginTop: 16,
+    marginBottom: s(16),
+    marginTop: s(16),
   },
   continueBtnText: { color: '#060913', fontSize: 16, fontWeight: 'bold' },
-  skipBtn: { alignItems: 'center', paddingVertical: 8, marginBottom: 16 },
+  skipBtn: { alignItems: 'center', paddingVertical: s(8), marginBottom: s(16) },
   skipText: { color: '#64748B', fontSize: 13 },
 });

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { s } from '../theme/responsive';
 const styles = StyleSheet.create({
     filterRow: {
         flexDirection: 'row',
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         marginTop: 16,
         minHeight: 620,
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
     },
     notificationRow: {
         flexDirection: 'row',

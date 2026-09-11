@@ -9,6 +9,7 @@ import { useThemeColors } from '../../../theme/colors';
 import { BackButton } from '../../../components/buttons';
 import { useAppSelector } from '../../../store/hooks';
 import { API_BASE_URL } from '../../../config/api';
+import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 const infoCards = [
     {
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingBottom: 12,
         gap: 12,
         borderBottomWidth: 1,
@@ -297,12 +298,12 @@ const styles = StyleSheet.create({
         gap: 6,
         borderWidth: 0.5,
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
     },
     inputWrapperPlain: {
         borderWidth: 0.5,
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
     },
     inputIcon: {
         fontSize: font.md,
@@ -318,7 +319,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderWidth: 0.5,
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 12,
     },
     dropdownText: {
@@ -340,7 +341,7 @@ const styles = StyleSheet.create({
     },
     modalOption: {
         paddingVertical: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
     },
     modalOptionText: {
         fontSize: font.md,

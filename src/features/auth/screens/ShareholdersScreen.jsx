@@ -22,6 +22,7 @@ import Toast from 'react-native-toast-message';
 import { useAppSelector } from '../../../store/hooks';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 const ShareholdersScreen = ({ navigation, route }) => {
   // signup ke time jo auth wala naam hai wahi dikhao (Redux user se), fallback route params
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingVertical: 12,
   },
   iconButton: {
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E293B',
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingVertical: 16,
   },
   titleSection: {
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
   },
   tagBadge: {
     backgroundColor: '#1E293B',
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 5,
     borderRadius: 8,
   },
@@ -417,7 +418,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
     borderColor: 'rgba(16, 185, 129, 0.3)',
     borderWidth: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 4,
     borderRadius: 8,
   },
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
   },
   kycBadge: {
     backgroundColor: 'rgba(234, 179, 8, 0.15)',
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 5,
     borderRadius: 8,
   },
@@ -489,11 +490,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: 8,
   },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: 20 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: s(20) },
   modalCard: { backgroundColor: '#0F172A', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   modalTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', marginBottom: 12 },
   modalLabel: { color: '#94A3B8', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 8 },
-  modalInputBox: { backgroundColor: '#070C15', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 12, height: 44, justifyContent: 'center' },
+  modalInputBox: { backgroundColor: '#070C15', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
   modalInput: { color: '#FFFFFF', fontSize: 14 },
   modalBtnRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   modalCancelBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },

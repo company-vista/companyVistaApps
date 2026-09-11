@@ -1,27 +1,28 @@
 import { StyleSheet } from 'react-native';
+import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
     container: {
-        padding: 14,
-        paddingBottom: 40,
-        gap: 14,
+        padding: s(14),
+        paddingBottom: s(40),
+        gap: s(14),
     },
     group: {
-        gap: 12,
+        gap: s(12),
     },
     sectionHeader: {
         fontSize: 17,
         fontWeight: '400',
         textTransform: 'capitalize',
         letterSpacing: 0.5,
-        marginLeft: 4,
+        marginLeft: s(4),
     },
     menuItem: {
         minHeight: 68,
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: s(16),
+        paddingVertical: s(12),
     },
     iconWrap: {
         width: 34,
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 17,
-        marginRight: 14,
+        marginRight: s(14),
     },
     copy: {
         flex: 1,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 12,
         fontWeight: '400',
-        marginTop: 4,
+        marginTop: s(4),
     },
 });
 export default styles;

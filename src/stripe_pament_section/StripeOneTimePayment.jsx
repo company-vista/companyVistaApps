@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { s } from '../theme/responsive';
 import { font } from '../theme/typography';
 import { API_BASE_URL } from '../config/api';
 import { useAppSelector } from '../store/hooks';
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 8,
         paddingVertical: 12,
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         borderRadius: 12,
         backgroundColor: '#10B981',
         shadowColor: '#059669',
@@ -270,15 +271,15 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     container: { flex: 1, backgroundColor: '#080E18' },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 34, paddingBottom: 16 },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(16), paddingTop: 34, paddingBottom: 16 },
     backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     headerTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-    scrollContent: { paddingHorizontal: 16, paddingBottom: 24, paddingTop: 10 },
+    scrollContent: { paddingHorizontal: s(16), paddingBottom: 24, paddingTop: 10 },
     card: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', padding: 20, alignItems: 'center', marginBottom: 16 },
     cardLabel: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8 },
     amountText: { color: '#D4AF37', fontSize: 32, fontWeight: '800', marginBottom: 6 },
     companyText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', marginBottom: 10, textAlign: 'center' },
     descText: { color: '#8E9BAE', fontSize: 12, lineHeight: 18, textAlign: 'center' },
-    secureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(16,185,129,0.08)', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)' },
+    secureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(16,185,129,0.08)', borderRadius: 10, paddingVertical: 10, paddingHorizontal: s(14), marginBottom: 20, borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)' },
     secureText: { color: '#10B981', fontSize: 12, fontWeight: '600' },
 });

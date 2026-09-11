@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { s } from "../../../theme/responsive";
 const styles = StyleSheet.create({
     container: {
         gap: 12,
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingVertical: 12,
     },
     iconWrap: {

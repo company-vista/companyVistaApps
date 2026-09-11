@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
+import { s } from '../../theme/responsive';
 import { useThemeColors } from '../../theme/colors';
 const { width } = Dimensions.get('window');
 const CompanyVistaReferral = () => {
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
         borderRadius: 44,
         paddingTop: 0,
         paddingBottom: 0,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         alignItems: 'center',
         justifyContent: 'space-between',
         margin: 4,

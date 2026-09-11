@@ -8,6 +8,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { findServiceBySlugOrName, formatPrice } from '../../../../constants/exploreServicesData';
 import { fetchMyServiceRequests } from './api/serviceRequestsHistoryApi';
 import ServiceCard from './ServiceCard';
+import { s } from '../../../../theme/responsive';
 
 const SERVICE_ICONS = {
   'CPA / Tax Consultation': 'chatbubbles-outline',
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerArea: {
-    paddingHorizontal: 20,
+    paddingHorizontal: s(20),
     paddingBottom: 12,
     marginBottom: 8,
   },
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
-    paddingHorizontal: 24,
+    paddingHorizontal: s(24),
   },
   stateText: {
     fontSize: font.base,

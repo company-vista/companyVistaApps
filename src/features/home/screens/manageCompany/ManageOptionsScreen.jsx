@@ -6,6 +6,7 @@ import AnimatedAppear from '../../../../components/AnimatedAppear';
 import { useThemeColors } from '../../../../theme/colors';
 import BackButton from '../../../../components/buttons/BackButton';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 const options = [
     {
         id: 'requestChange',
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
         paddingVertical: 8,
         borderBottomWidth: 1,
         gap: 8,

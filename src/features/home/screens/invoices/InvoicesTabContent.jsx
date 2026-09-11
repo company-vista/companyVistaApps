@@ -4,7 +4,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
+import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import { fetchInvoicesForCompany, selectHasLoadedInvoicesForCompany, selectInvoicesForCompany, } from '../../../../store/slices/invoicesSlice';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const HOME_HERO_COLORS = {
@@ -263,14 +265,11 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
             {!isLoading && errorMessage ? (<Text style={[styles.stateText, { color: colors.danger }]}>
                 {errorMessage}
             </Text>) : null}
-            {!isLoading && !errorMessage && !selectedCompany?.id ? (<Text style={[styles.stateText, { color: colors.muted }]}>
-                Please wait while we load invoices for your companies.
-            </Text>) : null}
+            {!isLoading && !errorMessage && !selectedCompany?.id ? (<View style={styles.emptyState}>
+                <DocumentNotFound subtitle="No invoices found for this company." />
+            </View>) : null}
             {!isLoading && !errorMessage && selectedCompany?.id && invoices.length === 0 ? (<View style={styles.emptyState}>
-                <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90 }} resizeMode="contain" />
-                <Text style={[styles.stateText, { color: colors.muted }]}>
-                    No invoices found for this company.
-                </Text>
+                <DocumentNotFound subtitle="No invoices found for this company." />
             </View>) : null}
             {!isLoading && invoices.map((invoice, index) => {
                 const statusColor = invoice.status === 'paid' ? '#16a34a' :
@@ -374,7 +373,7 @@ const getStyles = (colors) => {
             flex: 1,
             flexDirection: 'row',
             height: 50,
-            paddingHorizontal: 14,
+            paddingHorizontal: s(14),
         },
         searchInput: {
             color: palette.primaryText,
@@ -432,7 +431,7 @@ const getStyles = (colors) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             gap: 10,
-            paddingHorizontal: 14,
+            paddingHorizontal: s(14),
             paddingVertical: 10,
         },
         sortDropdownItemText: {
@@ -541,7 +540,7 @@ const getStyles = (colors) => {
         },
         statusPill: {
             borderRadius: 999,
-            paddingHorizontal: 15,
+            paddingHorizontal: s(15),
             paddingVertical: 6,
         },
         statusText: {

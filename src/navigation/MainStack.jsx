@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { s } from '../theme/responsive';
 import { useThemeColors } from '../theme/colors';
 import { font } from '../theme/typography';
 
@@ -37,7 +38,6 @@ const ComplianceCheckScreen = lazy(() => import('../features/home/screens/explor
 const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/DeactivateAccountScreen'));
 const DeleteAccountScreen = lazy(() => import('../features/settings/screens/DeleteAccountScreen'));
 const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
-const YourOrderScreen = lazy(() => import('../features/home/screens/YourOrderScreen'));
 
 const Stack = createNativeStackNavigator();
 
@@ -64,7 +64,7 @@ export default function MainStack() {
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="Profile" component={ProfileScreen} options={({ navigation }) => ({
         headerShown: false,
-        headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' }}>
+        headerRight: () => (<Pressable onPress={() => navigation.navigate('EditProfile')} style={{ paddingHorizontal: s(4), alignItems: 'center', justifyContent: 'center' }}>
           <FontAwesome name="pencil" size={17} color={colors.accent}/>
         </Pressable>),
       })}/>
@@ -98,7 +98,6 @@ export default function MainStack() {
       <Stack.Screen name="DeactivateAccount" component={DeactivateAccountScreen} options={{ title: 'Deactivate Account' }}/>
       <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Delete Account' }}/>
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
-      <Stack.Screen name="YourOrder" component={YourOrderScreen} options={{ title: 'Your Order', headerShown: false }}/>
     </Stack.Navigator>
     </Suspense>);
 }

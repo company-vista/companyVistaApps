@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
 const STATUS_STEPS = {
     standard: [
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingBottom: 12,
         gap: 12,
         borderBottomWidth: 1,
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
     },
     retryButton: {
         marginTop: 16,
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         paddingVertical: 10,
         borderRadius: 8,
     },
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     badge: {
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 2,
         borderRadius: 6,
         borderWidth: 1,
@@ -449,7 +450,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     timeBadge: {
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 4,
         borderRadius: 20,
     },

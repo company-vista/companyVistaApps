@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,8 +10,11 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function Compliance() {
+  const { rs, rvs, rms, width, height } = useResponsive();
+  const styles = useMemo(() => createStyles({ rs, rvs, rms, width, height }), [rs, rvs, rms, width, height]);
   const complianceActions = [
     {
       id: '1',
@@ -77,17 +80,17 @@ export default function Compliance() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.logoContainer}>
-            <Ionicons name="globe-outline" size={24} color="#1E3A8A" />
+            <Ionicons name="globe-outline" size={rs(24)} color="#1E3A8A" />
           </View>
           <Text style={styles.headerTitle}>Hi, Company vista</Text>
         </View>
 
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="search-outline" size={20} color="#1E293B" />
+            <Ionicons name="search-outline" size={rs(20)} color="#1E293B" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="notifications-outline" size={20} color="#1E293B" />
+            <Ionicons name="notifications-outline" size={rs(20)} color="#1E293B" />
             <View style={styles.badge}>
               <Text style={styles.badgeText}>4</Text>
             </View>
@@ -103,7 +106,7 @@ export default function Compliance() {
         {/* --- USER PROFILE CARD --- */}
         <View style={styles.userCard}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={22} color="#64748B" />
+            <Ionicons name="person" size={rs(22)} color="#64748B" />
             <View style={styles.onlineDot} />
           </View>
           <View style={styles.userInfo}>
@@ -130,13 +133,14 @@ export default function Compliance() {
         {/* --- SECTION TITLE --- */}
         <Text style={styles.sectionTitle}>COMPLIANCE ACTIONS</Text>
 
-        {/* --- ACTIONS LIST --- */}
+        {/* --- ACTIONS LIST - horizontal responsive: 2 columns on landscape --- */}
+        <View style={styles.actionsGrid}>
         {complianceActions.map((item) => (
           <View key={item.id} style={styles.actionCard}>
             <View style={styles.cardTopRow}>
               {/* Icon */}
               <View style={[styles.actionIcon, { backgroundColor: item.iconBg }]}>
-                <Ionicons name={item.iconName} size={22} color={item.iconColor} />
+                <Ionicons name={item.iconName} size={rs(22)} color={item.iconColor} />
               </View>
 
               {/* Details */}
@@ -145,7 +149,7 @@ export default function Compliance() {
                 <Text style={styles.actionSubtitle}>{item.subtitle}</Text>
 
                 <View style={styles.dateRow}>
-                  <Ionicons name="calendar-outline" size={14} color="#64748B" />
+                  <Ionicons name="calendar-outline" size={rs(14)} color="#64748B" />
                   <Text style={styles.dateText}>{item.date}</Text>
                 </View>
               </View>
@@ -157,7 +161,7 @@ export default function Compliance() {
                     {item.status}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#64748B" style={{ marginTop: 8 }} />
+                <Ionicons name="chevron-forward" size={rs(18)} color="#64748B" style={{ marginTop: rvs(8) }} />
               </View>
             </View>
 
@@ -169,32 +173,33 @@ export default function Compliance() {
             )}
           </View>
         ))}
+        </View>
       </ScrollView>
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home-outline" size={22} color="#64748B" />
+          <Ionicons name="home-outline" size={rs(22)} color="#64748B" />
           <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="checkbox-outline" size={22} color="#E05638" />
+          <Ionicons name="checkbox-outline" size={rs(22)} color="#E05638" />
           <Text style={[styles.navLabel, styles.navLabelActive]}>Compliance</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="document-text-outline" size={22} color="#64748B" />
+          <Ionicons name="document-text-outline" size={rs(22)} color="#64748B" />
           <Text style={styles.navLabel}>Invoice</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem}>
-          <Feather name="folder" size={22} color="#64748B" />
+          <Feather name="folder" size={rs(22)} color="#64748B" />
           <Text style={styles.navLabel}>Document</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="ellipsis-horizontal" size={22} color="#64748B" />
+          <Ionicons name="ellipsis-horizontal" size={rs(22)} color="#64748B" />
           <Text style={styles.navLabel}>More</Text>
         </TouchableOpacity>
       </View>
@@ -202,7 +207,13 @@ export default function Compliance() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ rs, rvs, rms, width, height }) {
+  const isLandscape = width > height;
+  const isTablet = width >= 768;
+  const isLargeLandscape = isLandscape && width >= 600;
+  const hPad = isTablet ? rs(24) : isLargeLandscape ? rs(20) : rs(16);
+
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
@@ -211,24 +222,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: hPad, // dynamic horizontal padding
+    paddingVertical: rvs(12),
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: rs(36),
+    height: rs(36),
+    borderRadius: rs(18),
     backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: rs(10),
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: rms(18),
     fontWeight: '700',
     color: '#0F172A',
   },
@@ -237,13 +248,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: rs(38),
+    height: rs(38),
+    borderRadius: rs(19),
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: rs(8),
     elevation: 1,
     shadowColor: '#000',
     shadowOpacity: 0.05,
@@ -251,42 +262,42 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
+    top: rvs(-2),
+    right: rs(-2),
     backgroundColor: '#DC2626',
-    borderRadius: 10,
-    width: 18,
-    height: 18,
+    borderRadius: rs(10),
+    width: rs(18),
+    height: rs(18),
     justifyContent: 'center',
     alignItems: 'center',
   },
   badgeText: {
     color: '#FFFFFF',
-    fontSize: 10,
+    fontSize: rms(10),
     fontWeight: 'bold',
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: hPad, // dynamic horizontal padding
+    paddingBottom: rvs(20),
   },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: rvs(12),
   },
   avatarContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: rs(44),
+    height: rs(44),
+    borderRadius: rs(22),
     backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   onlineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: rs(10),
+    height: rs(10),
+    borderRadius: rs(5),
     backgroundColor: '#16A34A',
     position: 'absolute',
     bottom: 0,
@@ -295,22 +306,23 @@ const styles = StyleSheet.create({
     borderColor: '#F8FAFC',
   },
   userInfo: {
-    marginLeft: 12,
+    marginLeft: rs(12),
   },
   userName: {
-    fontSize: 16,
+    fontSize: rms(16),
     fontWeight: '700',
     color: '#0F172A',
   },
   userEmail: {
-    fontSize: 13,
+    fontSize: rms(13),
     color: '#64748B',
   },
   healthCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
+    borderRadius: rs(12),
+    paddingHorizontal: rs(16), // dynamic horizontal padding
+    paddingVertical: rvs(16),
+    marginVertical: rvs(8),
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -318,47 +330,55 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: rvs(8),
   },
   healthTitle: {
-    fontSize: 14,
+    fontSize: rms(14),
     color: '#475569',
     fontWeight: '500',
   },
   healthPercentage: {
-    fontSize: 16,
+    fontSize: rms(16),
     fontWeight: '700',
     color: '#0F172A',
   },
   progressBarBackground: {
-    height: 8,
+    height: rvs(8),
     backgroundColor: '#F1F5F9',
-    borderRadius: 4,
+    borderRadius: rs(4),
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: rvs(10),
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: '#15803D',
-    borderRadius: 4,
+    borderRadius: rs(4),
   },
   healthSubtitle: {
-    fontSize: 12,
+    fontSize: rms(12),
     color: '#64748B',
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: rms(12),
     fontWeight: '700',
     color: '#334155',
     letterSpacing: 0.5,
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: rvs(16),
+    marginBottom: rvs(8),
+  },
+  actionsGrid: {
+    flexDirection: isLargeLandscape ? 'row' : 'column',
+    flexWrap: isLargeLandscape ? 'wrap' : 'nowrap',
+    gap: rs(12),
+    justifyContent: isLargeLandscape ? 'space-between' : 'flex-start',
   },
   actionCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: rs(12),
+    paddingHorizontal: rs(16), // dynamic horizontal padding
+    paddingVertical: rvs(16),
+    marginBottom: isLargeLandscape ? 0 : rvs(12),
+    width: isLargeLandscape ? '49%' : '100%',
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -367,65 +387,66 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   actionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: rs(40),
+    height: rs(40),
+    borderRadius: rs(20),
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: rs(12),
   },
   actionDetails: {
     flex: 1,
   },
   actionTitle: {
-    fontSize: 15,
+    fontSize: rms(15),
     fontWeight: '700',
     color: '#0F172A',
   },
   actionSubtitle: {
-    fontSize: 13,
+    fontSize: rms(13),
     color: '#64748B',
-    marginTop: 2,
+    marginTop: rvs(2),
   },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: rvs(6),
   },
   dateText: {
-    fontSize: 12,
+    fontSize: rms(12),
     color: '#64748B',
-    marginLeft: 4,
+    marginLeft: rs(4),
   },
   statusContainer: {
     alignItems: 'flex-end',
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: rs(10),
+    paddingVertical: rvs(4),
+    borderRadius: rs(12),
   },
   statusText: {
-    fontSize: 12,
+    fontSize: rms(12),
     fontWeight: '600',
   },
   actionButton: {
     backgroundColor: '#1D638F',
-    borderRadius: 20,
-    paddingVertical: 10,
+    borderRadius: rs(20),
+    paddingVertical: rvs(10),
     alignItems: 'center',
-    marginTop: 14,
+    marginTop: rvs(14),
   },
   actionButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: rms(14),
     fontWeight: '600',
   },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
+    paddingVertical: rvs(10),
+    paddingHorizontal: hPad, // dynamic horizontal padding
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
   },
@@ -433,12 +454,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navLabel: {
-    fontSize: 11,
+    fontSize: rms(11),
     color: '#64748B',
-    marginTop: 4,
+    marginTop: rvs(4),
   },
   navLabelActive: {
     color: '#E05638',
     fontWeight: '600',
   },
-});
+  });
+}

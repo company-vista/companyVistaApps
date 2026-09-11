@@ -9,6 +9,7 @@ import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 const STEPS = [
     { number: 1, title: 'Company selection', subtitle: 'Select the company for filing', status: 'done' },
     { number: 2, title: 'Fiscal year', subtitle: 'Choose the filing year', status: 'upcoming' },
@@ -508,7 +509,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 18,
         paddingVertical: 14,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         marginTop: 8,
     },
     selectFieldText: {
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         borderRadius: 18,
         paddingVertical: 20,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         alignItems: 'center',
     },
     uploadTitle: {
@@ -571,7 +572,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 18,
         paddingVertical: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -582,7 +583,7 @@ const styles = StyleSheet.create({
     },
     removeFileButton: {
         paddingVertical: 6,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         borderRadius: 8,
     },
     removeFileButtonText: {
@@ -651,14 +652,14 @@ const styles = StyleSheet.create({
     },
     dropdownItem: {
         paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
     },
     dropdownItemText: {
         fontSize: 13,
     },
     dropdownEmptyText: {
         paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         fontSize: 13,
     },
     submitButtonWrapper: {

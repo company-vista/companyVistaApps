@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import styles from '../screens/EditProfileScreen.styles';
 function getDateFromInput(value) {
     const date = value ? new Date(value) : new Date(2000, 0, 1);

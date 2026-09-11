@@ -1,6 +1,7 @@
 // TabPlaceholder.styles.ts में ये प्रॉपर्टीज सुनिश्चित करें:
 import { StyleSheet } from 'react-native';
 import { font } from '../../../theme/typography';
+import { s } from '../../../theme/responsive';
 export default StyleSheet.create({
     container: {
         paddingTop: 1,
@@ -132,7 +133,7 @@ export default StyleSheet.create({
         marginLeft: 4,
     },
     badgeWrap: {
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 8,
         borderRadius: 12,
         // marginLeft: 4,
@@ -145,7 +146,7 @@ export default StyleSheet.create({
     arrowIcon: {
         // backgroundColor: '#ece3e3a1',
         paddingVertical: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         borderRadius: 18,
         marginLeft: 6,
     },
@@ -154,7 +155,7 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
     renewButton: {
-        paddingHorizontal: 13,
+        paddingHorizontal: s(13),
         paddingVertical: 7,
         borderRadius: 8,
         flexDirection: 'row',

@@ -18,6 +18,7 @@ import {
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppSelector } from '../../../store/hooks';
+import { s } from '../../../theme/responsive';
 
 const RegistrationProgressScreen = ({ navigation, route }) => {
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, marginTop: 34 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingVertical: 16,
   },
   titleSection: {
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(234, 179, 8, 0.1)',
     borderColor: 'rgba(234, 179, 8, 0.3)',
     borderWidth: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 5,
     borderRadius: 12,
     marginTop: 8,
@@ -470,7 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 14,
+    paddingHorizontal: s(14),
     paddingVertical: 4,
     marginBottom: 20,
   },

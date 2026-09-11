@@ -15,7 +15,7 @@ const appTheme = {
 export default function RootStack() {
     const { isAuthenticated, redirectToLogin } = useAppSelector(state => state.auth);
     // Login ke baad sabhi authenticated users Main (HomeScreen) pe jayenge
-    // Dashboard block / ReviewSubmitScreen ka logic HomeScreen me handle hota hai (isCompleteRegistration === false pe auto-overlay)
+    // Dashboard block logic HomeScreen me handle hota hai (isCompleteRegistration === false pe auto-overlay)
     const canAccessDashboard = isAuthenticated;
     return (<NavigationContainer theme={appTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0f172a' } }}>

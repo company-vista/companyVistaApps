@@ -9,6 +9,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import ProfileDatePickerModal from '../components/ProfileDatePickerModal';
 import { uploadClientAvatar } from '../api/clientProfileAvatarApi';
 import { updateClientProfile } from '../api/clientProfileDetailsApi';
@@ -167,7 +168,7 @@ function EditProfileScreen() {
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
-            { paddingBottom: Math.max(safeAreaInsets.bottom, 24), paddingTop: safeAreaInsets.top + 12 },
+            { paddingBottom: Math.max(safeAreaInsets.bottom, s(24)), paddingTop: safeAreaInsets.top + s(12) },
         ]}>
             <View style={styles.titleRow}>
                 <BackButton onPress={() => navigation.goBack()}/>

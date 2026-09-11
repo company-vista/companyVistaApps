@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { deactivateAccountThunk } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 
 function DeactivateAccountScreen() {
@@ -98,14 +99,14 @@ function DeactivateAccountScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 14,
-        paddingBottom: 40,
-        gap: 14,
+        padding: s(14),
+        paddingBottom: s(40),
+        gap: s(14),
     },
     card: {
         borderWidth: 0.5,
         borderRadius: 14,
-        padding: 16,
+        padding: s(16),
     },
     iconContainer: {
         width: 52,
@@ -114,13 +115,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'center',
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     heading: {
         fontSize: font.xl,
         fontWeight: '600',
         textAlign: 'center',
-        marginBottom: 6,
+        marginBottom: s(6),
     },
     description: {
         fontSize: font.md,
@@ -129,32 +130,32 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: font.md,
-        marginBottom: 8,
+        marginBottom: s(8),
     },
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 0.5,
         borderRadius: 38,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
     },
     inputIcon: {
-        marginRight: 3,
-        marginLeft: 10,
+        marginRight: s(3),
+        marginLeft: s(10),
     },
     input: {
         flex: 1,
         fontSize: font.base,
-        paddingVertical: 16,
-        paddingHorizontal: 8,
+        paddingVertical: s(16),
+        paddingHorizontal: s(8),
     },
     deactivateBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: s(8),
         borderRadius: 38,
-        paddingVertical: 13,
+        paddingVertical: s(13),
     },
     deactivateBtnText: {
         color: '#fff',
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
         fontSize: font.md,
         fontWeight: '500',
         textAlign: 'center',
-        paddingVertical: 4,
+        paddingVertical: s(4),
     },
 });
 

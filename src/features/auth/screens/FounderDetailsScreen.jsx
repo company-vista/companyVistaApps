@@ -20,6 +20,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppDispatch } from '../../../store/hooks';
 import { signupUser } from '../../../store/slices/authSlice';
+import { s } from '../../../theme/responsive';
 
 const COUNTRIES = [
   { code: '+91', iso: 'IN', name: 'India' },
@@ -39,6 +40,25 @@ const COUNTRIES = [
 const FounderDetailsScreen = ({ navigation, route }) => {
   const dispatch = useAppDispatch();
   const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '' } = route.params || {};
+
+  useEffect(() => {
+    console.log('=== SIGNUP PAGE DATA (FounderDetails - FINAL) ===');
+    console.log('route.params FULL:', JSON.stringify(route.params, null, 2));
+    console.log('advisorFlow:', route.params?.advisorFlow);
+    console.log('selectedJurisdiction:', route.params?.selectedJurisdiction);
+    console.log('purpose:', route.params?.purpose);
+    console.log('customerLocation:', route.params?.customerLocation);
+    console.log('priorities:', route.params?.priorities);
+    console.log('dayOneNeeds:', route.params?.dayOneNeeds);
+    console.log('physicalPresence:', route.params?.physicalPresence);
+    console.log('usStatePriority:', route.params?.usStatePriority);
+    console.log('bestState:', route.params?.bestState);
+    console.log('selectedCountry:', route.params?.selectedCountry);
+    console.log('selectedState:', route.params?.selectedState);
+    console.log('selectedStructure:', route.params?.selectedStructure);
+    console.log('companyName:', route.params?.companyName);
+    console.log('SARA DATA SIGNUP TAK:', route.params);
+  }, []);
   const displayCompanyName = companyName ? `${companyName} ${selectedEnding || selectedStructure}` : `Your Company ${selectedStructure}`;
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -111,21 +131,35 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       const parts = fullName.trim().split(/\s+/);
       const firstName = parts[0] || '';
       const lastName = parts.slice(1).join(' ') || parts[0] || '';
-      const result = await dispatch(
-        signupUser({
-          firstName,
-          lastName,
-          email: email.trim(),
-          phoneNumber: phone.trim() || '0000000000',
-          countryCode,
-          companyName: displayCompanyName,
-          registrationCountry: countryOfResidence,
-        }),
-      );
+      const signupPayload = {
+        firstName,
+        lastName,
+        email: email.trim(),
+        phoneNumber: phone.trim() || '0000000000',
+        countryCode,
+        companyName: displayCompanyName,
+        registrationCountry: countryOfResidence,
+        // advisor data
+        advisorFlow: route.params?.advisorFlow,
+        selectedJurisdiction: route.params?.selectedJurisdiction,
+        purpose: route.params?.purpose,
+        customerLocation: route.params?.customerLocation,
+        priorities: route.params?.priorities,
+        dayOneNeeds: route.params?.dayOneNeeds,
+        physicalPresence: route.params?.physicalPresence,
+        usStatePriority: route.params?.usStatePriority,
+        bestState: route.params?.bestState,
+        selectedCountry: route.params?.selectedCountry,
+        selectedState: route.params?.selectedState,
+        selectedStructure: route.params?.selectedStructure,
+      };
+      console.log('=== SIGNUP API PAYLOAD ===', JSON.stringify(signupPayload, null, 2));
+      const result = await dispatch(signupUser(signupPayload));
       if (signupUser.fulfilled.match(result)) {
         const { token, clientId } = result.payload;
         Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}` });
         navigation.navigate('EmailVerification', {
+          ...(route.params || {}),
           email: email.trim(),
           signupToken: token,
           signupClientId: clientId,
@@ -157,6 +191,21 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   };
 
   const handleRegisterCompany = async () => {
+    console.log('=== FOUNDER DETAILS BUTTON CLICK ===');
+    console.log('route.params FULL:', JSON.stringify(route.params, null, 2));
+    console.log('advisorFlow:', route.params?.advisorFlow);
+    console.log('selectedJurisdiction:', route.params?.selectedJurisdiction);
+    console.log('purpose:', route.params?.purpose);
+    console.log('customerLocation:', route.params?.customerLocation);
+    console.log('priorities:', route.params?.priorities);
+    console.log('dayOneNeeds:', route.params?.dayOneNeeds);
+    console.log('physicalPresence:', route.params?.physicalPresence);
+    console.log('usStatePriority:', route.params?.usStatePriority);
+    console.log('bestState:', route.params?.bestState);
+    console.log('selectedCountry:', route.params?.selectedCountry);
+    console.log('selectedState:', route.params?.selectedState);
+    console.log('selectedStructure:', route.params?.selectedStructure);
+    console.log('companyName:', route.params?.companyName);
     // Agar email verified nahi hai to pehle OTP send / verification karwao (Verify button ka logic yahi shift ho gaya)
     if (!emailVerified) {
       await handleVerifyEmail();
@@ -421,112 +470,112 @@ export default FounderDetailsScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 24 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 34 },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: 6 },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: 16 },
+  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(16) },
   summaryCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 14,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: 14, marginBottom: 20,
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(20),
   },
-  summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
   usBadgeRow: { flexDirection: 'row', alignItems: 'center' },
-  countryCodeBadge: { color: '#64748B', fontSize: 11, fontWeight: 'bold', marginRight: 6 },
+  countryCodeBadge: { color: '#64748B', fontSize: 11, fontWeight: 'bold', marginRight: s(6) },
   summaryLabel: { color: '#64748B', fontSize: 11 },
   companyNameText: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
   summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   stateSubtitle: { color: '#64748B', fontSize: 11 },
   priceSummaryText: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, marginBottom: 6 },
-  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginTop: 6, marginBottom: 6 },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(6), marginBottom: s(6) },
+  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(6), marginBottom: s(6) },
   requiredAsterisk: { color: '#EF4444' },
   passportHint: { color: '#64748B', fontSize: 10 },
   inputContainerActive: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 12,
-    borderWidth: 1, borderColor: '#C9A84C', paddingHorizontal: 14, height: 48,
+    borderWidth: 1, borderColor: '#C9A84C', paddingHorizontal: s(14), height: 48,
   },
   inputContainerDefault: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', paddingHorizontal: 14, height: 48,
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', paddingHorizontal: s(14), height: 48,
   },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: 12,
-    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: 14, height: 48,
+    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
   },
   verifyRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginTop: 8, marginBottom: 12,
+    marginTop: s(8), marginBottom: s(12),
   },
-  verifyHint: { color: '#64748B', fontSize: 10, flex: 1, marginRight: 10 },
+  verifyHint: { color: '#64748B', fontSize: 10, flex: 1, marginRight: s(10) },
   verifyBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#C9A84C', paddingHorizontal: 14, paddingVertical: 7,
+    backgroundColor: '#C9A84C', paddingHorizontal: s(14), paddingVertical: s(7),
     borderRadius: 20, borderWidth: 1, borderColor: '#C9A84C',
   },
   verifyBtnDisabled: { backgroundColor: 'rgba(201,168,76,0.35)', borderColor: 'rgba(201,168,76,0.35)', opacity: 0.7 },
   verifyBtnText: { color: '#060913', fontSize: 12, fontWeight: '700' },
-  verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 12 },
+  verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(8), marginBottom: s(12) },
   verifiedText: { color: '#10B981', fontSize: 10, fontWeight: '600', flex: 1 },
   changeEmailText: { color: '#C9A84C', fontSize: 10, fontWeight: '700', textDecorationLine: 'underline' },
-  verifyWarning: { color: '#D97706', fontSize: 10, textAlign: 'center', marginBottom: 10, marginTop: -4 },
+  verifyWarning: { color: '#D97706', fontSize: 10, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
   dropdownInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 14, height: 48,
+    paddingHorizontal: s(14), height: 48,
   },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: 10 },
-  warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 12, gap: 6 },
+  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
+  warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(12), gap: 6 },
   warningText: { color: '#D97706', fontSize: 10 },
-  helperText: { color: '#64748B', fontSize: 10, marginTop: 6, marginBottom: 12 },
-  successRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 16, gap: 6 },
+  helperText: { color: '#64748B', fontSize: 10, marginTop: s(6), marginBottom: s(12) },
+  successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(16), gap: 6 },
   successText: { color: '#10B981', fontSize: 10 },
   phoneRow: { flexDirection: 'row', gap: 10 },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 12, height: 48, gap: 6,
+    paddingHorizontal: s(12), height: 48, gap: 6,
   },
   flagText: { color: '#64748B', fontSize: 10, fontWeight: 'bold' },
   codeText: { color: '#FFFFFF', fontSize: 13, fontWeight: 'bold' },
   phoneInputContainer: {
     flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 14, height: 48, justifyContent: 'center',
+    paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
   dropdownValueText: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500' },
-  checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 4, marginBottom: 20 },
+  checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: s(4), marginBottom: s(20) },
   checkbox: {
     width: 18, height: 18, borderRadius: 5, backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    alignItems: 'center', justifyContent: 'center', marginRight: 10, marginTop: 2,
+    alignItems: 'center', justifyContent: 'center', marginRight: s(10), marginTop: s(2),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
   checkboxText: { flex: 1, color: '#64748B', fontSize: 10, lineHeight: 15 },
   linkText: { color: '#C9A84C', fontWeight: 'bold' },
   primaryBtn: {
-    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: 14,
-    alignItems: 'center', marginBottom: 12,
+    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
+    alignItems: 'center', marginBottom: s(12),
   },
   primaryBtnDisabled: { backgroundColor: 'rgba(212, 175, 55, 0.3)' },
   primaryBtnText: { color: '#060913', fontSize: 15, fontWeight: 'bold' },
   footerSubtext: { color: '#64748B', fontSize: 10, textAlign: 'center' },
   goldText: { color: '#C9A84C' },
-  loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 16, marginBottom: 4 },
+  loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: s(16), marginBottom: s(4) },
   loginHint: { color: '#94A3B8', fontSize: 12 },
   loginLink: { color: '#C9A84C', fontSize: 12, fontWeight: '700', textDecorationLine: 'underline' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#111827', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  modalContent: { backgroundColor: '#111827', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   modalTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
-  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
+  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
   countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: 13 },
-  countryOptionCode: { color: '#94A3B8', fontSize: 12, marginRight: 6 },
+  countryOptionCode: { color: '#94A3B8', fontSize: 12, marginRight: s(6) },
 });

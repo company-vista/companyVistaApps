@@ -6,6 +6,7 @@ import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { getServiceCategories } from '../../../../constants/exploreServicesData';
+import { s } from '../../../../theme/responsive';
 const categoryItems = [
     {
         category: 'Tax & Accounting Services',
@@ -83,13 +84,13 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingBottom: 12,
         gap: 12,
         marginBottom: 20,
     },
     title: { fontSize: font.hero, fontWeight: '500' },
-    content: { paddingHorizontal: 20 },
+    content: { paddingHorizontal: s(20) },
     card: {
         flexDirection: 'row',
         alignItems: 'center',

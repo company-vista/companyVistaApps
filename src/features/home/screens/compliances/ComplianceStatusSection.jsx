@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { useResponsive } from '../../../../hooks/useResponsive';
+import { s } from '../../../../theme/responsive';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 import { font } from '../../../../theme/typography';
 function getToneStyles(tone, colors) {
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     },
     complianceTile: {
         borderRadius: 12,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 11,
     },
     complianceTileDark: {
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     },
     tag: {
         borderRadius: 20,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 3,
     },
     tagText: {
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     },
     statusPill: {
         borderRadius: 20,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 3,
     },
     statusPillText: {

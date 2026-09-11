@@ -1,4 +1,5 @@
-﻿import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { s } from '../../../theme/responsive';
 import {
   StyleSheet,
   Text,
@@ -97,9 +98,18 @@ export default function BestMatchesScreen({ navigation, route }) {
   }).sort((a, b) => b.score - a.score);
 
   const ranked = scored;
-  const best = ranked[0];
-  const strongAlts = ranked.slice(1, 4);
-  const alsoPossible = ranked.slice(4);
+  const [selectedBest, setSelectedBest] = useState(ranked[0]);
+
+  // jab ranking change ho (purpose/customer change pe) toh selected ko reset karo
+  useEffect(() => {
+    setSelectedBest(ranked[0]);
+  }, [purpose, customerLocation, priorities.join(','), dayOneNeeds.join(',')]);
+
+  const best = selectedBest;
+  // selected ko list se exclude karke baki dikhao
+  const remaining = ranked.filter(j => j.name !== best.name);
+  const strongAlts = remaining.slice(0, 3);
+  const alsoPossible = remaining.slice(3);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
@@ -200,7 +210,7 @@ export default function BestMatchesScreen({ navigation, route }) {
         </View>
 
         {strongAlts.map(item => (
-          <View key={item.name} style={styles.altCard}>
+          <TouchableOpacity key={item.name} style={styles.altCard} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
             <View style={styles.altLeft}>
               <Text style={styles.altFlag}>{item.flag}</Text>
               <View style={styles.altTextWrap}>
@@ -212,16 +222,16 @@ export default function BestMatchesScreen({ navigation, route }) {
               <Text style={styles.altMatch}>{item.match}</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
-        <View style={[styles.sectionHeader, { marginTop: 18 }]}>
+        <View style={[styles.sectionHeader, { marginTop: s(18) }]}>
           <Text style={styles.sectionTitle}>ALSO POSSIBLE</Text>
           <View style={styles.sectionDivider} />
         </View>
 
         {alsoPossible.map(item => (
-          <View key={item.name} style={[styles.altCard, styles.altCardSmall]}>
+          <TouchableOpacity key={item.name} style={[styles.altCard, styles.altCardSmall]} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
             <View style={styles.altLeft}>
               <Text style={[styles.altFlag, { fontSize: 20 }]}>{item.flag}</Text>
               <View style={styles.altTextWrap}>
@@ -233,7 +243,7 @@ export default function BestMatchesScreen({ navigation, route }) {
               <Text style={[styles.altMatch, { fontSize: 16 }]}>{item.match}</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
         <View style={styles.excludedCard}>
@@ -265,15 +275,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0B0E17',
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 24,
+    gap: s(8),
+    paddingHorizontal: s(16),
+    paddingVertical: s(12),
+    marginTop: s(24),
   },
   iconButton: {
     width: 38,
@@ -300,17 +310,17 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 7,
     letterSpacing: 1.2,
-    marginTop: 1,
+    marginTop: s(1),
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: s(16),
+    paddingBottom: s(20),
   },
   title: {
     fontSize: font.display,
     fontWeight: '500',
     color: '#FFFFFF',
-    marginTop: 8,
+    marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
@@ -320,19 +330,19 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#64748B',
-    marginTop: 6,
-    marginBottom: 16,
+    marginTop: s(6),
+    marginBottom: s(16),
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 20,
+    gap: s(8),
+    marginBottom: s(20),
   },
   tagPill: {
     backgroundColor: '#151329',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: s(12),
+    paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#2D264A',
@@ -351,8 +361,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#3D321D',
-    padding: 16,
-    marginBottom: 24,
+    padding: s(16),
+    marginBottom: s(24),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
@@ -360,9 +370,9 @@ const styles = StyleSheet.create({
     borderColor: '#D1A253',
     borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 16,
+    paddingHorizontal: s(10),
+    paddingVertical: s(4),
+    marginBottom: s(16),
   },
   badgeText: {
     color: '#D1A253',
@@ -373,9 +383,9 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: s(20),
   },
   cardHeaderLeft: {
     flexDirection: 'row',
@@ -385,7 +395,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#334155',
-    marginRight: 12,
+    marginRight: s(12),
   },
   countryName: {
     color: '#FFFFFF',
@@ -395,7 +405,7 @@ const styles = StyleSheet.create({
   stateSubtitle: {
     color: '#64748B',
     fontSize: 12,
-    marginTop: 2,
+    marginTop: s(2),
   },
   matchPercentageContainer: {
     alignItems: 'flex-end',
@@ -414,19 +424,19 @@ const styles = StyleSheet.create({
   featuresList: {
     borderTopWidth: 1,
     borderColor: '#1E2638',
-    paddingTop: 16,
-    marginBottom: 16,
+    paddingTop: s(16),
+    marginBottom: s(16),
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   checkIcon: {
     color: '#10B981',
     fontSize: 14,
-    marginRight: 10,
-    marginTop: 1,
+    marginRight: s(10),
+    marginTop: s(1),
   },
   featureText: {
     color: '#94A3B8',
@@ -444,12 +454,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3D321D',
-    padding: 12,
-    marginBottom: 16,
+    padding: s(12),
+    marginBottom: s(16),
   },
   warningIcon: {
     fontSize: 14,
-    marginRight: 8,
+    marginRight: s(8),
   },
   warningText: {
     color: '#94A3B8',
@@ -464,11 +474,11 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
     alignItems: 'flex-end',
     borderTopWidth: 1,
     borderColor: '#1E2638',
-    paddingTop: 14,
+    paddingTop: s(14),
   },
   priceContainer: {
     flexDirection: 'row',
@@ -478,7 +488,7 @@ const styles = StyleSheet.create({
     color: '#D1A253',
     fontSize: 20,
     fontWeight: 'bold',
-    marginRight: 8,
+    marginRight: s(8),
   },
   priceNote: {
     color: '#64748B',
@@ -497,7 +507,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1.2,
-    marginRight: 12,
+    marginRight: s(12),
   },
   sectionDivider: {
     flex: 1,
@@ -512,9 +522,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#1E2638',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginTop: 10,
+    paddingHorizontal: s(14),
+    paddingVertical: s(12),
+    marginTop: s(10),
   },
   altCardSmall: {
     backgroundColor: '#0F1420',
@@ -524,7 +534,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 10,
+    gap: s(10),
   },
   altFlag: {
     fontSize: 22,
@@ -540,12 +550,12 @@ const styles = StyleSheet.create({
   altDesc: {
     color: '#64748B',
     fontSize: 11,
-    marginTop: 2,
+    marginTop: s(2),
     lineHeight: 14,
   },
   altMatchWrap: {
     alignItems: 'flex-end',
-    marginLeft: 8,
+    marginLeft: s(8),
   },
   altMatch: {
     color: '#D1A253',
@@ -563,8 +573,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#2A2A2A',
-    padding: 12,
-    marginTop: 16,
+    padding: s(12),
+    marginTop: s(16),
   },
   excludedText: {
     color: '#94A3B8',
@@ -576,13 +586,13 @@ const styles = StyleSheet.create({
     color: '#475569',
     fontSize: 10,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: s(10),
     lineHeight: 14,
   },
   bottomContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 20,
+    paddingHorizontal: s(20),
+    paddingTop: s(12),
+    paddingBottom: s(20),
     backgroundColor: '#0B0E17',
   },
   actionButton: {
@@ -599,7 +609,7 @@ const styles = StyleSheet.create({
   },
   browseButton: {
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: s(12),
   },
   browseText: {
     color: '#64748B',

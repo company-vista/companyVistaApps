@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, onRegistrationTrackingPress, selectedCompany, }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
-        paddingHorizontal: 3,
+        paddingHorizontal: s(3),
         overflow: 'hidden',
     },
     iconContainer: {

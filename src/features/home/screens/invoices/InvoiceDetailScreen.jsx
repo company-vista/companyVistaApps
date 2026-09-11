@@ -13,6 +13,7 @@ import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTim
 import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOneTimePayment';
 import { buildInvoiceHtml } from './invoiceHtmlTemplate';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { s } from '../../../../theme/responsive';
 function getStringValue(...values) {
     const value = values.find(candidate => typeof candidate === 'string' && candidate.trim().length > 0);
     return typeof value === 'string' ? value.trim() : '';
@@ -318,7 +319,7 @@ function InvoiceDetailScreen() {
             const itemType = getStringValue(item.itemType) || 'ONE-TIME';
             return (<View key={index} style={styles.tableBodyRow}>
               <Text style={styles.tableRowIndex}>{index + 1}</Text>
-              <View style={{ flex: 1, paddingHorizontal: 8 }}>
+              <View style={{ flex: 1, paddingHorizontal: s(8) }}>
                 <View style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -487,7 +488,7 @@ const styles = StyleSheet.create({
     invoiceNumText: { color: '#94a3b8', fontSize: font.sm, marginTop: 2 },
     statusBadge: {
         borderRadius: 4,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 4,
         marginTop: 6,
     },
@@ -499,7 +500,7 @@ const styles = StyleSheet.create({
     },
     yellowDivider: { height: 4, backgroundColor: '#eab308' },
     detailsGrid: { padding: 16, backgroundColor: '#ffffff', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-    gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: 8, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, backgroundColor: '#fafafa' },
+    gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: s(8), borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, backgroundColor: '#fafafa' },
     columnLabel: {
         color: '#6d28d9',
         fontSize: font.sm,
@@ -527,7 +528,7 @@ const styles = StyleSheet.create({
     tableHeaderRow: {
         backgroundColor: '#231f4f',
         paddingVertical: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -535,7 +536,7 @@ const styles = StyleSheet.create({
     tableBodyRow: {
         flexDirection: 'row',
         paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
         backgroundColor: '#ffffff',
@@ -550,7 +551,7 @@ const styles = StyleSheet.create({
     itemTypeTag: {
         backgroundColor: '#14b8a6',
         borderRadius: 4,
-        paddingHorizontal: 5,
+        paddingHorizontal: s(5),
         paddingVertical: 1.5,
         marginRight: 6,
     },
@@ -617,7 +618,7 @@ const styles = StyleSheet.create({
     balanceStrip: {
         backgroundColor: '#1e1b4b',
         paddingVertical: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -650,7 +651,7 @@ const styles = StyleSheet.create({
     payButtonsRow: {
         flexDirection: 'row',
         gap: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingVertical: 14,
         backgroundColor: '#ffffff',
     },

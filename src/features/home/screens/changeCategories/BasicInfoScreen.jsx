@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import axios from 'axios'; // Ensure axios is installed
 import { BackButton } from '../../../../components/buttons';
+import { s as responsiveS } from '../../../../theme/responsive';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { API_BASE_URL } from '../../../../config/api';
@@ -336,7 +337,7 @@ const styles = (colors) => StyleSheet.create({
     },
     // Header
     header: {
-        paddingHorizontal: 14,
+        paddingHorizontal: responsiveS(14),
         paddingTop: 50,
         paddingBottom: 12,
         backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
@@ -380,7 +381,7 @@ const styles = (colors) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,
-        paddingHorizontal: 8,
+        paddingHorizontal: responsiveS(8),
         borderRadius: 12,
         borderWidth: 1.5,
         borderColor: colors.mode === 'dark' ? '#475569' : colors.border,
@@ -439,7 +440,7 @@ const styles = (colors) => StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: responsiveS(12),
         paddingVertical: 15,
         fontSize: font.md,
         color: colors.text,
@@ -522,7 +523,7 @@ const styles = (colors) => StyleSheet.create({
         backgroundColor: colors.primary,
         borderRadius: 24,
         paddingVertical: 12,
-        paddingHorizontal: 32,
+        paddingHorizontal: responsiveS(32),
         alignItems: 'center',
         shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },

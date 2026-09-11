@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/themeSlice';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import styles from './SettingsScreen.styles';
 const COMPANY_URL = 'https://www.companyvista.com/';
 const INVITE_MESSAGE = [

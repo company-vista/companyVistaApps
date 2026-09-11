@@ -3,6 +3,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { quickAccessItems } from '../../data/quickAccessItems';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 function QuickAccessSection({ onItemPress, onViewAllPress, }) {
     const colors = useThemeColors();
     const visibleItems = quickAccessItems.slice(0, 4);
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
         minHeight: 34,
         justifyContent: 'center',
         borderRadius: 17,
-        paddingHorizontal: 4,
+        paddingHorizontal: s(4),
     },
     viewAllText: {
         color: '#dc2626',

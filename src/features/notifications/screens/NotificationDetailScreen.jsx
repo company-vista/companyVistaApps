@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 function NotificationDetailScreen() {
     const navigation = useNavigation();
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     header: {
         flexDirection: 'row',
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
         paddingVertical: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         borderBottomWidth: 1,
     },
     dropdownOptionText: {
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         // backgroundColor: '#ffffff',
         marginTop: 24,
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingVertical: 24,
     },
     iconWrap: {

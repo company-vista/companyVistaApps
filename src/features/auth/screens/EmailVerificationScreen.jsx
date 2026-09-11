@@ -16,10 +16,14 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
 import { handleResendVerificationApi } from '../api/signupApi';
+import { s } from '../../../theme/responsive';
 
 const VerifyEmailScreen = (props) => {
   const { navigation, route } = props;
   const email = props.email || route?.params?.email || 'rajesh@meridianglobal.com';
+  useEffect(() => {
+    console.log('=== EMAIL VERIFY SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
+  }, []);
   const signupToken = props.signupToken || route?.params?.signupToken;
   const signupClientId = props.signupClientId || route?.params?.signupClientId;
   const onEditPress = props.onEditPress;
@@ -97,7 +101,7 @@ const VerifyEmailScreen = (props) => {
         // Agar embedded hai (onOtpVerified prop), toh wahi handle karega
         // Warna FounderDetails flow ke liye navigation se SetNewPassword par bhejo (with onboarding params)
         if (!onOtpVerified) {
-          navigation.navigate('SetNewPassword', {
+          const nextParams = {
             email,
             clientId,
             token,
@@ -115,7 +119,18 @@ const VerifyEmailScreen = (props) => {
             phone: route?.params?.phone,
             countryOfResidence: route?.params?.countryOfResidence,
             countryCode: route?.params?.countryCode,
-          });
+            advisorFlow: route?.params?.advisorFlow,
+            selectedJurisdiction: route?.params?.selectedJurisdiction,
+            purpose: route?.params?.purpose,
+            customerLocation: route?.params?.customerLocation,
+            priorities: route?.params?.priorities,
+            dayOneNeeds: route?.params?.dayOneNeeds,
+            physicalPresence: route?.params?.physicalPresence,
+            usStatePriority: route?.params?.usStatePriority,
+            bestState: route?.params?.bestState,
+          };
+          console.log('=== EMAIL VERIFY -> SET NEW PASSWORD DATA ===', JSON.stringify(nextParams, null, 2));
+          navigation.navigate('SetNewPassword', nextParams);
         }
       } else {
         Toast.show({ type: 'error', text1: 'Verification failed' });
@@ -298,14 +313,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: s(20),
+    paddingBottom: s(20),
     justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: s(10),
   },
   iconButton: {
     width: 40,
@@ -323,20 +338,20 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: s(5),
   },
   logoText: {
     color: '#E2E8F0',
     fontSize: 20,
     fontWeight: '700',
-    marginBottom: 15,
+    marginBottom: s(15),
   },
   logoAccent: {
     color: '#D4AF37',
   },
   outerCircle: {
-    width: 160,
-    height: 160,
+    width: 120,
+    height: 120,
     borderRadius: 80,
     borderWidth: 1,
     borderColor: '#1E293B',
@@ -344,8 +359,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkIconContainer: {
-    width: 75,
-    height: 75,
+    width: 62,
+    height: 62,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: '#D4AF37',
@@ -359,7 +374,7 @@ const styles = StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: s(12),
   },
   title: {
     color: '#FFFFFF',
@@ -375,7 +390,7 @@ const styles = StyleSheet.create({
   description: {
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: 6,
+    marginTop: s(6),
     fontSize: 13,
     lineHeight: 18,
   },
@@ -386,13 +401,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D4AF37',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginTop: 12,
+    paddingHorizontal: s(16),
+    paddingVertical: s(10),
+    marginTop: s(12),
   },
   chipIcon: {
     color: '#D4AF37',
-    marginRight: 8,
+    marginRight: s(8),
     fontSize: 14,
   },
   chipText: {
@@ -402,7 +417,7 @@ const styles = StyleSheet.create({
   },
   otpSection: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: s(10),
   },
   codeContainer: {
     flexDirection: 'row',
@@ -432,7 +447,7 @@ const styles = StyleSheet.create({
   },
   verifiedBadgeContainer: {
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: s(12),
   },
   verifiedBadge: {
     flexDirection: 'row',
@@ -441,13 +456,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#059669',
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: s(12),
+    paddingVertical: s(4),
   },
   badgeCheck: {
     color: '#10B981',
     fontSize: 12,
-    marginRight: 6,
+    marginRight: s(6),
   },
   verifiedText: {
     color: '#10B981',
@@ -457,7 +472,7 @@ const styles = StyleSheet.create({
   resendRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: s(12),
   },
   resendLabel: {
     color: '#64748B',
@@ -473,19 +488,19 @@ const styles = StyleSheet.create({
   },
   draftSection: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: s(10),
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: s(10),
   },
   draftLabel: {
     color: '#64748B',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
-    marginRight: 10,
+    marginRight: s(10),
   },
   line: {
     flex: 1,
@@ -497,8 +512,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1E293B',
     borderRadius: 12,
-    padding: 14,
-    marginBottom: 8,
+    padding: s(14),
+    marginBottom: s(8),
   },
   draftRow: {
     flexDirection: 'row',
@@ -506,7 +521,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   draftSubRow: {
-    marginTop: 6,
+    marginTop: s(6),
   },
   usTag: {
     color: '#64748B',
@@ -533,12 +548,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#05524C',
     borderRadius: 12,
-    padding: 12,
+    padding: s(12),
   },
   bannerCheck: {
     color: '#10B981',
     fontSize: 14,
-    marginRight: 10,
+    marginRight: s(10),
   },
   bannerText: {
     color: '#94A3B8',
@@ -547,13 +562,13 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   footer: {
-    marginTop: 15,
+    marginTop: s(15),
   },
   submitButton: {
     backgroundColor: '#D4AF37',
     width: '100%',
     height: 52,
-    borderRadius: 12,
+    borderRadius: 24,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -565,7 +580,7 @@ const styles = StyleSheet.create({
     color: '#070A12',
     fontSize: 16,
     fontWeight: '700',
-    marginRight: 8,
+    marginRight: s(8),
   },
   arrowIcon: {
     color: '#070A12',

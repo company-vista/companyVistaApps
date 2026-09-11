@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
     container: {
         gap: 14,
         marginBottom: 18,
-        paddingHorizontal: 6,
+        paddingHorizontal: s(6),
     },
     summaryCard: {
         backgroundColor: '#0D2137',
@@ -12,7 +13,7 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         minHeight: 108,
         overflow: 'hidden',
-        paddingHorizontal: 18,
+        paddingHorizontal: s(18),
         paddingVertical: 16,
     },
     summaryDeco: {
@@ -64,7 +65,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 5,
         marginTop: 8,
-        paddingHorizontal: 9,
+        paddingHorizontal: s(9),
         paddingVertical: 5,
     },
     primaryBadgeText: {
@@ -90,7 +91,7 @@ export const styles = StyleSheet.create({
     shareholderCard: {
         borderRadius: 8,
         borderWidth: 1,
-        paddingHorizontal: 15,
+        paddingHorizontal: s(15),
         paddingVertical: 15,
     },
     name: {
@@ -104,7 +105,7 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 14,
         marginTop: 6,
-        paddingHorizontal: 9,
+        paddingHorizontal: s(9),
         paddingVertical: 4,
     },
     roleText: {

@@ -14,12 +14,13 @@ import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 export default function WhatsIncludedScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
 
   const handleContinue = () => {
-    navigation.navigate('OptionalAddOns', { selectedStructure, companyName, selectedEnding, selectedState, selectedCountry });
+    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, companyName, selectedEnding, selectedState, selectedCountry });
   };
 
   const handleBack = () => {
@@ -207,11 +208,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 34,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    marginTop: s(34),
+    marginBottom: s(16),
+    paddingHorizontal: s(16),
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   iconButton: {
     width: 38,
     height: 38,
@@ -231,17 +232,17 @@ const styles = StyleSheet.create({
     color: '#D4AF37',
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: s(16),
+    paddingBottom: s(20),
   },
   titleContainer: {
-    marginVertical: 15,
+    marginVertical: s(15),
   },
   mainTitle: {
     fontSize: 28,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 8,
+    marginBottom: s(8),
   },
   italicTitle: {
     fontStyle: 'italic',
@@ -258,8 +259,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.2)',
-    padding: 16,
-    marginTop: 10,
+    padding: s(16),
+    marginTop: s(10),
   },
   packageHeader: {
     flexDirection: 'row',
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
   },
   packageTextContainer: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: s(12),
   },
   packageTitle: {
     color: '#FFFFFF',
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   packageSubtitle: {
     color: '#8E9BAE',
     fontSize: 12,
-    marginTop: 2,
+    marginTop: s(2),
   },
   valueContainer: {
     alignItems: 'flex-end',
@@ -303,12 +304,12 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    marginVertical: 14,
+    marginVertical: s(14),
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: s(16),
   },
   iconContainer: {
     width: 36,
@@ -317,12 +318,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: s(2),
   },
   itemTextContainer: {
     flex: 1,
-    marginLeft: 12,
-    marginRight: 8,
+    marginLeft: s(12),
+    marginRight: s(8),
   },
   titleBadgeRow: {
     flexDirection: 'row',
@@ -339,9 +340,9 @@ const styles = StyleSheet.create({
     borderColor: '#1E88E5',
     borderWidth: 1,
     borderRadius: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 6,
+    paddingHorizontal: s(6),
+    paddingVertical: s(2),
+    marginLeft: s(6),
   },
   badgeText: {
     color: '#64B5F6',
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
   itemDescription: {
     color: '#7C8BA1',
     fontSize: 12,
-    marginTop: 3,
+    marginTop: s(3),
     lineHeight: 16,
   },
   priceContainer: {
@@ -366,14 +367,14 @@ const styles = StyleSheet.create({
     color: '#00E676',
     fontSize: 12,
     fontWeight: '700',
-    marginTop: 1,
+    marginTop: s(1),
   },
   guaranteeRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   checkIconContainer: {
-    marginRight: 10,
+    marginRight: s(10),
   },
   guaranteeText: {
     color: '#8E9BAE',
@@ -388,13 +389,13 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: s(16),
   },
   statBox: {
     flex: 0.48,
     backgroundColor: '#0C1622',
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: s(14),
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
@@ -408,13 +409,13 @@ const styles = StyleSheet.create({
     color: '#6C7A8E',
     fontSize: 9,
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: s(4),
     letterSpacing: 0.5,
   },
   footerContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 16,
+    paddingHorizontal: s(16),
+    paddingTop: s(10),
+    paddingBottom: s(16),
     backgroundColor: '#080E18',
   },
   continueButton: {
@@ -429,12 +430,12 @@ const styles = StyleSheet.create({
     color: '#0A111D',
     fontSize: 16,
     fontWeight: '700',
-    marginRight: 8,
+    marginRight: s(8),
   },
   footerSubtext: {
     color: '#5B6B7C',
     fontSize: 12,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: s(10),
   },
 });

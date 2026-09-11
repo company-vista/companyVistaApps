@@ -1,14 +1,19 @@
-import { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View, } from 'react-native';
+import { useState, useMemo } from 'react';
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
-import styles from './HelpFeedbackScreen.styles';
+import { createStyles } from './HelpFeedbackScreen.styles';
+import { useResponsive } from '../../../hooks/useResponsive';
+
 export default function SendFeedbackScreen({ onBackPress }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const { rs, rvs, rms, width, height } = useResponsive();
+    const styles = useMemo(() => createStyles({ rs, rvs, rms, width, height }), [rs, rvs, rms, width, height]);
+    const isLandscape = width > height;
     const [feedback, setFeedback] = useState('');
     const [selectedMediaUri, setSelectedMediaUri] = useState(null);
     const canSend = feedback.trim().length > 0;
@@ -41,7 +46,8 @@ export default function SendFeedbackScreen({ onBackPress }) {
             Alert.alert('Gallery error', message);
         }
     };
-    return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
+    return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[
             styles.screen,
             {
                 paddingTop: safeAreaInsets.top,
@@ -57,58 +63,67 @@ export default function SendFeedbackScreen({ onBackPress }) {
         </Text>
       </View>
 
-      <View style={styles.feedbackContent}>
-        <Text style={[styles.feedbackHelpText, { color: colors.muted }]}>
-          For other issues like spam or scams, you can get help or contact
-          support from the{' '}
-          <Text style={[styles.linkText, { color: colors.accent }]}>
-            Help centre.
-          </Text>
-        </Text>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <View style={styles.feedbackContent}>
+            <Text style={[styles.feedbackHelpText, { color: colors.muted }]}>
+            For other issues like spam or scams, you can get help or contact
+            support from the{' '}
+            <Text style={[styles.linkText, { color: colors.accent }]}>
+                Help centre.
+            </Text>
+            </Text>
 
-        <TextInput multiline value={feedback} onChangeText={setFeedback} placeholder="Describe the technical issue" placeholderTextColor={colors.muted} style={[
-            styles.issueInput,
-            {
-                borderColor: colors.muted,
-                color: colors.text,
-                backgroundColor: colors.surface,
-            },
-        ]} textAlignVertical="top"/>
-
-        <View style={styles.mediaSection}>
-          <Text style={[styles.mediaTitle, { color: colors.text }]}>
-            Screenshots or recordings (optional)
-          </Text>
-          <Text style={[styles.mediaSubtitle, { color: colors.muted }]}>
-            Tap screenshot to edit or remove sensitive info
-          </Text>
-
-          <Pressable accessibilityRole="button" accessibilityLabel="Add screenshot or recording" onPress={handleAddMediaPress} style={[
-            styles.addMediaButton,
-            {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-            },
-        ]}>
-            {selectedMediaUri ? (<Image source={{ uri: selectedMediaUri }} style={styles.selectedMediaPreview}/>) : (<View>
-                <FontAwesome name="picture-o" size={27} color={colors.text}/>
-                <View style={[
-                styles.plusBadge,
-                {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.surface,
-                },
-            ]}>
-                  <FontAwesome name="plus" size={10} color={colors.text}/>
+            {/* Horizontal responsive: in landscape show input and media side-by-side */}
+            <View style={styles.feedbackBodyRow}>
+                <View style={styles.feedbackBodyLeft}>
+                    <TextInput multiline value={feedback} onChangeText={setFeedback} placeholder="Describe the technical issue" placeholderTextColor={colors.muted} style={[
+                        styles.issueInput,
+                        {
+                            borderColor: colors.muted,
+                            color: colors.text,
+                            backgroundColor: colors.surface,
+                        },
+                    ]} textAlignVertical="top"/>
                 </View>
-              </View>)}
-          </Pressable>
+
+                <View style={styles.feedbackBodyRight}>
+                    <View style={styles.mediaSection}>
+                    <Text style={[styles.mediaTitle, { color: colors.text }]}>
+                        Screenshots or recordings (optional)
+                    </Text>
+                    <Text style={[styles.mediaSubtitle, { color: colors.muted }]}>
+                        Tap screenshot to edit or remove sensitive info
+                    </Text>
+
+                    <Pressable accessibilityRole="button" accessibilityLabel="Add screenshot or recording" onPress={handleAddMediaPress} style={[
+                        styles.addMediaButton,
+                        {
+                            backgroundColor: colors.surface,
+                            borderColor: colors.border,
+                        },
+                    ]}>
+                        {selectedMediaUri ? (<Image source={{ uri: selectedMediaUri }} style={styles.selectedMediaPreview}/>) : (<View>
+                            <FontAwesome name="picture-o" size={rms(27)} color={colors.text}/>
+                            <View style={[
+                            styles.plusBadge,
+                            {
+                                backgroundColor: colors.surface,
+                                borderColor: colors.surface,
+                            },
+                        ]}>
+                            <FontAwesome name="plus" size={rms(10)} color={colors.text}/>
+                            </View>
+                        </View>)}
+                    </Pressable>
+                    </View>
+                </View>
+            </View>
         </View>
-      </View>
+      </ScrollView>
 
       <View style={[
             styles.footer,
-            { paddingBottom: Math.max(safeAreaInsets.bottom, 18) },
+            { paddingBottom: Math.max(safeAreaInsets.bottom, rvs(18)) },
         ]}>
         <Text style={[styles.footerText, { color: colors.muted }]}>
           By sending, you allow Vista to review related technical info to help

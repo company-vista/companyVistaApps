@@ -20,8 +20,13 @@ import Toast from 'react-native-toast-message';
 import { Linking, ActivityIndicator } from 'react-native';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
+import { savePaymentConfirmApi } from '../api/orderApi';
+import { s } from '../../../theme/responsive';
 
 export default function CompletePaymentScreen({ navigation, route }) {
+  React.useEffect(() => {
+    console.log('=== COMPLETE YOUR PAYMENT SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
+  }, []);
   const {
     selectedStructure = '',
     companyName = '',
@@ -66,8 +71,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
       if (!data?.url) throw new Error('Payment URL is missing');
       await Linking.openURL(data.url);
       Toast.show({ type: 'success', text1: 'Stripe checkout opened' });
-      // pehle Details Received dikhao, StatusScreen khud poll karke Payment Confirmed pe toggle karega
-      navigation.navigate('Status', {
+      const statusParams = {
         isPaid: false,
         referenceId: invoiceId,
         invoiceId: invoiceId,
@@ -88,7 +92,24 @@ export default function CompletePaymentScreen({ navigation, route }) {
         amountPaid: `$${amount}`,
         amount: amount,
         runningTotal: dueNow,
-      });
+        advisorFlow: route.params?.advisorFlow,
+        selectedJurisdiction: route.params?.selectedJurisdiction,
+        purpose: route.params?.purpose,
+        customerLocation: route.params?.customerLocation,
+        priorities: route.params?.priorities,
+        dayOneNeeds: route.params?.dayOneNeeds,
+        physicalPresence: route.params?.physicalPresence,
+        usStatePriority: route.params?.usStatePriority,
+        bestState: route.params?.bestState,
+        countryCode: route.params?.countryCode,
+        selectedAddOns,
+        addOnsTotal,
+      };
+      console.log('=== COMPLETE PAYMENT -> PAYMENT CONFIRM DATA ===', JSON.stringify(statusParams, null, 2));
+      // API 2: Payment confirm data alag API se save
+      await savePaymentConfirmApi(statusParams, token);
+      // pehle Details Received dikhao, StatusScreen khud poll karke Payment Confirmed pe toggle karega
+      navigation.navigate('Status', statusParams);
     } catch (e) {
       const msg = e?.response?.data?.message || e?.message || 'Unable to start Stripe payment';
       Toast.show({ type: 'error', text1: msg });
@@ -228,47 +249,47 @@ export default function CompletePaymentScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 34, marginBottom: 16, paddingHorizontal: 16 },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 20 },
-  titleContainer: { marginVertical: 10 },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: 4 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(34), marginBottom: s(16), paddingHorizontal: s(16) },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
+  titleContainer: { marginVertical: s(10) },
+  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
   subtitle: { color: '#8E9BAE', fontSize: 13 },
-  summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: 16, marginVertical: 12 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginVertical: s(12) },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(10) },
   summaryTitle: { color: '#8E9BAE', fontSize: 14 },
   summaryPrice: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: 10 },
-  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 2 },
+  summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: s(10) },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(2) },
   totalLabel: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
   totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginTop: 10, marginBottom: 12 },
-  sectionTitle: { color: '#6C7A8E', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginRight: 10 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginTop: s(10), marginBottom: s(12) },
+  sectionTitle: { color: '#6C7A8E', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
   sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  paymentCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: 14, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  paymentCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(10), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   selectedPaymentCard: { borderColor: '#D4AF37', backgroundColor: '#0E1A29' },
   paymentLeft: { flexDirection: 'row', alignItems: 'center' },
   cardLogoBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
   iconBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
   cryptoIconBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 152, 0, 0.1)', justifyContent: 'center', alignItems: 'center' },
-  paymentTextGroup: { marginLeft: 12 },
+  paymentTextGroup: { marginLeft: s(12) },
   paymentTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  paymentSubtext: { color: '#6C7A8E', fontSize: 11, marginTop: 2 },
+  paymentSubtext: { color: '#6C7A8E', fontSize: 11, marginTop: s(2) },
   radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: '#4A5768', justifyContent: 'center', alignItems: 'center' },
   radioOuterSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
-  cardInputSection: { marginTop: 10 },
-  inputLabel: { color: '#6C7A8E', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: 6 },
-  inputBox: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginBottom: 12 },
-  inputIcon: { marginRight: 8 },
+  cardInputSection: { marginTop: s(10) },
+  inputLabel: { color: '#6C7A8E', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: s(6) },
+  inputBox: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(12), marginBottom: s(12) },
+  inputIcon: { marginRight: s(8) },
   textInput: { flex: 1, color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   rowInputs: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   halfInputContainer: { flex: 1 },
-  securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: 10, flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  shieldIcon: { marginRight: 8 },
+  securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
+  shieldIcon: { marginRight: s(8) },
   securityText: { color: '#8E9BAE', fontSize: 11, flex: 1 },
-  footerContainer: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 16, backgroundColor: '#080E18' },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  lockIcon: { marginRight: 8 },
+  lockIcon: { marginRight: s(8) },
   payButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700' },
 });

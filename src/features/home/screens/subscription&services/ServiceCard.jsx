@@ -3,6 +3,7 @@ import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { font } from '../../../../theme/typography';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 
 const STATUS_META = {
   pending: { label: 'Pending Review', icon: 'time-outline', color: '#f59f0bb6', bg: 'rgba(245, 158, 11, 0.12)', border: '#B45309' },
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     borderWidth: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingVertical: 14,
     marginHorizontal: 12,
     marginVertical: 6,
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    paddingHorizontal: 8,
+    paddingHorizontal: s(8),
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,

@@ -7,6 +7,7 @@ import RNFetchBlob from 'react-native-blob-util';
 import Toast from 'react-native-toast-message';
 import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 import { styles } from './TransactionDetailScreenStyles';
 export default function TransactionDetailScreen({ transaction, onBackPress, }) {
     const safeAreaInsets = useSafeAreaInsets();
@@ -195,7 +196,7 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
     };
     return (<View style={styles.screen}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: safeAreaInsets.top + 8, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { paddingTop: safeAreaInsets.top + s(8), backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
         <BackButton onPress={onBackPress}/>
         <Text style={[styles.title, { color: colors.text }]}>Transaction Details</Text>
         <Pressable style={[styles.downloadButton, { backgroundColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#eef2ff', borderWidth: 1, borderColor: colors.border }]} onPress={handleDownload}>
@@ -204,8 +205,8 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
       </View>
 
       <ScrollView contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: safeAreaInsets.bottom + 24,
+            paddingHorizontal: s(20),
+            paddingBottom: safeAreaInsets.bottom + s(24),
         }} showsVerticalScrollIndicator={false}>
         {/* Amount Section */}
         <View style={[styles.amountCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>

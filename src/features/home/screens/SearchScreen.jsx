@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import { ScreenWrapper } from '../../../components/ScreenWrapper';
+import { s } from '../../../theme/responsive';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 16,
         marginBottom: 8,
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
         borderRadius: 28,
     },
     searchIcon: {
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
         fontSize: font.base,
         fontWeight: '600',
         letterSpacing: 0.5,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingTop: 20,
         paddingBottom: 8,
     },
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 14,
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
     },
     settingsIcon: {
         width: 33,

@@ -4,7 +4,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppSelector } from '../../../../store/hooks';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
+import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import { API_BASE } from '../../../../config/api';
 import axios from 'axios';
 import { fetchCompanyDocuments } from '../../api/clientDocumentApi';
@@ -236,8 +238,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
       {/* **************Registered / Locked / Unlocked tabs ************** */}
       <View style={styles.tabsRow}>
         <Pressable onPress={() => setActiveTab('registered')} style={[styles.tab, activeTab === 'registered' && styles.tabActive]}>
-          <FontAwesome name="file-text-o" size={12} color={activeTab === 'registered' ? palette.link : colors.muted} style={styles.tabIcon}/>
-          <Text style={[styles.tabText, activeTab === 'registered' && styles.tabTextActive]}>
+          <FontAwesome name="file-text-o" size={10} color={activeTab === 'registered' ? palette.link : colors.muted} style={styles.tabIcon}/>
+          <Text style={[styles.tabText, activeTab === 'registered' && styles.tabTextActive]} numberOfLines={1}>
             Company Docs
           </Text>
           <View style={[styles.tabCount, activeTab === 'registered' && styles.tabCountActive]}>
@@ -245,8 +247,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
           </View>
         </Pressable>
         <Pressable onPress={() => setActiveTab('locked')} style={[styles.tab, activeTab === 'locked' && styles.tabActive]}>
-          <FontAwesome name="lock" size={12} color={activeTab === 'locked' ? palette.link : colors.muted} style={styles.tabIcon}/>
-          <Text style={[styles.tabText, activeTab === 'locked' && styles.tabTextActive]}>
+          <FontAwesome name="lock" size={10} color={activeTab === 'locked' ? palette.link : colors.muted} style={styles.tabIcon}/>
+          <Text style={[styles.tabText, activeTab === 'locked' && styles.tabTextActive]} numberOfLines={1}>
             Locked
           </Text>
           <View style={[styles.tabCount, activeTab === 'locked' && styles.tabCountActive]}>
@@ -254,8 +256,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
           </View>
         </Pressable>
         <Pressable onPress={() => setActiveTab('unlocked')} style={[styles.tab, activeTab === 'unlocked' && styles.tabActive]}>
-          <FontAwesome name="unlock-alt" size={12} color={activeTab === 'unlocked' ? palette.link : colors.muted} style={styles.tabIcon}/>
-          <Text style={[styles.tabText, activeTab === 'unlocked' && styles.tabTextActive]}>
+          <FontAwesome name="unlock-alt" size={10} color={activeTab === 'unlocked' ? palette.link : colors.muted} style={styles.tabIcon}/>
+          <Text style={[styles.tabText, activeTab === 'unlocked' && styles.tabTextActive]} numberOfLines={1}>
             Unlocked
           </Text>
           <View style={[styles.tabCount, activeTab === 'unlocked' && styles.tabCountActive]}>
@@ -310,9 +312,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                 {lockedToShow.map((item, idx) => (<LockedDocumentCard key={item._id ?? `locked-${idx}`} item={item} idx={idx} selectedCompany={selectedCompany} colors={colors} onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}/>))}
               </>)}
 
-            {filteredDocuments.length === 0 && !hasLocked && (<View style={{ alignItems: 'center', marginTop: 90 }}>
-                <Image source={require('../../../../assets/images/not_found.png')} style={{ width: 90, height: 90, marginBottom: 12 }} resizeMode="contain"/>
-                <Text style={{ color: colors.muted }}>No documents found.</Text>
+            {filteredDocuments.length === 0 && !hasLocked && (<View style={{ alignItems: 'center', marginTop: 40 }}>
+                <DocumentNotFound subtitle="No documents found." />
               </View>)}
           </>)}
       </View>
@@ -351,7 +352,7 @@ const getStyles = (colors) => {
             alignItems: 'center',
             backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 28,
-            paddingHorizontal: 16,
+            paddingHorizontal: s(16),
             height: 50,
             marginBottom: 20,
             borderWidth: 1,
@@ -401,7 +402,7 @@ const getStyles = (colors) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 10,
-            paddingHorizontal: 14,
+            paddingHorizontal: s(14),
             paddingVertical: 10,
         },
         sortDropdownItemText: {
@@ -410,42 +411,62 @@ const getStyles = (colors) => {
         },
         tabsRow: {
             flexDirection: 'row',
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-            marginBottom: 16,
+            backgroundColor: colors.mode === 'dark' ? '#0F172A' : '#E8EEF5',
+            borderRadius: 999,
+            padding: 4,
+            gap: 4,
+            marginBottom: 18,
+            borderWidth: 1,
+            borderColor: colors.mode === 'dark' ? '#1E293B' : '#CBD5E1',
         },
         tab: {
             flex: 1,
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingVertical: 10,
-            flexDirection: 'row',
-            gap: 2,
+            paddingVertical: 9,
+            paddingHorizontal: s(6),
+            borderRadius: 999,
+            gap: 4,
+            minWidth: 0,
         },
         tabActive: {
-            borderBottomWidth: 2,
-            borderBottomColor: palette.link,
+            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#FFFFFF',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            elevation: 3,
+            borderWidth: 1,
+            borderColor: colors.mode === 'dark' ? '#334155' : '#E2E8F0',
         },
         tabText: {
-            fontSize: font.sm,
+            fontSize: 12,
             fontWeight: '600',
-            color: colors.muted,
+            color: colors.mode === 'dark' ? '#94A3B8' : '#475569',
+            letterSpacing: -0.1,
+            flexShrink: 1,
         },
         tabIcon: {
-            marginRight: 1,
+            marginRight: 0,
         },
         tabCount: {
-            minWidth: 20,
+            minWidth: 18,
             height: 18,
-            borderRadius: 9,
-            paddingHorizontal: 5,
-            marginLeft: 2,
+            borderRadius: 999,
+            paddingHorizontal: s(5),
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
+            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#FFFFFF',
+            borderWidth: 1,
+            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#E2E8F0',
         },
-        tabCountActive: {},
+        tabCountActive: {
+            backgroundColor: colors.mode === 'dark' ? 'rgba(250,199,117,0.18)' : '#FEF3C7',
+        },
         tabCountText: {
-            fontSize: font.xs,
+            fontSize: 10,
             fontWeight: '700',
             color: colors.muted,
         },
@@ -453,15 +474,15 @@ const getStyles = (colors) => {
             color: palette.link,
         },
         tabTextActive: {
-            color: palette.link,
-            fontWeight: '800',
+            color: colors.mode === 'dark' ? '#F8FAFC' : '#0F172A',
+            fontWeight: '700',
         },
         unlockAllBtn: {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             paddingVertical: 10,
-            paddingHorizontal: 14,
+            paddingHorizontal: s(14),
             borderRadius: 20,
         },
         unlockAllBtnText: {

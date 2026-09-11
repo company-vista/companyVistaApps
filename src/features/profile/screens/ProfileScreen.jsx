@@ -6,6 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { logoutUser, updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import BackButton from '../../../components/buttons/BackButton';
 import { fetchClientProfile } from '../api/clientProfileDetailsApi';
 import styles from './ProfileScreen.styles';
@@ -101,8 +102,8 @@ function ProfileScreen() {
     styles.scrollContent,
     {
       backgroundColor: colors.background,
-      paddingBottom: Math.max(safeAreaInsets.bottom, 24),
-      paddingTop: safeAreaInsets.top + 12,
+      paddingBottom: Math.max(safeAreaInsets.bottom, s(24)),
+      paddingTop: safeAreaInsets.top + s(12),
     },
   ]} style={styles.screen}>
 
@@ -111,7 +112,7 @@ function ProfileScreen() {
         <BackButton onPress={() => navigation.goBack()} />
         <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
       </View>
-      <Pressable onPress={() => navigation.navigate('EditProfile')} style={{ padding: 4 }} hitSlop={8}>
+      <Pressable onPress={() => navigation.navigate('EditProfile')} style={{ padding: s(4) }} hitSlop={8}>
         <FontAwesome name="pencil" size={17} color={colors.accent} />
       </Pressable>
     </View>
@@ -125,10 +126,10 @@ function ProfileScreen() {
           {profileImage ? (<Image onError={event => console.log('Profile avatar failed', event.nativeEvent.error, profileImage)} source={{ uri: profileImage }} style={styles.avatarImage} />) : (<FontAwesome name="user" size={42} color={colors.accent} />)}
         </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(8), marginTop: s(16) }}>
         <Text style={[styles.name, { color: colors.text, marginTop: 0, lineHeight: 30 }]}>{user?.name ?? 'N/A'}</Text>
         {filledCount === totalCount && (
-          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981', alignItems: 'center', justifyContent: 'center', marginTop: s(1) }}>
             <FontAwesome name="check" size={10} color="#FFF" />
           </View>
         )}
@@ -209,7 +210,7 @@ function ProfileScreen() {
           </View>
           <View style={styles.emailDropdownRight}>
             <Text style={styles.emailDropdownPrimaryLabel}>Primary</Text>
-            <FontAwesome name={isEmailDropdownOpen ? 'chevron-up' : 'chevron-down'} size={14} color={colors.muted} style={{ marginTop: 6 }} />
+            <FontAwesome name={isEmailDropdownOpen ? 'chevron-up' : 'chevron-down'} size={14} color={colors.muted} style={{ marginTop: s(6) }} />
           </View>
         </Pressable>
         {isEmailDropdownOpen && (<View style={[styles.emailDropdown, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>

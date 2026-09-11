@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { s } from '../../../../theme/responsive';
 const styles = StyleSheet.create({
     rewardCard: {
         minHeight: 154,
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         backgroundColor: '#ea580c',
         marginTop: 14,
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingVertical: 10,
     },
     enrollText: {

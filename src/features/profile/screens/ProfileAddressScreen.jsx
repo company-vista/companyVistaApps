@@ -7,6 +7,7 @@ import { SaveButton } from '../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import { updateClientProfile } from '../api/clientProfileDetailsApi';
 import styles from './EditProfileScreen.styles';
 function ProfileAddressScreen() {
@@ -85,7 +86,7 @@ function ProfileAddressScreen() {
     return (<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.screen}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
-            { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },
+            { paddingBottom: Math.max(safeAreaInsets.bottom, s(24)) },
         ]}>
             <View style={[styles.formCard, { backgroundColor: colors.cardHighlight }]}>
                 <AddressInput icon="map-marker" label="Street" onChangeText={setStreet} value={street} />

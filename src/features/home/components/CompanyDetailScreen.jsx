@@ -8,6 +8,8 @@ import { useThemeColors } from '../../../theme/colors';
 import BackButton from '../../../components/buttons/BackButton';
 import CompanyInfo from './companyInformationSection/CompanyInfo';
 import ShareHolders from './companyInformationSection/ShareHolders';
+import OrderDetailsScreen from './companyInformationSection/yourOrder/OrderDetailsScreen';
+import DocumentNotFound from '../../../components/emptyState/DocumentNotFound';
 import { useNavigation } from '@react-navigation/native';
 const menuItems = [
     { id: 'companyInfo', label: 'Company Info', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
@@ -30,10 +32,6 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         setLocalActiveSection(null);
     }
     function handleSectionPress(section) {
-        if (section === 'orders') {
-            nav.navigate('YourOrder', { companyName: companyData?.name, selectedState: companyData?.state, orderId: companyData?.orderId });
-            return;
-        }
         if (onSectionPress) {
             onSectionPress(section);
             return;
@@ -45,10 +43,13 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         return (<View style={[styles.container, { backgroundColor: colors.background, paddingBottom: insets.bottom }]}>
         <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background}/>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets.top + 12 }]}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Company Details</Text>
+          <View style={styles.headerLeft}>
+            <BackButton onPress={onBackPress ?? (() => nav.canGoBack() && nav.goBack())} />
+            <Text style={[styles.headerTitle, { color: colors.text }]}>Company Details</Text>
+          </View>
         </View>
         <View style={styles.emptyState}>
-          {isLoading ? (<ActivityIndicator size="large" color={colors.mode === 'dark' ? '#93C5FD' : '#4F46E5'}/>) : (<Text style={[styles.emptyText, { color: colors.muted }]}>No company selected</Text>)}
+          {isLoading ? (<ActivityIndicator size="large" color={colors.mode === 'dark' ? '#93C5FD' : '#4F46E5'}/>) : (<DocumentNotFound />)}
         </View>
       </View>);
     }
@@ -61,16 +62,11 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
     const renderSection = () => {
         switch (activeSection) {
             case 'companyInfo':
-                return <CompanyInfo companyData={companyData}/>;
+                return <CompanyInfo companyData={companyData} />;
             case 'shareholders':
                 return <ShareHolders companyId={companyData.id}/>;
             case 'orders':
-                return (
-                  <View style={{ padding: 16, alignItems: 'center' }}>
-                    <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>Orders</Text>
-                    <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>No orders yet</Text>
-                  </View>
-                );
+                return <OrderDetailsScreen onBackPress={handleBackPress} onMessagePress={() => nav.navigate('Support')} />;
             default:
                 return null;
         }
@@ -82,7 +78,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
       {/* ── HEADER ─────────────────────────────────────────── */}
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingTop: insets.top + 12 }]}>
         <View style={styles.headerLeft}>
-          <BackButton onPress={activeSection ? handleBackPress : onBackPress}/>
+          <BackButton onPress={activeSection ? handleBackPress : (onBackPress ?? (() => nav.canGoBack() && nav.goBack()))} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>
             {activeSection === 'companyInfo'
             ? 'Company Information'

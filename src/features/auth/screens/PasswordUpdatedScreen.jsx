@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { s } from '../../../theme/responsive';
 
 const PasswordUpdatedScreen = () => {
   const navigation = useNavigation();
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: s(20),
     paddingBottom: 24,
     justifyContent: 'space-between',
   },
@@ -121,11 +122,11 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    marginVertical: 20,
+    // marginVertical: 0,
   },
   outerCircle: {
-    width: 200,
-    height: 200,
+    width: 120,
+    height: 120,
     borderRadius: 100,
     borderWidth: 1,
     borderColor: '#064E3B',
@@ -134,9 +135,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6, 78, 59, 0.1)',
   },
   innerCard: {
-    width: 140,
-    height: 140,
-    borderRadius: 36,
+    width: 80,
+    height: 80,
+    borderRadius: 60,
     borderWidth: 1,
     borderColor: '#059669',
     backgroundColor: '#064E3B',
@@ -152,18 +153,18 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#10B981',
-    fontSize: 44,
+    fontSize: 40,
     fontWeight: '300',
   },
   textSection: {
     alignItems: 'center',
     marginVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(4),
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 26,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '400',
     textAlign: 'center',
   },
   italicTitle: {
@@ -174,13 +175,13 @@ const styles = StyleSheet.create({
   description: {
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 6,
     fontSize: 14,
     lineHeight: 20,
   },
   infoSection: {
     width: '100%',
-    marginVertical: 15,
+    marginVertical: 10,
   },
   infoCard: {
     flexDirection: 'row',
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D4AF37',
     width: '100%',
     height: 52,
-    borderRadius: 12,
+    borderRadius: 24,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

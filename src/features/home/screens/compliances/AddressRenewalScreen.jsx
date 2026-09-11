@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 import Toast from 'react-native-toast-message';
 const API_REQUEST_TIMEOUT_MS = 10000;
 const getIconName = (icon) => {
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
     yearIconText: { fontSize: 14 },
     yearTitle: { fontSize: 14, fontWeight: '500' },
     yearSubtitle: { fontSize: 11 },
-    deselectBtn: { borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
+    deselectBtn: { borderRadius: 20, paddingHorizontal: s(12), paddingVertical: 5 },
     deselectBtnText: { fontSize: 11, fontWeight: '500' },
     serviceCard: { borderRadius: 12, borderStyle: 'solid', padding: 14 },
     cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
     cardIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     cardInfo: { flex: 1 },
     cardName: { fontSize: 13, fontWeight: '500' },
-    expiredBadge: { borderRadius: 20, paddingHorizontal: 7, paddingVertical: 2, alignSelf: 'flex-start', marginTop: 3 },
+    expiredBadge: { borderRadius: 20, paddingHorizontal: s(7), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 3 },
     expiredBadgeText: { fontSize: 10, fontWeight: '500' },
     cardDates: { fontSize: 11, marginTop: 4 },
     dueDateText: { fontWeight: '500' },

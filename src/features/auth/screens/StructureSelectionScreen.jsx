@@ -13,6 +13,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 const StructureSelectionScreen = ({ navigation, route }) => {
   const { companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -151,7 +152,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
           style={[styles.continueBtn, !selectedStructure && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           disabled={!selectedStructure}
-          onPress={() => navigation.navigate('WhatsIncluded', { selectedStructure, companyName, selectedEnding, selectedState, selectedCountry })}
+          onPress={() => navigation.navigate('WhatsIncluded', { ...(route.params || {}), selectedStructure, companyName, selectedEnding, selectedState, selectedCountry })}
         >
           <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
             {selectedStructure ? `Continue with ${selectedItem.title}  →` : 'Select a structure to continue'}
@@ -166,58 +167,58 @@ export default StructureSelectionScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 90 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 34 },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: 8 },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(8) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   goldText: { color: '#C9A84C' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: 20 },
+  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
   listContainer: { gap: 14 },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 16,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: 16,
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(16),
   },
   cardSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.02)' },
-  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   iconBox: {
     width: 40, height: 40, borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.04)', borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)', alignItems: 'center', justifyContent: 'center', marginRight: 12,
+    borderColor: 'rgba(255, 255, 255, 0.08)', alignItems: 'center', justifyContent: 'center', marginRight: s(12),
   },
   iconBoxSelected: { borderColor: 'rgba(201, 168, 76, 0.3)', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
   titleContainer: { flex: 1 },
   cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
-  cardSubtitle: { color: '#64748B', fontSize: 11, marginTop: 2 },
+  cardSubtitle: { color: '#64748B', fontSize: 11, marginTop: s(2) },
   radioCircle: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)', alignItems: 'center', justifyContent: 'center',
   },
   radioCircleSelected: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  cardDescription: { color: '#94A3B8', fontSize: 11.5, lineHeight: 17, marginBottom: 12 },
-  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 14 },
+  cardDescription: { color: '#94A3B8', fontSize: 11.5, lineHeight: 17, marginBottom: s(12) },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: s(14) },
   tagChip: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)', borderRadius: 12,
-    paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: s(10), paddingVertical: s(5), borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   tagWarn: { borderColor: 'rgba(234, 179, 8, 0.2)', backgroundColor: 'rgba(234, 179, 8, 0.05)' },
   tagText: { color: '#94A3B8', fontSize: 10, fontWeight: '500' },
   tagWarnText: { color: '#EAB308' },
-  cardDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.06)', marginBottom: 12 },
+  cardDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.06)', marginBottom: s(12) },
   cardFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   priceText: { color: '#C9A84C', fontSize: 18, fontWeight: 'bold' },
   stateFeeText: { color: '#64748B', fontSize: 10, fontWeight: 'normal' },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  badge: { paddingHorizontal: s(10), paddingVertical: s(4), borderRadius: 12 },
   badgeGreen: { backgroundColor: 'rgba(16, 185, 129, 0.12)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' },
   badgeTextGreen: { color: '#10B981', fontSize: 10, fontWeight: 'bold' },
   badgeBlue: { backgroundColor: 'rgba(59, 130, 246, 0.12)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.3)' },
   badgeTextBlue: { color: '#60A5FA', fontSize: 10, fontWeight: 'bold' },
   bottomBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: '#060913', paddingHorizontal: 16, paddingVertical: 12,
+    backgroundColor: '#060913', paddingHorizontal: s(16), paddingVertical: s(12),
     borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
-  continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: 14, alignItems: 'center' },
+  continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
   continueBtnDisabled: { backgroundColor: 'rgba(212,175,55,0.35)' },
   continueBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
   continueBtnTextDisabled: { color: 'rgba(6,9,19,0.5)' },

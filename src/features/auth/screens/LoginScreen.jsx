@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import logoR from '../../../assets/images/logoR.png';
 import BackButton from '../../../components/buttons/BackButton';
 import Toast from 'react-native-toast-message';
+import { s } from '../../../theme/responsive';
 
 GoogleSignin.configure({
   webClientId: '1080172574320-193qhf74d29aa4b7fuf2f01h70ahjsic.apps.googleusercontent.com',
@@ -49,8 +50,8 @@ const LoginScreen = ({ navigation }) => {
       if (loginUser.fulfilled.match(result)) {
         const user = result.payload?.user;
         if (user?.isCompleteRegistration === false) {
-          // Option 1: Silent - no error toast, HomeScreen will auto-open ReviewSubmitScreen
-          // Dashboard is blocked via RootStack, user will be taken to complete registration form
+          // Silent - no error toast, dashboard is blocked via RootStack
+          // User will be taken to complete registration flow
         } else {
           Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
         }
@@ -60,7 +61,8 @@ const LoginScreen = ({ navigation }) => {
         Toast.show({ type: 'error', text1: 'Missing fields', text2: 'Please fill all fields' });
         return;
       }
-      Toast.show({ type: 'info', text1: 'Mobile login', text2: 'Coming soon' });
+      navigation.navigate('VerifyNumber', { phone: `+91 ${phone.trim()}` });
+      return;
     }
   }
 
@@ -82,7 +84,7 @@ const LoginScreen = ({ navigation }) => {
       if (googleLoginUser.fulfilled.match(result)) {
         const user = result.payload?.user;
         if (user?.isCompleteRegistration === false) {
-          // Silent - HomeScreen auto-opens ReviewSubmitScreen for incomplete users
+          // Silent - for incomplete users
         } else {
           Toast.show({ type: 'success', text1: 'Login successful', text2: 'Welcome back!' });
         }
@@ -249,7 +251,7 @@ const LoginScreen = ({ navigation }) => {
         {/* Create Account Link */}
         <Text style={styles.signupText}>
           New to CompanyVista?{' '}
-          <Text style={styles.createAccountLink} onPress={() => navigation.navigate('CountrySelection')}>
+          <Text style={styles.createAccountLink} onPress={() => navigation.navigate('RegisterJurisdiction')}>
             Create account
           </Text>
         </Text>
@@ -270,79 +272,79 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 24 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 34 },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  mainTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '500', lineHeight: 34, marginBottom: 6, marginTop: 10 },
+  scrollContent: { paddingHorizontal: s(20), paddingBottom: s(24) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '500', lineHeight: 34, marginBottom: s(6), marginTop: s(10) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: 20 },
+  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
   tabContainer: {
     flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 12, padding: 3, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
-    marginBottom: 20,
+    borderRadius: 12, padding: s(3), borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: s(20),
   },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 9, flexDirection: 'row', justifyContent: 'center', gap: 6 },
+  tabButton: { flex: 1, paddingVertical: s(10), alignItems: 'center', borderRadius: 9, flexDirection: 'row', justifyContent: 'center', gap: 6 },
   activeTabButton: { backgroundColor: 'rgba(255, 255, 255, 0.08)' },
   tabText: { color: '#64748B', fontSize: 12, fontWeight: '600' },
   activeTabText: { color: '#C9A84C', fontWeight: 'bold' },
-  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: 8, marginTop: 4 },
+  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
   inputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 14, height: 48, marginBottom: 16,
+    paddingHorizontal: s(14), height: 48, marginBottom: s(16),
   },
   inputContainerError: { borderColor: '#EF4444' },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: 10 },
-  errorText: { color: '#EF4444', fontSize: 10, marginTop: -12, marginBottom: 12 },
-  phoneRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
+  errorText: { color: '#EF4444', fontSize: 10, marginTop: -12, marginBottom: s(12) },
+  phoneRow: { flexDirection: 'row', gap: 10, marginBottom: s(16) },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 12, height: 48, gap: 6,
+    paddingHorizontal: s(12), height: 48, gap: 6,
   },
   flagText: { color: '#64748B', fontSize: 10, fontWeight: 'bold' },
   codeText: { color: '#FFFFFF', fontSize: 13, fontWeight: 'bold' },
   phoneInputContainer: {
     flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 14, height: 48, justifyContent: 'center',
+    paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
-  optionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  optionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(20) },
   checkboxRow: { flexDirection: 'row', alignItems: 'center' },
   checkbox: {
     width: 16, height: 16, borderRadius: 4, backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    alignItems: 'center', justifyContent: 'center', marginRight: 8,
+    alignItems: 'center', justifyContent: 'center', marginRight: s(8),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
   rememberText: { color: '#64748B', fontSize: 11 },
   forgotText: { color: '#C9A84C', fontSize: 11, fontWeight: '500' },
   loginBtn: {
-    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: 14,
-    alignItems: 'center', marginBottom: 24,
+    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
+    alignItems: 'center', marginBottom: s(24),
   },
   loginBtnDisabled: { backgroundColor: 'rgba(212, 175, 55, 0.3)' },
   loginBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(20) },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  dividerText: { color: '#475569', fontSize: 10, paddingHorizontal: 12 },
-  socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 24 },
+  dividerText: { color: '#475569', fontSize: 10, paddingHorizontal: s(12) },
+  socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: s(24) },
   socialBtn: {
     width: '48%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: 12, gap: 8,
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: s(12), gap: 8,
   },
   socialBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
-  signupText: { color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: 20 },
+  signupText: { color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: s(20) },
   createAccountLink: { color: '#C9A84C', fontWeight: 'bold', fontSize: 15 },
   supportContainer: { alignItems: 'center' },
   supportBtn: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 20,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 16, paddingVertical: 8, gap: 6,
+    paddingHorizontal: s(16), paddingVertical: s(8), gap: 6,
   },
   supportBtnText: { color: '#94A3B8', fontSize: 11, fontWeight: '500' },
 });

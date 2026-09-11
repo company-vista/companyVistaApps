@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { quickAccessItems } from '../data/quickAccessItems';
+import { s } from '../../../theme/responsive';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 const quickAccessScreenMap = {
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     header: {
         flexDirection: 'row',

@@ -5,11 +5,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
+import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import TransactionDetailScreen from './TransactionDetailScreen';
 import { fetchSubscriptionPayments } from '../../api/subscriptionPaymentsApi';
 import { formatDate } from '../../../../constants/dateFormatter';
 import { matchesTransactionSearch, } from './transactionsUtils';
 import { formatCurrency } from '../../../../constants/currencyConverter';
+import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
 
 
@@ -127,6 +129,9 @@ export default function TransactionsScreen() {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
+    const rawCompanies = useAppSelector(state => state.auth.user?.companies);
+    const userCompanies = rawCompanies ?? [];
+    const hasNoCompany = userCompanies.length === 0;
     const [activeFilter, setActiveFilter] = useState('All');
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const [search, setSearch] = useState('');
@@ -166,6 +171,7 @@ export default function TransactionsScreen() {
         };
     }, [token]);
     const filteredTransactions = useMemo(() => {
+        if (hasNoCompany) return [];
         return transactions.filter(item => {
             if (companyId) {
                 const txnCompanyId = String(item.details?.company ?? '').trim();
@@ -179,6 +185,7 @@ export default function TransactionsScreen() {
         });
     }, [
         companyId,
+        hasNoCompany,
         activeFilter,
         search,
         transactions,
@@ -262,7 +269,7 @@ export default function TransactionsScreen() {
                     </Text>
                     <Text style={[
                         styles.summaryLabel,
-                        { color: colors.muted, marginTop: 8 },
+                        { color: colors.muted, marginTop: s(8) },
                     ]}>
                         Pending ({currency})
                     </Text>
@@ -312,9 +319,11 @@ export default function TransactionsScreen() {
 
         {isLoading ? (<View style={styles.centerContent}>
             <ActivityIndicator size="large" color={colors.accent} />
-            <Text style={[styles.emptyText, { color: colors.text, marginTop: 12 }]}>
+            <Text style={[styles.emptyText, { color: colors.text, marginTop: s(12) }]}>
                 Loading transactions...
             </Text>
+        </View>) : hasNoCompany ? (<View style={[styles.emptyContainer, { backgroundColor: 'transparent' }]}>
+            <DocumentNotFound subtitle="No transactions found" />
         </View>) : errorMessage ? (<View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
             <FontAwesome name="exclamation-circle" size={40} color={colors.accent} />
             <Text style={[
@@ -324,16 +333,13 @@ export default function TransactionsScreen() {
                 {errorMessage}
             </Text>
         </View>) : (<FlatList data={currencyFilteredTransactions} keyExtractor={item => item.id} contentContainerStyle={{
-            paddingHorizontal: 20,
-            paddingBottom: safeAreaInsets.bottom + 24,
+            paddingHorizontal: s(20),
+            paddingBottom: safeAreaInsets.bottom + s(24),
         }} ListEmptyComponent={<View style={[
             styles.emptyContainer,
-            { backgroundColor: colors.surface },
+            { backgroundColor: 'transparent' },
         ]}>
-            <FontAwesome name="credit-card" size={40} color={colors.muted} />
-            <Text style={[styles.emptyText, { color: colors.text }]}>
-                No transactions found
-            </Text>
+            <DocumentNotFound subtitle="No transactions found" />
         </View>} renderItem={({ item }) => (<Pressable onPress={() => {
             setSelectedTransaction(item);
             navigation.setOptions({ headerShown: false });
@@ -381,29 +387,29 @@ export default function TransactionsScreen() {
 }
 const styles = StyleSheet.create({
     screen: { flex: 1 },
-    searchContainer: { paddingHorizontal: 20, marginBottom: 16 },
+    searchContainer: { paddingHorizontal: s(20), marginBottom: s(16) },
     searchInput: {
         height: 50,
         borderRadius: 10,
         borderWidth: 1,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         borderColor: '#ccc',
     },
     summaryContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
-        gap: 12,
-        marginBottom: 20,
-        marginTop: 12,
+        paddingHorizontal: s(20),
+        gap: s(12),
+        marginBottom: s(20),
+        marginTop: s(12),
     },
-    summaryCard: { flex: 1, padding: 16, borderRadius: 16, borderWidth: 1 },
-    summaryLabel: { fontSize: font.base, fontWeight: '600', marginBottom: 6 },
+    summaryCard: { flex: 1, padding: s(16), borderRadius: 16, borderWidth: 1 },
+    summaryLabel: { fontSize: font.base, fontWeight: '600', marginBottom: s(6) },
     summaryValue: { fontSize: font.large, fontWeight: '800' },
     filterRow: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
-        gap: 8,
-        marginBottom: 16,
+        paddingHorizontal: s(20),
+        gap: s(8),
+        marginBottom: s(16),
     },
     filterButton: {
         flex: 1,
@@ -417,10 +423,10 @@ const styles = StyleSheet.create({
     txCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 14,
+        padding: s(14),
         borderRadius: 16,
         borderWidth: 1,
-        marginBottom: 10,
+        marginBottom: s(10),
     },
     iconContainer: {
         width: 40,
@@ -428,31 +434,31 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
+        marginRight: s(12),
     },
     middleSection: { flex: 1 },
-    txTitle: { fontSize: font.lg, fontWeight: '500', marginBottom: 4 },
+    txTitle: { fontSize: font.lg, fontWeight: '500', marginBottom: s(4) },
     txSubtitle: { fontSize: font.sm },
     rightSection: { alignItems: 'flex-end' },
     txAmount: {
         fontSize: font.lg,
         fontWeight: '600',
-        marginBottom: 4,
+        marginBottom: s(4),
         textAlign: 'right',
     },
     centerContent: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
-    statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, marginTop: 4 },
+    statusBadge: { paddingHorizontal: s(8), paddingVertical: s(4), borderRadius: 8, marginTop: s(4) },
     statusText: { fontSize: font.xs, fontWeight: '800' },
     emptyContainer: {
-        padding: 40,
+        padding: s(40),
         borderRadius: 16,
         alignItems: 'center',
-        gap: 12,
+        gap: s(12),
     },
     emptyText: { fontSize: font.lg, fontWeight: '600' },
 });

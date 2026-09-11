@@ -6,8 +6,15 @@ import {
   Pressable,
   StatusBar,
   Text,
+  TextInput,
   View,
 } from 'react-native';
+
+// Disable system font scaling globally — 100% pixel-perfect UI on all devices
+if (Text.defaultProps == null) Text.defaultProps = {};
+Text.defaultProps.allowFontScaling = false;
+if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+TextInput.defaultProps.allowFontScaling = false;
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';

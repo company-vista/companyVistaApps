@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { s } from "./src/theme/responsive";
 
 const styles = StyleSheet.create({
   splashScreen: {
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   toastCard: {
     width: '80%',
     borderRadius: 24,
-    paddingHorizontal: 18,
+    paddingHorizontal: s(18),
     paddingVertical: 10,
     backgroundColor: '#fffffff8',
     borderWidth: 0.3,

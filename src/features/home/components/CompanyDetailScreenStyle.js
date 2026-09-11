@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { s } from "../../../theme/responsive";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -9,7 +10,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingTop: 12,
         paddingBottom: 10,
         backgroundColor: '#FFFFFF',
@@ -30,7 +31,7 @@ export const styles = StyleSheet.create({
     },
     /* scroll */
     scrollContent: {
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingTop: 12,
         paddingBottom: 48,
     },
@@ -93,7 +94,7 @@ export const styles = StyleSheet.create({
     statusBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 5,
         borderRadius: 12,
         gap: 6,
@@ -173,11 +174,10 @@ export const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 80,
     },
     emptyText: {
-        fontSize: 16,
-        fontWeight: '500',
+        fontSize: 19,
+        fontWeight: '600',
         color: '#64748B',
     },
 });

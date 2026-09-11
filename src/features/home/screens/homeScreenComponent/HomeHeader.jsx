@@ -4,9 +4,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import logoImage from '../../../../assets/images/company-vista-icon-gold-512.png';
 import styles from '../HomeScreen.styles';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { s } from '../../../../theme/responsive';
 
 export function HomeHeader({ displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress, colors, }) {
-    return (<View style={[styles.header, { backgroundColor: colors.surface, paddingHorizontal: 18 }]}>
+    return (<View style={[styles.header, { backgroundColor: colors.surface, paddingHorizontal: s(18) }]}>
       <Image source={logoImage} style={[styles.avatar, { backgroundColor: '#000' }]}/>
       <Text numberOfLines={1} style={[styles.greeting, { color: colors.text }]}>
         Hi, {capitalizeCompanyName(displayName) || 'User'}

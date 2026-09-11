@@ -1,6 +1,7 @@
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { s } from '../../../theme/responsive';
 import { useThemeColors } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 const socialItems = [
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
         backgroundColor: '#ffffff',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     headerTitle: {
         color: '#111827',
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     content: {
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingTop: 25,
     },
     heading: {
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
         borderColor: '#e5e7eb',
         borderRadius: 14,
         backgroundColor: '#ffffff',
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
         paddingVertical: 12,
     },
     socialTitle: {

@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { s } from '../../../../theme/responsive';
 import { useThemeColors } from '../../../../theme/colors';
 function QuickAccessDetailScreen({ color, description, icon, onBackPress, title, }) {
     const safeAreaInsets = useSafeAreaInsets();
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     header: {
         flexDirection: 'row',
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 18,
         backgroundColor: '#ffffff',
-        paddingHorizontal: 22,
+        paddingHorizontal: s(22),
         paddingVertical: 36,
     },
     iconWrap: {

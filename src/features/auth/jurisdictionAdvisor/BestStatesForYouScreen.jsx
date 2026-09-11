@@ -1,4 +1,5 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
+import { s } from '../../../theme/responsive';
 import {
   StyleSheet,
   Text,
@@ -47,7 +48,47 @@ const CLOSE_ALTERNATIVES = [
   { icon: '⚖️', name: 'Delaware', desc: '$423 · $300/yr · only if raising capital', match: '64%' },
 ];
 
-export default function BestStatesForYouScreen({ navigation }) {
+const STATES_DATA = [
+  {
+    icon: '⛰️', name: 'Wyoming', subtitle: 'LLC · best value overall', match: '94%', price: '$399', priceNote: '$299 package + $100 state', timeframe: '3–5 days',
+    features: FEATURES, warning: 'if you later raise VC money, expect investors to ask you to redomesticate to Delaware.',
+    desc: '$100 state fee and only $60 a year after',
+  },
+  {
+    icon: '🌵', name: 'New Mexico', subtitle: 'No annual report ever', match: '91%', price: '$349', priceNote: '$299 package + $50 state', timeframe: '5–7 days',
+    features: [
+      { boldText: 'No annual report ever', normalText: ' — truly set and forget.' },
+      { boldText: 'Anonymous LLC', normalText: ' — members not on public record.' },
+      { boldText: '$50 state fee', normalText: ' — cheapest credible option.' },
+      { boldText: '5–7 days', normalText: ' to form.' },
+    ], warning: 'less prestige than Wyoming with banks and vendors.',
+    desc: '$349 · no annual report ever · anonymous',
+  },
+  {
+    icon: '🐎', name: 'Kentucky', subtitle: 'Cheapest to form', match: '85%', price: '$339', priceNote: '$299 package + $40 state', timeframe: '7–10 days',
+    features: [
+      { boldText: '$15/yr', normalText: ' annual fee — lowest running cost.' },
+      { boldText: 'Fast online filing', normalText: ' — simple process.' },
+      { boldText: 'Good for bootstrapped', normalText: ' founders.' },
+      { boldText: '7–10 days', normalText: ' to form.' },
+    ], warning: 'fewer banking options than Wyoming/New Mexico.',
+    desc: '$339 · cheapest to form · $15/yr',
+  },
+  {
+    icon: '⚖️', name: 'Delaware', subtitle: 'Only if raising capital', match: '64%', price: '$423', priceNote: '$123 package + $300 state', timeframe: '3–5 days',
+    features: [
+      { boldText: 'Investor standard', normalText: ' — VCs prefer Delaware C-Corp.' },
+      { boldText: '$300/yr franchise tax', normalText: ' — expensive to maintain.' },
+      { boldText: 'Court of Chancery', normalText: ' — strong legal precedent.' },
+      { boldText: '3–5 days', normalText: ' to form.' },
+    ], warning: 'overkill and costly if you are not raising VC money.',
+    desc: '$423 · $300/yr · only if raising capital',
+  },
+];
+
+export default function BestStatesForYouScreen({ navigation, route }) {
+  const [selected, setSelected] = useState(STATES_DATA[0]);
+  const alternatives = STATES_DATA.filter(s => s.name !== selected.name);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
@@ -93,25 +134,25 @@ export default function BestStatesForYouScreen({ navigation }) {
             <Text style={styles.badgeText}>★ BEST MATCH</Text>
           </View>
 
-          {/* Card Header Info */}
+          {/* Card Header Info - dynamic selected */}
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderLeft}>
-              <Text style={styles.stateIcon}>⛰️</Text>
+              <Text style={styles.stateIcon}>{selected.icon}</Text>
               <View>
-                <Text style={styles.stateName}>Wyoming</Text>
-                <Text style={styles.stateSubtitle}>LLC · best value overall</Text>
+                <Text style={styles.stateName}>{selected.name}</Text>
+                <Text style={styles.stateSubtitle}>{selected.subtitle}</Text>
               </View>
             </View>
 
             <View style={styles.matchPercentageContainer}>
-              <Text style={styles.matchPercentage}>94%</Text>
+              <Text style={styles.matchPercentage}>{selected.match}</Text>
               <Text style={styles.matchLabel}>MATCH</Text>
             </View>
           </View>
 
-          {/* Features List */}
+          {/* Features List - dynamic */}
           <View style={styles.featuresList}>
-            {FEATURES.map((item, index) => (
+            {selected.features.map((item, index) => (
               <View key={index} style={styles.featureItem}>
                 <Text style={styles.checkIcon}>✓</Text>
                 <Text style={styles.featureText}>
@@ -126,21 +167,21 @@ export default function BestStatesForYouScreen({ navigation }) {
             ))}
           </View>
 
-          {/* Warning Note */}
+          {/* Warning Note - dynamic */}
           <View style={styles.warningCard}>
             <Text style={styles.warningIcon}>⚠️</Text>
             <Text style={styles.warningText}>
-              <Text style={styles.warningBold}>Watch:</Text> if you later raise VC money, expect investors to ask you to redomesticate to Delaware.
+              <Text style={styles.warningBold}>Watch:</Text> {selected.warning}
             </Text>
           </View>
 
-          {/* Pricing Footer */}
+          {/* Pricing Footer - dynamic */}
           <View style={styles.cardFooter}>
             <View style={styles.priceContainer}>
-              <Text style={styles.priceAmount}>$399</Text>
-              <Text style={styles.priceNote}>$299 package + $100 state</Text>
+              <Text style={styles.priceAmount}>{selected.price}</Text>
+              <Text style={styles.priceNote}>{selected.priceNote}</Text>
             </View>
-            <Text style={styles.timeframeText}>3–5 days</Text>
+            <Text style={styles.timeframeText}>{selected.timeframe}</Text>
           </View>
         </View>
 
@@ -150,8 +191,8 @@ export default function BestStatesForYouScreen({ navigation }) {
           <View style={styles.sectionDivider} />
         </View>
 
-        {CLOSE_ALTERNATIVES.map(item => (
-          <View key={item.name} style={styles.altCard}>
+        {alternatives.map(item => (
+          <TouchableOpacity key={item.name} style={styles.altCard} activeOpacity={0.7} onPress={() => setSelected(STATES_DATA.find(s => s.name === item.name))}>
             <View style={styles.altLeft}>
               <Text style={styles.altIcon}>{item.icon}</Text>
               <View style={styles.altTextWrap}>
@@ -163,7 +204,7 @@ export default function BestStatesForYouScreen({ navigation }) {
               <Text style={styles.altMatch}>{item.match}</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
         <View style={styles.savingCard}>
@@ -174,9 +215,9 @@ export default function BestStatesForYouScreen({ navigation }) {
 
       {/* Bottom Action Area */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={() => navigation.navigate('CountrySelection')}>
+        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={() => navigation.navigate('CompanyNaming', { ...(route?.params || {}), bestState: selected.name, advisorFlow: true })}>
           <Text style={styles.actionButtonText}>
-            Continue with Wyoming · $399  →
+            Continue with {selected.name} · {selected.price}  →
           </Text>
         </TouchableOpacity>
 
@@ -195,15 +236,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0B0E17',
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 24,
+    gap: s(8),
+    paddingHorizontal: s(16),
+    paddingVertical: s(12),
+    marginTop: s(24),
   },
   iconButton: {
     width: 38,
@@ -230,17 +271,17 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 7,
     letterSpacing: 1.2,
-    marginTop: 1,
+    marginTop: s(1),
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: s(20),
+    paddingBottom: s(20),
   },
   title: {
     fontSize: font.display,
     fontWeight: '500',
     color: '#FFFFFF',
-    marginTop: 8,
+    marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
@@ -250,19 +291,19 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#64748B',
-    marginTop: 6,
-    marginBottom: 16,
+    marginTop: s(6),
+    marginBottom: s(16),
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 20,
+    gap: s(8),
+    marginBottom: s(20),
   },
   tagPill: {
     backgroundColor: '#151329',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: s(12),
+    paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#2D264A',
@@ -281,8 +322,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#3D321D',
-    padding: 16,
-    marginBottom: 24,
+    padding: s(16),
+    marginBottom: s(24),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
@@ -290,9 +331,9 @@ const styles = StyleSheet.create({
     borderColor: '#D1A253',
     borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 16,
+    paddingHorizontal: s(10),
+    paddingVertical: s(4),
+    marginBottom: s(16),
   },
   badgeText: {
     color: '#D1A253',
@@ -303,9 +344,9 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: s(20),
   },
   cardHeaderLeft: {
     flexDirection: 'row',
@@ -313,7 +354,7 @@ const styles = StyleSheet.create({
   },
   stateIcon: {
     fontSize: 28,
-    marginRight: 12,
+    marginRight: s(12),
   },
   stateName: {
     color: '#FFFFFF',
@@ -323,7 +364,7 @@ const styles = StyleSheet.create({
   stateSubtitle: {
     color: '#64748B',
     fontSize: 12,
-    marginTop: 2,
+    marginTop: s(2),
   },
   matchPercentageContainer: {
     alignItems: 'flex-end',
@@ -342,19 +383,19 @@ const styles = StyleSheet.create({
   featuresList: {
     borderTopWidth: 1,
     borderColor: '#1E2638',
-    paddingTop: 16,
-    marginBottom: 16,
+    paddingTop: s(16),
+    marginBottom: s(16),
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   checkIcon: {
     color: '#10B981',
     fontSize: 14,
-    marginRight: 10,
-    marginTop: 1,
+    marginRight: s(10),
+    marginTop: s(1),
   },
   featureText: {
     color: '#94A3B8',
@@ -372,12 +413,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3D321D',
-    padding: 12,
-    marginBottom: 16,
+    padding: s(12),
+    marginBottom: s(16),
   },
   warningIcon: {
     fontSize: 14,
-    marginRight: 8,
+    marginRight: s(8),
   },
   warningText: {
     color: '#94A3B8',
@@ -392,11 +433,11 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
     alignItems: 'flex-end',
     borderTopWidth: 1,
     borderColor: '#1E2638',
-    paddingTop: 14,
+    paddingTop: s(14),
   },
   priceContainer: {
     flexDirection: 'row',
@@ -406,7 +447,7 @@ const styles = StyleSheet.create({
     color: '#D1A253',
     fontSize: 20,
     fontWeight: 'bold',
-    marginRight: 8,
+    marginRight: s(8),
   },
   priceNote: {
     color: '#64748B',
@@ -425,7 +466,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1.2,
-    marginRight: 12,
+    marginRight: s(12),
   },
   sectionDivider: {
     flex: 1,
@@ -440,15 +481,15 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#1E2638',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginTop: 10,
+    paddingHorizontal: s(14),
+    paddingVertical: s(12),
+    marginTop: s(10),
   },
   altLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 10,
+    gap: s(10),
   },
   altIcon: {
     fontSize: 20,
@@ -464,11 +505,11 @@ const styles = StyleSheet.create({
   altDesc: {
     color: '#64748B',
     fontSize: 11,
-    marginTop: 2,
+    marginTop: s(2),
   },
   altMatchWrap: {
     alignItems: 'flex-end',
-    marginLeft: 8,
+    marginLeft: s(8),
   },
   altMatch: {
     color: '#D1A253',
@@ -487,15 +528,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'rgba(16,185,129,0.2)',
-    padding: 12,
-    marginTop: 14,
+    padding: s(12),
+    marginTop: s(14),
     alignItems: 'flex-start',
-    gap: 8,
+    gap: s(8),
   },
   savingIcon: {
     color: '#10B981',
     fontSize: 12,
-    marginTop: 1,
+    marginTop: s(1),
   },
   savingText: {
     flex: 1,
@@ -504,9 +545,9 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
   bottomContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 20,
+    paddingHorizontal: s(16),
+    paddingTop: s(12),
+    paddingBottom: s(20),
     backgroundColor: '#0B0E17',
   },
   actionButton: {
@@ -523,7 +564,7 @@ const styles = StyleSheet.create({
   },
   browseButton: {
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: s(12),
   },
   browseText: {
     color: '#64748B',

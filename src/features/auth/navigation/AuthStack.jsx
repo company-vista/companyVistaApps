@@ -3,7 +3,6 @@ import OnboardingSlide from '../screens/OnboardingSlide';
 import BusinessServicesScreen from '../screens/BusinessServicesScreen';
 import TrustedWorldwideScreen from '../screens/TrustedWorldwideScreen';
 import RegistrationLandingScreen from '../screens/RegistrationLandingScreen';
-import CountrySelectionScreen from '../screens/CountrySelectionScreen';
 import CompanyNamingScreen from '../screens/CompanyNamingScreen';
 import StructureSelectionScreen from '../screens/StructureSelectionScreen';
 import WhatsIncludedScreen from '../screens/WhatsIncludedScreen';
@@ -14,6 +13,7 @@ import FounderDetailsScreen from '../screens/FounderDetailsScreen';
 import DetailsReceivedScreen from '../screens/DetailsReceivedScreen';
 import EmailVerificationScreen from '../screens/EmailVerificationScreen';
 import LoginScreen from '../screens/LoginScreen';
+import VerifyNumberScreen from '../screens/VerifyNumberScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import OtpVerifyScreen from '../screens/OtpVerifyScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen';
@@ -53,7 +53,6 @@ export default function AuthStack() {
       <Stack.Screen name="BusinessServices" component={BusinessServicesScreen}/>
       <Stack.Screen name="TrustedWorldwide" component={TrustedWorldwideScreen}/>
       <Stack.Screen name="RegistrationLanding" component={RegistrationLandingScreen}/>
-      <Stack.Screen name="CountrySelection" component={CountrySelectionScreen}/>
       <Stack.Screen name="CompanyNaming" component={CompanyNamingScreen}/>
       <Stack.Screen name="StructureSelection" component={StructureSelectionScreen}/>
       <Stack.Screen name="WhatsIncluded" component={WhatsIncludedScreen}/>
@@ -64,6 +63,7 @@ export default function AuthStack() {
       <Stack.Screen name="DetailsReceived" component={DetailsReceivedScreen}/>
       <Stack.Screen name="EmailVerification" component={EmailVerificationScreen}/>
       <Stack.Screen name="Login" component={LoginScreen}/>
+      <Stack.Screen name="VerifyNumber" component={VerifyNumberScreen}/>
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
       <Stack.Screen name="OtpVerify" component={OtpVerifyScreen}/>
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen}/>

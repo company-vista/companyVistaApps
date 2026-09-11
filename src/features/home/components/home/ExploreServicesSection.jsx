@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 const serviceItems = [
     {
         title: 'Tax / Acct Services',
@@ -123,7 +124,7 @@ function ExploreServicesSection({ onQuickAccessItemPress: _onQuickAccessItemPres
 const styles = StyleSheet.create({
     section: {
         marginTop: 14,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
         borderColor: '#E5E7EB',
         borderRadius: 14,
         paddingVertical: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         overflow: 'hidden',
     },
     iconWrapper: {
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
         top: -5,
         right: -10,
         borderRadius: 8,
-        paddingHorizontal: 5,
+        paddingHorizontal: s(5),
         paddingVertical: 1,
         maxWidth: 45,
     },

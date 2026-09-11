@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 function formatBytes(bytes) {
     if (bytes === undefined || bytes === null)
@@ -38,7 +39,7 @@ function getStyles(colors) {
             borderBottomWidth: 1,
             flexDirection: 'row',
             paddingBottom: 12,
-            paddingHorizontal: 16,
+            paddingHorizontal: s(16),
             backgroundColor: colors.cardHighlight,
         },
         headerTitle: {

@@ -29,10 +29,15 @@ import ServicesScreen from './subscription&services/ServicesScreen';
 import SubscriptionScreen from './subscription&services/SubscriptionScreen';
 import ExploreServicesScreen from './subscription&services/ExploreServicesScreen';
 import ServicesHistoryScreen from './subscription&services/ServicesHistoryScreen';
-import ReviewSubmitScreen from './addCompany/ReviewSubmitScreen';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
+import OrderDetailsScreen from '../components/companyInformationSection/yourOrder/OrderDetailsScreen';
+import QuoteScreen from '../components/companyInformationSection/yourOrder/QuoteScreen';
+import QuoteBreakdownScreen from '../components/companyInformationSection/yourOrder/QuoteBreakdownScreen';
+import PaymentMethodScreen from '../components/companyInformationSection/yourOrder/PaymentMethodScreen';
+import ShareholdersScreen from '../components/companyInformationSection/yourOrder/ShareholdersScreen';
+import VerifyIdentityScreen from '../components/companyInformationSection/yourOrder/VerifyIdentityScreen';
 import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
@@ -40,7 +45,7 @@ const emptyCompanies = [];
 export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { initialTab, pendingCompanySection: routePendingCompanySection, pendingHomeAction: routePendingHomeAction } = route.params ?? {};
+    const { initialTab, pendingCompanySection: routePendingCompanySection, pendingHomeAction: routePendingHomeAction, openOrderDetails } = route.params ?? {};
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const dispatch = useAppDispatch();
@@ -65,6 +70,12 @@ export default function HomeScreen() {
     const [isServicesHistoryOpen, setIsServicesHistoryOpen] = useState(false);
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
     const [trackingCompanyId, setTrackingCompanyId] = useState(null);
+    const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
+    const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+    const [isQuoteBreakdownOpen, setIsQuoteBreakdownOpen] = useState(false);
+    const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
+    const [isShareholdersOpen, setIsShareholdersOpen] = useState(false);
+    const [isVerifyIdentityOpen, setIsVerifyIdentityOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [supportFromRegistrationTracking, setSupportFromRegistrationTracking] = useState(false);
     const [editingCompanyId, setEditingCompanyId] = useState(null);
@@ -85,6 +96,11 @@ export default function HomeScreen() {
             setActiveCompanySection(routePendingCompanySection);
         }
     }, [routePendingCompanySection]);
+    useEffect(() => {
+        if (openOrderDetails) {
+            setIsOrderDetailsOpen(true);
+        }
+    }, [openOrderDetails]);
     useEffect(() => {
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
@@ -230,7 +246,7 @@ export default function HomeScreen() {
             isMounted = false;
         };
     }, [token, userCompanies, userId]);
-    // Registration incomplete (false) -> dashboard block, force ReviewSubmitScreen (chahe companies ho ya na ho)
+    // Registration incomplete (false) -> dashboard block
     useEffect(() => {
         if (user?.isCompleteRegistration === false && !isAddCompanyOpen && !isRegistrationTrackingOpen && token) {
             setIsAddCompanyOpen(true);
@@ -469,6 +485,24 @@ export default function HomeScreen() {
         setSelectedCompany(company);
         closeCompanySwitcher();
     }
+    if (isVerifyIdentityOpen) {
+        return <VerifyIdentityScreen onBackPress={() => { setIsVerifyIdentityOpen(false); setIsShareholdersOpen(true); }} />;
+    }
+    if (isShareholdersOpen) {
+        return <ShareholdersScreen onBackPress={() => setIsShareholdersOpen(false)} onContinue={() => { setIsShareholdersOpen(false); setIsVerifyIdentityOpen(true); }} />;
+    }
+    if (isPaymentMethodOpen) {
+        return <PaymentMethodScreen companyId={selectedCompany?.id} amount={3090} onBackPress={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(true); }} onPaymentSuccess={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(false); setIsShareholdersOpen(true); Toast.show({ type: 'success', text1: 'Payment successful!' }); }} onSelectPayment={(method) => { const label = method === 'stripe' ? 'Stripe' : method === 'razorpay' ? 'Razorpay' : 'UPI'; Toast.show({ type: 'info', text1: `${label} selected` }); }} />;
+    }
+    if (isQuoteBreakdownOpen) {
+        return <QuoteBreakdownScreen onBackPress={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(true); }} onDecline={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onAccept={() => { setIsQuoteBreakdownOpen(false); setIsPaymentMethodOpen(true); }} />;
+    }
+    if (isQuoteOpen) {
+        return <QuoteScreen onBackPress={() => { setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onViewBreakdown={() => { setIsQuoteOpen(false); setIsQuoteBreakdownOpen(true); }} />;
+    }
+    if (isOrderDetailsOpen) {
+        return <OrderDetailsScreen onBackPress={() => setIsOrderDetailsOpen(false)} onNextPress={() => { setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
+    }
     if (activeCompanySection) {
         return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);
     }
@@ -564,7 +598,7 @@ export default function HomeScreen() {
                 paddingBottom: safeAreaInsets.bottom + 75,
             },
         ]} showsVerticalScrollIndicator={false}>
-            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onRegistrationTrackingPress={openRegistrationTrackingScreen} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -624,41 +658,5 @@ export default function HomeScreen() {
         </View>) : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} colors={colors} safeAreaInsets={safeAreaInsets} />
-
-        {isAddCompanyOpen && (
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}>
-                <Pressable onPress={() => {
-                    // First time (false) + no company -> mandatory -> back = logout to login
-                    if (user?.isCompleteRegistration === false && !editingCompanyId && companyOptions.length === 0) {
-                        dispatch(setRedirectToLogin(true));
-                        dispatch(logoutUser());
-                        return;
-                    }
-                    // true wale (already registered) -> back = just close form
-                    setIsAddCompanyOpen(false); setEditingCompanyId(null);
-                }} style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.55)' }} />
-                <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 16, paddingTop: safeAreaInsets.top + 12, paddingBottom: safeAreaInsets.bottom + 12 }}>
-                    <View style={{ flex: 1, maxHeight: '92%', backgroundColor: colors.surface, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 24, elevation: 20 }}>
-                        <ReviewSubmitScreen onBackPress={() => {
-                            if (user?.isCompleteRegistration === false && !editingCompanyId && companyOptions.length === 0) {
-                                dispatch(setRedirectToLogin(true));
-                                dispatch(logoutUser());
-                                return;
-                            }
-                            setIsAddCompanyOpen(false); setEditingCompanyId(null);
-                        }} onSubmit={(companyId) => {
-                            setIsAddCompanyOpen(false);
-                            setEditingCompanyId(null);
-                            setTrackingCompanyId(companyId ?? selectedCompany?.id ?? null);
-                            setIsRegistrationTrackingOpen(true);
-                            refreshCompanies(companyId);
-                        }} companyId={editingCompanyId} />
-                    </View>
-                </View>
-            </View>
-        )}
-        {isAddCompanyOpen && (
-            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 49, backgroundColor: 'rgba(6,9,19,0.35)' }} />
-        )}
     </View>);
 }

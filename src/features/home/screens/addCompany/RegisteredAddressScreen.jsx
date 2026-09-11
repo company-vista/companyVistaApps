@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, } from
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setRegisteredAddress } from '../../../../store/slices/companyRegistrationSlice';
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingBottom: 12,
         gap: 12,
         borderBottomWidth: 1,
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
     inputWrapper: {
         borderWidth: 0.5,
         borderRadius: 8,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         marginBottom: 10,
     },
     input: {

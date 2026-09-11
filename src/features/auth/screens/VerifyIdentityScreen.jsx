@@ -19,6 +19,7 @@ import {
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppSelector } from '../../../store/hooks';
+import { s } from '../../../theme/responsive';
 
 const VerifyIdentityScreen = ({ navigation, route }) => {
   const authUser = useAppSelector(s => s.auth.user);
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EAB308',
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     paddingVertical: 16,
   },
   titleSection: {
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(234, 179, 8, 0.1)',
     borderColor: 'rgba(234, 179, 8, 0.3)',
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: s(12),
     paddingVertical: 6,
     borderRadius: 8,
   },
@@ -366,7 +367,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
     borderColor: 'rgba(239, 68, 68, 0.3)',
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: s(12),
     paddingVertical: 6,
     borderRadius: 8,
   },

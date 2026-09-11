@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,11 +21,15 @@ import logoR from '../../../assets/images/logoR.png';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppDispatch } from '../../../store/hooks';
 import { setPendingAddCompany } from '../../../store/slices/authSlice';
+import { s } from '../../../theme/responsive';
 
 export default function SetNewPasswordScreen(props) {
   const { navigation, route } = props;
   const dispatch = useAppDispatch();
   const email = props.email || route?.params?.email;
+  useEffect(() => {
+    console.log('=== SET NEW PASSWORD SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
+  }, []);
   const clientId = props.clientId || route?.params?.clientId;
   const token = props.token || route?.params?.token;
   const onPasswordSet = props.onPasswordSet || route?.params?.onPasswordSet;
@@ -79,7 +83,7 @@ export default function SetNewPasswordScreen(props) {
         if (from === 'FounderDetails') {
           // FounderDetails flow: after password -> ReviewAndConfirm
           if (navigation?.navigate) {
-            navigation.navigate('ReviewAndConfirm', {
+            const reviewParams = {
               selectedStructure: route?.params?.selectedStructure,
               selectedState: route?.params?.selectedState,
               selectedEnding: route?.params?.selectedEnding,
@@ -92,7 +96,19 @@ export default function SetNewPasswordScreen(props) {
               fullName: route?.params?.fullName,
               countryOfResidence: route?.params?.countryOfResidence,
               phone: route?.params?.phone,
-            });
+              advisorFlow: route?.params?.advisorFlow,
+              selectedJurisdiction: route?.params?.selectedJurisdiction,
+              purpose: route?.params?.purpose,
+              customerLocation: route?.params?.customerLocation,
+              priorities: route?.params?.priorities,
+              dayOneNeeds: route?.params?.dayOneNeeds,
+              physicalPresence: route?.params?.physicalPresence,
+              usStatePriority: route?.params?.usStatePriority,
+              bestState: route?.params?.bestState,
+              countryCode: route?.params?.countryCode,
+            };
+            console.log('=== SET PASSWORD -> REVIEW & SUBMIT DATA ===', JSON.stringify(reviewParams, null, 2));
+            navigation.navigate('ReviewAndConfirm', reviewParams);
           }
         } else {
           if (navigation?.reset) {
@@ -234,12 +250,12 @@ function CheckRow({ ok, text }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#070A12' },
   keyboardView: { flex: 1 },
-  scrollContent: { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 20, justifyContent: 'space-between' },
+  scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingBottom: 20, justifyContent: 'space-between' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 10 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  heroSection: { alignItems: 'center', marginTop: 5 },
-  lockOuterCard: { width: 140, height: 140, borderRadius: 30, borderWidth: 1, borderColor: '#0F5257', backgroundColor: '#051E24', justifyContent: 'center', alignItems: 'center' },
-  lockIconContainer: { width: 80, height: 80, borderRadius: 20, borderWidth: 1.5, borderColor: '#00F5D4', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30' },
+  heroSection: { alignItems: 'center', marginTop: 12 },
+  lockOuterCard: { width: 106, height: 106, borderRadius: 30, borderWidth: 1, borderColor: '#0F5257', backgroundColor: '#051E24', justifyContent: 'center', alignItems: 'center' },
+  lockIconContainer: { width: 60, height: 60, borderRadius: 20, borderWidth: 1.5, borderColor: '#00F5D4', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30' },
   lockIcon: { fontSize: 32 },
   textSection: { alignItems: 'center', marginVertical: 15 },
   title: { color: '#FFFFFF', fontSize: 26, fontWeight: '600', textAlign: 'center' },
@@ -248,7 +264,7 @@ const styles = StyleSheet.create({
   emailHighlight: { color: '#D4AF37', fontWeight: '700' },
   form: { width: '100%' },
   label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: 12, height: 52 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: s(12), height: 52 },
   inputContainerSuccess: { borderColor: '#10B981' },
   inputContainerError: { borderColor: '#EF4444' },
   inputIcon: { fontSize: 16, marginRight: 10 },
@@ -271,7 +287,7 @@ const styles = StyleSheet.create({
   matchIcon: { fontSize: 12, marginRight: 6 },
   matchText: { fontSize: 12 },
   footer: { marginTop: 20 },
-  submitButton: { backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  submitButton: { backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   submitButtonText: { color: '#070A12', fontSize: 16, fontWeight: '700', marginRight: 8 },
   arrowIcon: { color: '#070A12', fontSize: 18, fontWeight: 'bold' },
 });

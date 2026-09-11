@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
@@ -11,7 +12,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         paddingVertical: 24,
     },
     brandMark: {
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     verifyButton: {
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 7,
         borderRadius: 10,
         backgroundColor: '#187269',
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
         borderColor: '#080808',
         borderRadius: 12,
         backgroundColor: '#111827',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
     },
     input: {
         flex: 1,

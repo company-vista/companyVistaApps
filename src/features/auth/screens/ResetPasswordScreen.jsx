@@ -18,6 +18,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 export default function ResetPasswordScreen() {
   const navigation = useNavigation();
@@ -214,28 +215,28 @@ function CheckRow({ ok, text }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#070A12' },
   keyboardView: { flex: 1 },
-  scrollContent: { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 20, justifyContent: 'space-between' },
+  scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingBottom: 20, justifyContent: 'space-between' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 10 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   heroSection: { alignItems: 'center', marginTop: 5 },
   lockOuterCard: {
-    width: 140, height: 140, borderRadius: 30, borderWidth: 1, borderColor: '#0F5257',
+    width: 106, height: 106, borderRadius: 60, borderWidth: 1, borderColor: '#0F5257',
     backgroundColor: '#051E24', justifyContent: 'center', alignItems: 'center',
   },
   lockIconContainer: {
-    width: 80, height: 80, borderRadius: 20, borderWidth: 1.5, borderColor: '#00F5D4',
+    width: 60, height: 60, borderRadius: 50, borderWidth: 1.5, borderColor: '#00f5d479',
     justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30',
   },
-  lockIcon: { fontSize: 32 },
-  textSection: { alignItems: 'center', marginVertical: 15 },
-  title: { color: '#FFFFFF', fontSize: 26, fontWeight: '600', textAlign: 'center' },
+  lockIcon: { fontSize: 26 },
+  textSection: { alignItems: 'center', marginVertical: 10 },
+  title: { color: '#FFFFFF', fontSize: 24, fontWeight: '400', textAlign: 'center' },
   italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
   description: { color: '#94A3B8', textAlign: 'center', marginTop: 6, fontSize: 14 },
   form: { width: '100%' },
   label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
   inputContainer: {
     flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B',
-    borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: 12, height: 52,
+    borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: s(12), height: 52,
   },
   inputContainerSuccess: { borderColor: '#10B981' },
   inputContainerError: { borderColor: '#EF4444' },
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   matchText: { fontSize: 12 },
   footer: { marginTop: 20 },
   submitButton: {
-    backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 12,
+    backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 24,
     flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
   },
   submitButtonText: { color: '#070A12', fontSize: 16, fontWeight: '700', marginRight: 8 },

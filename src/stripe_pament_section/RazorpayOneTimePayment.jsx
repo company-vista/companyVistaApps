@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { s } from '../theme/responsive';
 import { font } from '../theme/typography';
 import { API_BASE_URL, RAZORPAY_KEY_ID } from '../config/api';
 import { useAppSelector } from '../store/hooks';
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 8,
         paddingVertical: 12,
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         borderRadius: 12,
         backgroundColor: '#072654',
         shadowColor: '#072654',

@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
+import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
-    container: { paddingHorizontal: 4 },
+    container: { paddingHorizontal: s(4) },
     sectionHeader: {
         fontSize: 16,
         fontWeight: '700',
@@ -10,7 +11,7 @@ export const styles = StyleSheet.create({
     },
     sectionContainer: {
         borderRadius: 16,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingVertical: 4,
         marginBottom: 14,
         borderWidth: 1,

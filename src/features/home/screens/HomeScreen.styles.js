@@ -1,11 +1,12 @@
 import { StyleSheet } from "react-native";
+import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
     },
     content: {
-        paddingHorizontal: 18,
+        paddingHorizontal: s(18),
     },
     header: {
         flexDirection: 'row',
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
         borderRadius: 22,
         backgroundColor: '#ea580c',
         marginTop: 14,
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingVertical: 10,
     },
     enrollText: {
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         backgroundColor: '#ffffff',
         marginTop: 28,
-        paddingHorizontal: 22,
+        paddingHorizontal: s(22),
         paddingVertical: 36,
     },
     placeholderIcon: {
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 24,
         backgroundColor: '#ffffff',
         paddingTop: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         borderTopWidth: 1,
         borderTopColor: 'rgba(0,0,0,0.03)',
         shadowColor: '#000000',
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         backgroundColor: '#f8fafc',
-        paddingHorizontal: 18,
+        paddingHorizontal: s(18),
         paddingTop: 12,
     },
     sheetHandle: {
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
         borderColor: '#e5e7eb',
         borderRadius: 12,
         backgroundColor: '#f8fafc',
-        paddingHorizontal: 13,
+        paddingHorizontal: s(13),
     },
     searchInput: {
         flex: 1,
@@ -541,7 +542,7 @@ const styles = StyleSheet.create({
         borderColor: '#e5e7eb',
         borderRadius: 18,
         backgroundColor: '#ffffff',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingVertical: 14,
         shadowColor: '#000000',
         shadowOffset: { width: 0, height: 12 },
@@ -584,7 +585,7 @@ const styles = StyleSheet.create({
         borderColor: '#e5e7eb',
         borderRadius: 14,
         backgroundColor: '#ffffff',
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 8,
     },
     companySwitcherAvatar: {

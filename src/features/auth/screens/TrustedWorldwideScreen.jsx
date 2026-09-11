@@ -13,10 +13,13 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 
 const TrustedWorldwideScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
+  const colors = useThemeColors();
 
   useEffect(() => {
     Animated.parallel([
@@ -111,7 +114,7 @@ const TrustedWorldwideScreen = ({ navigation }) => {
             <View style={styles.dashActive} />
           </View>
 
-          <TouchableOpacity style={styles.getStartedBtn} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
+          <TouchableOpacity style={[styles.getStartedBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
             <Text style={styles.btnText}>Get Started →</Text>
           </TouchableOpacity>
 
@@ -131,22 +134,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#060913',
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 30,
-    paddingBottom: 30,
+    paddingHorizontal: s(24),
+    paddingTop: s(30),
+    paddingBottom: s(30),
   },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 16 },
-  topLogo: { width: 150, height: 38, marginTop: 10, resizeMode: 'contain' },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(16) },
+  topLogo: { width: 150, height: 38, marginTop: s(10), resizeMode: 'contain' },
   counterSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: s(20),
   },
   counterTextWrapper: {
     alignItems: 'center',
-    marginHorizontal: 10,
-    marginTop: 18
+    marginHorizontal: s(10),
+    marginTop: s(18)
   },
   counterNumber: {
     color: '#FFFFFF',
@@ -162,37 +165,37 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.5,
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: s(2),
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   statCard: {
     width: '48%',
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
     borderRadius: 14,
-    padding: 16,
+    padding: s(16),
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: s(12),
     borderWidth: 1,
   },
   goldCard: { borderColor: 'rgba(201, 168, 76, 0.3)' },
   greenCard: { borderColor: 'rgba(16, 185, 129, 0.3)' },
   blueCard: { borderColor: 'rgba(96, 165, 250, 0.3)' },
   purpleCard: { borderColor: 'rgba(168, 85, 247, 0.3)' },
-  statNumber: { fontSize: 22, fontWeight: '600', fontFamily: 'serif', marginTop: 6 },
-  statLabel: { color: '#64748B', fontSize: 11, marginTop: 2 },
+  statNumber: { fontSize: 22, fontWeight: '600', fontFamily: 'serif', marginTop: s(6) },
+  statLabel: { color: '#64748B', fontSize: 11, marginTop: s(2) },
   testimonialCard: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: 14,
-    padding: 14,
+    padding: s(14),
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    marginBottom: 28,
+    marginBottom: s(28),
   },
   avatarContainer: {
     width: 36,
@@ -201,23 +204,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#C9A84C',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: s(12),
   },
   avatarText: { color: '#060913', fontWeight: 'bold', fontSize: 12 },
   testimonialContent: { flex: 1 },
-  stars: { color: '#C9A84C', fontSize: 10, marginBottom: 4 },
+  stars: { color: '#C9A84C', fontSize: 10, marginBottom: s(4) },
   reviewText: { color: '#CBD5E1', fontSize: 11, lineHeight: 16 },
-  authorText: { color: '#64748B', fontSize: 10, marginTop: 4 },
-  contentSection: { marginTop: 4 },
-  tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  goldLine: { width: 18, height: 2, backgroundColor: '#C9A84C', marginRight: 8 },
+  authorText: { color: '#64748B', fontSize: 10, marginTop: s(4) },
+  contentSection: { marginTop: s(4) },
+  tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
+  goldLine: { width: 18, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
   sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
   mainHeading: {
     color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '500',
     lineHeight: 36,
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   italicGold: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   boldWhite: { color: '#FFFFFF', fontWeight: 'bold' },
@@ -225,19 +228,19 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontSize: 13,
     lineHeight: 20,
-    marginBottom: 24,
+    marginBottom: s(24),
   },
   paginationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: s(20),
   },
   dotInactive: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginRight: 6,
+    marginRight: s(6),
   },
   dashActive: {
     width: 24,
@@ -247,10 +250,10 @@ const styles = StyleSheet.create({
   },
   getStartedBtn: {
     backgroundColor: '#D4AF37',
-    borderRadius: 25,
-    paddingVertical: 16,
+    borderRadius: 24,
+    paddingVertical: s(16),
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: s(16),
   },
   btnText: { color: '#060913', fontSize: 16, fontWeight: 'bold' },
 });

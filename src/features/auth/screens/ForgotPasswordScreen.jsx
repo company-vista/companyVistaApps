@@ -19,6 +19,7 @@ import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { forgotPassword } from '../api/forgotPasswordApi';
+import { s } from '../../../theme/responsive';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -191,31 +192,31 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: s(20),
+    paddingBottom: s(20),
     justifyContent: 'space-between',
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 16,
-    marginTop: 10,
+    marginBottom: s(16),
+    marginTop: s(10),
   },
   topLogo: {
     width: 150,
     height: 38,
     resizeMode: 'contain',
-    marginTop: 10,
+    marginTop: s(10),
   },
   heroSection: {
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: s(2),
   },
 
   outerCircle: {
-    width: 180,
-    height: 180,
+    width: 140,
+    height: 140,
     borderRadius: 90,
     borderWidth: 1,
     borderColor: '#1E293B',
@@ -223,8 +224,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   innerCircle: {
-    width: 140,
-    height: 140,
+    width: 110,
+    height: 110,
     borderRadius: 70,
     borderWidth: 1,
     borderColor: '#334155',
@@ -232,9 +233,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lockIconContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 32,
     borderWidth: 1.5,
     borderColor: '#D4AF37',
     justifyContent: 'center',
@@ -246,12 +247,12 @@ const styles = StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: s(10),
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 26,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '500',
     textAlign: 'center',
   },
   italicTitle: {
@@ -262,10 +263,10 @@ const styles = StyleSheet.create({
   description: {
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: s(10),
     fontSize: 14,
     lineHeight: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: s(10),
   },
   form: {
     width: '100%',
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
-    marginBottom: 8,
+    marginBottom: s(8),
   },
   inputContainer: {
     flexDirection: 'row',
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     borderColor: '#D4AF37',
     borderRadius: 12,
     backgroundColor: '#0F172A',
-    paddingHorizontal: 12,
+    paddingHorizontal: s(12),
     height: 52,
   },
   inputError: {
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     color: '#D4AF37',
     fontSize: 16,
-    marginRight: 10,
+    marginRight: s(10),
   },
   input: {
     flex: 1,
@@ -303,13 +304,13 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#fca5a5',
     fontSize: 12,
-    marginTop: 6,
+    marginTop: s(6),
   },
   subtext: {
     color: '#64748B',
     fontSize: 12,
-    marginTop: 6,
-    marginBottom: 16,
+    marginTop: s(6),
+    marginBottom: s(16),
   },
   infoCard: {
     flexDirection: 'row',
@@ -318,13 +319,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1E293B',
     borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
+    padding: s(14),
+    marginBottom: s(12),
   },
   infoIcon: {
     color: '#94A3B8',
     fontSize: 16,
-    marginRight: 10,
+    marginRight: s(10),
   },
   infoText: {
     color: '#94A3B8',
@@ -343,14 +344,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   footer: {
-    marginTop: 20,
+    marginTop: s(20),
     alignItems: 'center',
   },
   submitButton: {
     backgroundColor: '#D4AF37',
     width: '100%',
     height: 52,
-    borderRadius: 12,
+    borderRadius: 24,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     color: '#070A12',
     fontSize: 16,
     fontWeight: '700',
-    marginRight: 8,
+    marginRight: s(8),
   },
   arrowIcon: {
     color: '#070A12',
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
   },
   bottomLinkContainer: {
     flexDirection: 'row',
-    marginTop: 16,
+    marginTop: s(16),
   },
   bottomText: {
     color: '#64748B',

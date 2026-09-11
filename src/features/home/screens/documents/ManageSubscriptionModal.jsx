@@ -3,6 +3,7 @@ import { Modal, StyleSheet, Text, View, ScrollView, Pressable, } from 'react-nat
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 const PLANS_DATA = [
     {
         id: 'basic',
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingVertical: 16,
         borderBottomWidth: 1,
     },
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 12,
         right: 12,
-        paddingHorizontal: 10,
+        paddingHorizontal: s(10),
         paddingVertical: 3,
         borderRadius: 6,
         zIndex: 2,
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     },
     cardBottomAction: {
         paddingVertical: 14,
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         alignItems: 'center',
         justifyContent: 'center',
     },

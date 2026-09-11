@@ -21,5 +21,7 @@ export function useResponsive() {
     const isSmallScreen = width < 380;
     const isMediumScreen = width >= 380 && width < 768;
     const isLargeScreen = width >= 768;
-    return { width, height, rs, rvs, rms, isSmallScreen, isMediumScreen, isLargeScreen };
+    const isLandscape = width > height;
+    const isPortrait = height >= width;
+    return { width, height, rs, rvs, rms, isSmallScreen, isMediumScreen, isLargeScreen, isLandscape, isPortrait };
 }

@@ -15,6 +15,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 export default function OptionalAddOnsScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -46,6 +47,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
 
   const handleContinue = () => {
     navigation.navigate('FounderDetails', {
+      ...(route.params || {}),
       selectedStructure,
       companyName,
       selectedEnding,
@@ -226,9 +228,9 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 34, marginBottom: 16, paddingHorizontal: 16 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 34, marginBottom: 16, paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 20 },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: 20 },
   titleContainer: { marginVertical: 15 },
   mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: 8 },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
@@ -249,27 +251,27 @@ const styles = StyleSheet.create({
   cardTextContainer: { flex: 1, marginLeft: 12, marginRight: 8 },
   titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
   cardTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  popularBadge: { backgroundColor: 'rgba(212,175,55,0.15)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
+  popularBadge: { backgroundColor: 'rgba(212,175,55,0.15)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
   popularBadgeText: { color: '#D4AF37', fontSize: 8, fontWeight: '700' },
-  purpleBadge: { backgroundColor: 'rgba(100,80,255,0.15)', borderWidth: 1, borderColor: 'rgba(100,80,255,0.3)', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
+  purpleBadge: { backgroundColor: 'rgba(100,80,255,0.15)', borderWidth: 1, borderColor: 'rgba(100,80,255,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
   purpleBadgeText: { color: '#A78BFA', fontSize: 8, fontWeight: '700' },
-  guaranteeBadge: { backgroundColor: 'rgba(0,230,118,0.12)', borderWidth: 1, borderColor: 'rgba(0,230,118,0.3)', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, alignSelf: 'flex-start', marginTop: 4 },
+  guaranteeBadge: { backgroundColor: 'rgba(0,230,118,0.12)', borderWidth: 1, borderColor: 'rgba(0,230,118,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 4 },
   guaranteeBadgeText: { color: '#00E676', fontSize: 8, fontWeight: '700' },
   cardDescription: { color: '#7C8BA1', fontSize: 12, marginTop: 4, lineHeight: 16 },
   checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.04)', justifyContent: 'center', alignItems: 'center', marginTop: 2 },
   checkboxSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 12 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1, marginRight: 10 },
-  tagGreen: { backgroundColor: 'rgba(0,230,118,0.1)', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(0,230,118,0.2)' },
+  tagGreen: { backgroundColor: 'rgba(0,230,118,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(0,230,118,0.2)' },
   tagGreenText: { color: '#00E676', fontSize: 10, fontWeight: '500' },
-  tagGray: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  tagGray: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
   tagGrayText: { color: '#8E9BAE', fontSize: 10 },
-  tagBlue: { backgroundColor: 'rgba(100,149,237,0.1)', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(100,149,237,0.2)' },
+  tagBlue: { backgroundColor: 'rgba(100,149,237,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(100,149,237,0.2)' },
   tagBlueText: { color: '#64B5F6', fontSize: 10 },
   priceContainer: { alignItems: 'flex-end' },
   priceText: { color: '#D4AF37', fontSize: 14, fontWeight: '700' },
   priceSubtext: { color: '#6C7A8E', fontSize: 10 },
-  footerContainer: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 16, backgroundColor: '#080E18', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: 10, paddingBottom: 16, backgroundColor: '#080E18', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
   continueButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   continueButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700', marginRight: 8 },
   footerSubtext: { color: '#5B6B7C', fontSize: 12, textAlign: 'center', marginTop: 10 },

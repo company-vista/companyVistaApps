@@ -14,6 +14,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 const CompanyNamingScreen = ({ navigation, route }) => {
   const { selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -163,7 +164,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[styles.continueBtn, !companyName.trim() && styles.continueBtnDisabled]}
           activeOpacity={0.85}
-          onPress={() => companyName.trim() && navigation.navigate('StructureSelection', { companyName: companyName.trim(), selectedEnding, selectedState, selectedCountry })}
+          onPress={() => companyName.trim() && navigation.navigate('StructureSelection', { ...(route.params || {}), companyName: companyName.trim(), selectedEnding, selectedState, selectedCountry })}
           disabled={!companyName.trim()}
         >
           <Text style={styles.continueBtnText}>Continue →</Text>
@@ -177,73 +178,73 @@ export default CompanyNamingScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  progressContainer: { flexDirection: 'row', paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16, gap: 8 },
+  progressContainer: { flexDirection: 'row', paddingHorizontal: s(20), paddingTop: s(12), paddingBottom: s(16), gap: 8 },
   progressStep: { flex: 1, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 2 },
   progressActive: { backgroundColor: '#C9A84C' },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 90 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 34 },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: 8 },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(8) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: 20 },
+  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
   jurisdictionCard: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 14,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 14, paddingVertical: 12, marginBottom: 20,
+    paddingHorizontal: s(14), paddingVertical: s(12), marginBottom: s(20),
   },
-  countryCodeBadge: { color: '#64748B', fontSize: 12, fontWeight: 'bold', marginRight: 8 },
+  countryCodeBadge: { color: '#64748B', fontSize: 12, fontWeight: 'bold', marginRight: s(8) },
   jurisdictionLabel: { color: '#64748B', fontSize: 12, flex: 1 },
   jurisdictionValue: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
-  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: 8, marginTop: 8 },
+  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(8) },
   requiredAsterisk: { color: '#EF4444' },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.03)', borderRadius: 12,
-    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: 14, height: 48,
+    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
   },
   defaultInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 14, height: 48,
+    paddingHorizontal: s(14), height: 48,
   },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: 10 },
+  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
   greenCheckBadge: {
     width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981',
     alignItems: 'center', justifyContent: 'center',
   },
-  availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, marginBottom: 16, gap: 6 },
+  availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(16), gap: 6 },
   availabilityText: { color: '#10B981', fontSize: 11 },
-  endingsRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  endingsRow: { flexDirection: 'row', gap: 8, marginBottom: s(12) },
   endingChip: {
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 16,
+    paddingHorizontal: s(14), paddingVertical: s(8), borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   endingChipSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
   endingChipText: { color: '#64748B', fontSize: 11, fontWeight: '600' },
   endingChipTextSelected: { color: '#C9A84C', fontWeight: 'bold' },
-  fullLegalPreview: { color: '#64748B', fontSize: 11, marginBottom: 16 },
+  fullLegalPreview: { color: '#64748B', fontSize: 11, marginBottom: s(16) },
   fullLegalHighlight: { color: '#C9A84C', fontWeight: 'bold' },
-  helperText: { color: '#64748B', fontSize: 10, marginTop: 6, marginBottom: 16 },
+  helperText: { color: '#64748B', fontSize: 10, marginTop: s(6), marginBottom: s(16) },
   infoBox: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(59, 130, 246, 0.04)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.15)',
-    padding: 12, marginTop: 10,
+    padding: s(12), marginTop: s(10),
   },
   infoIconCircle: {
     width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#60A5FA',
-    alignItems: 'center', justifyContent: 'center', marginRight: 10,
+    alignItems: 'center', justifyContent: 'center', marginRight: s(10),
   },
   infoBoxText: { flex: 1, color: '#94A3B8', fontSize: 10.5, lineHeight: 15 },
   boldWhite: { color: '#CBD5E1', fontWeight: 'bold' },
   bottomBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: '#060913', paddingHorizontal: 16, paddingVertical: 12,
+    backgroundColor: '#060913', paddingHorizontal: s(16), paddingVertical: s(12),
     borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
-  continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: 14, alignItems: 'center' },
+  continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
   continueBtnDisabled: { backgroundColor: 'rgba(212, 175, 55, 0.3)' },
   continueBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
 });

@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
 import { useAppSelector } from '../../../store/hooks';
 import { useThemeColors } from '../../../theme/colors';
+import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 import { deleteNotification, fetchNotifications, markNotificationAsRead } from '../api/notificationsApi';
 import { notifications } from '../data/notifications';
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     scrollContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
     },
     header: {
         flexDirection: 'row',
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 1,
         borderRadius: 22,
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         paddingVertical: 10
     },
     activeFilterButton: {},
@@ -281,13 +282,13 @@ const styles = StyleSheet.create({
     listCard: {
         borderRadius: 18,
         marginTop: 16,
-        paddingHorizontal: 4,
+        paddingHorizontal: s(4),
     },
     emptyCard: {
         alignItems: 'center',
         borderRadius: 18,
         marginTop: 24,
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
         paddingVertical: 40,
     },
     emptyIcon: {
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(15, 23, 42, 0.42)',
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
     },
     modalCard: {
         width: '100%',
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 20,
         marginBottom: 24,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
     },
     modalActions: {
         width: '100%',

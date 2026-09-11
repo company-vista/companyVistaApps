@@ -3,6 +3,7 @@ import { ActivityIndicator, View, Text, StyleSheet, TouchableOpacity, } from 're
 import axios from 'axios';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
 import RequestCard from './components/RequestCard';
+import { s } from '../../../../theme/responsive';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
     },
     filter: {
         paddingVertical: 8,
-        paddingHorizontal: 18,
+        paddingHorizontal: s(18),
         borderRadius: 20,
         borderWidth: 0.5,
     },
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginVertical: 32,
         fontSize: font.lg,
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
     },
 });
 export default MyRequestsScreen;

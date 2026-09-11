@@ -12,6 +12,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import logoR from '../../../assets/images/logoR.png';
+import { s } from '../../../theme/responsive';
 
 export default function DetailsReceivedScreen({ navigation, route }) {
   const {
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
   topBar: { alignItems: 'center', paddingVertical: 16, marginTop: 10 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain' },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 20, alignItems: 'center' },
+  scrollContent: { paddingHorizontal: s(20), paddingBottom: 20, alignItems: 'center' },
   summarySection: { width: '100%', gap: 12, marginBottom: 10 },
   summaryCard: { width: '100%', backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: 14, borderTopWidth: 1, borderTopColor: 'rgba(212,175,55,0.15)' },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   summaryLabel: { color: '#6C7A8E', fontSize: 12 },
   summaryValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
   summaryValueGold: { color: '#D4AF37', fontSize: 12, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
-  summaryValueSmall: { color: '#8E9BAE', fontSize: 10, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: 4, paddingVertical: 1, borderRadius: 3, overflow: 'hidden' },
+  summaryValueSmall: { color: '#8E9BAE', fontSize: 10, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: s(4), paddingVertical: 1, borderRadius: 3, overflow: 'hidden' },
   residenceValue: { flexDirection: 'row', alignItems: 'center' },
   heroSection: { alignItems: 'center', marginTop: 20, marginBottom: 30, width: '100%' },
   outerGlowCircle: { width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(255, 255, 255, 0.02)', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
@@ -192,14 +193,14 @@ const styles = StyleSheet.create({
   iconContainer: { width: 90, height: 90, borderRadius: 28, backgroundColor: '#0C1827', borderWidth: 1, borderColor: 'rgba(100, 181, 246, 0.3)', justifyContent: 'center', alignItems: 'center' },
   mainTitle: { fontSize: 32, fontWeight: '700', color: '#FFFFFF', marginTop: 15, marginBottom: 8 },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#64B5F6' },
-  subtitle: { color: '#8E9BAE', fontSize: 14, textAlign: 'center', lineHeight: 22, paddingHorizontal: 10 },
+  subtitle: { color: '#8E9BAE', fontSize: 14, textAlign: 'center', lineHeight: 22, paddingHorizontal: s(10) },
   companyName: { color: '#FFFFFF', fontWeight: '700' },
   infoCard: { width: '100%', backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center' },
   cardIconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255, 255, 255, 0.04)', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   cardTextGroup: { flex: 1 },
   cardTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   cardSubtext: { color: '#6C7A8E', fontSize: 12, marginTop: 3 },
-  footerContainer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20, backgroundColor: '#080E18', gap: 10 },
+  footerContainer: { paddingHorizontal: s(20), paddingTop: 10, paddingBottom: 20, backgroundColor: '#080E18', gap: 10 },
   dashboardButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   dashboardButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700', marginRight: 8 },
   speakButton: { backgroundColor: '#0C1622', height: 50, borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.12)', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },

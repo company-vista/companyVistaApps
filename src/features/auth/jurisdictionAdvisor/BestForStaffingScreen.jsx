@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { s } from '../../../theme/responsive';
 import {
   StyleSheet,
   Text,
@@ -154,15 +155,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0B0E17',
   },
-  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
+  topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 24,
+    gap: s(8),
+    paddingHorizontal: s(16),
+    paddingVertical: s(12),
+    marginTop: s(24),
   },
   iconButton: {
     width: 38,
@@ -189,17 +190,17 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 7,
     letterSpacing: 1.2,
-    marginTop: 1,
+    marginTop: s(1),
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingHorizontal: s(16),
+    paddingBottom: s(20),
   },
   title: {
     fontSize: font.display,
     fontWeight: '500',
     color: '#FFFFFF',
-    marginTop: 8,
+    marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
@@ -209,19 +210,19 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#64748B',
-    marginTop: 6,
-    marginBottom: 16,
+    marginTop: s(6),
+    marginBottom: s(16),
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 20,
+    gap: s(8),
+    marginBottom: s(20),
   },
   tagPill: {
     backgroundColor: '#151329',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: s(12),
+    paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#2D264A',
@@ -240,13 +241,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#3D2D1B',
-    padding: 16,
-    marginBottom: 20,
+    padding: s(16),
+    marginBottom: s(20),
   },
   noticeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: s(8),
   },
   warningIconBadge: {
     width: 28,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#261F13',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: s(10),
   },
   warningIcon: {
     fontSize: 14,
@@ -275,8 +276,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#3D321D',
-    padding: 16,
-    marginBottom: 20,
+    padding: s(16),
+    marginBottom: s(20),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
@@ -284,9 +285,9 @@ const styles = StyleSheet.create({
     borderColor: '#D1A253',
     borderWidth: 1,
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 16,
+    paddingHorizontal: s(10),
+    paddingVertical: s(4),
+    marginBottom: s(16),
   },
   badgeText: {
     color: '#D1A253',
@@ -297,9 +298,9 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: s(8),
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: s(20),
   },
   cardHeaderLeft: {
     flexDirection: 'row',
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#334155',
-    marginRight: 12,
+    marginRight: s(12),
   },
   countryName: {
     color: '#FFFFFF',
@@ -320,11 +321,11 @@ const styles = StyleSheet.create({
   stateSubtitle: {
     color: '#64748B',
     fontSize: 11,
-    marginTop: 2,
+    marginTop: s(2),
   },
   matchPercentageContainer: {
     alignItems: 'flex-end',
-    marginLeft: 8,
+    marginLeft: s(8),
   },
   matchPercentage: {
     color: '#D1A253',
@@ -340,18 +341,18 @@ const styles = StyleSheet.create({
   featuresList: {
     borderTopWidth: 1,
     borderColor: '#1E2638',
-    paddingTop: 16,
+    paddingTop: s(16),
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: s(12),
   },
   checkIcon: {
     color: '#10B981',
     fontSize: 14,
-    marginRight: 10,
-    marginTop: 1,
+    marginRight: s(10),
+    marginTop: s(1),
   },
   featureText: {
     color: '#94A3B8',
@@ -364,9 +365,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bottomContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 16,
+    paddingHorizontal: s(16),
+    paddingTop: s(12),
+    paddingBottom: s(16),
     backgroundColor: '#0B0E17',
     alignItems: 'center',
   },
@@ -386,6 +387,6 @@ const styles = StyleSheet.create({
   addonText: {
     color: '#475569',
     fontSize: 12,
-    marginTop: 10,
+    marginTop: s(10),
   },
 });

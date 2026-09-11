@@ -6,6 +6,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../../../config/api";
 import { useAppSelector } from "../../../../store/hooks";
 import { useThemeColors } from '../../../../theme/colors';
+import { s } from '../../../../theme/responsive';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const API_REQUEST_TIMEOUT_MS = 10000;
 const BreakdownRow = ({ label, value, isTotal = false, colors }) => (<View style={[styles.breakdownRow, isTotal && [styles.breakdownRowTotal, { borderTopColor: colors.border }]]}>
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     },
     deselectBtn: {
         borderRadius: 20,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 5,
     },
     deselectBtnText: {
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     },
     expiredBadge: {
         borderRadius: 20,
-        paddingHorizontal: 7,
+        paddingHorizontal: s(7),
         paddingVertical: 2,
         alignSelf: "flex-start",
         marginTop: 3,

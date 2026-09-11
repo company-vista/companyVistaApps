@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../../../components/buttons/BackButton';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
+import { s } from '../../../../theme/responsive';
 const serviceItems = [
     {
         title: 'Subscription',
@@ -78,7 +79,7 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExp
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
-            paddingHorizontal: 20,
+            paddingHorizontal: s(20),
             paddingBottom: safeAreaInsets.bottom + 24,
         }}>
         {serviceItems.map((item) => {
@@ -105,7 +106,7 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExp
 const styles = StyleSheet.create({
     screen: { flex: 1 },
     headerArea: {
-        paddingHorizontal: 20,
+        paddingHorizontal: s(20),
         paddingBottom: 12,
         marginBottom: 20,
     },
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
         top: -6,
         right: -8,
         borderRadius: 8,
-        paddingHorizontal: 5,
+        paddingHorizontal: s(5),
         paddingVertical: 1,
         maxWidth: 55,
     },

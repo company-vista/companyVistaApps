@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { font } from "../../../../theme/typography";
+import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -8,7 +9,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
         paddingTop: 0,
         paddingBottom: 8,
         borderBottomWidth: 1,
@@ -28,7 +29,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 6,
         gap: 6,
     },
@@ -48,7 +49,7 @@ export const styles = StyleSheet.create({
         fontSize: font.sm,
     },
     scrollContent: {
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
         paddingTop: 20,
         paddingBottom: 30,
     },
@@ -155,7 +156,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 10,
         gap: 12,
     },
@@ -175,7 +176,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 12,
         gap: 12,
     },
@@ -219,7 +220,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 10,
     },
     dropdownText: {
@@ -229,7 +230,7 @@ export const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 10,
         fontSize: font.base,
     },
@@ -239,7 +240,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 10,
     },
     dateText: {
@@ -250,7 +251,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         borderWidth: 1,
         borderRadius: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 12,
         gap: 10,
         marginBottom: 20,
@@ -279,7 +280,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 6,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 6,
         gap: 4,
     },
@@ -303,7 +304,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 6,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 5,
         gap: 4,
     },
@@ -319,7 +320,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 10,
         gap: 10,
     },
@@ -330,7 +331,7 @@ export const styles = StyleSheet.create({
     statusBadge: {
         borderWidth: 1,
         borderRadius: 6,
-        paddingHorizontal: 8,
+        paddingHorizontal: s(8),
         paddingVertical: 4,
     },
     statusText: {
@@ -347,7 +348,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 12,
+        paddingHorizontal: s(12),
         paddingVertical: 12,
         gap: 10,
         marginBottom: 12,

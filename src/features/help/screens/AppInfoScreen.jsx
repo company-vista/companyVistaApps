@@ -1,9 +1,12 @@
-import { Image, Platform, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { Image, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackButton } from '../../../components/buttons';
 import { useThemeColors } from '../../../theme/colors';
-import styles from './HelpFeedbackScreen.styles';
+import { createStyles } from './HelpFeedbackScreen.styles';
+import { useResponsive } from '../../../hooks/useResponsive';
 import logoImage from '../../../assets/images/Logo1.png';
+
 const appInfoItems = [
     { label: 'App name', value: 'Company Vista' },
     { label: 'Version', value: '0.0.1' },
@@ -14,7 +17,10 @@ const appInfoItems = [
 export default function AppInfoScreen({ onBackPress }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
-    return (<View style={[
+    const { rs, rvs, rms, width, height } = useResponsive();
+    const styles = useMemo(() => createStyles({ rs, rvs, rms, width, height }), [rs, rvs, rms, width, height]);
+    return (
+    <View style={[
             styles.screen,
             {
                 paddingTop: safeAreaInsets.top,
@@ -30,29 +36,32 @@ export default function AppInfoScreen({ onBackPress }) {
         </Text>
       </View>
 
-      <View style={styles.appInfoContent}>
-        <View style={[styles.appInfoCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}>
-          <View style={[styles.appInfoIcon, { backgroundColor: colors.accentSoft }]}>
-            <Image source={logoImage} style={styles.appInfoLogo}/>
-          </View>
-          <Text style={[styles.appInfoTitle, { color: colors.text }]}>
-            Company Vista
-          </Text>
-          <Text style={[styles.appInfoSubtitle, { color: colors.muted }]}>
-            Client Application
-          </Text>
-        </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: rvs(20) }} showsVerticalScrollIndicator={false}>
+        <View style={styles.appInfoContent}>
+            <View style={[styles.appInfoCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}>
+            <View style={[styles.appInfoIcon, { backgroundColor: colors.accentSoft }]}>
+                <Image source={logoImage} style={styles.appInfoLogo}/>
+            </View>
+            <Text style={[styles.appInfoTitle, { color: colors.text }]}>
+                Company Vista
+            </Text>
+            <Text style={[styles.appInfoSubtitle, { color: colors.muted }]}>
+                Client Application
+            </Text>
+            </View>
 
-        <View style={[styles.appInfoList, { backgroundColor: colors.surface }]}>
-          {appInfoItems.map(item => (<View key={item.label} style={[styles.appInfoRow, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.appInfoLabel, { color: colors.muted }]}>
-                {item.label}
-              </Text>
-              <Text style={[styles.appInfoValue, { color: colors.text }]}>
-                {item.value}
-              </Text>
-            </View>))}
+            <View style={[styles.appInfoList, { backgroundColor: colors.surface }]}>
+            {appInfoItems.map(item => (
+            <View key={item.label} style={[styles.appInfoRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.appInfoLabel, { color: colors.muted }]}>
+                    {item.label}
+                </Text>
+                <Text style={[styles.appInfoValue, { color: colors.text }]}>
+                    {item.value}
+                </Text>
+                </View>))}
+            </View>
         </View>
-      </View>
+      </ScrollView>
     </View>);
 }

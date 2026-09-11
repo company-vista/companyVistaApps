@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
+import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
-        paddingHorizontal: 16,
+        paddingHorizontal: s(16),
     },
     header: {
         flexDirection: 'row',
@@ -13,7 +14,7 @@ const styles = StyleSheet.create({
     titleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: s(12),
     },
     title: {
         color: '#111827',
@@ -21,14 +22,14 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
     content: {
-        paddingTop: 24,
+        paddingTop: s(24),
     },
     avatarCard: {
         alignItems: 'center',
         borderRadius: 18,
         backgroundColor: '#ffffff',
-        padding: 24,
-        marginTop: 28,
+        padding: s(24),
+        marginTop: s(28),
     },
     avatarWrap: {
         position: 'relative',
@@ -52,8 +53,8 @@ const styles = StyleSheet.create({
     },
     cameraButton: {
         position: 'absolute',
-        right: -16,
-        bottom: -4,
+        right: s(-16),
+        bottom: s(-4),
         width: 44,
         height: 44,
         alignItems: 'center',
@@ -65,12 +66,12 @@ const styles = StyleSheet.create({
     formCard: {
         borderRadius: 18,
         backgroundColor: '#ffffff',
-        marginTop: 18,
-        padding: 16,
-        gap: 14,
+        marginTop: s(18),
+        padding: s(16),
+        gap: s(14),
     },
     inputGroup: {
-        gap: 7,
+        gap: s(7),
     },
     inputLabel: {
         color: '#94a3b8',
@@ -81,12 +82,12 @@ const styles = StyleSheet.create({
         minHeight: 50,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: s(12),
         borderWidth: 1,
         borderColor: '#e5e7eb',
         borderRadius: 14,
         backgroundColor: '#ecfeff',
-        paddingHorizontal: 14,
+        paddingHorizontal: s(14),
     },
     input: {
         flex: 1,
@@ -103,13 +104,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(15, 23, 42, 0.42)',
-        paddingHorizontal: 24,
+        paddingHorizontal: s(24),
     },
     modalCard: {
         width: '100%',
         borderRadius: 18,
         backgroundColor: '#ffffff',
-        padding: 18,
+        padding: s(18),
     },
     modalTitle: {
         color: '#111827',
@@ -119,13 +120,13 @@ const styles = StyleSheet.create({
     },
     datePickerColumns: {
         flexDirection: 'row',
-        gap: 10,
-        marginTop: 18,
+        gap: s(10),
+        marginTop: s(18),
     },
     dateColumn: {
         flex: 1,
         alignItems: 'center',
-        gap: 10,
+        gap: s(10),
     },
     dateLabel: {
         color: '#94a3b8',
@@ -148,8 +149,8 @@ const styles = StyleSheet.create({
     },
     modalActions: {
         flexDirection: 'row',
-        gap: 12,
-        marginTop: 22,
+        gap: s(12),
+        marginTop: s(22),
     },
     modalButton: {
         flex: 1,
