@@ -17,6 +17,7 @@ function getAuthHeaders(token) {
         }
         : {};
 }
+// **************Old payment status clear and poll functions**********************
 function clearPaymentStatusFlow() {
     if (paymentStatusInterval) {
         clearInterval(paymentStatusInterval);
@@ -56,8 +57,7 @@ function pollPaymentStatus({ referenceId, token, onPaid, onGiveUp }) {
                 onPaid?.(data);
             }
         }
-        catch {
-            // silently retry
+        catch (err) {
         }
     }, 5000);
 }
@@ -68,6 +68,7 @@ export default function StripeOneTimePayment(props) {
     const invoice = props.invoice || routeInvoice || {};
     const onSuccess = props.onSuccess || props?.route?.params?.onSuccess;
     const onInitiated = props.onInitiated || props?.route?.params?.onInitiated;
+    const onFailure = props.onFailure || props?.route?.params?.onFailure;
     const paymentType = props.paymentType || routePaymentType || 'invoice';
     const label = props.label || routeLabel || 'Pay Now';
     const buttonStyle = props.buttonStyle;
@@ -77,7 +78,6 @@ export default function StripeOneTimePayment(props) {
         return () => clearPaymentStatusFlow();
     }, []);
     const handlePayment = async () => {
-        console.log(invoice, 'invoice');
         // bina login ke payment allow - token optional rakha hai
         // agar token nahi hai to bina Auth header ke API call hogi
         const companyId = invoice?.companyId || invoice?.company?._id;
@@ -176,6 +176,7 @@ export default function StripeOneTimePayment(props) {
                     },
                     onGiveUp: () => {
                         Toast.show({ type: 'info', text1: 'Payment not confirmed', text2: 'Your payment may still be processing. Check Transactions shortly.' });
+                        onFailure?.();
                     },
                 });
             }
@@ -185,6 +186,7 @@ export default function StripeOneTimePayment(props) {
         }
         catch (error) {
             clearPaymentStatusFlow();
+            onFailure?.(error);
             const msg = error?.response?.data?.message ||
                 error?.message ||
                 'Unable to start Stripe payment';

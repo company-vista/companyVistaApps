@@ -11,10 +11,9 @@ export const styles = StyleSheet.create({
     },
     sectionContainer: {
         borderRadius: 16,
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(8),
         paddingVertical: 4,
         marginBottom: 14,
-        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,

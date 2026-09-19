@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
     },
     header: {
         flexDirection: 'row',

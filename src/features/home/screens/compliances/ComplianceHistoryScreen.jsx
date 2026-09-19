@@ -316,15 +316,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        padding: 18,
+        paddingHorizontal: s(10),
         paddingBottom: 40,
         paddingTop: 16,
     },
     card: {
+        width: '100%',
+        alignSelf: 'stretch',
         borderWidth: 1,
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 14,
+        borderRadius: s(16),
+        padding: s(14),
+        marginBottom: s(14),
     },
     cardTitleRow: {
         flexDirection: 'row',
@@ -375,9 +377,9 @@ const styles = StyleSheet.create({
     detailCard: {
         width: '48%',
         borderWidth: 1,
-        borderRadius: 14,
-        padding: 12,
-        marginBottom: 12,
+        borderRadius: s(14),
+        padding: s(12),
+        marginBottom: s(12),
     },
     detailRow: {
         flexDirection: 'row',
@@ -397,9 +399,10 @@ const styles = StyleSheet.create({
         fontSize: font.base,
     },
     historyCard: {
+        width: '100%',
         borderWidth: 1,
-        borderRadius: 14,
-        padding: 16,
+        borderRadius: s(14),
+        padding: s(14),
     },
     historyFields: {
         flexDirection: 'row',
@@ -416,9 +419,10 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     historyItemCard: {
+        width: '100%',
         borderWidth: 1,
-        borderRadius: 14,
-        padding: 14,
+        borderRadius: s(14),
+        padding: s(14),
     },
     historyItemHeader: {
         flexDirection: 'row',

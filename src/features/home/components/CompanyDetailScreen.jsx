@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 const menuItems = [
     { id: 'companyInfo', label: 'Company Info', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
     { id: 'shareholders', label: 'Shareholders', icon: 'users', iconBg: '#E6F4EA', iconColor: '#137333' },
-    { id: 'orders', label: 'Orders', icon: 'shopping-cart', iconBg: '#FFF7ED', iconColor: '#C2410C' },
 ];
 const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPress, onSectionPress, selectedCompany, isLoading, }) => {
     const colors = useThemeColors();
@@ -66,7 +65,7 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
             case 'shareholders':
                 return <ShareHolders companyId={companyData.id}/>;
             case 'orders':
-                return <OrderDetailsScreen onBackPress={handleBackPress} onMessagePress={() => nav.navigate('Support')} />;
+                return <OrderDetailsScreen selectedCompany={companyData} onBackPress={handleBackPress} onMessagePress={() => nav.navigate('Support')} />;
             default:
                 return null;
         }
@@ -93,62 +92,22 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        {/* ── HERO CARD ─────────────────────────────────────── */}
-        <View style={[styles.heroCard, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
-          {/* Avatar */}
-          <View style={[styles.avatarCircle, { backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#EEF2FF' }]}>
-            <Text style={[styles.avatarText, { color: colors.mode === 'dark' ? '#93C5FD' : '#4F46E5' }]}>
-              {companyData.initials ?? companyData.name?.slice(0, 1)?.toUpperCase()}
-            </Text>
-          </View>
-
-          {/* Name + Details */}
-          <View style={styles.heroInfo}>
-            {/* Name + Status row */}
-            <View style={styles.heroNameRow}>
-              <Text style={[styles.heroName, { color: colors.text }]} numberOfLines={1}>
-                {companyData.name}
-              </Text>
-
-              {/* Status Badge */}
-              <View style={[styles.statusBadge, { backgroundColor: statusColor.bg }]}>
-                <View style={[styles.statusDot, { backgroundColor: statusColor.dot }]}/>
-                <Text style={[styles.statusText, { color: statusColor.text }]}>
-                  {companyData.status?.toUpperCase()}
-                </Text>
-              </View>
-            </View>
-
-            {/* Mockup matching company details */}
-            <Text style={[styles.heroMetaText, { color: colors.muted }]}>
-              Your Company Name ·
-            </Text>
-            <View style={styles.einWrapperNo}>
-              <Text style={[styles.heroMetaText, { color: colors.muted }]}>
-                EIN
-              </Text>
-              <Text style={[styles.heroMetaText, { color: colors.muted }]}>
-                {companyData.ein ?? 'XX-XXXXXXX'}
-              </Text>
-            </View>
-          </View>
-        </View>
-
         {/* ── SECTION CONTENT / MENU LIST ───────────────────── */}
         {activeSection ? (<View style={styles.sectionContent}>{renderSection()}</View>) : (
         /* Image ke jaisa separated floating card style list */
         <View style={styles.menuCard}>
-            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={[styles.menuRow, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
+            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={styles.menuRow}>
 
                 {/* Icon bubble */}
                 <View style={[styles.iconBubble, { backgroundColor: colors.mode === 'dark' ? 'rgba(79,70,229,0.15)' : item.iconBg }]}>
                   <FontAwesome name={item.icon} size={16} color={colors.mode === 'dark' ? '#93C5FD' : item.iconColor}/>
                 </View>
 
-                {/* Label - short text */}
+                {/* Label */}
                 <Text style={[styles.menuLabel, { color: colors.text }]} numberOfLines={1}>
                   {item.label}
                 </Text>
+                <FontAwesome name="angle-right" size={18} color={colors.muted} />
               </TouchableOpacity>))}
           </View>)}
       </ScrollView>

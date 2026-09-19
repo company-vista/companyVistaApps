@@ -101,7 +101,7 @@ export default function ServicesHistoryScreen({ onBackPress, selectedCompany }) 
           <ActivityIndicator size="large" color={colors.muted} />
         </View>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: safeAreaInsets.bottom + 24 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: s(12), paddingBottom: safeAreaInsets.bottom + 24 }}>
           {error ? (
             <View style={styles.centerState}>
               <Text style={[styles.stateText, { color: colors.muted }]}>{error}</Text>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerArea: {
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(12),
     paddingBottom: 12,
     marginBottom: 8,
   },
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
-    paddingHorizontal: s(24),
+    paddingHorizontal: s(12),
   },
   stateText: {
     fontSize: font.base,

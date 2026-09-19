@@ -272,10 +272,10 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  scrollContent: { paddingHorizontal: s(20), paddingBottom: s(24) },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '500', lineHeight: 34, marginBottom: s(6), marginTop: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: s(26), fontWeight: '500', lineHeight: s(34), marginBottom: s(6), marginTop: s(10) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
   tabContainer: {
@@ -289,10 +289,11 @@ const styles = StyleSheet.create({
   activeTabText: { color: '#C9A84C', fontWeight: 'bold' },
   inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
   inputContainer: {
+    width: '100%',
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(12),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: s(14), height: 48, marginBottom: s(16),
+    paddingHorizontal: s(14), height: s(48), marginBottom: s(16),
   },
   inputContainerError: { borderColor: '#EF4444' },
   textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
@@ -333,8 +334,8 @@ const styles = StyleSheet.create({
   socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: s(24) },
   socialBtn: {
     width: '48%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: s(12), gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(12),
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: s(12), gap: s(8),
   },
   socialBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
   signupText: { color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: s(20) },

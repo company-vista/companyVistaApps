@@ -65,7 +65,7 @@ function ExploreServicesScreen({ onBackPress, selectedCompany }) {
                     if (screen) {
                         navigation.navigate(screen, { companyId: selectedCompany?.id });
                     }
-                }} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                }} style={styles.card}>
               <View style={[styles.iconBox, { backgroundColor: tone.iconBg }]}>
                 <FontAwesome name={item?.icon ?? 'th-large'} size={20} color={tone.iconColor}/>
               </View>
@@ -84,19 +84,18 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: s(20),
+        paddingHorizontal: s(12),
         paddingBottom: 12,
         gap: 12,
         marginBottom: 20,
     },
     title: { fontSize: font.hero, fontWeight: '500' },
-    content: { paddingHorizontal: s(20) },
+    content: { paddingHorizontal: s(12) },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 14,
         borderRadius: 16,
-        borderWidth: 1,
         marginBottom: 10,
         gap: 12,
     },

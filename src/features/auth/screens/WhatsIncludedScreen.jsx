@@ -20,7 +20,7 @@ export default function WhatsIncludedScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
 
   const handleContinue = () => {
-    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, companyName, selectedEnding, selectedState, selectedCountry });
+    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299), companyName, selectedEnding, selectedState, selectedCountry });
   };
 
   const handleBack = () => {
@@ -192,7 +192,30 @@ export default function WhatsIncludedScreen({ navigation, route }) {
         </TouchableOpacity>
 
         <Text style={styles.footerSubtext}>
-          $299 package + $180 Delaware state fee
+          {(() => {
+            const p = route.params || {};
+            if (p.advisorFlow && (p.bestStatePrice || p.bestCountryPrice || p.selectedCountryPrice)) {
+              if (p.bestStatePrice) {
+                const structPrice = p.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299);
+                const delta = structPrice - 299;
+                const total = Number(p.bestStatePrice) + (delta > 0 ? delta : 0);
+                const stateName = p.bestState || p.selectedState || selectedState;
+                return `$${total} total · $${structPrice} structure + $${p.bestStateGovFee ?? (total - structPrice)} ${stateName} state fee`;
+              } else {
+                const countryPrice = p.bestCountryPrice ?? p.selectedCountryPrice ?? 0;
+                const countryName = p.bestCountryName || p.selectedCountry || selectedCountry;
+                return `$${countryPrice} total · ${countryName} package`;
+              }
+            }
+            const stateName = p.selectedState || p.bestState || selectedState;
+            const stateFee = p.selectedStatePrice ?? p.bestStateGovFee ?? 160;
+            const structPrice = p.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299);
+            if (p.selectedCountry && p.selectedCountry !== 'US') {
+              const cPrice = p.selectedCountryPrice ?? 0;
+              return cPrice ? `$${cPrice} ${p.selectedCountry} package` : `$${structPrice} Structure package + $${stateFee} ${stateName} state fee`;
+            }
+            return `$${structPrice} Structure package + $${stateFee} ${stateName} state fee`;
+          })()}
         </Text>
       </View>
     </SafeAreaView>
@@ -239,8 +262,8 @@ const styles = StyleSheet.create({
     marginVertical: s(15),
   },
   mainTitle: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: s(26),
+    fontWeight: '400',
     color: '#FFFFFF',
     marginBottom: s(8),
   },
@@ -280,7 +303,7 @@ const styles = StyleSheet.create({
   },
   packageTitle: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: s(15),
     fontWeight: '700',
   },
   packageSubtitle: {
@@ -332,7 +355,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: s(13),
     fontWeight: '600',
   },
   badge: {
@@ -420,7 +443,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     backgroundColor: '#D4AF37',
-    height: 52,
+    paddingVertical: s(14),
     borderRadius: 26,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -428,7 +451,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#0A111D',
-    fontSize: 16,
+    fontSize: s(15),
     fontWeight: '700',
     marginRight: s(8),
   },

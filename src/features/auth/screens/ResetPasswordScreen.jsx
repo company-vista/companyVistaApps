@@ -92,14 +92,7 @@ export default function ResetPasswordScreen() {
             <Image source={logoR} style={styles.topLogo} />
           </View>
 
-          {/* Lock Icon Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.lockOuterCard}>
-              <View style={styles.lockIconContainer}>
-                <Text style={styles.lockIcon}>🔒</Text>
-              </View>
-            </View>
-          </View>
+
 
           <View style={styles.textSection}>
             <Text style={styles.title}>

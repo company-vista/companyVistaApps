@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -21,11 +22,81 @@ import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
 import { useThemeColors } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
+import { useAppSelector } from '../../../../../store/hooks';
+import { fetchQuote, isQuoteReady, formatCurrency, formatConverted } from './api/quoteApi';
 
-const QuoteScreen = ({ onBackPress, onViewBreakdown }) => {
+const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany = null, quote: quoteProp = null }) => {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
+  const token = useAppSelector((state) => state.auth.token);
+  const pendingOrder = useAppSelector((state) => state.auth.pendingOrderData);
+  const authUser = useAppSelector((state) => state.auth.user);
+  const signupFullName = pendingOrder?.fullName || authUser?.name || [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ') || selectedCompany?.name || 'User';
+  const signupInitials = signupFullName.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || 'U';
+  const signupFirstName = signupFullName.trim().split(/\s+/)[0] || 'User';
+
+  const [quote, setQuote] = useState(quoteProp || null);
+  const [loadingQuote, setLoadingQuote] = useState(!quoteProp);
+  useEffect(() => {
+    if (quoteProp) { setQuote(quoteProp); setLoadingQuote(false); return; }
+    let mounted = true;
+    setLoadingQuote(true);
+    const cid = selectedCompany?.id || selectedCompany?._id || pendingOrder?.companyId;
+    fetchQuote({ companyId: cid, token, invoiceId: pendingOrder?.orderId })
+      .then(res => { if (mounted) setQuote(res.quote); })
+      .finally(() => { if (mounted) setLoadingQuote(false); });
+    return () => { mounted = false; };
+  }, [selectedCompany?.id, selectedCompany?._id, pendingOrder?.companyId, pendingOrder?.orderId, token, quoteProp]);
+
+  const effectiveQuote = quote;
+  const rawAmount = (amount && Number(amount) > 0 ? amount : [effectiveQuote?.total, effectiveQuote?.totalAmount, effectiveQuote?.raw?.total, effectiveQuote?.raw?.totalAmount].find(v => Number(v) > 0) ?? 0);
+  const numericAmount = Number(rawAmount) || 0;
+  const hasAmount = isQuoteReady(effectiveQuote) && numericAmount > 0;
+  const companyVistaTotal = Number(effectiveQuote?.companyVista?.total ?? 0);
+  const thirdPartyTotal = Number(effectiveQuote?.thirdParty?.total ?? 0);
+  const quoteCurrency = String(effectiveQuote?.currency || 'EUR').toUpperCase();
+  // displayTotal ab admin ki currency me, convert bhi dikhayega
+  const displayTotal = hasAmount ? formatCurrency(numericAmount, quoteCurrency) : formatCurrency(0, quoteCurrency);
+  const otherCurr = quoteCurrency === 'EUR' ? 'USD' : quoteCurrency === 'USD' ? 'EUR' : 'EUR';
+  const displayConverted = hasAmount ? `≈ ${formatConverted(numericAmount, quoteCurrency, otherCurr)} ${otherCurr}` : `≈ ${formatCurrency(0, otherCurr)} ${otherCurr}`;
+
+  // Format validUntil: "2028-06-20T00:00:00.000Z" / "20 June 2028" / "2028-06-20" -> "20 June 2028"
+  const formatValidUntil = (val) => {
+    if (!val) return '—';
+    const str = String(val).trim();
+    // already formatted like "20 June 2028" (contains month name) -> return as is
+    if (/[A-Za-z]{3,}\s+\d{1,2}|\d{1,2}\s+[A-Za-z]{3,}/.test(str) && str.length < 30) {
+      // normalize to Title case
+      return str;
+    }
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    return str;
+  };
+  const formattedValidUntil = formatValidUntil(effectiveQuote?.validUntil);
+  // Days left: API ka daysRemaining use karo, nahi to validUntil se calculate karo
+  const getDaysRemaining = (validUntil, apiDays) => {
+    if (apiDays != null && !isNaN(Number(apiDays))) return Number(apiDays);
+    if (!validUntil) return null;
+    const target = new Date(String(validUntil).trim());
+    // Try parsing formatted "20 June 2028" as well
+    let t = target;
+    if (isNaN(t.getTime())) {
+      // try Date parse with en-GB format already handled
+      return null;
+    }
+    const now = new Date();
+    // strip time for day diff
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const end = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    const diffMs = end - start;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 ? diffDays : 0;
+  };
+  const daysRemaining = getDaysRemaining(effectiveQuote?.validUntil, effectiveQuote?.daysRemaining);
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: colors.background }]}>
       <StatusBar barStyle={isLight ? 'dark-content' : 'light-content'} backgroundColor={colors.background} />
@@ -52,22 +123,23 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown }) => {
             <FileText color="#EAB308" size={24} />
           </View>
           <View style={styles.quoteDetails}>
-            <Text style={[styles.quoteHeader, { color: colors.text }]}>Quote #Q-2026-0412</Text>
+            <Text style={[styles.quoteHeader, { color: colors.text }]}>Quote #{effectiveQuote?.quoteId || '—'}</Text>
             <Text style={[styles.quoteSubText, { color: colors.muted }]}>
-              Prepared by Anita Desai · German desk · 1 hour ago
+              Prepared by {effectiveQuote?.preparedBy || '—'} · {effectiveQuote?.preparedByRole || ''} · {effectiveQuote?.preparedAt || ''}
             </Text>
           </View>
+          {loadingQuote && <ActivityIndicator size="small" color={colors.muted} style={{ marginLeft: s(8) }} />}
         </View>
 
-        {/* Breakdown Card */}
+        {/* Breakdown Card - amounts admin API se - currency auto */}
         <View style={[styles.breakdownCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
           <View style={styles.row}>
             <Text style={[styles.label, { color: colors.muted }]}>CompanyVista service</Text>
-            <Text style={[styles.value, { color: colors.text }]}>€1,850</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{hasAmount ? formatCurrency(companyVistaTotal, quoteCurrency) : formatCurrency(0, quoteCurrency)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={[styles.label, { color: colors.muted }]}>Third-party & government</Text>
-            <Text style={[styles.value, { color: colors.text }]}>€1,240</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{hasAmount ? formatCurrency(thirdPartyTotal, quoteCurrency) : formatCurrency(0, quoteCurrency)}</Text>
           </View>
 
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -75,18 +147,22 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown }) => {
           <View style={styles.totalRow}>
             <Text style={[styles.totalLabel, { color: colors.muted }]}>TOTAL</Text>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={styles.totalAmount}>€3,090</Text>
-              <Text style={[styles.convertedAmount, { color: colors.muted }]}>≈ $3,340 USD</Text>
+              <Text style={styles.totalAmount}>{displayTotal}</Text>
+              <Text style={[styles.convertedAmount, { color: colors.muted }]}>{displayConverted}</Text>
             </View>
           </View>
+          {!hasAmount && (
+            <Text style={[styles.convertedAmount, { color: colors.muted, textAlign: 'center', marginTop: 8 }]}>
+              Awaiting admin to add quote amount
+            </Text>
+          )}
         </View>
 
-        {/* Validity Banner */}
+        {/* Validity Banner - formatted validUntil + days left */}
         <View style={[styles.validityCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
           <Clock color="#EAB308" size={18} style={{ marginRight: s(8) }} />
           <Text style={[styles.validityText, { color: colors.muted }]}>
-            Valid until <Text style={styles.boldText}>20 June 2026</Text> · 13
-            days remaining
+            Valid until <Text style={styles.boldText}>{formattedValidUntil}</Text> · {daysRemaining != null ? `${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining` : '— days remaining'}
           </Text>
         </View>
 
@@ -129,26 +205,31 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown }) => {
           </View>
         </View>
 
-        {/* Note Box */}
+        {/* Note Box - signup user */}
         <View style={[styles.noteCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>AD</Text>
+            <Text style={styles.avatarText}>{signupInitials}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.noteTitle}>Note from Anita</Text>
+            <Text style={styles.noteTitle}>Note for {signupFirstName}</Text>
             <Text style={[styles.noteDescription, { color: colors.muted }]}>
-              Your €25,000 capital can be deposited in two tranches — I've
-              priced the standard single-deposit route. Ask if you'd prefer the
-              split option.
+              {effectiveQuote?.noteForCustomer ? effectiveQuote.noteForCustomer.replace('{firstName}', signupFirstName) : `Hi ${signupFirstName}, awaiting admin quote details.`}
             </Text>
           </View>
         </View>
 
-        {/* CTA Button */}
-        <TouchableOpacity style={[styles.button, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={onViewBreakdown}>
-          <Text style={styles.buttonText}>View Full Breakdown</Text>
-          <ArrowRight color="#000000" size={18} style={{ marginLeft: s(8) }} />
+        {/* CTA Button - disabled till admin adds amount */}
+        <TouchableOpacity
+          disabled={!hasAmount || loadingQuote}
+          style={[styles.button, { backgroundColor: hasAmount ? colors.buttonBackground : colors.border, opacity: hasAmount && !loadingQuote ? 1 : 0.6 }]}
+          activeOpacity={0.8}
+          onPress={hasAmount ? () => onViewBreakdown?.(effectiveQuote) : undefined}
+        >
+          {loadingQuote ? <ActivityIndicator size="small" color={colors.muted} /> : null}
+          <Text style={[styles.buttonText, (!hasAmount || loadingQuote) && { color: colors.muted }]}>{loadingQuote ? 'Loading quote...' : hasAmount ? 'View Full Breakdown' : 'Awaiting Quote Amount'}</Text>
+          {!loadingQuote && <ArrowRight color={hasAmount ? '#000000' : colors.muted} size={18} style={{ marginLeft: s(8) }} />}
         </TouchableOpacity>
+
       </ScrollView>
     </View>
   );

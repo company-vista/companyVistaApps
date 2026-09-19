@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: s(24),
+    paddingHorizontal: s(16),
     paddingTop: -10,
     paddingBottom: s(40),
     justifyContent: 'center',
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   continueBtn: {
     backgroundColor: '#D4AF37',
     borderRadius: 25,
-    paddingVertical: s(16),
+    paddingVertical: s(14),
     alignItems: 'center',
     marginBottom: s(16),
     marginTop: s(16),

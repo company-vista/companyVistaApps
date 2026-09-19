@@ -83,7 +83,6 @@ function getDaysRemaining(value) {
 function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
-    const { rs } = useResponsive();
     const complianceCards = useMemo(() => complianceItems.map(item => {
         const days = getDaysRemaining(rawDueDatesByTitle[item.title]);
         return {
@@ -103,11 +102,6 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
             daysTone: days !== null && days > 30 ? 'ok' : 'soon',
         };
     }), [dueDatesByTitle, rawDueDatesByTitle, isLoadingDueDates, statusesByTitle]);
-    const tileWidth = useMemo(() => {
-        const GAP = rs(8);
-        const PADDING = rs(40);
-        return Math.floor((rs(375) - PADDING - GAP) / 2);
-    }, [rs]);
     return (<View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -127,7 +121,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                 companyId,
                 price: item.price,
                 years: item.years,
-            })} style={[styles.tileWrapper, { width: tileWidth }]}>
+            })} style={styles.tileWrapper}>
               <View style={[styles.complianceTile, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderWidth: isLight ? 0 : 1, borderColor: 'rgba(255,255,255,0.08)' }]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
@@ -181,9 +175,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
+        justifyContent: 'space-between',
     },
     tileWrapper: {
         position: 'relative',
+        flexBasis: '48%',
+        flexGrow: 1,
+        maxWidth: '48%',
+        minWidth: '48%',
     },
     complianceTile: {
         borderRadius: 12,

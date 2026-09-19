@@ -2,22 +2,25 @@ import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
     container: {
-        gap: 14,
-        marginBottom: 18,
+        width: '100%',
+        gap: s(14),
+        marginBottom: s(18),
         paddingHorizontal: s(6),
     },
     summaryCard: {
-        backgroundColor: '#0D2137',
-        borderColor: 'rgba(255,255,255,0.3)',
-        borderRadius: 16,
+        width: '100%',
+        alignSelf: 'stretch',
+        backgroundColor: '#0d2137a6',
+        borderColor: 'rgba(255, 255, 255, 0.14)',
+        borderRadius: s(16),
         borderWidth: 1,
-        minHeight: 108,
+        minHeight: s(108),
         overflow: 'hidden',
         paddingHorizontal: s(18),
-        paddingVertical: 16,
+        paddingVertical: s(16),
     },
     summaryDeco: {
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        backgroundColor: 'rgba(36, 21, 21, 0.03)',
         borderColor: 'rgba(255,255,255,0.07)',
         borderRadius: 50,
         borderWidth: 1,
@@ -89,10 +92,12 @@ export const styles = StyleSheet.create({
         gap: 12,
     },
     shareholderCard: {
-        borderRadius: 8,
+        width: '100%',
+        alignSelf: 'stretch',
+        borderRadius: s(8),
         borderWidth: 1,
         paddingHorizontal: s(15),
-        paddingVertical: 15,
+        paddingVertical: s(15),
     },
     name: {
         fontSize: 15,

@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 130,
     marginTop: s(16)
   },
-  badgesRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: s(24), position: 'absolute', bottom: 20 },
+  badgesRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: s(16), position: 'absolute', bottom: 20 },
   badgeLeft: {
     backgroundColor: 'rgba(11, 17, 32, 0.85)',
     borderWidth: 1,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   stepperLine: { width: 30, height: 1, marginHorizontal: -4 },
   contentSection: {
     flex: 1,
-    paddingHorizontal: s(28),
+    paddingHorizontal: s(16),
     paddingTop: s(26),
     paddingBottom: s(24),
     borderTopLeftRadius: 32,

@@ -121,19 +121,7 @@ export default function OtpVerifyScreen() {
             <Image source={logoR} style={styles.topLogo} />
           </View>
 
-          {/* Mail Icon Section - without CompanyVista text */}
-          <View style={styles.heroSection}>
-            <View style={styles.outerCircle}>
-              <View style={styles.innerCircle}>
-                <View style={styles.mailIconContainer}>
-                  <Text style={styles.mailIcon}>✉</Text>
-                  <View style={styles.checkBadge}>
-                    <Text style={styles.checkText}>✓</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
+
 
           {/* Title & Email Badge */}
           <View style={styles.textSection}>
@@ -248,7 +236,7 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(16),
     paddingBottom: s(20),
     justifyContent: 'space-between',
   },
@@ -262,28 +250,28 @@ const styles = StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   heroSection: { alignItems: 'center', marginTop: s(5) },
   outerCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 85,
+    width: s(120),
+    height: s(120),
+    borderRadius: s(60),
     borderWidth: 1,
     borderColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
   },
   innerCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 65,
+    width: s(92),
+    height: s(92),
+    borderRadius: s(46),
     borderWidth: 1,
     borderColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
   },
   mailIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 32,
-    borderWidth: 1.5,
+    width: s(52),
+    height: s(52),
+    borderRadius: s(26),
+    borderWidth: 1,
     borderColor: '#22D3EE',
     justifyContent: 'center',
     alignItems: 'center',
@@ -326,9 +314,9 @@ const styles = StyleSheet.create({
   line: { flex: 1, height: 1, backgroundColor: '#1E293B' },
   codeContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   codeBox: {
-    width: 48,
-    height: 58,
-    borderRadius: 12,
+    width: s(44),
+    height: s(54),
+    borderRadius: s(12),
     borderWidth: 1,
     borderColor: '#1E293B',
     backgroundColor: '#0B1120',

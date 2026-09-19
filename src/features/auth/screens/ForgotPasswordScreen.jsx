@@ -86,16 +86,7 @@ export default function ForgotPasswordScreen() {
             <Image source={logoR} style={styles.topLogo} />
           </View>
 
-          {/* Lock Icon Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.outerCircle}>
-              <View style={styles.innerCircle}>
-                <View style={styles.lockIconContainer}>
-                  <Text style={styles.lockIcon}>🔓</Text>
-                </View>
-              </View>
-            </View>
-          </View>
+
 
           {/* Title & Description */}
           <View style={styles.textSection}>
@@ -215,28 +206,28 @@ const styles = StyleSheet.create({
   },
 
   outerCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 90,
+    width: s(120),
+    height: s(120),
+    borderRadius: s(60),
     borderWidth: 1,
     borderColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
   },
   innerCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 70,
+    width: s(92),
+    height: s(92),
+    borderRadius: s(46),
     borderWidth: 1,
     borderColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
   },
   lockIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 32,
-    borderWidth: 1.5,
+    width: s(52),
+    height: s(52),
+    borderRadius: s(26),
+    borderWidth: 1,
     borderColor: '#D4AF37',
     justifyContent: 'center',
     alignItems: 'center',
@@ -247,7 +238,8 @@ const styles = StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginVertical: s(10),
+    marginTop: s(4),
+    marginBottom: s(10),
   },
   title: {
     color: '#FFFFFF',
@@ -350,8 +342,8 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: '#D4AF37',
     width: '100%',
-    height: 52,
-    borderRadius: 24,
+    paddingVertical: s(14),
+    borderRadius: s(24),
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

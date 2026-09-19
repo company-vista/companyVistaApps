@@ -98,7 +98,7 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
 const styles = StyleSheet.create({
     card: {
         borderRadius: 16,
-        padding: 20,
+        padding: 18,
         borderWidth: 1,
     },
     headerRow: {
@@ -109,13 +109,13 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: '500',
         flex: 1,
         marginRight: 8,
     },
     price: {
         fontSize: 17,
-        fontWeight: '700',
+        fontWeight: '500',
         color: '#FFA500',
     },
     description: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        gap: 12,
+        gap: 24,
     },
     outlineButton: {
         flex: 1,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     },
     outlineButtonText: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '500',
     },
     primaryButton: {
         flex: 1,
@@ -150,6 +150,6 @@ const styles = StyleSheet.create({
     },
     primaryButtonText: {
         fontSize: 14,
-        fontWeight: '700',
+        fontWeight: '500',
     },
 });

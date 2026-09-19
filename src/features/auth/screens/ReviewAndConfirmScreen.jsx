@@ -13,6 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { CommonActions } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingOrderData } from '../../../store/slices/authSlice';
 import { saveReviewOrderApi } from '../api/orderApi';
@@ -24,12 +25,18 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   React.useEffect(() => {
     console.log('=== REVIEW & SUBMIT SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
   }, []);
-  // Hardware back pe bhi Signup (FounderDetails) par bhejo
+  // Hardware back pe bhi Signup (FounderDetails) par bhejo - intermediate screens skip
   React.useEffect(() => {
     const unsub = navigation.addListener('beforeRemove', (e) => {
       if (e.data.action.type === 'GO_BACK' && (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow)) {
         e.preventDefault();
-        navigation.navigate('FounderDetails', route.params);
+        // Reset stack to keep only FounderDetails so back won't show EmailVerify/SetPassword
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'FounderDetails', params: route.params }],
+          })
+        );
       }
     });
     return unsub;
@@ -45,11 +52,43 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     runningTotal = 0,
   } = route.params || {};
 
-  const [isChecked, setIsChecked] = useState(true);
+  // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
+  const getLegalName = () => {
+    if (!companyName) return 'Meridian Global Ventures LLC';
+    const suffix = String(selectedEnding || selectedStructure || '').trim();
+    if (!suffix) return String(companyName).trim();
+    const normalize = (s) => s.toLowerCase().replace(/[\.\s-]/g, '');
+    const normSuffix = normalize(suffix);
+    let cleaned = String(companyName).trim();
+    let parts = cleaned.split(/\s+/);
+    while (parts.length > 0 && normalize(parts[parts.length - 1]) === normSuffix) {
+      parts.pop();
+      cleaned = parts.join(' ');
+    }
+    return `${cleaned} ${suffix}`.trim();
+  };
+  const legalName = getLegalName();
 
-  // derive add-ons list from params, fallback to default 2 if empty
-  const hasAddOnsParam = selectedAddOns && Object.keys(selectedAddOns).length > 0;
-  const addOns = hasAddOnsParam ? selectedAddOns : { expeditedFiling: true, expressEin: true };
+  const [isChecked, setIsChecked] = useState(false);
+  const [localAddOns, setLocalAddOns] = useState(selectedAddOns || {});
+
+  // Sync if params change (e.g. coming back from OptionalAddOns)
+  React.useEffect(() => { setLocalAddOns(selectedAddOns || {}); }, [JSON.stringify(selectedAddOns)]);
+
+  const addOnKeyMap = {
+    'Expedited State Filing': 'expeditedFiling',
+    'Express EIN': 'expressEin',
+    'Bank Approval Assurance': 'bankAssurance',
+    'Stripe + PayPal Setup': 'stripePaypal',
+  };
+  const handleRemoveAddOn = (title) => {
+    const key = addOnKeyMap[title];
+    if (!key) return;
+    setLocalAddOns(prev => ({ ...prev, [key]: false }));
+  };
+
+  // derive add-ons list from local state - no fallback, empty if none selected
+  const addOns = localAddOns || {};
   const addOnList = [
     addOns.expeditedFiling ? { title: 'Expedited State Filing', subtext: '24-hour Delaware turnaround', price: 99 } : null,
     addOns.expressEin ? { title: 'Express EIN', subtext: 'Tax ID in 3–5 days instead of 4–6 weeks', price: 149 } : null,
@@ -58,13 +97,18 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   ].filter(Boolean);
 
   const computedAddOnsTotal = addOnList.reduce((s, i) => s + i.price, 0);
-  const computedRunningTotal = 459 + computedAddOnsTotal; // base 459 as per OptionalAddOns
-  const displayAddOnsTotal = addOnsTotal || computedAddOnsTotal;
-  const displayTotal = runningTotal ? runningTotal + 160 - 0 : computedRunningTotal + 160; // +160 state fee as per design (299 package +160 =459 base, total 707 example)
-  // For exact UI match, use 707 if 2 add-ons selected, else compute
-  const packagePrice = 299;
-  const stateFee = 160;
-  const finalTotal = packagePrice + stateFee + displayAddOnsTotal;
+  const displayAddOnsTotal = computedAddOnsTotal;
+  // RegistrationLanding se signup tak sahi amount - FounderDetails ka runningTotal hi dikhao, addOn change pe recompute
+  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
+  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
+  const packagePrice = structurePrice;
+  // --- dono route ka alag calculation ---
+  const baseTotal = getBasePrice(route.params, packagePrice);
+  const hasPrice = hasPriceFn(route.params);
+  const directStateFee = route.params?.selectedStatePrice ?? route.params?.bestStateGovFee ?? 0;
+  const passedRunningTotal = route.params?.runningTotal;
+  const isAddOnsUnchanged = JSON.stringify(localAddOns || {}) === JSON.stringify(route.params?.selectedAddOns || {});
+  const finalTotal = !hasPrice ? 0 : (passedRunningTotal != null && isAddOnsUnchanged) ? passedRunningTotal : (baseTotal + displayAddOnsTotal);
 
   const handleConfirm = async () => {
     const orderData = {
@@ -73,6 +117,13 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
       selectedEnding,
       selectedState,
       selectedCountry,
+      selectedCountryPrice: route.params?.selectedCountryPrice,
+      selectedStatePrice: route.params?.selectedStatePrice,
+      selectedStructurePrice: route.params?.selectedStructurePrice,
+      bestState: route.params?.bestState,
+      bestStatePrice: route.params?.bestStatePrice,
+      bestStatePriceNote: route.params?.bestStatePriceNote,
+      bestStateTimeframe: route.params?.bestStateTimeframe,
       selectedAddOns: addOns,
       addOnsTotal: displayAddOnsTotal,
       runningTotal: finalTotal,
@@ -93,7 +144,6 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
       dayOneNeeds: route.params?.dayOneNeeds,
       physicalPresence: route.params?.physicalPresence,
       usStatePriority: route.params?.usStatePriority,
-      bestState: route.params?.bestState,
       countryCode: route.params?.countryCode,
     };
     console.log('=== REVIEW & SUBMIT -> COMPLETE PAYMENT DATA ===', JSON.stringify(orderData, null, 2));
@@ -109,9 +159,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
       <View style={styles.header}>
         <BackButton onPress={() => {
-          // Review se back pe direct Signup (FounderDetails) par jao
+          // Review se back pe direct Signup (FounderDetails) par jao - skip EmailVerify/SetPassword
           if (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow) {
-            navigation.navigate('FounderDetails', route.params);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'FounderDetails', params: route.params }],
+              })
+            );
           } else {
             navigation.goBack();
           }
@@ -147,7 +202,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Legal name</Text>
-              <Text style={styles.summaryValueGold}>{companyName ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : 'Meridian Global Ventures LLC'}</Text>
+              <Text style={styles.summaryValueGold}>{legalName}</Text>
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Jurisdiction</Text>
@@ -229,13 +284,31 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                     <Text style={styles.addOnTitle}>{item.title}</Text>
                     <Text style={styles.addOnSubtext}>{item.subtext}</Text>
                   </View>
-                  <Text style={styles.addOnPrice}>${item.price}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={styles.addOnPrice}>${item.price}</Text>
+                    <TouchableOpacity onPress={() => handleRemoveAddOn(item.title)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                      <Ionicons name="close-circle" size={18} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
                 {idx < addOnList.length - 1 && <View style={styles.itemSeparator} />}
               </View>
             ))
           )}
         </View>
+
+        {route.params?.advisorFlow && route.params?.bestState ? (
+          <View style={[styles.summaryCard, { borderColor: 'rgba(16,185,129,0.3)' }]}>
+            <View style={styles.summaryRow}>
+              <View>
+                <Text style={styles.summaryTitle}>Recommended jurisdiction</Text>
+                <Text style={styles.summarySubtext}>{route.params.bestState} · {route.params.bestStatePriceNote || ''}</Text>
+              </View>
+              <Text style={styles.summaryPrice}>${route.params.bestStatePrice}</Text>
+            </View>
+            <Text style={{ color: '#10B981', fontSize: 11, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
@@ -246,20 +319,21 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             <Text style={styles.summaryPrice}>${packagePrice}</Text>
           </View>
 
+          {!route.params?.advisorFlow && (
           <View style={styles.summaryRow}>
             <View>
-              <Text style={styles.summaryTitle}>Delaware state fee</Text>
+              <Text style={styles.summaryTitle}>{selectedState || 'Delaware'} state fee</Text>
               <Text style={styles.summarySubtext}>Charged at cost</Text>
             </View>
-            <Text style={styles.summaryPrice}>${stateFee}</Text>
+            <Text style={styles.summaryPrice}>${directStateFee || 160}</Text>
           </View>
+          )}
 
           <View style={styles.summaryRow}>
             <View>
               <Text style={styles.summaryTitle}>Add-ons ({addOnList.length})</Text>
               <Text style={styles.summarySubtext}>{addOnList.map(a => a.title.split(' ')[0]).join(' · ') || 'None'}</Text>
             </View>
-            <Text style={styles.summaryPrice}>${displayAddOnsTotal}</Text>
           </View>
 
           <View style={styles.summaryDivider} />

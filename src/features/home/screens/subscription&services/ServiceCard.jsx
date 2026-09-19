@@ -73,9 +73,9 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     borderWidth: 1,
-    paddingHorizontal: s(16),
+    paddingHorizontal: s(12),
     paddingVertical: 14,
-    marginHorizontal: 12,
+    marginHorizontal: s(12),
     marginVertical: 6,
     shadowColor: '#000',
     shadowOpacity: 0.06,

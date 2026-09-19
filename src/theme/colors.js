@@ -35,7 +35,7 @@ export const appThemes = {
         mode: 'dark',
         background: '#000',
         authBackground: '#020617',
-        surface: '#111827',
+        surface: '#06080ecb',
         surfaceAlt: '#164e63',
         cardHighlight: '#1E293B',
         cardElevated: '#0D1B2A',

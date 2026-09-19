@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, StyleSheet, Text, View, Pressable } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
+import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
 export default function UnlockDocumentModal({ visible, onClose, documentName = 'Document 3 - test', price, onPayPress, companyId, documentIndex, }) {
     console.log('UnlockDocumentModal render, visible:', visible);
@@ -75,36 +76,36 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.55)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 24,
+        padding: s(24),
     },
     modalBox: {
         width: '100%',
         backgroundColor: '#1E3A5F',
-        borderRadius: 24,
-        padding: 18,
+        borderRadius: s(24),
+        padding: s(18),
         borderWidth: 1,
         borderColor: 'rgba(133, 183, 235, 0.25)',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
+        shadowOffset: { width: 0, height: s(10) },
         shadowOpacity: 0.3,
-        shadowRadius: 20,
+        shadowRadius: s(20),
         elevation: 10,
     },
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: s(20),
     },
     headerLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: s(12),
     },
     lockIconCircle: {
-        width: 38,
-        height: 38,
-        borderRadius: 19,
+        width: s(38),
+        height: s(38),
+        borderRadius: s(19),
         backgroundColor: 'rgba(250, 199, 117, 0.12)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -123,20 +124,20 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     closeBtn: {
-        padding: 6,
+        padding: s(6),
     },
     featureCard: {
         flexDirection: 'row',
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: 16,
-        padding: 16,
+        borderRadius: s(16),
+        padding: s(16),
         borderWidth: 1,
         borderColor: 'rgba(133, 183, 235, 0.15)',
-        marginBottom: 20,
+        marginBottom: s(20),
     },
     fileIconContainer: {
-        marginRight: 12,
-        marginTop: 2,
+        marginRight: s(12),
+        marginTop: s(2),
     },
     featureTextColumn: {
         flex: 1,
@@ -145,18 +146,18 @@ const styles = StyleSheet.create({
         fontSize: font.xl,
         fontWeight: '700',
         color: '#ffffff',
-        marginBottom: 4,
+        marginBottom: s(4),
     },
     featureDescription: {
         fontSize: font.md,
         color: 'rgba(255, 255, 255, 0.65)',
-        lineHeight: 18,
+        lineHeight: s(18),
     },
     priceRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: s(16),
     },
     priceLabel: {
         fontSize: font.xl,
@@ -164,15 +165,15 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     priceValue: {
-        fontSize: 26,
+        fontSize: s(26),
         fontWeight: '800',
         color: '#FAC775',
     },
     upsellText: {
         fontSize: font.base,
         color: 'rgba(255, 255, 255, 0.45)',
-        lineHeight: 18,
-        marginBottom: 24,
+        lineHeight: s(18),
+        marginBottom: s(24),
     },
     whiteBoldText: {
         color: '#ffffff',
@@ -180,13 +181,13 @@ const styles = StyleSheet.create({
     },
     actionRow: {
         flexDirection: 'row',
-        gap: 12,
-        marginBottom: 20,
+        gap: s(12),
+        marginBottom: s(20),
     },
     cancelButton: {
         flex: 1,
-        height: 46,
-        borderRadius: 12,
+        height: s(46),
+        borderRadius: s(12),
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
@@ -199,28 +200,28 @@ const styles = StyleSheet.create({
     },
     payButton: {
         flex: 1.3,
-        height: 46,
+        height: s(46),
         backgroundColor: '#00C853',
-        borderRadius: 12,
+        borderRadius: s(12),
         justifyContent: 'center',
         alignItems: 'center',
     },
     noticeBox: {
         flexDirection: 'row',
         backgroundColor: 'rgba(133, 183, 235, 0.06)',
-        borderRadius: 12,
-        padding: 12,
+        borderRadius: s(12),
+        padding: s(12),
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(133, 183, 235, 0.1)',
     },
     noticeIcon: {
-        marginRight: 8,
+        marginRight: s(8),
     },
     noticeText: {
         flex: 1,
         fontSize: font.sm,
         color: 'rgba(255, 255, 255, 0.5)',
-        lineHeight: 16,
+        lineHeight: s(16),
     },
 });

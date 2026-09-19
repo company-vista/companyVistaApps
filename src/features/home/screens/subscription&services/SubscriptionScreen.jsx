@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: s(18),
+        paddingHorizontal: s(12),
         gap: 12,
     },
     headerArea: {
@@ -231,7 +231,8 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     content: {
-        padding: 16,
+        padding: 12,
+        paddingHorizontal: s(12),
     },
 });
 

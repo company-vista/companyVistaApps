@@ -7,6 +7,7 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
  * @type {import('@react-native/metro-config').MetroConfig}
  */
 const config = {
+  maxWorkers: 2,
   resolver: {
     // Metro ko kisi bhi library ke build/android/gradle folders ko ignore karne bole
     blockList: [
@@ -15,6 +16,12 @@ const config = {
       /.*\/node_modules\/.*\/android\/build\/.*/,
       /.*\/node_modules\/.*\/ios\/build\/.*/,
     ],
+  },
+  // Windows EMFILE fix: file handles kam use ho
+  watcher: {
+    healthCheck: {
+      enabled: true,
+    },
   },
 };
 

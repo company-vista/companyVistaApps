@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
+import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, selectedCompany, companySwitcherOpacity, companySwitcherTranslateY, onSelectCompany, onClose, colors, safeAreaInsets, }) {
     if (!isOpen)
@@ -14,7 +15,7 @@ export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, select
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
                 opacity: companySwitcherOpacity,
-                top: safeAreaInsets.top + 236,
+                top: safeAreaInsets.top + s(236),
                 transform: [{ translateY: companySwitcherTranslateY }],
             },
         ]}>

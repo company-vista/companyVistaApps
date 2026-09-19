@@ -49,7 +49,7 @@ const ManageOptionsScreen = ({ onBackPress, onRequestChangePress, }) => {
 
       <View style={styles.body}>
         {options.map((option, index) => (<AnimatedAppear key={option.id} index={index}>
-            <Pressable style={[styles.optionCard, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]} onPress={() => handleOptionPress(option.id)}>
+            <Pressable style={styles.optionCard} onPress={() => handleOptionPress(option.id)}>
               <View style={[styles.optionIconWrap, { backgroundColor: `${option.color}15` }]}>
                 <FontAwesome name={option.icon} size={22} color={option.color}/>
               </View>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: s(14),
+        paddingHorizontal: s(10),
         paddingVertical: 8,
         borderBottomWidth: 1,
         gap: 8,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
-        padding: 16,
+        padding: s(10),
         gap: 12,
     },
     optionCard: {
@@ -93,7 +93,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         borderRadius: 12,
-        borderWidth: 1,
     },
     optionIconWrap: {
         width: 48,

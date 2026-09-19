@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     scrollContent: {
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
     },
     header: {
         flexDirection: 'row',
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         backgroundColor: '#ffffff',
         marginTop: s(14),
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
         paddingVertical: s(14),
     },
     progressHeader: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         backgroundColor: '#ffffff',
         marginTop: s(14),
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
         paddingVertical: s(14),
     },
     switchAccountIcon: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         backgroundColor: '#ffffff',
         marginTop: s(18),
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
         paddingTop: s(18),
     },
     addressCard: {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         backgroundColor: '#ffffff',
         marginTop: s(18),
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
         paddingVertical: s(16),
     },
     sectionTitle: {
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     switchSheet: {
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        paddingHorizontal: s(16),
+        paddingHorizontal: s(10),
         paddingTop: s(10),
         paddingBottom: s(20),
     },

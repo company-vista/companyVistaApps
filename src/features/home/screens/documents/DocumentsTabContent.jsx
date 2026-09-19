@@ -330,6 +330,7 @@ const getStyles = (colors) => {
         container: {
             flex: 1,
             paddingTop: 2,
+            paddingHorizontal: s(2),
         },
         header: {
             flexDirection: 'row',
@@ -411,13 +412,13 @@ const getStyles = (colors) => {
         },
         tabsRow: {
             flexDirection: 'row',
-            backgroundColor: colors.mode === 'dark' ? '#0F172A' : '#E8EEF5',
+            backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
             borderRadius: 999,
             padding: 4,
             gap: 4,
             marginBottom: 18,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? '#1E293B' : '#CBD5E1',
+            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
         },
         tab: {
             flex: 1,
@@ -434,11 +435,11 @@ const getStyles = (colors) => {
             backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#FFFFFF',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
+            shadowOpacity: 0.06,
             shadowRadius: 6,
-            elevation: 3,
+            elevation: 2,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? '#334155' : '#E2E8F0',
+            borderColor: colors.mode === 'dark' ? '#334155' : '#FFFFFF',
         },
         tabText: {
             fontSize: 12,
@@ -458,12 +459,11 @@ const getStyles = (colors) => {
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#FFFFFF',
-            borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#E2E8F0',
+            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#E2E8F0',
+            borderWidth: 0,
         },
         tabCountActive: {
-            backgroundColor: colors.mode === 'dark' ? 'rgba(250,199,117,0.18)' : '#FEF3C7',
+            backgroundColor: colors.mode === 'dark' ? 'rgba(250,199,117,0.18)' : '#0F172A',
         },
         tabCountText: {
             fontSize: 10,
@@ -471,7 +471,7 @@ const getStyles = (colors) => {
             color: colors.muted,
         },
         tabCountTextActive: {
-            color: palette.link,
+            color: '#FFFFFF',
         },
         tabTextActive: {
             color: colors.mode === 'dark' ? '#F8FAFC' : '#0F172A',

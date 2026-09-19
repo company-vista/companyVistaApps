@@ -39,7 +39,10 @@ const COUNTRIES = [
 
 const FounderDetailsScreen = ({ navigation, route }) => {
   const dispatch = useAppDispatch();
-  const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '' } = route.params || {};
+  const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '', selectedCountry: jurisdictionCountry, bestState, advisorFlow } = route.params || {};
+  const isUSFounder = (route.params?.selectedCountry || jurisdictionCountry) === 'US' || (!jurisdictionCountry && !route.params?.selectedCountry);
+  const jurisdictionCountryName = jurisdictionCountry ? ({ US: 'USA', GB: 'UK', AE: 'UAE', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta' }[jurisdictionCountry] || jurisdictionCountry) : (bestState ? 'USA' : null);
+  const displayJurisdictionCountry = advisorFlow ? (bestState ? 'USA' : jurisdictionCountryName || 'USA') : (jurisdictionCountryName || 'USA');
 
   useEffect(() => {
     console.log('=== SIGNUP PAGE DATA (FounderDetails - FINAL) ===');
@@ -59,14 +62,18 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     console.log('companyName:', route.params?.companyName);
     console.log('SARA DATA SIGNUP TAK:', route.params);
   }, []);
-  const displayCompanyName = companyName ? `${companyName} ${selectedEnding || selectedStructure}` : `Your Company ${selectedStructure}`;
+  const displayCompanyName = (() => {
+    const suffix = selectedEnding || selectedStructure;
+    if (!isUSFounder) return companyName || 'Your Company';
+    return companyName ? `${companyName} ${suffix}`.trim() : `Your Company ${suffix}`;
+  })();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [countryCode, setCountryCode] = useState('+91');
-  const [countryIso, setCountryIso] = useState('IN');
+  const [countryCode, setCountryCode] = useState('');
+  const [countryIso, setCountryIso] = useState('');
   const [phone, setPhone] = useState('');
-  const [countryOfResidence, setCountryOfResidence] = useState('India');
-  const [residenceIso, setResidenceIso] = useState('IN');
+  const [countryOfResidence, setCountryOfResidence] = useState('');
+  const [residenceIso, setResidenceIso] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [showCodePicker, setShowCodePicker] = useState(false);
   const [showResidencePicker, setShowResidencePicker] = useState(false);
@@ -83,7 +90,15 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     ]).start();
   }, []);
 
-  const summaryPrice = selectedStructure === 'LLC' ? '$299' : selectedStructure === 'C-Corp' ? '$399' : '$299';
+  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
+  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
+  const addOnsTotal = route.params?.addOnsTotal ?? 0;
+  const hasPrice = hasPriceFn(route.params);
+  // --- dono route ka alag calculation: advisorFlow true => advisor price, false => direct price ---
+  const basePrice = getBasePrice(route.params, structurePrice);
+  const runningTotalValue = hasPrice ? (route.params?.runningTotal ?? (basePrice + addOnsTotal)) : 0;
+  const summaryPrice = `$${structurePrice}`;
+  const totalPrice = hasPrice ? `$${runningTotalValue}` : 'Quote on request';
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -125,21 +140,38 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     }
     setVerifyingEmail(true);
     try {
-      // Backend currently only sends OTP via signup/step1 which creates a draft client
-      // This is the ONLY working endpoint: POST https://api.companyvista.com/api/signup/step1
-      // Ideal: POST /api/client/auth/send-email-otp (without creating client) - not yet implemented on backend
+      // New company signup: POST /api/company-signup -> createCompanySignup (replaces old POST /api/signup/step1)
+      // Creates Client (pending) + Company (pending) + Quote (awaiting_quote if quoted pricing)
       const parts = fullName.trim().split(/\s+/);
       const firstName = parts[0] || '';
       const lastName = parts.slice(1).join(' ') || parts[0] || '';
       const signupPayload = {
+        // founder details
         firstName,
         lastName,
+        fullName: fullName.trim(),
         email: email.trim(),
+        phone: phone.trim() || '0000000000',
         phoneNumber: phone.trim() || '0000000000',
         countryCode,
+        countryIso,
+        countryOfResidence,
+        residence: countryOfResidence,
+        // company
         companyName: displayCompanyName,
+        rawCompanyName: companyName,
+        selectedEnding,
         registrationCountry: countryOfResidence,
-        // advisor data
+        // signup tak ka pura data (jurisdiction, structure, advisor, addons, totals)
+        selectedStructure,
+        selectedState,
+        selectedStatePrice: route.params?.selectedStatePrice,
+        selectedCountry: route.params?.selectedCountry,
+        selectedCountryPrice: route.params?.selectedCountryPrice,
+        bestState: route.params?.bestState,
+        bestStatePrice: route.params?.bestStatePrice,
+        bestStatePriceNote: route.params?.bestStatePriceNote,
+        bestStateTimeframe: route.params?.bestStateTimeframe,
         advisorFlow: route.params?.advisorFlow,
         selectedJurisdiction: route.params?.selectedJurisdiction,
         purpose: route.params?.purpose,
@@ -148,16 +180,18 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         dayOneNeeds: route.params?.dayOneNeeds,
         physicalPresence: route.params?.physicalPresence,
         usStatePriority: route.params?.usStatePriority,
-        bestState: route.params?.bestState,
-        selectedCountry: route.params?.selectedCountry,
-        selectedState: route.params?.selectedState,
-        selectedStructure: route.params?.selectedStructure,
+        selectedStructurePrice: route.params?.selectedStructurePrice,
+        selectedAddOns: route.params?.selectedAddOns,
+        addOnsTotal: route.params?.addOnsTotal,
+        runningTotal: route.params?.runningTotal ?? runningTotalValue,
+        countryCodeResidence: countryCode,
       };
-      console.log('=== SIGNUP API PAYLOAD ===', JSON.stringify(signupPayload, null, 2));
+      console.log('=== SIGNUP STEP1 PAYLOAD (FounderDetails) ===', JSON.stringify(signupPayload, null, 2));
+      console.log('FullName:', fullName.trim(), '| Email:', email.trim(), '| Phone:', phone.trim(), '| CountryCode:', countryCode, '| Residence:', countryOfResidence);
       const result = await dispatch(signupUser(signupPayload));
       if (signupUser.fulfilled.match(result)) {
-        const { token, clientId } = result.payload;
-        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}` });
+        const { token, clientId, companyId, pricingType } = result.payload;
+        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}${companyId ? ` · ${pricingType || ''}` : ''}` });
         navigation.navigate('EmailVerification', {
           ...(route.params || {}),
           email: email.trim(),
@@ -166,7 +200,6 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           companyName: displayCompanyName,
           companyLocation: `${selectedState} · ${selectedStructure}`,
           from: 'FounderDetails',
-          // onboarding params forward to ReviewAndConfirm after password set
           selectedStructure,
           selectedState,
           selectedEnding,
@@ -239,18 +272,26 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
           {/* Summary Card */}
           <View style={styles.summaryCard}>
-            <View style={styles.summaryRow}>
-              <View style={styles.usBadgeRow}>
-                <Text style={styles.countryCodeBadge}>US</Text>
-                <Text style={styles.summaryLabel}>Company</Text>
-              </View>
-              <Text style={styles.companyNameText}>
-                {displayCompanyName}
-              </Text>
+            <View style={styles.summaryField}>
+              <Text style={styles.summaryFieldLabel}>COMPANY NAME</Text>
+              <Text style={styles.companyNameText} numberOfLines={1}>{displayCompanyName}</Text>
             </View>
+            <View style={styles.summaryDivider} />
             <View style={styles.summaryRowBottom}>
-              <Text style={styles.stateSubtitle}>{selectedState} · {selectedStructure}</Text>
-              <Text style={styles.priceSummaryText}>{summaryPrice} + $90 state</Text>
+              <View style={styles.summaryFieldHalf}>
+                <Text style={styles.summaryFieldLabel}>JURISDICTION</Text>
+                <Text style={styles.stateSubtitle}>{isUSFounder ? `${bestState || selectedState} · ${selectedStructure}` : (displayJurisdictionCountry || jurisdictionCountry || selectedCountry || '—')}</Text>
+              </View>
+              <View style={styles.summaryFieldHalf}>
+                <Text style={styles.summaryFieldLabel}>COUNTRY</Text>
+                <Text style={styles.stateSubtitle}>{displayJurisdictionCountry}</Text>
+              </View>
+              {hasPrice ? (
+                <View style={styles.summaryFieldHalfRight}>
+                  <Text style={styles.summaryFieldLabel}>TOTAL</Text>
+                  <Text style={styles.priceSummaryText}>{totalPrice}</Text>
+                </View>
+              ) : null}
             </View>
           </View>
 
@@ -313,8 +354,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           </Text>
           <View style={styles.phoneRow}>
             <TouchableOpacity style={styles.countryCodePicker} activeOpacity={0.8} onPress={() => setShowCodePicker(true)}>
-              <Text style={styles.flagText}>{countryIso}</Text>
-              <Text style={styles.codeText}>{countryCode}</Text>
+              {countryIso ? <Text style={styles.flagText}>{countryIso}</Text> : null}
+              <Text style={[styles.codeText, !countryCode && styles.placeholderText]}>{countryCode || 'Select'}</Text>
               <Ionicons name="chevron-down" size={12} color="#64748B" />
             </TouchableOpacity>
             <View style={styles.phoneInputContainer}>
@@ -337,8 +378,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             COUNTRY OF RESIDENCE <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
           <TouchableOpacity style={styles.dropdownInputContainer} activeOpacity={0.8} onPress={() => setShowResidencePicker(true)}>
-            <Text style={styles.flagText}>{residenceIso}</Text>
-            <Text style={styles.dropdownValueText}>{countryOfResidence}</Text>
+            {residenceIso ? <Text style={styles.flagText}>{residenceIso}</Text> : null}
+            <Text style={[styles.dropdownValueText, !countryOfResidence && styles.placeholderText]}>{countryOfResidence || 'Select'}</Text>
             <Ionicons name="chevron-down" size={12} color="#64748B" />
           </TouchableOpacity>
           <View style={styles.successRow}>
@@ -369,17 +410,17 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[
             styles.primaryBtn,
-            !(fullName.trim() && isEmailValid && phone.trim() && countryOfResidence && isChecked) && styles.primaryBtnDisabled,
+            !(fullName.trim() && isEmailValid && phone.trim() && countryCode && countryOfResidence && isChecked) && styles.primaryBtnDisabled,
             verifyingEmail && styles.primaryBtnDisabled,
           ]}
           activeOpacity={0.85}
-          disabled={!(fullName.trim() && isEmailValid && phone.trim() && countryOfResidence && isChecked) || verifyingEmail}
+          disabled={!(fullName.trim() && isEmailValid && phone.trim() && countryCode && countryOfResidence && isChecked) || verifyingEmail}
           onPress={handleRegisterCompany}
         >
           {verifyingEmail ? (
             <ActivityIndicator size="small" color="#060913" />
           ) : (
-            <Text style={styles.primaryBtnText}>{emailVerified ? '+  Register Company' : 'Continue to Verify Email->'}</Text>
+            <Text style={styles.primaryBtnText}>{emailVerified ? '+  Register Company' : 'Submit->'}</Text>
           )}
         </TouchableOpacity>
         {!emailVerified && email.length > 0 && !isEmailValid && (
@@ -477,19 +518,26 @@ const styles = StyleSheet.create({
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(16) },
   summaryCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 14,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(20),
+    width: '100%',
+    alignSelf: 'stretch',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(16),
+    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(18), marginBottom: s(20), minHeight: 105,
   },
+  summaryField: { marginBottom: s(8) },
+  summaryFieldLabel: { color: '#64748B', fontSize: 10, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
+  summaryDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: s(8) },
+  summaryFieldHalf: { flex: 1 },
+  summaryFieldHalfRight: { flex: 1, alignItems: 'flex-end' },
   summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
   usBadgeRow: { flexDirection: 'row', alignItems: 'center' },
   countryCodeBadge: { color: '#64748B', fontSize: 11, fontWeight: 'bold', marginRight: s(6) },
   summaryLabel: { color: '#64748B', fontSize: 11 },
-  companyNameText: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
-  summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  stateSubtitle: { color: '#64748B', fontSize: 11 },
-  priceSummaryText: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(6), marginBottom: s(6) },
-  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(6), marginBottom: s(6) },
+  companyNameText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
+  summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: s(12) },
+  stateSubtitle: { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
+  priceSummaryText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(14), marginBottom: s(8) },
+  inputLabel: { color: '#64748B', fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
   requiredAsterisk: { color: '#EF4444' },
   passportHint: { color: '#64748B', fontSize: 10 },
   inputContainerActive: {
@@ -530,10 +578,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(14), height: 48,
   },
   textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
-  warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(12), gap: 6 },
+  warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(16), gap: s(6) },
   warningText: { color: '#D97706', fontSize: 10 },
-  helperText: { color: '#64748B', fontSize: 10, marginTop: s(6), marginBottom: s(12) },
-  successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(16), gap: 6 },
+  helperText: { color: '#64748B', fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
+  successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(18), gap: s(6) },
   successText: { color: '#10B981', fontSize: 10 },
   phoneRow: { flexDirection: 'row', gap: 10 },
   countryCodePicker: {
@@ -550,6 +598,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
   dropdownValueText: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500' },
+  placeholderText: { color: '#475569' },
   checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: s(4), marginBottom: s(20) },
   checkbox: {
     width: 18, height: 18, borderRadius: 5, backgroundColor: 'rgba(255, 255, 255, 0.1)',

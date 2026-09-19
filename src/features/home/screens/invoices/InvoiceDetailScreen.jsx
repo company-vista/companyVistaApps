@@ -291,19 +291,19 @@ function InvoiceDetailScreen() {
 
         {/* टेबल हेडर */}
         <View style={styles.tableHeaderRow}>
-          <Text style={[styles.tableHeaderText, { width: 24, textAlign: 'center' }]}>
+          <Text style={[styles.tableHeaderText, { width: s(28), textAlign: 'center' }]}>
             #
           </Text>
-          <Text style={[styles.tableHeaderText, { flex: 1, paddingLeft: 8 }]}>
+          <Text style={[styles.tableHeaderText, { flex: 1, paddingLeft: s(8) }]}>
             SERVICE / DESCRIPTION
           </Text>
-          <Text style={[styles.tableHeaderText, { width: 36, textAlign: 'center' }]}>
+          <Text style={[styles.tableHeaderText, { width: s(36), textAlign: 'center' }]}>
             QTY
           </Text>
-          <Text style={[styles.tableHeaderText, { width: 70, textAlign: 'right' }]}>
+          <Text style={[styles.tableHeaderText, { width: s(72), textAlign: 'right' }]}>
             PRICE
           </Text>
-          <Text style={[styles.tableHeaderText, { width: 75, textAlign: 'right' }]}>
+          <Text style={[styles.tableHeaderText, { width: s(78), textAlign: 'right' }]}>
             AMOUNT
           </Text>
         </View>
@@ -319,24 +319,20 @@ function InvoiceDetailScreen() {
             const itemType = getStringValue(item.itemType) || 'ONE-TIME';
             return (<View key={index} style={styles.tableBodyRow}>
               <Text style={styles.tableRowIndex}>{index + 1}</Text>
-              <View style={{ flex: 1, paddingHorizontal: s(8) }}>
-                <View style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: 4,
-                }}>
+              <View style={styles.serviceDescCol}>
+                <View style={styles.itemNameRow}>
                   <View style={styles.itemTypeTag}>
-                    <Text style={styles.itemTypeTagText}>{itemType}</Text>
+                    <Text style={styles.itemTypeTagText} numberOfLines={1}>{itemType}</Text>
                   </View>
-                  <Text style={styles.itemNameText}>{itemName}</Text>
+                  <Text style={styles.itemNameText} numberOfLines={2} ellipsizeMode="tail">{itemName}</Text>
                 </View>
-                <Text style={styles.itemDescText}>{itemDesc}</Text>
+                <Text style={styles.itemDescText} numberOfLines={2} ellipsizeMode="tail">{itemDesc}</Text>
               </View>
               <Text style={styles.tableRowQty}>{itemQty}</Text>
-              <Text style={styles.tableRowPrice}>
+              <Text style={styles.tableRowPrice} numberOfLines={1} adjustsFontSizeToFit>
                 {formatAmount(itemAmount / itemQty, currency)}
               </Text>
-              <Text style={styles.tableRowAmount}>
+              <Text style={styles.tableRowAmount} numberOfLines={1} adjustsFontSizeToFit>
                 {formatAmount(itemAmount, currency)}
               </Text>
             </View>);
@@ -527,7 +523,7 @@ const styles = StyleSheet.create({
     metaValue: { fontSize: font.base, fontWeight: '400', color: '#1e1b4b' },
     tableHeaderRow: {
         backgroundColor: '#231f4f',
-        paddingVertical: 10,
+        paddingVertical: s(10),
         paddingHorizontal: s(12),
         flexDirection: 'row',
         alignItems: 'center',
@@ -535,7 +531,7 @@ const styles = StyleSheet.create({
     tableHeaderText: { color: '#ffffff', fontSize: font.sm, fontWeight: '700' },
     tableBodyRow: {
         flexDirection: 'row',
-        paddingVertical: 12,
+        paddingVertical: s(12),
         paddingHorizontal: s(12),
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
@@ -543,42 +539,56 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
     tableRowIndex: {
-        width: 24,
+        width: s(28),
         textAlign: 'center',
         color: '#94a3b8',
         fontSize: font.base,
     },
+    serviceDescCol: {
+        flex: 1,
+        paddingHorizontal: s(8),
+        minWidth: 0,
+    },
+    itemNameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: s(4),
+        flex: 1,
+        minWidth: 0,
+    },
     itemTypeTag: {
         backgroundColor: '#14b8a6',
-        borderRadius: 4,
+        borderRadius: s(4),
         paddingHorizontal: s(5),
         paddingVertical: 1.5,
-        marginRight: 6,
+        marginRight: s(6),
+        flexShrink: 0,
+        maxWidth: s(70),
     },
     itemTypeTagText: { color: '#ffffff', fontSize: font.xs, fontWeight: '700' },
-    itemNameText: { fontSize: font.base, fontWeight: '700', color: '#1e1b4b', flex: 1 },
+    itemNameText: { fontSize: font.base, fontWeight: '700', color: '#1e1b4b', flex: 1, flexShrink: 1, minWidth: 0 },
     itemDescText: {
         fontSize: font.sm,
         color: '#64748b',
-        lineHeight: 15,
-        marginTop: 2,
+        lineHeight: s(15),
+        marginTop: s(2),
     },
     tableRowQty: {
-        width: 36,
+        width: s(36),
         textAlign: 'center',
         fontSize: font.base,
         color: '#1e1b4b',
         fontWeight: '500',
     },
     tableRowPrice: {
-        width: 70,
+        width: s(72),
         textAlign: 'right',
         fontSize: font.base,
         color: '#1e1b4b',
         fontWeight: '500',
     },
     tableRowAmount: {
-        width: 75,
+        width: s(78),
         textAlign: 'right',
         fontSize: font.base,
         fontWeight: '700',

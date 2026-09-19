@@ -20,7 +20,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppDispatch } from '../../../store/hooks';
-import { setPendingAddCompany } from '../../../store/slices/authSlice';
+import { setPendingAddCompany, setAuthSession, setPendingOrderData, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
 import { s } from '../../../theme/responsive';
 
 export default function SetNewPasswordScreen(props) {
@@ -74,7 +74,8 @@ export default function SetNewPasswordScreen(props) {
     setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/api/signup/set-password`, { clientId, password: newPassword.trim() }, { headers: { Authorization: `Bearer ${token}` } });
-      Toast.show({ type: 'success', text1: 'Account registered', text2: 'Please login to continue' });
+      Toast.show({ type: 'success', text1: 'Account registered', text2: 'Please continue' });
+      // Signup ke baad sidha Home nahi - Confirm & Review pe jaye, auto-login Status pe hoga
       if (onPasswordSet) {
         onPasswordSet();
       } else {
@@ -88,6 +89,16 @@ export default function SetNewPasswordScreen(props) {
               selectedState: route?.params?.selectedState,
               selectedEnding: route?.params?.selectedEnding,
               selectedCountry: route?.params?.selectedCountry,
+              selectedCountryPrice: route?.params?.selectedCountryPrice,
+              bestCountry: route?.params?.bestCountry,
+              bestCountryPrice: route?.params?.bestCountryPrice,
+              bestCountryName: route?.params?.bestCountryName,
+              selectedStatePrice: route?.params?.selectedStatePrice,
+              selectedStructurePrice: route?.params?.selectedStructurePrice,
+              bestState: route?.params?.bestState,
+              bestStatePrice: route?.params?.bestStatePrice,
+              bestStatePriceNote: route?.params?.bestStatePriceNote,
+              bestStateTimeframe: route?.params?.bestStateTimeframe,
               selectedAddOns: route?.params?.selectedAddOns,
               addOnsTotal: route?.params?.addOnsTotal,
               runningTotal: route?.params?.runningTotal,
@@ -104,18 +115,34 @@ export default function SetNewPasswordScreen(props) {
               dayOneNeeds: route?.params?.dayOneNeeds,
               physicalPresence: route?.params?.physicalPresence,
               usStatePriority: route?.params?.usStatePriority,
-              bestState: route?.params?.bestState,
               countryCode: route?.params?.countryCode,
             };
             console.log('=== SET PASSWORD -> REVIEW & SUBMIT DATA ===', JSON.stringify(reviewParams, null, 2));
-            navigation.navigate('ReviewAndConfirm', reviewParams);
+            // RegisterJurisdictionScreen ke do routes: price define hai -> ReviewAndConfirm, price empty (quoted) -> Your Order
+            const hasPrice = Number(route.params?.selectedCountryPrice || 0) > 0 || Number(route.params?.bestCountryPrice || 0) > 0 || Number(route.params?.selectedStatePrice || 0) > 0 || Number(route.params?.bestStatePrice || 0) > 0;
+            if (!hasPrice) {
+              const orderId = `INV-${Date.now()}`;
+              const orderData = { ...reviewParams, orderId, token, clientId, amount: 0, runningTotal: 0 };
+              dispatch(setPendingOrderData(orderData));
+              // auto-login so RootStack switches to Main/Home
+              const emailForSession = email || route.params?.email || '';
+              const fullName = route.params?.fullName || '';
+              if (token) {
+                dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
+              } else {
+                dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
+              }
+              dispatch(setPendingOpenOrderDetails(true));
+              // RootStack will auto switch to Main/Home with OrderDetails open - no manual navigate to Status
+              return;
+            } else {
+              if (navigation.replace) navigation.replace('ReviewAndConfirm', reviewParams);
+              else navigation.navigate('ReviewAndConfirm', reviewParams);
+            }
           }
         } else {
-          if (navigation?.reset) {
-            navigation.reset({ index: 0, routes: [{ name: 'Login', params: { fromSignup: true, email } }] });
-          } else if (navigation?.navigate) {
-            navigation.navigate('Login', { fromSignup: true, email });
-          }
+          // Non-founder: auto-login ho gaya, Root Main pe switch karega - Login pe bhejne ki zarurat nahi
+          // Home khud khul jayega
         }
       }
     } catch (error) {
@@ -143,13 +170,7 @@ export default function SetNewPasswordScreen(props) {
             <Image source={logoR} style={styles.topLogo} />
           </View>
 
-          <View style={styles.heroSection}>
-            <View style={styles.lockOuterCard}>
-              <View style={styles.lockIconContainer}>
-                <Text style={styles.lockIcon}>🔒</Text>
-              </View>
-            </View>
-          </View>
+
 
           <View style={styles.textSection}>
             <Text style={styles.title}>
@@ -251,19 +272,19 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#070A12' },
   keyboardView: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingBottom: 20, justifyContent: 'space-between' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 10 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6, marginTop: 6 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   heroSection: { alignItems: 'center', marginTop: 12 },
   lockOuterCard: { width: 106, height: 106, borderRadius: 30, borderWidth: 1, borderColor: '#0F5257', backgroundColor: '#051E24', justifyContent: 'center', alignItems: 'center' },
   lockIconContainer: { width: 60, height: 60, borderRadius: 20, borderWidth: 1.5, borderColor: '#00F5D4', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30' },
   lockIcon: { fontSize: 32 },
-  textSection: { alignItems: 'center', marginVertical: 15 },
+  textSection: { alignItems: 'center', marginTop: 8, marginBottom: 10 },
   title: { color: '#FFFFFF', fontSize: 26, fontWeight: '600', textAlign: 'center' },
   italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
   description: { color: '#94A3B8', textAlign: 'center', marginTop: 6, fontSize: 14, lineHeight: 20 },
   emailHighlight: { color: '#D4AF37', fontWeight: '700' },
   form: { width: '100%' },
-  label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
+  label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 4 },
   inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: s(12), height: 52 },
   inputContainerSuccess: { borderColor: '#10B981' },
   inputContainerError: { borderColor: '#EF4444' },

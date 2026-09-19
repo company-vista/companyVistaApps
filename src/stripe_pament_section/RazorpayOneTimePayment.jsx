@@ -57,7 +57,7 @@ function pollPaymentStatus(invoiceId, token, onPaid) {
         }
     }, 5000);
 }
-export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInitiated, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
+export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInitiated, onFailure, paymentType = 'invoice', label = 'Pay Now', buttonStyle, }) {
     const [loading, setLoading] = useState(false);
     const token = useAppSelector(state => state.auth.token);
     useEffect(() => {
@@ -171,6 +171,7 @@ export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInit
             clearPaymentStatusFlow();
             if (error?.description === 'User cancelled') {
                 Toast.show({ type: 'info', text1: 'Payment cancelled' });
+                onFailure?.(error);
                 return;
             }
             const msg = error?.response?.data?.message ||
@@ -178,6 +179,7 @@ export default function RazorpayOneTimePayment({ invoice = {}, onSuccess, onInit
                 error?.message ||
                 'Unable to complete Razorpay payment';
             Toast.show({ type: 'error', text1: msg });
+            onFailure?.(error);
         }
         finally {
             setLoading(false);

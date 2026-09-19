@@ -79,12 +79,12 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExp
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
-            paddingHorizontal: s(20),
+            paddingHorizontal: s(12),
             paddingBottom: safeAreaInsets.bottom + 24,
         }}>
         {serviceItems.map((item) => {
             const tone = toneStyles[item.tone];
-            return (<Pressable key={item.title} onPress={() => handleItemPress(item)} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            return (<Pressable key={item.title} onPress={() => handleItemPress(item)} style={styles.card}>
               <View style={[styles.iconBox, { backgroundColor: tone.iconBg }]}>
                 <FontAwesome name={item.icon} size={20} color={tone.iconColor}/>
                 {item.tag ? (<View style={[styles.badge, { backgroundColor: tone.tagBg }]}>
@@ -106,7 +106,7 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExp
 const styles = StyleSheet.create({
     screen: { flex: 1 },
     headerArea: {
-        paddingHorizontal: s(20),
+        paddingHorizontal: s(12),
         paddingBottom: 12,
         marginBottom: 20,
     },
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 14,
         borderRadius: 16,
-        borderWidth: 1,
         marginBottom: 10,
         gap: 12,
     },

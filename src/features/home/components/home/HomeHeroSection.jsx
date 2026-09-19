@@ -86,40 +86,39 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FFF7ED' : 'rgba(249,115,22,0.18)' }]}>
           <FontAwesome name="shopping-cart" size={14} color={isLight ? '#EA580C' : '#FB923C'} />
         </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Your</Text>
-        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Order</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Your Order</Text>
       </Pressable>
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>
           <FontAwesome name="cog" size={16} color={isLight ? colors.accent : '#85B7EB'} />
         </View>
-        <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Manage</Text>
-        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Manage</Text>
       </Pressable>
       <Pressable onPress={onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FEF2F2' : 'rgba(240,149,149,0.15)' }]}>
           <FontAwesome name="info-circle" size={16} color={isLight ? '#dc2626' : '#F09595'} />
         </View>
-        <Text numberOfLines={1} style={[styles.heroTileValue, heroCompanyStyle]}>Details</Text>
-        <Text numberOfLines={1} style={[styles.heroTileLabel, heroTileLabelStyle]}>Company</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Company Info</Text>
       </Pressable>
     </View>
   </View>);
 }
 const styles = StyleSheet.create({
   hero: {
+    width: '100%',
+    alignSelf: 'stretch',
     overflow: 'hidden',
-    borderRadius: 18,
+    borderRadius: s(18),
     backgroundColor: '#0D2137',
     paddingHorizontal: s(16),
-    paddingTop: 16,
-    paddingBottom: 14,
-    marginTop: -14,
+    paddingTop: s(16),
+    paddingBottom: s(14),
+    marginTop: s(-14),
   },
   heroLocationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: s(5),
   },
   heroEyebrow: {
     color: '#85B7EB',
@@ -144,38 +143,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 8,
-    marginTop: 14,
+    gap: s(8),
+    marginTop: s(14),
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 14,
+    borderRadius: s(14),
     backgroundColor: 'transparent',
     paddingHorizontal: s(12),
-    paddingVertical: 8,
+    paddingVertical: s(8),
   },
   heroSwitchIcon: {
-    width: 30,
-    height: 30,
+    width: s(30),
+    height: s(30),
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 15,
+    borderRadius: s(15),
     backgroundColor: 'rgba(255,255,255,0.12)',
   },
   heroMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: s(10),
   },
   heroMetaCol: {
     flex: 1,
     alignItems: 'flex-start',
-    marginLeft: 4,
+    marginLeft: s(4),
   },
   heroMetaDivider: {
     width: 1,
-    height: 28,
+    height: s(28),
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   heroMetaLabel: {
@@ -192,28 +191,28 @@ const styles = StyleSheet.create({
   },
   heroStats: {
     flexDirection: 'row',
-    gap: 6,
-    marginTop: 14,
+    gap: s(6),
+    marginTop: s(14),
   },
   heroTile: {
     flex: 1,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 12,
+    borderRadius: s(10),
     backgroundColor: 'rgba(255,255,255,0.07)',
-    paddingHorizontal: s(6),
-    paddingVertical: 10,
+    paddingHorizontal: s(4),
+    paddingVertical: s(7),
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
+    gap: s(3),
   },
   heroIconBubble: {
-    width: 28,
-    height: 28,
-    borderRadius: 9,
+    width: s(22),
+    height: s(22),
+    borderRadius: s(7),
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 2,
+    marginBottom: s(1),
   },
   heroTileNumber: {
     color: '#ffffff',
@@ -224,14 +223,14 @@ const styles = StyleSheet.create({
   },
   heroTileValue: {
     color: '#ffffff',
-    fontSize: font.base,
+    fontSize: s(13),
     fontWeight: '600',
-    lineHeight: 18,
+    lineHeight: s(16),
     textAlign: 'center',
   },
   heroTileLabel: {
-    fontSize: font.xs,
-    lineHeight: 13,
+    fontSize: s(10),
+    lineHeight: s(11),
     textAlign: 'center',
     flexShrink: 1,
     marginTop: 0,

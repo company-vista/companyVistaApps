@@ -9,7 +9,7 @@ function QuickAccessDetailScreen({ color, description, icon, onBackPress, title,
     return (<View style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
             styles.content,
-            { paddingBottom: Math.max(safeAreaInsets.bottom, 24) },
+            { paddingBottom: Math.max(safeAreaInsets.bottom, s(24)) },
         ]}>
         <View style={[styles.heroCard, { backgroundColor: colors.surface }]}>
           <View style={[styles.iconWrap, { backgroundColor: colors.surfaceAlt }]}>
@@ -46,36 +46,36 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     content: {
-        paddingTop: 24,
+        paddingTop: s(24),
     },
     heroCard: {
         alignItems: 'center',
-        borderRadius: 18,
+        borderRadius: s(18),
         backgroundColor: '#ffffff',
         paddingHorizontal: s(22),
-        paddingVertical: 36,
+        paddingVertical: s(36),
     },
     iconWrap: {
-        width: 72,
-        height: 72,
+        width: s(72),
+        height: s(72),
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 36,
+        borderRadius: s(36),
         backgroundColor: '#ecfeff',
     },
     heroTitle: {
         color: '#111827',
-        fontSize: 22,
+        fontSize: s(22),
         fontWeight: '900',
-        marginTop: 18,
+        marginTop: s(18),
         textAlign: 'center',
     },
     description: {
         color: '#64748b',
-        fontSize: 15,
+        fontSize: s(15),
         fontWeight: '600',
-        lineHeight: 22,
-        marginTop: 10,
+        lineHeight: s(22),
+        marginTop: s(10),
         textAlign: 'center',
     },
 });

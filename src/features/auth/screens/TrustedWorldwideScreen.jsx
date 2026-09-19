@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#060913',
   },
   scrollContent: {
-    paddingHorizontal: s(24),
+    paddingHorizontal: s(16),
     paddingTop: s(30),
     paddingBottom: s(30),
   },
@@ -175,9 +175,10 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
+    alignSelf: 'stretch',
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderRadius: 14,
-    padding: s(16),
+    borderRadius: s(14),
+    padding: s(14),
     alignItems: 'center',
     marginBottom: s(12),
     borderWidth: 1,
@@ -189,9 +190,10 @@ const styles = StyleSheet.create({
   statNumber: { fontSize: 22, fontWeight: '600', fontFamily: 'serif', marginTop: s(6) },
   statLabel: { color: '#64748B', fontSize: 11, marginTop: s(2) },
   testimonialCard: {
+    width: '100%',
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 14,
+    borderRadius: s(14),
     padding: s(14),
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
   getStartedBtn: {
     backgroundColor: '#D4AF37',
     borderRadius: 24,
-    paddingVertical: s(16),
+    paddingVertical: s(14),
     alignItems: 'center',
     marginBottom: s(16),
   },

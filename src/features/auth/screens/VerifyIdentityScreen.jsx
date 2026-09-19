@@ -107,8 +107,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
-        {/* Bottom Button - ab RegistrationProgress pe le jayega with dynamic fill */}
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.navigate?.('RegistrationProgress', { ...route?.params, companyName: route?.params?.companyName, selectedState: route?.params?.country || route?.params?.selectedState, selectedStructure: route?.params?.selectedStructure || route?.params?.structure, shareCapital: route?.params?.shareCapital || '€25,000', shareholdersCount: route?.params?.shareholdersCount || '3 people', amount: route?.params?.amountPaid || route?.params?.amount, orderId: route?.params?.orderId })}>
+        {/* Bottom Button - KYC complete karke Status pe wapas, tick dikhega */}
+        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.navigate?.('Status', { ...route?.params, kycCompleted: true })}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
 

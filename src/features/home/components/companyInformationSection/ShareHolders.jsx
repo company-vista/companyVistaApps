@@ -61,12 +61,7 @@ const ShareHolders = ({ companyId }) => {
         </View>
       </AnimatedAppear>
 
-      <AnimatedAppear index={1}>
-        <View style={styles.sectionTitleRow}>
-          <FontAwesome name="users" size={16} color={palette.sectionIcon}/>
-          <Text style={[styles.header, { color: colors.text }]}>Shareholders</Text>
-        </View>
-      </AnimatedAppear>
+
 
       <View style={styles.list}>
         {data.length === 0 ? (<Text style={{ color: colors.muted, marginTop: 10 }}>No shareholders found.</Text>) : (data.map((shareholder, index) => {
@@ -81,7 +76,7 @@ const ShareHolders = ({ companyId }) => {
                 <View style={[
                     styles.shareholderCard,
                     {
-                        backgroundColor: colors.cardHighlight,
+                        // backgroundColor: colors.cardHighlight,
                         borderColor: colors.border,
                         shadowColor: palette.cardShadow,
                     },

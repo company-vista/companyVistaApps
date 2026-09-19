@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logoutUser, updateProfileUser } from '../../../store/slices/authSlice';
+import { logoutUser, setRedirectToLogin, updateProfileUser } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import BackButton from '../../../components/buttons/BackButton';
@@ -96,6 +96,7 @@ function ProfileScreen() {
   }
   function handleAddAccountPress() {
     setIsSwitchSheetVisible(false);
+    dispatch(setRedirectToLogin(true));
     dispatch(logoutUser());
   }
   return (<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[
@@ -293,7 +294,7 @@ function ProfileScreen() {
       <FontAwesome name="angle-right" size={22} color={colors.muted} />
     </Pressable>
 
-    <Pressable onPress={() => dispatch(logoutUser())} style={[styles.logoutButton, { backgroundColor: colors.buttonBackground }]}>
+    <Pressable onPress={() => { dispatch(setRedirectToLogin(true)); dispatch(logoutUser()); }} style={[styles.logoutButton, { backgroundColor: colors.buttonBackground }]}>
       <FontAwesome name="sign-out" size={18} color={colors.buttonText} />
       <Text style={[styles.logoutText, { color: colors.buttonText }]}>Logout</Text>
     </Pressable>

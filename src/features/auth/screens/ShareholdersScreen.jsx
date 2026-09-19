@@ -199,7 +199,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
         </View>
 
         {/* Continue Button */}
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.goBack?.()}>
+        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.navigate?.('Status', { ...route?.params, shareholderCompleted: true })}>
           <Text style={styles.continueButtonText}>Continue to KYC</Text>
           <ArrowRight color="#070C15" size={20} />
         </TouchableOpacity>

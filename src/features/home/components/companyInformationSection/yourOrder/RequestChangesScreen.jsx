@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,34 +20,83 @@ import { useThemeColors } from '../../../../../theme/colors';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { s } from '../../../../../theme/responsive';
+import { useAppSelector } from '../../../../../store/hooks';
+import { requestQuoteChange } from './api/quoteApi';
 
-const RequestChangesScreen = ({ onBackPress }) => {
+const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, quote = null }) => {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const insets = useSafeAreaInsets();
   const scrollRef = useRef(null);
+  const user = useAppSelector(s => s.auth.user);
+  const token = useAppSelector(s => s.auth.token);
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
+  const displayName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email?.split('@')[0] || 'You';
+  const initials = displayName.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'YO';
   const [selectedCategory, setSelectedCategory] = useState('Pricing');
   const [inputText, setInputText] = useState('');
-  const [messages, setMessages] = useState([
-    { id: 1, type: 'agent', name: 'Anita Desai', text: 'Your quote is ready. The €25,000 capital can be deposited in two tranches if that helps with cash flow — let me know.', time: 'Today, 10:14 AM' },
-    { id: 2, type: 'user', text: 'Thanks Anita. Can we drop the certified translations? Our passports already have English pages.', time: 'Today, 10:31 AM' },
-  ]);
+  const [sending, setSending] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   const categories = ['Pricing', 'Scope of services', 'Timeline', 'Entity type', 'Shareholder setup', 'Something else'];
+  // companyId priority: prop -> quote -> pendingOrder -> user companies
+  const companyId = companyIdProp || quote?.companyId || pendingOrder?.companyId || user?.companies?.[0]?._id || user?.companies?.[0]?.id || null;
+  // clientId priority: pendingOrder.clientId -> user._id/id -> quote sender
+  // backend requires clientId; fallback to demo id so dummy flow still works (API will return 404/403 but UI shows optimistic reply)
+  const clientId =
+    pendingOrder?.clientId ||
+    user?._id ||
+    user?.id ||
+    user?.userId ||
+    user?.clientId ||
+    quote?.clientId ||
+    user?.companies?.[0]?.clientId ||
+    null;
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputText.trim()) {
       Toast.show({ type: 'error', text1: 'Please enter message' });
       return;
     }
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userMsg = { id: Date.now(), type: 'user', text: inputText.trim(), time: `Today, ${now}` };
+    const messageText = inputText.trim();
+    const userMsg = { id: Date.now(), type: 'user', name: displayName, text: messageText, time: `Today, ${now}` };
+
+    // if companyId/clientId missing -> save locally, no dummy agent reply
+    if (!companyId || !clientId) {
+      setMessages(prev => [...prev, userMsg]);
+      setInputText('');
+      Toast.show({ type: 'info', text1: 'Demo mode', text2: 'Message saved locally (backend ids missing)' });
+      return;
+    }
+
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
-    setTimeout(() => {
-      const reply = { id: Date.now() + 1, type: 'agent', name: 'Anita Desai', text: 'Thanks, revising your quote. We will update within 2 hours.', time: `Today, ${now}` };
-      setMessages(prev => [...prev, reply]);
-    }, 1000);
+    setSending(true);
+    try {
+      const res = await requestQuoteChange({
+        companyId,
+        token,
+        clientId,
+        text: messageText,
+        reasons: selectedCategory ? [selectedCategory] : [],
+      });
+      if (res.isSuccess) {
+        Toast.show({ type: 'success', text1: res.message || 'Message sent successfully' });
+        // only show real server reply if available - no dummy fallback
+        const replyText = res.data?.reply || res.data?.message || res.data?.quote?.messages?.slice(-1)?.[0]?.text;
+        if (replyText) {
+          const reply = { id: Date.now() + 1, type: 'agent', name: 'Anita Desai', text: replyText, time: `Today, ${now}` };
+          setMessages(prev => [...prev, reply]);
+        }
+      } else {
+        Toast.show({ type: 'error', text1: res.error || 'Failed to send message' });
+      }
+    } catch (err) {
+      Toast.show({ type: 'error', text1: err?.message || 'Network error' });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -70,7 +120,7 @@ const RequestChangesScreen = ({ onBackPress }) => {
           <Text style={[styles.title, { color: colors.text }]}>
             Request <Text style={styles.titleItalic}>changes</Text>
           </Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>Quote #Q-2026-0412 · we'll revise within 2 hours</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>Quote #{quote?.quoteId || 'Q-2026-0412'} · we'll revise within 2 hours</Text>
 
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.muted }]}>WHAT WOULD YOU LIKE TO CHANGE?</Text>
@@ -99,30 +149,34 @@ const RequestChangesScreen = ({ onBackPress }) => {
           </View>
 
           <View style={styles.chatContainer}>
-            {messages.map((m) =>
-              m.type === 'agent' ? (
-                <View key={m.id} style={styles.messageRowLeft}>
-                  <View style={[styles.avatar, { backgroundColor: '#3A72EC' }]}>
-                    <Text style={styles.avatarText}>AD</Text>
+            {messages.length === 0 ? (
+              <Text style={[styles.emptyChatText, { color: colors.muted }]}>No messages yet. Select a category and send your request.</Text>
+            ) : (
+              messages.map((m) =>
+                m.type === 'agent' ? (
+                  <View key={m.id} style={styles.messageRowLeft}>
+                    <View style={[styles.avatar, { backgroundColor: '#3A72EC' }]}>
+                      <Text style={styles.avatarText}>AD</Text>
+                    </View>
+                    <View style={[styles.agentBubble, { backgroundColor: isLight ? '#FFFFFF' : '#121626', borderColor: colors.border }]}>
+                      <Text style={styles.agentName}>
+                        {m.name} <Text style={styles.agentRole}>· German desk</Text>
+                      </Text>
+                      <Text style={[styles.messageText, { color: colors.text }]}>{m.text}</Text>
+                      <Text style={[styles.timeText, { color: colors.muted }]}>{m.time}</Text>
+                    </View>
                   </View>
-                  <View style={[styles.agentBubble, { backgroundColor: isLight ? '#FFFFFF' : '#121626', borderColor: colors.border }]}>
-                    <Text style={styles.agentName}>
-                      {m.name} <Text style={styles.agentRole}>· German desk</Text>
-                    </Text>
-                    <Text style={[styles.messageText, { color: colors.text }]}>{m.text}</Text>
-                    <Text style={[styles.timeText, { color: colors.muted }]}>{m.time}</Text>
+                ) : (
+                  <View key={m.id} style={styles.messageRowRight}>
+                    <View style={[styles.userBubble, { backgroundColor: isLight ? '#F1F5F9' : '#151722', borderColor: colors.border }]}>
+                      <Text style={[styles.messageText, { color: colors.text }]}>{m.text}</Text>
+                      <Text style={[styles.timeText, { color: colors.muted }]}>{m.time}</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#B89B48' }]}>
+                      <Text style={styles.avatarText}>{initials}</Text>
+                    </View>
                   </View>
-                </View>
-              ) : (
-                <View key={m.id} style={styles.messageRowRight}>
-                  <View style={[styles.userBubble, { backgroundColor: isLight ? '#F1F5F9' : '#151722', borderColor: colors.border }]}>
-                    <Text style={[styles.messageText, { color: colors.text }]}>{m.text}</Text>
-                    <Text style={[styles.timeText, { color: colors.muted }]}>{m.time}</Text>
-                  </View>
-                  <View style={[styles.avatar, { backgroundColor: '#B89B48' }]}>
-                    <Text style={styles.avatarText}>RS</Text>
-                  </View>
-                </View>
+                )
               )
             )}
           </View>
@@ -141,8 +195,13 @@ const RequestChangesScreen = ({ onBackPress }) => {
                 onSubmitEditing={handleSend}
               />
             </View>
-            <TouchableOpacity style={[styles.sendButtonSmall, { backgroundColor: colors.buttonBackground, opacity: inputText.trim() ? 1 : 0.6 }]} activeOpacity={0.8} onPress={handleSend}>
-              <Ionicons name="arrow-forward" size={18} color="#0A0C16" />
+            <TouchableOpacity
+              disabled={sending || !inputText.trim()}
+              style={[styles.sendButtonSmall, { backgroundColor: colors.buttonBackground, opacity: sending || !inputText.trim() ? 0.6 : 1 }]}
+              activeOpacity={0.8}
+              onPress={handleSend}
+            >
+              {sending ? <ActivityIndicator size="small" color="#0A0C16" /> : <Ionicons name="arrow-forward" size={18} color="#0A0C16" />}
             </TouchableOpacity>
           </View>
           <Text style={[styles.disclaimerText, { color: colors.muted }]}>Quote stays valid while under revision</Text>
@@ -182,6 +241,7 @@ const styles = StyleSheet.create({
   footerInputWrap: { flex: 1, backgroundColor: '#121626', borderRadius: 12, borderWidth: 1, borderColor: '#1D233A', paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
   footerInput: { flex: 1, color: '#FFFFFF', fontSize: 13, padding: s(0) },
   sendButtonSmall: { backgroundColor: '#DDB763', borderRadius: 999, justifyContent: 'center', alignItems: 'center', height: 44, width: 44 },
+  emptyChatText: { fontSize: 13, textAlign: 'center', marginVertical: s(20), lineHeight: 18 },
   disclaimerText: { color: '#4B536B', fontSize: 11, marginTop: s(8), textAlign: 'center', width: '100%' },
 });
 

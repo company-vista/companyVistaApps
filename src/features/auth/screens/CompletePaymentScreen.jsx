@@ -45,12 +45,31 @@ export default function CompletePaymentScreen({ navigation, route }) {
   const [paying, setPaying] = useState(false);
   const token = useAppSelector(s => s.auth.token);
 
-  // Calculate totals dynamically if passed
-  const packagePrice = 299;
-  const stateFee = 160;
+  // RegistrationLanding se lekar sahi amount: runningTotal priority, fallback me advisorFlow aware calc
+  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 299 };
+  const structurePrice = route.params?.selectedStructurePrice ?? structurePriceMap[selectedStructure] ?? 299;
+  const advisorPrice = route.params?.bestStatePrice ?? 0;
+  const isAdvisorFlow = advisorPrice > 0;
+  const directStateFee = route.params?.selectedStatePrice ?? 0;
+  const countryPrice = route.params?.selectedCountryPrice ?? 0;
+  // USA additive: country + state + structure; non-USA: country only
+  let packagePrice;
+  let stateFee;
+  if (isAdvisorFlow) {
+    packagePrice = advisorPrice;
+    stateFee = 0;
+  } else if ((route.params?.selectedCountry || selectedCountry) === 'US') {
+    packagePrice = structurePrice;
+    stateFee = directStateFee;
+  } else {
+    packagePrice = 0;
+    stateFee = 0;
+  }
+  const isUSPayment = (route.params?.selectedCountry || selectedCountry) === 'US';
+  const additiveBase = isAdvisorFlow ? advisorPrice : isUSPayment ? (Number(countryPrice) || 0) + (Number(directStateFee) || 0) + (Number(structurePrice) || 0) : (Number(countryPrice) || 0);
+  const hasPrice = Number(route.params?.selectedCountryPrice || route.params?.bestStatePrice || route.params?.selectedStatePrice || route.params?.selectedStructurePrice || 0) > 0;
   const computedAddOnsTotal = addOnsTotal || 0;
-  // if runningTotal already includes stateFee, use it, else compute
-  const dueNow = runningTotal || packagePrice + stateFee + computedAddOnsTotal;
+  const dueNow = !hasPrice ? 0 : (runningTotal || (additiveBase + computedAddOnsTotal));
 
   const handlePay = async () => {
     if (paying) return;

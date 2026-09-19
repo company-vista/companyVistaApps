@@ -185,7 +185,7 @@ export default RegistrationLandingScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  scrollContent: { paddingHorizontal: s(24), paddingBottom: s(24) },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: s(16), marginTop: s(38) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   heroSection: { marginBottom: s(20) },
@@ -218,8 +218,9 @@ const styles = StyleSheet.create({
   flagEmoji: { fontSize: 32 },
   countryLabel: { color: '#64748B', fontSize: 10, textAlign: 'center' },
   howItWorksCard: {
+    width: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderRadius: 16, padding: s(14),
+    borderRadius: s(16), padding: s(14),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
     marginTop: s(16),
     marginBottom: s(14),

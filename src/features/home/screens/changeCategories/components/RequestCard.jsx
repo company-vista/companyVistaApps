@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import { s } from '../../../../../theme/responsive';
 import { font } from '../../../../../theme/typography';
 const STAGE_COLORS = {
     submitted: {
@@ -137,38 +138,38 @@ const styles = StyleSheet.create({
     progressTrack: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: s(8),
     },
     node: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        width: s(28),
+        height: s(28),
+        borderRadius: s(14),
         alignItems: 'center',
         justifyContent: 'center',
     },
     line: {
         flex: 1,
-        height: 2,
+        height: s(2),
     },
     progressLegend: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 14,
+        marginBottom: s(14),
     },
     legendText: {
         fontSize: font.sm,
     },
     card: {
-        borderRadius: 16,
-        padding: 16,
-        paddingBottom: 14,
-        marginBottom: 14,
+        borderRadius: s(16),
+        padding: s(16),
+        paddingBottom: s(14),
+        marginBottom: s(14),
     },
     cardHead: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'baseline',
-        marginBottom: 14,
+        marginBottom: s(14),
     },
     cardTitle: {
         fontSize: font.xl,
@@ -180,11 +181,11 @@ const styles = StyleSheet.create({
     progressLabel: {
         fontSize: font.sm,
         letterSpacing: 0.5,
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     divider: {
         height: 0.5,
-        marginBottom: 12,
+        marginBottom: s(12),
     },
     cardFoot: {
         flexDirection: 'row',
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     detailsToggle: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: s(6),
         flex: 1,
     },
     detailsText: {
@@ -203,11 +204,11 @@ const styles = StyleSheet.create({
     statusPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
-        paddingVertical: 5,
-        paddingLeft: 12,
-        paddingRight: 5,
-        borderRadius: 14,
+        gap: s(6),
+        paddingVertical: s(5),
+        paddingLeft: s(12),
+        paddingRight: s(5),
+        borderRadius: s(14),
     },
     statusPillText: {
         fontSize: font.sm,

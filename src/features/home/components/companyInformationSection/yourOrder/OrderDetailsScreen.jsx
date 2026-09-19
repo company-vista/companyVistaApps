@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,14 +7,17 @@ import {
   TouchableOpacity,
   StatusBar,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Clock, Check } from 'lucide-react-native';
+import { Clock, Check, RefreshCw } from 'lucide-react-native';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
 import { useThemeColors } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
+import { useAppSelector } from '../../../../../store/hooks';
+import { fetchQuote, isQuoteReady, formatCurrency } from './api/quoteApi';
 
 const OrderDetailsScreen = ({
   onBackPress,
@@ -22,35 +25,121 @@ const OrderDetailsScreen = ({
   onNextPress,
   submission = {},
   progress = 0,
+  selectedCompany = null,
 }) => {
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const insets = useSafeAreaInsets();
-  // progress: 0 = empty, 1 = details submitted, 2 = quote in progress, 3 = review, 4 = filing
-  // Auto-derive from submission if progress not provided
+  const registration = useAppSelector((state) => state.companyRegistration);
+  const fallbackCompany = useAppSelector((state) => state.auth.user?.companies?.[0]);
+  const pendingOrder = useAppSelector((state) => state.auth.pendingOrderData);
+  // Build display values: priority -> submission prop -> pendingOrder (ReviewAndConfirm data) -> selectedCompany -> registration
+  // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
+  const buildPendingCompanyName = () => {
+    if (!pendingOrder?.companyName) return null;
+    const base = String(pendingOrder.companyName).trim();
+    const suffix = String(pendingOrder.selectedEnding || pendingOrder.selectedStructure || '').trim();
+    if (!suffix) return base;
+    const normalize = (s) => s.toLowerCase().replace(/[\.\s-]/g, '');
+    const normSuffix = normalize(suffix);
+    // repeatedly strip trailing word that equals suffix (handles duplicate "LLC LLC" and L.L.C. vs LLC alias)
+    let cleaned = base;
+    let parts = cleaned.split(/\s+/);
+    while (parts.length > 0 && normalize(parts[parts.length - 1]) === normSuffix) {
+      parts.pop();
+      cleaned = parts.join(' ');
+    }
+    return `${cleaned} ${suffix}`.trim();
+  };
+  const pendingCompanyName = buildPendingCompanyName();
+  const pendingJurisdiction = pendingOrder?.selectedState ? `US ${pendingOrder.selectedState}, USA` : pendingOrder?.selectedJurisdiction ? String(pendingOrder.selectedJurisdiction) : null;
+  const companyVal =
+    submission.company ??
+    pendingCompanyName ??
+    selectedCompany?.name ??
+    registration.companyName ??
+    fallbackCompany?.companyName ??
+    '—';
+  const jurisdictionVal =
+    submission.jurisdiction ??
+    pendingJurisdiction ??
+    selectedCompany?.state ??
+    selectedCompany?.countryOfIncorporation ??
+    registration.stateOfIncorporation ??
+    registration.jurisdictionName ??
+    '—';
+  const structureVal =
+    submission.structure ??
+    pendingOrder?.selectedStructure ??
+    selectedCompany?.companyType ??
+    registration.entityType ??
+    '—';
+  const shareholdersVal =
+    submission.shareholders ??
+    pendingOrder?.shareholdersCount ??
+    (Array.isArray(registration.directors) && registration.directors.length > 0
+      ? `${registration.directors.length} Shareholder(s)`
+      : selectedCompany?.name
+        ? '1 Shareholder'
+        : '—');
+  const orderRefVal =
+    submission.orderRef ??
+    pendingOrder?.orderId ??
+    (selectedCompany?.id ? `#${String(selectedCompany.id).slice(-8).toUpperCase()}` : fallbackCompany?._id ? `#${String(fallbackCompany._id).slice(-8).toUpperCase()}` : '—');
+
+  const token = useAppSelector((state) => state.auth.token);
+  const [quote, setQuote] = useState(null);
+  const [loadingQuote, setLoadingQuote] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshQuote = async () => {
+    const cid = selectedCompany?.id || selectedCompany?._id || pendingOrder?.companyId;
+    setRefreshing(true);
+    setLoadingQuote(true);
+    try {
+      const res = await fetchQuote({ companyId: cid, token, invoiceId: pendingOrder?.orderId });
+      setQuote(res.quote);
+    } finally {
+      setRefreshing(false);
+      setLoadingQuote(false);
+    }
+  };
+  useEffect(() => {
+    let mounted = true;
+    const cid = selectedCompany?.id || selectedCompany?._id || pendingOrder?.companyId;
+    fetchQuote({ companyId: cid, token, invoiceId: pendingOrder?.orderId })
+      .then(res => { if (mounted) setQuote(res.quote); })
+      .finally(() => { if (mounted) setLoadingQuote(false); });
+    return () => { mounted = false; };
+  }, [selectedCompany?.id, selectedCompany?._id, pendingOrder?.companyId, pendingOrder?.orderId, token]);
+
+  const effectiveQuote = quote;
+  // Xyz LLC: admin ne totalAmount bheja ho to wo bhi pick karo, 0 ko skip karke first positive amount lo
+  const rawAmount = [
+    submission.amount, submission.adminAmount, submission.totalAmount,
+    pendingOrder?.amount, pendingOrder?.runningTotal, pendingOrder?.totalAmount,
+    selectedCompany?.quoteAmount, selectedCompany?.adminAmount, selectedCompany?.totalAmount,
+    effectiveQuote?.total, effectiveQuote?.totalAmount, effectiveQuote?.raw?.total, effectiveQuote?.raw?.totalAmount,
+  ].find(v => Number(v) > 0) ?? 0;
+  const numericAmount = Number(rawAmount) || 0;
+  const hasAmount = !loadingQuote && isQuoteReady(effectiveQuote) && numericAmount > 0;
+  // progress: 1 = only Details submitted, 2 = Quote being prepared done -> Review & approve active
   const derivedProgress = (() => {
     if (progress) return progress;
-    const hasCompany = !!submission.company && submission.company !== '—';
-    const hasJurisdiction = !!submission.jurisdiction && submission.jurisdiction !== '—';
-    const hasStructure = !!submission.structure && submission.structure !== '—';
-    if (hasCompany || hasJurisdiction || hasStructure) return 1;
-    return 0;
+    if (hasAmount) return 2; // quote fill hone par Quote being prepared -> done, Review & approve -> active
+    return 1; // quote pending -> Quote being prepared active (not done)
   })();
-  const isStep1Done = derivedProgress >= 1;
+  const isStep1Done = true;
   const isStep2Active = derivedProgress === 1;
   const isStep2Done = derivedProgress >= 2;
   const isStep3Active = derivedProgress === 2;
   const isStep3Done = derivedProgress >= 3;
   const isStep4Active = derivedProgress === 3;
   const isStep4Done = derivedProgress >= 4;
-  const hasSubmission = derivedProgress >= 1;
-
-  const companyVal = submission.company ?? '—';
-  const jurisdictionVal = submission.jurisdiction ?? '—';
-  const structureVal = submission.structure ?? '—';
-  const shareCapitalVal = submission.shareCapital ?? '—';
-  const shareholdersVal = submission.shareholders ?? '—';
-  const orderRefVal = submission.orderRef ?? '—';
+  const hasSubmission = true;
+  const isNextEnabled = hasAmount && !loadingQuote;
+  // price define nahi hai toh back band - quote + payment pura karke hi homepage
+  const isNoPriceOrder = Number(pendingOrder?.selectedCountryPrice ?? 0) === 0 && Number(pendingOrder?.selectedStatePrice ?? 0) === 0 && Number(pendingOrder?.bestStatePrice ?? 0) === 0 && pendingOrder?.orderId;
+  const handleBack = isNoPriceOrder ? undefined : onBackPress;
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: colors.background }]}>
       <StatusBar barStyle={isLight ? 'dark-content' : 'light-content'} backgroundColor={colors.background} />
@@ -58,7 +147,9 @@ const OrderDetailsScreen = ({
         
         {/* Header */}
         <View style={[styles.header, { marginTop: s(8) }]}>
-          <BackButton onPress={onBackPress} />
+          <View style={{ opacity: isNoPriceOrder ? 0.3 : 1 }}>
+            <BackButton onPress={handleBack} disabled={!!isNoPriceOrder} />
+          </View>
           <Image source={logoR} style={styles.logoImage} resizeMode="contain" />
           <TouchableOpacity style={[styles.iconButton, { backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderColor: colors.border }]}>
             <Clock color={colors.text} size={20} />
@@ -73,31 +164,39 @@ const OrderDetailsScreen = ({
           <Text style={[styles.subTitle, { color: colors.muted }]}>Track your company registration — status updates appear here.</Text>
         </View>
 
-        {/* Preparing Quote Banner */}
-        <View style={[styles.statusBanner, { backgroundColor: isLight ? '#FFFFFF' : '#0F1A30', borderColor: colors.border }]}>
-          <View style={styles.bannerIconContainer}>
-            <Clock color="#3B82F6" size={22} />
+        {/* Preparing Quote Banner - changes when admin quote ready */}
+        <View style={[styles.statusBanner, { backgroundColor: isLight ? '#FFFFFF' : '#0F1A30', borderColor: hasAmount ? 'rgba(16,185,129,0.3)' : colors.border }]}>
+          <View style={[styles.bannerIconContainer, hasAmount && { backgroundColor: 'rgba(16,185,129,0.15)' }]}>
+            {hasAmount ? <Check color="#10B981" size={22} /> : loadingQuote ? <ActivityIndicator size="small" color="#3B82F6" /> : <Clock color="#3B82F6" size={22} />}
           </View>
           <View style={styles.bannerTextContainer}>
-            <Text style={[styles.bannerTitle, { color: colors.text }]}>Preparing your quote</Text>
+            <Text style={[styles.bannerTitle, { color: colors.text }]}>{hasAmount ? 'Quote ready!' : 'Preparing your quote'}</Text>
             <Text style={[styles.bannerDescription, { color: colors.muted }]}>
-              Our German desk is confirming notary and register fees for your structure.
+              {hasAmount ? `Admin has prepared your quote — ${formatCurrency(numericAmount, effectiveQuote?.currency)} ready for review.` : 'Our German desk is confirming notary and register fees for your structure.'}
             </Text>
           </View>
         </View>
 
         {/* Status Time Info */}
         <View style={styles.timeInfoContainer}>
-          <View style={styles.blueDot} />
+          <View style={[styles.blueDot, hasAmount && { backgroundColor: '#10B981' }]} />
           <Text style={[styles.timeInfoText, { color: colors.muted }]}>
-            Typically ready within <Text style={styles.boldTimeText}>2 hours</Text> · submitted 47 min ago
+            {hasAmount ? <><Text style={[styles.boldTimeText, { color: '#10B981' }]}>Ready to review</Text> · tap View Quote below</> : <>Typically ready within <Text style={styles.boldTimeText}>2 hours</Text> · submitted 47 min ago</>}
           </Text>
         </View>
 
-        {/* Section Header */}
+        {/* Section Header with small refresh for quote API */}
         <View style={styles.sectionHeaderContainer}>
           <Text style={[styles.sectionTitle, { color: colors.muted }]}>YOUR SUBMISSION</Text>
           <View style={[styles.sectionHeaderLine, { backgroundColor: colors.border }]} />
+          <TouchableOpacity
+            onPress={refreshQuote}
+            disabled={refreshing || loadingQuote}
+            style={[styles.smallRefreshBtn, { borderColor: colors.border, backgroundColor: isLight ? '#FFFFFF' : '#1E293B', opacity: refreshing || loadingQuote ? 0.6 : 1 }]}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            {refreshing ? <ActivityIndicator size="small" color="#EAB308" /> : <RefreshCw size={16} color="#EAB308" />}
+          </TouchableOpacity>
         </View>
 
         {/* Submission Details Card */}
@@ -113,10 +212,6 @@ const OrderDetailsScreen = ({
           <View style={[styles.row, { borderBottomColor: colors.border }]}>
             <Text style={[styles.label, { color: colors.muted }]}>Structure</Text>
             <Text style={[styles.value, { color: colors.text }, structureVal === '—' ? styles.emptyValue : null]}>{structureVal}</Text>
-          </View>
-          <View style={[styles.row, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.label, { color: colors.muted }]}>Share capital</Text>
-            <Text style={[styles.value, { color: colors.text }, shareCapitalVal === '—' ? styles.emptyValue : null]}>{shareCapitalVal}</Text>
           </View>
           <View style={[styles.row, { borderBottomColor: colors.border }]}>
             <Text style={[styles.label, { color: colors.muted }]}>Shareholders</Text>
@@ -190,11 +285,23 @@ const OrderDetailsScreen = ({
           </View>
         </View>
 
-        {/* Action Button */}
-        <TouchableOpacity style={[styles.nextButton, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.85} onPress={onNextPress ?? onMessagePress}>
-          <Text style={styles.nextButtonText}>Next</Text>
-          <Text style={styles.nextArrow}>→</Text>
+        {/* Action Button - enable only when admin quote amount filled */}
+        <TouchableOpacity
+          disabled={!isNextEnabled}
+          style={[styles.nextButton, { backgroundColor: isNextEnabled ? colors.buttonBackground : colors.border, opacity: isNextEnabled ? 1 : 0.6 }]}
+          activeOpacity={0.85}
+          onPress={isNextEnabled ? () => (onNextPress ? onNextPress(effectiveQuote) : onMessagePress?.(effectiveQuote)) : undefined}
+        >
+          {loadingQuote ? <ActivityIndicator size="small" color={colors.muted} style={{ marginRight: 8 }} /> : null}
+          <Text style={[styles.nextButtonText, !isNextEnabled && { color: colors.muted }]}>{loadingQuote ? 'Loading quote...' : isNextEnabled ? 'View Quote' : 'Awaiting Quote'}</Text>
+          {!loadingQuote && <Text style={[styles.nextArrow, !isNextEnabled && { color: colors.muted }]}>→</Text>}
         </TouchableOpacity>
+        {!isNextEnabled && !loadingQuote && (
+          <Text style={[styles.footerText, { color: colors.muted, marginTop: 8 }]}>
+            Admin will add quote amount soon
+          </Text>
+        )}
+
 
         {/* Footer Text */}
         <Text style={[styles.footerText, { color: colors.muted }]}>We'll notify you by email and push</Text>
@@ -319,6 +426,15 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  smallRefreshBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: s(8),
   },
   card: {
     backgroundColor: '#0F1A30',

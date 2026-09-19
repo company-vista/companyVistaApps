@@ -17,9 +17,13 @@ import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 
 const CompanyNamingScreen = ({ navigation, route }) => {
-  const { selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
+  const p = route.params || {};
+  // bestCountry/bestState (advisor flow) + selectedCountry/selectedState (direct) dono handle
+  const selectedCountry = p.selectedCountry || p.bestCountry || 'US';
+  const isUS = selectedCountry === 'US';
+  const selectedState = p.selectedState || p.bestState || (isUS ? 'Delaware' : '');
   const [companyName, setCompanyName] = useState('');
-  const [selectedEnding, setSelectedEnding] = useState('LLC');
+  const [selectedEnding, setSelectedEnding] = useState('');
   const [alternateName, setAlternateName] = useState('');
   const [showAvailable, setShowAvailable] = useState(false);
 
@@ -45,7 +49,8 @@ const CompanyNamingScreen = ({ navigation, route }) => {
   }, [companyName]);
 
   const legalEndings = ['LLC', 'L.L.C.', 'Inc.', 'Corp.', 'Co.'];
-  const countryNames = { US: 'USA', AE: 'UAE', GB: 'UK' };
+  const endingFullForm = { 'LLC': 'Limited Liability Company', 'L.L.C.': 'Limited Liability Company', 'Inc.': 'Incorporated', 'Corp.': 'Corporation', 'Co.': 'Company' };
+  const countryFullNames = { US: 'United States', AE: 'United Arab Emirates', GB: 'United Kingdom', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta', CA: 'Canada', IN: 'India', CN: 'China', AU: 'Australia', DE: 'Germany', NL: 'Netherlands', IE: 'Ireland', CH: 'Switzerland', PA: 'Panama', MY: 'Malaysia', GE: 'Georgia', IL: 'Israel', JP: 'Japan', KR: 'South Korea', PT: 'Portugal', ES: 'Spain', FR: 'France', IT: 'Italy', PL: 'Poland', CZ: 'Czech Republic', RO: 'Romania', BG: 'Bulgaria', LU: 'Luxembourg', TH: 'Thailand', ID: 'Indonesia', PH: 'Philippines', NZ: 'New Zealand', SA: 'Saudi Arabia', QA: 'Qatar', BH: 'Bahrain', MX: 'Mexico', BR: 'Brazil', PE: 'Peru', CL: 'Chile', CO: 'Colombia', UY: 'Uruguay', MU: 'Mauritius', VG: 'British Virgin Islands', KY: 'Cayman Islands', BZ: 'Belize', SC: 'Seychelles', BB: 'Barbados' };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,18 +65,18 @@ const CompanyNamingScreen = ({ navigation, route }) => {
 
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
 
-          <Text style={styles.mainTitle}>
+          <Text style={[styles.mainTitle, { marginTop: s(8) }]}>
             What will you <Text style={styles.italicTitle}>call it?</Text>
           </Text>
           <Text style={styles.subtitle}>
-            We'll check name availability with the Delaware Division of Corporations.
+            {isUS ? `We'll check name availability with the ${selectedState} Division of Corporations.` : `We'll check name availability in ${countryFullNames[selectedCountry] || selectedCountry}.`}
           </Text>
 
-          {/* Jurisdiction Card */}
+          {/* Jurisdiction Card - pura naam */}
           <View style={styles.jurisdictionCard}>
             <Text style={styles.countryCodeBadge}>{selectedCountry}</Text>
             <Text style={styles.jurisdictionLabel}>Jurisdiction</Text>
-            <Text style={styles.jurisdictionValue}>{selectedState}, {countryNames[selectedCountry] || selectedCountry}</Text>
+            <Text style={styles.jurisdictionValue}>{isUS ? `${selectedState}, ${countryFullNames[selectedCountry] || selectedCountry}` : (countryFullNames[selectedCountry] || selectedCountry)}</Text>
           </View>
 
           {/* Company Name Input */}
@@ -87,48 +92,48 @@ const CompanyNamingScreen = ({ navigation, route }) => {
               placeholder="Enter company name"
               placeholderTextColor="#475569"
             />
-            {showAvailable && (
-              <View style={styles.greenCheckBadge}>
-                <Ionicons name="checkmark" size={12} color="#060913" />
+          </View>
+
+
+
+          {/* Legal Endings - sirf US ke liye */}
+          {isUS && (
+            <>
+              <Text style={styles.inputLabel}>LEGAL ENDING <Text style={styles.requiredAsterisk}>*</Text></Text>
+              <View style={styles.endingsRow}>
+                {legalEndings.map((ending) => {
+                  const isSelected = selectedEnding === ending;
+                  return (
+                    <TouchableOpacity
+                      key={ending}
+                      style={[styles.endingChip, isSelected && styles.endingChipSelected]}
+                      activeOpacity={0.8}
+                      onPress={() => setSelectedEnding(ending)}
+                    >
+                      <Text style={[styles.endingChipText, isSelected && styles.endingChipTextSelected]}>
+                        {ending}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
-            )}
-          </View>
 
-          {showAvailable && (
-            <View style={styles.availabilityRow}>
-              <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-              <Text style={styles.availabilityText}>
-                Available in {selectedState} — checked just now
+              <Text style={styles.fullLegalPreview}>
+                Full legal name:{' '}
+                <Text style={styles.fullLegalHighlight}>
+                  {companyName || 'Your Company'} {selectedEnding || '—'}
+                </Text>
               </Text>
-            </View>
+              <Text style={[styles.helperText, { marginTop: 4 }]}>
+                Short: {companyName || 'Your Company'} {selectedEnding || '—'}
+              </Text>
+            </>
           )}
-
-          {/* Legal Endings */}
-          <Text style={styles.inputLabel}>LEGAL ENDING</Text>
-          <View style={styles.endingsRow}>
-            {legalEndings.map((ending) => {
-              const isSelected = selectedEnding === ending;
-              return (
-                <TouchableOpacity
-                  key={ending}
-                  style={[styles.endingChip, isSelected && styles.endingChipSelected]}
-                  activeOpacity={0.8}
-                  onPress={() => setSelectedEnding(ending)}
-                >
-                  <Text style={[styles.endingChipText, isSelected && styles.endingChipTextSelected]}>
-                    {ending}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          <Text style={styles.fullLegalPreview}>
-            Full legal name:{' '}
-            <Text style={styles.fullLegalHighlight}>
-              {companyName || 'Your Company'} {selectedEnding}
+          {!isUS && companyName.trim().length > 0 && (
+            <Text style={styles.fullLegalPreview}>
+              Full legal name: <Text style={styles.fullLegalHighlight}>{companyName}</Text>
             </Text>
-          </Text>
+          )}
 
           {/* Alternate Name */}
           <Text style={styles.inputLabel}>ALTERNATE NAME (OPTIONAL)</Text>
@@ -162,10 +167,23 @@ const CompanyNamingScreen = ({ navigation, route }) => {
       {/* Bottom Fixed Button */}
       <View style={styles.bottomBar}>
         <TouchableOpacity
-          style={[styles.continueBtn, !companyName.trim() && styles.continueBtnDisabled]}
+          style={[styles.continueBtn, (!companyName.trim() || (isUS && !selectedEnding)) && styles.continueBtnDisabled]}
           activeOpacity={0.85}
-          onPress={() => companyName.trim() && navigation.navigate('StructureSelection', { ...(route.params || {}), companyName: companyName.trim(), selectedEnding, selectedState, selectedCountry })}
-          disabled={!companyName.trim()}
+          onPress={() => {
+            if (!companyName.trim() || (isUS && !selectedEnding)) return;
+            const hasPrice = Number(route.params?.selectedCountryPrice || route.params?.bestCountryPrice || route.params?.bestStatePrice || route.params?.selectedStatePrice || 0) > 0;
+            const baseParams = { ...(route.params || {}), companyName: companyName.trim(), selectedEnding: isUS ? selectedEnding : '', selectedState, selectedCountry };
+            if (!hasPrice) {
+              // amount wala page nahi dikhana - direct FounderDetails, fir signup ke baad Your Order
+              navigation.navigate('FounderDetails', baseParams);
+            } else if (!isUS) {
+              // USA ke alawa other country -> StructureSelection skip, no structure (price 0)
+              navigation.navigate('WhatsIncluded', { ...baseParams, selectedStructure: '', selectedStructurePrice: 0 });
+            } else {
+              navigation.navigate('StructureSelection', baseParams);
+            }
+          }}
+          disabled={!companyName.trim() || (isUS && !selectedEnding)}
         >
           <Text style={styles.continueBtnText}>Continue →</Text>
         </TouchableOpacity>
@@ -178,25 +196,26 @@ export default CompanyNamingScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
-  progressContainer: { flexDirection: 'row', paddingHorizontal: s(20), paddingTop: s(12), paddingBottom: s(16), gap: 8 },
+  progressContainer: { flexDirection: 'row', paddingHorizontal: s(16), paddingTop: s(12), paddingBottom: s(16), gap: 8 },
   progressStep: { flex: 1, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 2 },
   progressActive: { backgroundColor: '#C9A84C' },
-  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90), gap: s(2) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(12), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(8) },
+  mainTitle: { color: '#FFFFFF', fontSize: s(20), fontWeight: '500', lineHeight: s(34), marginBottom: s(10) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
+  subtitle: { color: '#94A3B8', fontSize: s(12), lineHeight: s(18), marginBottom: s(24) },
   jurisdictionCard: {
+    width: '100%',
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: s(14),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: s(14), paddingVertical: s(12), marginBottom: s(20),
+    paddingHorizontal: s(14), paddingVertical: s(12), marginBottom: s(14),
   },
   countryCodeBadge: { color: '#64748B', fontSize: 12, fontWeight: 'bold', marginRight: s(8) },
   jurisdictionLabel: { color: '#64748B', fontSize: 12, flex: 1 },
   jurisdictionValue: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
-  inputLabel: { color: '#64748B', fontSize: 10, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(8) },
+  inputLabel: { color: '#64748B', fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(12) },
   requiredAsterisk: { color: '#EF4444' },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
@@ -214,9 +233,9 @@ const styles = StyleSheet.create({
     width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981',
     alignItems: 'center', justifyContent: 'center',
   },
-  availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(6), marginBottom: s(16), gap: 6 },
+  availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(20), gap: s(6) },
   availabilityText: { color: '#10B981', fontSize: 11 },
-  endingsRow: { flexDirection: 'row', gap: 8, marginBottom: s(12) },
+  endingsRow: { flexDirection: 'row', gap: s(8), marginBottom: s(20), marginTop: s(4) },
   endingChip: {
     paddingHorizontal: s(14), paddingVertical: s(8), borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -224,14 +243,14 @@ const styles = StyleSheet.create({
   endingChipSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
   endingChipText: { color: '#64748B', fontSize: 11, fontWeight: '600' },
   endingChipTextSelected: { color: '#C9A84C', fontWeight: 'bold' },
-  fullLegalPreview: { color: '#64748B', fontSize: 11, marginBottom: s(16) },
-  fullLegalHighlight: { color: '#C9A84C', fontWeight: 'bold' },
-  helperText: { color: '#64748B', fontSize: 10, marginTop: s(6), marginBottom: s(16) },
+  fullLegalPreview: { color: '#64748B', fontSize: s(13), marginBottom: s(12), marginTop: s(4) },
+  fullLegalHighlight: { color: '#C9A84C', fontWeight: 'bold', fontSize: s(14) },
+  helperText: { color: '#64748B', fontSize: 10, marginTop: s(6), marginBottom: s(10) },
   infoBox: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(59, 130, 246, 0.04)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.15)',
-    padding: s(12), marginTop: s(10),
+    padding: s(12), marginTop: s(12), marginBottom: s(4),
   },
   infoIconCircle: {
     width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#60A5FA',

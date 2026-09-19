@@ -16,6 +16,7 @@ const initialState = {
     pendingAddCompany: false,
     redirectToLogin: false,
     pendingOrderData: null,
+    pendingOpenOrderDetails: false,
 };
 async function saveAuthSession(session) {
     try {
@@ -100,6 +101,9 @@ export const signupUser = createAsyncThunk('auth/signupUser', async (payload, { 
         lastName: result.lastName,
         token: result.token,
         clientId: result.clientId,
+        companyId: result.companyId,
+        pricingType: result.pricingType,
+        rawResponse: result.rawResponse,
     };
 });
 export const resendVerification = createAsyncThunk('auth/resendVerification', async (payload, { rejectWithValue }) => {
@@ -171,6 +175,9 @@ const authSlice = createSlice({
         setRedirectToLogin(state, action) {
             state.redirectToLogin = action.payload;
         },
+        setPendingOpenOrderDetails(state, action) {
+            state.pendingOpenOrderDetails = action.payload;
+        },
     },
     extraReducers: builder => {
         builder
@@ -223,9 +230,21 @@ const authSlice = createSlice({
             state.isLoading = true;
             state.signupErrors = {};
         })
-            .addCase(signupUser.fulfilled, state => {
+            .addCase(signupUser.fulfilled, (state, action) => {
             state.isLoading = false;
             state.signupErrors = {};
+            // token ko auth.token me save rakho taaki Status pe auto-login ke liye mile (isAuthenticated abhi false)
+            const tok = action.payload?.token;
+            const cid = action.payload?.clientId;
+            const compId = action.payload?.companyId;
+            const pType = action.payload?.pricingType;
+            if (tok) {
+                state.token = tok;
+                // pendingOrderData me bhi token rakh do fallback ke liye (companyId/pricingType bhi)
+                state.pendingOrderData = { ...(state.pendingOrderData || {}), token: tok, clientId: cid, companyId: compId, pricingType: pType, email: action.payload?.email || state.pendingOrderData?.email };
+            } else if (compId) {
+                state.pendingOrderData = { ...(state.pendingOrderData || {}), companyId: compId, clientId: cid, pricingType: pType };
+            }
         })
             .addCase(signupUser.rejected, (state, action) => {
             state.isLoading = false;
@@ -239,7 +258,8 @@ const authSlice = createSlice({
                 state.signupErrors = {};
                 state.pendingAddCompany = false;
                 state.pendingOrderData = null;
-                // keep redirectToLogin flag intact so AuthStack can read it
+                state.pendingOpenOrderDetails = false;
+                state.redirectToLogin = true;
             })
             .addCase(deactivateAccountThunk.fulfilled, state => {
                 state.user = null;
@@ -259,5 +279,5 @@ const authSlice = createSlice({
             });
     },
 });
-export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, setRedirectToLogin } = authSlice.actions;
+export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, setRedirectToLogin, setPendingOpenOrderDetails } = authSlice.actions;
 export default authSlice.reducer;

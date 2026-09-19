@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { s } from '../../../theme/responsive';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
 import HomeHeroSection from './home/HomeHeroSection';
@@ -34,7 +35,7 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onComp
 }
 const styles = StyleSheet.create({
   container: {
-    marginTop: 14,
+    marginTop: s(14),
   },
 });
 export default HomeTabContent;

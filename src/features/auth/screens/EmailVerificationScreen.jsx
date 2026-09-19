@@ -110,6 +110,16 @@ const VerifyEmailScreen = (props) => {
             selectedState: route?.params?.selectedState,
             selectedEnding: route?.params?.selectedEnding,
             selectedCountry: route?.params?.selectedCountry,
+            selectedCountryPrice: route?.params?.selectedCountryPrice,
+            bestCountry: route?.params?.bestCountry,
+            bestCountryPrice: route?.params?.bestCountryPrice,
+            bestCountryName: route?.params?.bestCountryName,
+            selectedStatePrice: route?.params?.selectedStatePrice,
+            selectedStructurePrice: route?.params?.selectedStructurePrice,
+            bestState: route?.params?.bestState,
+            bestStatePrice: route?.params?.bestStatePrice,
+            bestStatePriceNote: route?.params?.bestStatePriceNote,
+            bestStateTimeframe: route?.params?.bestStateTimeframe,
             selectedAddOns: route?.params?.selectedAddOns,
             addOnsTotal: route?.params?.addOnsTotal,
             runningTotal: route?.params?.runningTotal,
@@ -127,10 +137,10 @@ const VerifyEmailScreen = (props) => {
             dayOneNeeds: route?.params?.dayOneNeeds,
             physicalPresence: route?.params?.physicalPresence,
             usStatePriority: route?.params?.usStatePriority,
-            bestState: route?.params?.bestState,
           };
           console.log('=== EMAIL VERIFY -> SET NEW PASSWORD DATA ===', JSON.stringify(nextParams, null, 2));
-          navigation.navigate('SetNewPassword', nextParams);
+          if (navigation.replace) navigation.replace('SetNewPassword', nextParams);
+          else navigation.navigate('SetNewPassword', nextParams);
         }
       } else {
         Toast.show({ type: 'error', text1: 'Verification failed' });
@@ -165,32 +175,13 @@ const VerifyEmailScreen = (props) => {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
         style={styles.keyboardView}>
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-          {/* Header Bar */}
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.iconButton} onPress={onBackPress || onEditPress || (() => navigation?.goBack?.())}>
-              <Text style={styles.iconText}>←</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Text style={styles.iconText}>?</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Logo & Check Icon Section */}
-          <View style={styles.heroSection}>
-            <Text style={styles.logoText}>
-              Company<Text style={styles.logoAccent}>Vista</Text>
-            </Text>
 
-            {/* Concentric Circles & Gold Check Badge */}
-            <View style={styles.outerCircle}>
-              <View style={styles.checkIconContainer}>
-                <Text style={styles.checkIcon}>✓</Text>
-              </View>
-            </View>
-          </View>
+
 
           {/* Title & Email Display */}
           <View style={styles.textSection}>
@@ -250,33 +241,7 @@ const VerifyEmailScreen = (props) => {
             </View>
           </View>
 
-          {/* Company Draft Section */}
-          <View style={styles.draftSection}>
-            <View style={styles.dividerContainer}>
-              <Text style={styles.draftLabel}>YOUR COMPANY DRAFT</Text>
-              <View style={styles.line} />
-            </View>
 
-            {/* Draft Card */}
-            <View style={styles.draftCard}>
-              <View style={styles.draftRow}>
-                <Text style={styles.usTag}>US  Company</Text>
-                <Text style={styles.companyName}>{companyName}</Text>
-              </View>
-              <View style={[styles.draftRow, styles.draftSubRow]}>
-                <Text style={styles.draftLocation}>{companyLocation}</Text>
-                <Text style={styles.savedStatus}>Saved as draft</Text>
-              </View>
-            </View>
-
-            {/* Saved Banner */}
-            <View style={styles.savedBanner}>
-              <Text style={styles.bannerCheck}>✓</Text>
-              <Text style={styles.bannerText}>
-                Your registration is saved. You can complete payment and upload documents any time.
-              </Text>
-            </View>
-          </View>
 
           {/* Footer Button */}
           <View style={styles.footer}>
@@ -314,8 +279,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: s(20),
-    paddingBottom: s(20),
-    justifyContent: 'space-between',
+    paddingTop: s(10),
+    paddingBottom: s(30),
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -374,7 +340,8 @@ const styles = StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginVertical: s(12),
+    marginTop: s(8),
+    marginBottom: s(0),
   },
   title: {
     color: '#FFFFFF',
@@ -417,7 +384,8 @@ const styles = StyleSheet.create({
   },
   otpSection: {
     width: '100%',
-    marginVertical: s(10),
+    marginTop: s(12),
+    marginBottom: s(10),
   },
   codeContainer: {
     flexDirection: 'row',
@@ -562,7 +530,8 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   footer: {
-    marginTop: s(15),
+    marginTop: s(24),
+    marginBottom: s(10),
   },
   submitButton: {
     backgroundColor: '#D4AF37',

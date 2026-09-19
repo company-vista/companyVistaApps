@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logoutUser, setPendingAddCompany, setRedirectToLogin } from '../../../store/slices/authSlice';
+import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 // Import subcomponents
 import { HomeHeader } from './homeScreenComponent/HomeHeader';
@@ -74,6 +74,7 @@ export default function HomeScreen() {
     const [isQuoteOpen, setIsQuoteOpen] = useState(false);
     const [isQuoteBreakdownOpen, setIsQuoteBreakdownOpen] = useState(false);
     const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
+    const [currentQuote, setCurrentQuote] = useState(null);
     const [isShareholdersOpen, setIsShareholdersOpen] = useState(false);
     const [isVerifyIdentityOpen, setIsVerifyIdentityOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
@@ -96,11 +97,13 @@ export default function HomeScreen() {
             setActiveCompanySection(routePendingCompanySection);
         }
     }, [routePendingCompanySection]);
+    const pendingOpenOrderDetails = useAppSelector((s) => s.auth.pendingOpenOrderDetails);
     useEffect(() => {
-        if (openOrderDetails) {
+        if (openOrderDetails || pendingOpenOrderDetails) {
             setIsOrderDetailsOpen(true);
+            if (pendingOpenOrderDetails) dispatch(setPendingOpenOrderDetails(false));
         }
-    }, [openOrderDetails]);
+    }, [openOrderDetails, pendingOpenOrderDetails, dispatch]);
     useEffect(() => {
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
@@ -195,7 +198,9 @@ export default function HomeScreen() {
     const displayName = user?.name ??
         [user?.firstName, user?.lastName].filter(Boolean).join(' ') ??
         'User';
+    const isDemoToken = typeof token === 'string' && token.startsWith('demo-token');
     useEffect(() => {
+        if (isDemoToken) { setNotificationCount(0); return; }
         if (!selectedCompany?.id) {
             setNotificationCount(0);
             return;
@@ -211,11 +216,12 @@ export default function HomeScreen() {
         return () => {
             isMounted = false;
         };
-    }, [token, selectedCompany?.id]);
+    }, [token, selectedCompany?.id, isDemoToken]);
     useEffect(() => {
         prevNotificationCount.current = notificationCount;
     }, [notificationCount]);
     useEffect(() => {
+        if (isDemoToken) { setIsLoadingCompanies(false); return; }
         let isMounted = true;
         setIsLoadingCompanies(true);
         fetchClientCompanies({ token, userId })
@@ -259,6 +265,7 @@ export default function HomeScreen() {
         }
     }, [isLoadingCompanies, companyOptions.length, isAddCompanyOpen, isRegistrationTrackingOpen, token, user?.isCompleteRegistration]);
     useEffect(() => {
+        if (isDemoToken) return;
         if (!selectedCompany?.id) {
             return;
         }
@@ -317,7 +324,7 @@ export default function HomeScreen() {
         return () => {
             isMounted = false;
         };
-    }, [selectedCompany?.id, token]);
+    }, [selectedCompany?.id, token, isDemoToken]);
     function openMoreSheet() {
         closeFabMenu();
         moreSlideAnim.setValue(320);
@@ -492,16 +499,19 @@ export default function HomeScreen() {
         return <ShareholdersScreen onBackPress={() => setIsShareholdersOpen(false)} onContinue={() => { setIsShareholdersOpen(false); setIsVerifyIdentityOpen(true); }} />;
     }
     if (isPaymentMethodOpen) {
-        return <PaymentMethodScreen companyId={selectedCompany?.id} amount={3090} onBackPress={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(true); }} onPaymentSuccess={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(false); setIsShareholdersOpen(true); Toast.show({ type: 'success', text1: 'Payment successful!' }); }} onSelectPayment={(method) => { const label = method === 'stripe' ? 'Stripe' : method === 'razorpay' ? 'Razorpay' : 'UPI'; Toast.show({ type: 'info', text1: `${label} selected` }); }} />;
+        const payAmount = currentQuote?.total ?? 3090;
+        const payCurrency = currentQuote?.currency || 'EUR';
+        return <PaymentMethodScreen companyId={selectedCompany?.id} amount={payAmount} invoice={{ id: currentQuote?.quoteId || 'Q-2026-0412', companyId: selectedCompany?.id, amount: payAmount, currency: payCurrency }} onBackPress={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(true); }} onPaymentSuccess={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(false); setIsShareholdersOpen(false); setIsVerifyIdentityOpen(false); Toast.show({ type: 'success', text1: 'Payment successful!', text2: 'Your order is confirmed - redirecting to Home' }); }} onSelectPayment={(method) => { const label = method === 'stripe' ? 'Stripe' : method === 'razorpay' ? 'Razorpay' : 'UPI'; Toast.show({ type: 'info', text1: `${label} selected` }); }} />;
     }
     if (isQuoteBreakdownOpen) {
-        return <QuoteBreakdownScreen onBackPress={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(true); }} onDecline={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onAccept={() => { setIsQuoteBreakdownOpen(false); setIsPaymentMethodOpen(true); }} />;
+        return <QuoteBreakdownScreen quote={currentQuote} onBackPress={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(true); }} onDecline={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onAccept={() => { setIsQuoteBreakdownOpen(false); setIsPaymentMethodOpen(true); }} />;
     }
     if (isQuoteOpen) {
-        return <QuoteScreen onBackPress={() => { setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onViewBreakdown={() => { setIsQuoteOpen(false); setIsQuoteBreakdownOpen(true); }} />;
+        const quoteAmount = selectedCompany?.amount ?? selectedCompany?.quoteAmount ?? 0;
+        return <QuoteScreen amount={quoteAmount} selectedCompany={selectedCompany} quote={currentQuote} onBackPress={() => { setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onViewBreakdown={(q) => { if(q) setCurrentQuote(q); setIsQuoteOpen(false); setIsQuoteBreakdownOpen(true); }} />;
     }
     if (isOrderDetailsOpen) {
-        return <OrderDetailsScreen onBackPress={() => setIsOrderDetailsOpen(false)} onNextPress={() => { setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
+        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={() => setIsOrderDetailsOpen(false)} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
     }
     if (activeCompanySection) {
         return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);

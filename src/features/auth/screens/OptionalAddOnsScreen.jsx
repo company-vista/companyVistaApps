@@ -20,14 +20,17 @@ import { s } from '../../../theme/responsive';
 export default function OptionalAddOnsScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
 
-  const [selectedAddOns, setSelectedAddOns] = useState({
-    expeditedFiling: false,
-    expressEin: false,
-    bankAssurance: false,
-    stripePaypal: false,
+  const [selectedAddOns, setSelectedAddOns] = useState(() => {
+    const init = route.params?.selectedAddOns;
+    if (init && typeof init === 'object' && Object.keys(init).length > 0) return { expeditedFiling: !!init.expeditedFiling, expressEin: !!init.expressEin, bankAssurance: !!init.bankAssurance, stripePaypal: !!init.stripePaypal };
+    return { expeditedFiling: false, expressEin: false, bankAssurance: false, stripePaypal: false };
   });
 
-  const basePrice = 459;
+  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
+  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
+  // --- dono route ka alag calculation ---
+  // advisorFlow true => getAdvisorBasePrice, warna getDirectBasePrice
+  const basePrice = getBasePrice(route.params, structurePrice);
   const prices = {
     expeditedFiling: 99,
     expressEin: 149,
@@ -43,12 +46,14 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
   const addOnsTotal = Object.keys(selectedAddOns).reduce((sum, key) => {
     return selectedAddOns[key] ? sum + prices[key] : sum;
   }, 0);
-  const runningTotal = basePrice + addOnsTotal;
+  const hasPrice = hasPriceFn(route.params);
+  const runningTotal = hasPrice ? (basePrice + addOnsTotal) : 0;
 
   const handleContinue = () => {
-    navigation.navigate('FounderDetails', {
+    const updatedParams = {
       ...(route.params || {}),
       selectedStructure,
+      selectedStructurePrice: structurePrice,
       companyName,
       selectedEnding,
       selectedState,
@@ -56,8 +61,20 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
       selectedAddOns,
       addOnsTotal,
       runningTotal,
+      basePrice,
       fromOptionalAddOns: true,
-    });
+    };
+    // Agar Review se Change karke aaye ho to seedha Review pe wapas jao taaki total update dikhe
+    const fromReview = route.params?.from === 'FounderDetails' || route.params?.email || route.params?.fullName;
+    // Check if we came via ReviewAndConfirm Change button (params contain Review data)
+    const isReviewFlow = route.params?.runningTotal !== undefined && (route.params?.fullName || route.params?.email);
+    if (isReviewFlow || (fromReview && navigation.getState?.()?.routes?.some(r => r.name === 'ReviewAndConfirm'))) {
+      // Prefer replace/navigate to ReviewAndConfirm with updated totals
+      if (navigation.replace) navigation.replace('ReviewAndConfirm', updatedParams);
+      else navigation.navigate('ReviewAndConfirm', updatedParams);
+    } else {
+      navigation.navigate('FounderDetails', updatedParams);
+    }
   };
 
   return (
@@ -232,7 +249,7 @@ const styles = StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: 20 },
   titleContainer: { marginVertical: 15 },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: 8 },
+  mainTitle: { fontSize: s(24), fontWeight: '700', color: '#FFFFFF', marginBottom: s(8) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
   subtitle: { color: '#8E9BAE', fontSize: 14, lineHeight: 20 },
   totalBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(212,175,55,0.2)', padding: 16, marginTop: 10, marginBottom: 16 },
@@ -244,13 +261,13 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 10 },
   sectionTitle: { color: '#6C7A8E', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
   sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-  card: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: 14, marginBottom: 12 },
+  card: { width: '100%', backgroundColor: '#0C1622', borderRadius: s(12), borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: s(14), marginBottom: s(12) },
   selectedCard: { borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.06)' },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   iconContainer: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)', justifyContent: 'center', alignItems: 'center', marginTop: 2 },
   cardTextContainer: { flex: 1, marginLeft: 12, marginRight: 8 },
   titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  cardTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
+  cardTitle: { color: '#FFFFFF', fontSize: s(13), fontWeight: '600' },
   popularBadge: { backgroundColor: 'rgba(212,175,55,0.15)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
   popularBadgeText: { color: '#D4AF37', fontSize: 8, fontWeight: '700' },
   purpleBadge: { backgroundColor: 'rgba(100,80,255,0.15)', borderWidth: 1, borderColor: 'rgba(100,80,255,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },

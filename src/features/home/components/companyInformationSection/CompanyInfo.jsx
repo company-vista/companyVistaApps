@@ -16,8 +16,7 @@ const CompanyInfo = ({ companyData }) => {
     return (<View style={styles.container}>
             {/* COMPANY INFORMATION SECTION */}
             <AnimatedAppear index={0}>
-                <Text style={[styles.sectionHeader, { color: colors.text }]}>Company Information</Text>
-                <View style={[styles.sectionContainer, { backgroundColor: colors.cardHighlight, borderColor: colors.border }]}>
+                <View style={styles.sectionContainer}>
                     <View style={styles.fieldGroup}>
                         <View style={[styles.fieldIcon, iconStyle]}>
                             <FontAwesome name="building" size={17} color={iconColor}/>

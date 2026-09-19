@@ -13,10 +13,14 @@ import {
   CheckCircle,
   ChevronRight,
   ArrowRight,
+  Check,
 } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { setAuthSession, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
 
 const StatusScreen = ({ navigation, route }) => {
   const params = route?.params || {};
@@ -29,19 +33,57 @@ const StatusScreen = ({ navigation, route }) => {
   const userEmail = params.userEmail || params.email || 'rajesh@meridianglobal.com';
   const orderId = params.orderId || params.invoiceId || '#CV-2026-04821';
   const amountPaid = params.amountPaid || (params.runningTotal ? `$${params.runningTotal}` : params.amount ? `$${params.amount}` : '$459');
+  const isShareholderDone = params.shareholderCompleted === true;
+  const isKycDone = params.kycCompleted === true;
+
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
+  const authToken = useAppSelector((s) => s.auth.token);
+  const pendingOrder = useAppSelector((s) => s.auth.pendingOrderData);
+
+  // price define nahi hai toh StatusScreen skip -> direct Your Order (OrderDetailsScreen)
+  const hasPrice = Number(params.selectedCountryPrice || 0) > 0 || Number(params.selectedStatePrice || 0) > 0 || Number(params.bestStatePrice || 0) > 0 || Number(params.amount || 0) > 0 || Number(params.runningTotal || 0) > 0;
+  React.useEffect(() => {
+    if (!hasPrice) {
+      const token = params.signupToken || params.token || pendingOrder?.token || authToken || '';
+      const clientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
+      const emailForSession = params.email || params.userEmail || userEmail || pendingOrder?.email || '';
+      const fullName = params.fullName || pendingOrder?.fullName || '';
+      if (!isAuthenticated) {
+        if (token) {
+          dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
+        } else {
+          dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
+        }
+      }
+      dispatch(setPendingOpenOrderDetails(true));
+    }
+  }, [hasPrice]);
 
   const handlePrimaryPress = () => {
-    if (navigation?.reset) {
-      navigation.reset({ index: 0, routes: [{ name: 'Main', params: { screen: 'Home', params: { openOrderDetails: true, companyName, orderId } } }] });
-    } else {
-      navigation?.navigate?.('Home', { openOrderDetails: true, companyName, orderId });
+    // price define ho ya na ho - Status ke baad Your Order (OrderDetailsScreen) pe hi redirect
+    const token = params.signupToken || params.token || pendingOrder?.token || authToken || '';
+    const clientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
+    const emailForSession = params.email || params.userEmail || userEmail || pendingOrder?.email || '';
+    const fullName = params.fullName || pendingOrder?.fullName || '';
+    if (!isAuthenticated) {
+      if (token) {
+        dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
+      } else {
+        dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
+      }
     }
+    // chahe price define ho ya na ho - Your Order pe hi jaye
+    dispatch(setPendingOpenOrderDetails(true));
   };
 
   const handleSpeakToTeam = () => {
     // placeholder - maybe navigate to Support
     navigation?.navigate?.('Support');
   };
+
+  // price nahi hai toh Status UI skip - direct Your Order
+  if (!hasPrice) return null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -78,25 +120,37 @@ const StatusScreen = ({ navigation, route }) => {
         {/* Card List / Steps */}
         <View style={styles.cardsContainer}>
           <Text style={styles.sectionHeader}>NEXT: 2 QUICK STEPS</Text>
-          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Shareholders', { companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence })}>
-            <View style={styles.stepNumberBox}>
-              <Text style={styles.stepNumberText}>1</Text>
-            </View>
+          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Shareholders', { companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
+            {isShareholderDone ? (
+              <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
+                <Check color="#fff" size={16} strokeWidth={3} />
+              </View>
+            ) : (
+              <View style={styles.stepNumberBox}>
+                <Text style={styles.stepNumberText}>1</Text>
+              </View>
+            )}
             <View style={styles.cardTextContainer}>
               <Text style={styles.cardTitle}>Shareholders & ownership</Text>
               <Text style={styles.cardDesc}>Who owns what — about 2 minutes</Text>
             </View>
-            <ChevronRight color="#64748b" size={20} />
+            {isShareholderDone ? <Check color="#10B981" size={18} /> : <ChevronRight color="#64748b" size={20} />}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Home')}>
-            <View style={styles.stepNumberBox}>
-              <Text style={styles.stepNumberText}>2</Text>
-            </View>
+          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('VerifyIdentity', { companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
+            {isKycDone ? (
+              <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
+                <Check color="#fff" size={16} strokeWidth={3} />
+              </View>
+            ) : (
+              <View style={styles.stepNumberBox}>
+                <Text style={styles.stepNumberText}>2</Text>
+              </View>
+            )}
             <View style={styles.cardTextContainer}>
               <Text style={styles.cardTitle}>KYC documents</Text>
               <Text style={styles.cardDesc}>Passport & address proof per shareholder</Text>
             </View>
-            <ChevronRight color="#64748b" size={20} />
+            {isKycDone ? <Check color="#10B981" size={18} /> : <ChevronRight color="#64748b" size={20} />}
           </TouchableOpacity>
         </View>
 
@@ -283,6 +337,10 @@ const styles = StyleSheet.create({
     color: '#E2E8F0',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  stepCompletedBox: {
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
   },
   cardTextContainer: {
     flex: 1,

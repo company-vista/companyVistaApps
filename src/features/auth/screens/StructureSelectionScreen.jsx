@@ -16,20 +16,25 @@ import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 
 const StructureSelectionScreen = ({ navigation, route }) => {
-  const { companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
+  const p = route.params || {};
+  const advisorFlow = !!p.advisorFlow;
+  const effectiveState = p.bestState || p.selectedState || 'Delaware';
+  const effectiveCountry = p.bestCountry || p.selectedCountry || 'US';
+  const { companyName = '', selectedEnding = '' } = p;
+  const selectedState = effectiveState;
+  const selectedCountry = effectiveCountry;
   const [selectedStructure, setSelectedStructure] = useState(null);
+
+  // CompanyNamingScreen ending ke hisab se filter
+  const llcEndings = ['LLC', 'L.L.C.', 'Co.'];
+  const corpEndings = ['Inc.', 'Corp.'];
+  const shouldShowOnlyLLC = llcEndings.includes(selectedEnding);
+  const shouldShowCorpOnly = corpEndings.includes(selectedEnding);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
-    ]).start();
-  }, []);
-
-  const structures = [
+  const allStructures = [
     {
       id: 'LLC',
       title: 'LLC',
@@ -68,6 +73,28 @@ const StructureSelectionScreen = ({ navigation, route }) => {
     },
   ];
 
+  const structures = shouldShowOnlyLLC
+    ? allStructures.filter(s => s.id === 'LLC')
+    : shouldShowCorpOnly
+    ? allStructures.filter(s => s.id === 'C-Corp' || s.id === 'S-Corp')
+    : allStructures;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  // LLC/L.L.C./Co. ke liye auto-select LLC
+  useEffect(() => {
+    if (shouldShowOnlyLLC && structures.length === 1) {
+      setSelectedStructure('LLC');
+    }
+  }, [shouldShowOnlyLLC, structures.length]);
+
+  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 299 };
+  const getStructurePrice = (id) => structurePriceMap[id] ?? 299;
   const selectedItem = structures.find((s) => s.id === selectedStructure);
 
   return (
@@ -86,7 +113,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
           <Text style={styles.mainTitle}>
             Choose your <Text style={styles.italicTitle}>structure</Text>
           </Text>
-          <Text style={styles.subtitle}>Entity types available in Delaware.</Text>
+          <Text style={styles.subtitle}>Entity types available in {selectedState}.</Text>
 
           <View style={styles.listContainer}>
             {structures.map((item) => {
@@ -152,7 +179,12 @@ const StructureSelectionScreen = ({ navigation, route }) => {
           style={[styles.continueBtn, !selectedStructure && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           disabled={!selectedStructure}
-          onPress={() => navigation.navigate('WhatsIncluded', { ...(route.params || {}), selectedStructure, companyName, selectedEnding, selectedState, selectedCountry })}
+          onPress={() => {
+            const { selectedEnding: _omit, ...restParams } = route.params || {};
+            const structPrice = getStructurePrice(selectedStructure);
+            // advisor flow me bestStatePrice already includes LLC 299+govFee, adjustment downstream hoga
+            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
+          }}
         >
           <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
             {selectedStructure ? `Continue with ${selectedItem.title}  →` : 'Select a structure to continue'}

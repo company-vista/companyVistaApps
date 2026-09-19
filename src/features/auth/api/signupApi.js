@@ -1,7 +1,9 @@
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
-const SIGNUP_STEP1_ROUTE = `${API_BASE_URL}/api/signup/step1`;
+// New company signup - POST /api/company-signup -> createCompanySignup
+// Replaces old step1 (POST /api/signup/step1)
+const SIGNUP_STEP1_ROUTE = `${API_BASE_URL}/api/company-signup`;
 const RESEND_VERIFICATION_ROUTE = `${API_BASE_URL}/api/signup/resend-verification`;
 const API_REQUEST_TIMEOUT_MS = 10000;
 function isValidEmail(value) {
@@ -67,7 +69,7 @@ function getCookieToken(cookieHeader) {
     const tokenMatch = cookieHeader.match(/(?:^|;\s*)clientToken=([^;]+)/);
     return tokenMatch?.[1] ? decodeURIComponent(tokenMatch[1]) : '';
 }
-export async function handleSignupApi({ firstName, lastName, email, phoneNumber, countryCode, companyName, address, registrationCountry, }) {
+export async function handleSignupApi({ firstName, lastName, fullName, email, phone, phoneNumber, countryCode, countryIso, countryOfResidence, residence, companyName, rawCompanyName, selectedEnding, selectedStructure, selectedState, selectedCountry, bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, selectedJurisdiction, purpose, customerLocation, priorities, dayOneNeeds, physicalPresence, usStatePriority, selectedStructurePrice, selectedAddOns, addOnsTotal, runningTotal, address, registrationCountry, ...rest }) {
     const errors = {};
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
@@ -111,24 +113,60 @@ export async function handleSignupApi({ firstName, lastName, email, phoneNumber,
         };
     }
     try {
-        const addr = (address || registrationCountry || '').trim();
-        const response = await axios.post(SIGNUP_STEP1_ROUTE, {
+        const addr = (address || registrationCountry || countryOfResidence || residence || '').trim();
+        const fullNameVal = (fullName || `${trimmedFirstName} ${trimmedLastName}`.trim()).trim();
+        const phoneVal = (phone || phoneNumber || '').trim() || trimmedPhone;
+        const countryCodeVal = countryCode || '';
+        const countryIsoVal = countryIso || '';
+        const residenceVal = (countryOfResidence || residence || addr).trim();
+        // signup tak ka complete data
+        const fullPayload = {
             firstName: trimmedFirstName,
             lastName: trimmedLastName,
+            fullName: fullNameVal,
             email: trimmedEmail,
-            phoneNumber: trimmedPhone,
-            countryCode,
+            phone: phoneVal,
+            phoneNumber: phoneVal,
+            countryCode: countryCodeVal,
+            countryIso: countryIsoVal,
+            countryOfResidence: residenceVal,
+            residence: residenceVal,
             companyName,
+            rawCompanyName: rawCompanyName || companyName,
+            selectedEnding: selectedEnding || '',
+            selectedStructure: selectedStructure || '',
+            selectedState: selectedState || '',
+            selectedCountry: selectedCountry || '',
+            bestState: bestState || '',
+            bestStatePrice: bestStatePrice || 0,
+            bestStatePriceNote: bestStatePriceNote || '',
+            bestStateTimeframe: bestStateTimeframe || '',
+            advisorFlow: advisorFlow || false,
+            selectedJurisdiction: selectedJurisdiction || '',
+            purpose: purpose || '',
+            customerLocation: customerLocation || '',
+            priorities: priorities || [],
+            dayOneNeeds: dayOneNeeds || [],
+            physicalPresence: physicalPresence || '',
+            usStatePriority: usStatePriority || '',
+            selectedStructurePrice: selectedStructurePrice || 0,
+            selectedAddOns: selectedAddOns || {},
+            addOnsTotal: addOnsTotal || 0,
+            runningTotal: runningTotal || 0,
             address: addr,
             registrationCountry: addr,
-            countryOfResidence: addr,
-        }, { timeout: API_REQUEST_TIMEOUT_MS });
+            ...rest,
+        };
+        console.log('=== COMPANY SIGNUP API CALL (createCompanySignup) ===', JSON.stringify(fullPayload, null, 2));
+        const response = await axios.post(SIGNUP_STEP1_ROUTE, fullPayload, { timeout: API_REQUEST_TIMEOUT_MS });
         const token = findDeepValue(response.data, TOKEN_KEYS) || getHeaderToken(response.headers);
         const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);
+        const companyId = findDeepValue(response.data, ['companyId', 'company_id', 'companyID']);
+        const pricingType = response.data?.pricingType || response.data?.data?.pricingType || '';
         Toast.show({
             type: 'success',
-            text1: 'Account created',
-            text2: 'Please login.',
+            text1: response.data?.message || 'Verification code sent. Please check your inbox.',
+            text2: companyId ? `Company: ${companyId.slice(-6)}` : 'Please login.',
         });
         return {
             errors: {},
@@ -138,6 +176,9 @@ export async function handleSignupApi({ firstName, lastName, email, phoneNumber,
             lastName: trimmedLastName,
             token,
             clientId,
+            companyId,
+            pricingType,
+            rawResponse: response.data,
         };
     }
     catch (error) {
