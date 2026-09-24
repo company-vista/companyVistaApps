@@ -22,6 +22,7 @@ import { setHasCompletedPayment } from '../../../store/slices/authSlice';
 import { savePaymentConfirmApi, fetchReviewApi, createCheckoutApi, finalizeCheckoutApi } from '../api/orderApi';
 import StripeCheckoutModal from '../../../components/StripeCheckoutModal';
 import { s } from '../../../theme/responsive';
+import { CommonActions } from '@react-navigation/native';
 
 export default function CompletePaymentScreen({ navigation, route }) {
   const {
@@ -161,7 +162,14 @@ export default function CompletePaymentScreen({ navigation, route }) {
         registrationStatus: respData.registrationStatus,
       };
       await savePaymentConfirmApi(statusParams, token).catch(()=>{});
-      navigation.navigate('Status', statusParams);
+      // RootStack Main (isAuthenticated) me switch ho chuka hai, AuthStack ka navigate fail hota hai -> parent Main.Status pe bhejo
+      setTimeout(() => {
+        const parent = navigation.getParent?.();
+        if (parent) {
+          try { parent.navigate('Main', { screen: 'Status', params: statusParams }); return; } catch {}
+        }
+        try { navigation.dispatch(CommonActions.navigate({ name: 'Status', params: statusParams })); } catch { navigation.navigate('Status', statusParams); }
+      }, 300);
     } catch (e) {
       const fullErr = JSON.stringify(e?.response?.data || e.message, null, 2);
       const errMsg = e?.response?.data?.message || e?.message || '';
