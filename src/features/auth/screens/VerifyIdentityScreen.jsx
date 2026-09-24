@@ -18,13 +18,64 @@ import {
 } from 'lucide-react-native';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
-import { useAppSelector } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { setAuthSession, setHasCompletedPayment } from '../../../store/slices/authSlice';
+import { launchImageLibrary } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
 
 const VerifyIdentityScreen = ({ navigation, route }) => {
+  const dispatch = useAppDispatch();
   const authUser = useAppSelector(s => s.auth.user);
+  const isAuthenticated = useAppSelector(s => s.auth.isAuthenticated);
+  const authToken = useAppSelector(s => s.auth.token);
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
   const authName = authUser?.name || [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() || route?.params?.fullName || 'Rajesh Kumar Sharma';
   const initials = authName.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0,2).toUpperCase() || 'RS';
+  const shareholders = route?.params?.shareholders || [];
+
+  const handleContinue = () => {
+    const token = route?.params?.signupToken || route?.params?.token || pendingOrder?.token || authToken || '';
+    const clientId = route?.params?.clientId || route?.params?.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
+    const emailForSession = route?.params?.email || route?.params?.userEmail || authUser?.email || '';
+    const fullName = route?.params?.fullName || authName || '';
+    if (!isAuthenticated) {
+      if (token) {
+        dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
+      } else {
+        dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
+      }
+    }
+    // Payment ho chuka hai -> Home dikhao, tracking nahi. Dubara login pe bhi Home dikhe isliye flag persist karo
+    dispatch(setHasCompletedPayment(true));
+  };
+  const [passportUri, setPassportUri] = React.useState(null);
+  const [addressUri, setAddressUri] = React.useState(null);
+  const [selfieUri, setSelfieUri] = React.useState(null);
+
+  const openGallery = (type) => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, (res) => {
+      if (res.didCancel) return;
+      if (res.errorCode) {
+        Toast.show({ type: 'error', text1: res.errorMessage || 'Gallery error' });
+        return;
+      }
+      const uri = res.assets?.[0]?.uri;
+      if (!uri) return;
+      if (type === 'passport') setPassportUri(uri);
+      if (type === 'address') setAddressUri(uri);
+      if (type === 'selfie') setSelfieUri(uri);
+      Toast.show({ type: 'success', text1: `${type} uploaded` });
+    });
+  };
+
+  const primaryShareholder = shareholders.find(s => s.passportNumber) || shareholders[0] || null;
+  const passportNumber = primaryShareholder?.passportNumber || primaryShareholder?.passport || '';
+  const shareholderAddress = primaryShareholder?.address || '';
+  const shareholderPincode = primaryShareholder?.pincode || '';
+  const isPassportFilled = !!passportNumber || !!passportUri;
+  const isAddressFilled = !!shareholderAddress || !!addressUri;
+  const isSelfieFilled = !!selfieUri;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -61,40 +112,43 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
           <Text style={styles.progressText}>0 of 3 done</Text>
         </View>
 
-        {/* Upload Status Items - abhi tick nahi, KYC ke baad verified hoga */}
+        {/* Upload Status Items - tap to open gallery */}
         <View style={styles.documentsContainer}>
-          {/* Passport - Pending */}
-          <View style={styles.docCard}>
-            <View style={[styles.docIconBox, { backgroundColor: 'rgba(148,163,184,0.12)' }]}>
-              <CreditCard color="#94A3B8" size={20} />
+          {/* Passport */}
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('passport')} style={[styles.docCard, isPassportFilled && styles.verifiedCard]}>
+            <View style={[styles.docIconBox, { backgroundColor: isPassportFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
+              <CreditCard color={isPassportFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Passport</Text>
-              <Text style={styles.docSub}>Not uploaded · tap to upload</Text>
+              <Text style={[styles.docSub, isPassportFilled && styles.docSubYellow]} numberOfLines={1}>{passportUri ? `Selected: ${passportUri.split('/').pop()}` : isPassportFilled ? `Passport: ${passportNumber}` : 'Not uploaded · tap to upload'}</Text>
             </View>
-          </View>
+            {isPassportFilled ? <Check color="#10B981" size={18} /> : <Camera color="#94A3B8" size={16} />}
+          </TouchableOpacity>
 
-          {/* Proof of address - Pending */}
-          <View style={styles.docCard}>
-            <View style={[styles.docIconBox, { backgroundColor: 'rgba(148,163,184,0.12)' }]}>
-              <FileText color="#94A3B8" size={20} />
+          {/* Proof of address */}
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('address')} style={[styles.docCard, isAddressFilled && styles.verifiedCard]}>
+            <View style={[styles.docIconBox, { backgroundColor: isAddressFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
+              <FileText color={isAddressFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Proof of address</Text>
-              <Text style={styles.docSub}>Not uploaded · tap to upload</Text>
+              <Text style={[styles.docSub, isAddressFilled && styles.docSubYellow]} numberOfLines={2}>{addressUri ? `Selected: ${addressUri.split('/').pop()}` : isAddressFilled ? `${shareholderAddress}${shareholderPincode ? ` — ${shareholderPincode}` : ''}` : 'Not uploaded · tap to upload'}</Text>
             </View>
-          </View>
+            {isAddressFilled ? <Check color="#10B981" size={18} /> : <Camera color="#94A3B8" size={16} />}
+          </TouchableOpacity>
 
-          {/* Selfie verification - Pending */}
-          <View style={styles.docCard}>
-            <View style={[styles.docIconBox, { backgroundColor: 'rgba(148,163,184,0.12)' }]}>
-              <Camera color="#94A3B8" size={20} />
+          {/* Selfie verification */}
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('selfie')} style={[styles.docCard, isSelfieFilled && styles.verifiedCard]}>
+            <View style={[styles.docIconBox, { backgroundColor: isSelfieFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
+              <Camera color={isSelfieFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Selfie verification</Text>
-              <Text style={styles.docSub}>Not uploaded · tap to upload</Text>
+              <Text style={[styles.docSub, isSelfieFilled && styles.docSubYellow]}>{selfieUri ? `Selected: ${selfieUri.split('/').pop()}` : 'Not uploaded · tap to upload'}</Text>
             </View>
-          </View>
+            {isSelfieFilled ? <Check color="#10B981" size={18} /> : null}
+          </TouchableOpacity>
         </View>
 
         {/* OTHER SHAREHOLDERS dummy hata diya - jab banega tab show hoga */}
@@ -107,8 +161,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
-        {/* Bottom Button - KYC complete karke Status pe wapas, tick dikhega */}
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.navigate?.('Status', { ...route?.params, kycCompleted: true })}>
+        {/* Bottom Button - KYC complete -> direct RegistrationTracking */}
+        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
 
@@ -408,8 +462,8 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     backgroundColor: '#EAB308',
-    borderRadius: 14,
-    paddingVertical: 16,
+    borderRadius: 24,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 6,

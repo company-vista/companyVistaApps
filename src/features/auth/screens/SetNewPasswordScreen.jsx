@@ -18,20 +18,24 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
-import { API_BASE_URL } from '../../../config/api';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingAddCompany, setAuthSession, setPendingOrderData, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
+import { setPasswordApi } from '../api/orderApi';
 import { s } from '../../../theme/responsive';
+import { hasPrice } from '../../../utils/priceCalculator';
 
 export default function SetNewPasswordScreen(props) {
   const { navigation, route } = props;
   const dispatch = useAppDispatch();
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
   const email = props.email || route?.params?.email;
   useEffect(() => {
     console.log('=== SET NEW PASSWORD SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
+    console.log('=== SET NEW PASSWORD PENDING ORDER ===', JSON.stringify(pendingOrder, null, 2));
   }, []);
-  const clientId = props.clientId || route?.params?.clientId;
-  const token = props.token || route?.params?.token;
+  const clientId = props.clientId || route?.params?.clientId || pendingOrder?.clientId;
+  const token = props.token || route?.params?.token || pendingOrder?.token;
+  const companyIdFromStore = pendingOrder?.companyId || route?.params?.companyId || route?.params?.company_id || '';
   const onPasswordSet = props.onPasswordSet || route?.params?.onPasswordSet;
   const onBackPress = props.onBackPress || route?.params?.onBackPress;
   const insets = useSafeAreaInsets();
@@ -73,7 +77,9 @@ export default function SetNewPasswordScreen(props) {
     }
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/signup/set-password`, { clientId, password: newPassword.trim() }, { headers: { Authorization: `Bearer ${token}` } });
+      const respData = await setPasswordApi({ clientId, password: newPassword.trim(), token });
+      console.log('=== SET-PASSWORD RESPONSE RAW ===', JSON.stringify(respData, null, 2));
+      if (respData?.success === false) throw new Error(respData?.message || 'Set password failed');
       Toast.show({ type: 'success', text1: 'Account registered', text2: 'Please continue' });
       // Signup ke baad sidha Home nahi - Confirm & Review pe jaye, auto-login Status pe hoga
       if (onPasswordSet) {
@@ -102,6 +108,8 @@ export default function SetNewPasswordScreen(props) {
               selectedAddOns: route?.params?.selectedAddOns,
               addOnsTotal: route?.params?.addOnsTotal,
               runningTotal: route?.params?.runningTotal,
+              totalAmount: route?.params?.totalAmount ?? pendingOrder?.totalAmount,
+              pricingType: route?.params?.pricingType ?? pendingOrder?.pricingType,
               companyName: route?.params?.companyName,
               email,
               fullName: route?.params?.fullName,
@@ -116,11 +124,14 @@ export default function SetNewPasswordScreen(props) {
               physicalPresence: route?.params?.physicalPresence,
               usStatePriority: route?.params?.usStatePriority,
               countryCode: route?.params?.countryCode,
+              companyId: companyIdFromStore,
+              clientId,
+              token,
             };
             console.log('=== SET PASSWORD -> REVIEW & SUBMIT DATA ===', JSON.stringify(reviewParams, null, 2));
-            // RegisterJurisdictionScreen ke do routes: price define hai -> ReviewAndConfirm, price empty (quoted) -> Your Order
-            const hasPrice = Number(route.params?.selectedCountryPrice || 0) > 0 || Number(route.params?.bestCountryPrice || 0) > 0 || Number(route.params?.selectedStatePrice || 0) > 0 || Number(route.params?.bestStatePrice || 0) > 0;
-            if (!hasPrice) {
+            // Advisor + Direct dono routes: price define hai -> ReviewAndConfirm, price empty (custom quote) -> Your Order (Home lock)
+            const hasPriceValue = hasPrice(route.params);
+            if (!hasPriceValue) {
               const orderId = `INV-${Date.now()}`;
               const orderData = { ...reviewParams, orderId, token, clientId, amount: 0, runningTotal: 0 };
               dispatch(setPendingOrderData(orderData));
@@ -146,7 +157,8 @@ export default function SetNewPasswordScreen(props) {
         }
       }
     } catch (error) {
-      const message = error?.response?.data?.message || 'Failed to set password.';
+      console.log('=== SET-PASSWORD ERROR ===', JSON.stringify(error?.response?.data || error.message, null, 2));
+      const message = error?.response?.data?.message || error?.message || 'Failed to set password.';
       Toast.show({ type: 'error', text1: 'Error', text2: message });
     } finally {
       setLoading(false);

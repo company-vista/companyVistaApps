@@ -20,7 +20,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setAuthSession, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
+import { setAuthSession, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress } from '../../../store/slices/authSlice';
 
 const StatusScreen = ({ navigation, route }) => {
   const params = route?.params || {};
@@ -60,8 +60,13 @@ const StatusScreen = ({ navigation, route }) => {
     }
   }, [hasPrice]);
 
+  const isContinueEnabled = isShareholderDone && isKycDone;
   const handlePrimaryPress = () => {
-    // price define ho ya na ho - Status ke baad Your Order (OrderDetailsScreen) pe hi redirect
+    if (!isContinueEnabled) {
+      if (!isShareholderDone) Toast.show({ type: 'error', text1: 'Complete shareholders & ownership first' });
+      else if (!isKycDone) Toast.show({ type: 'error', text1: 'Complete KYC documents first' });
+      return;
+    }
     const token = params.signupToken || params.token || pendingOrder?.token || authToken || '';
     const clientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
     const emailForSession = params.email || params.userEmail || userEmail || pendingOrder?.email || '';
@@ -73,8 +78,8 @@ const StatusScreen = ({ navigation, route }) => {
         dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
       }
     }
-    // chahe price define ho ya na ho - Your Order pe hi jaye
-    dispatch(setPendingOpenOrderDetails(true));
+    // Auth ke baad RootStack Main pe switch hoga, isliye flag set karo jisse HomeScreen RegistrationProgress auto-open kare
+    dispatch(setPendingOpenRegistrationProgress(true));
   };
 
   const handleSpeakToTeam = () => {
@@ -154,13 +159,27 @@ const StatusScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
+        {!isContinueEnabled && (
+          <View style={{ backgroundColor: 'rgba(234,179,8,0.08)', borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
+            <CheckCircle size={16} color="#EAB308" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#EAB308', fontSize: 11, flex: 1 }}>
+              {!isShareholderDone ? 'Complete shareholders & ownership first' : 'Complete KYC documents first'} — then Continue will be enabled
+            </Text>
+          </View>
+        )}
         {/* Action Buttons */}
         <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={handlePrimaryPress}>
-            <Text style={styles.primaryButtonText}>Go to Your Order</Text>
+          <TouchableOpacity style={[styles.primaryButton, !isContinueEnabled && { opacity: 0.5 }]} activeOpacity={0.85} onPress={handlePrimaryPress} disabled={!isContinueEnabled}>
+            <Text style={styles.primaryButtonText}>{isContinueEnabled ? 'Continue' : 'Complete steps to continue'}</Text>
             <ArrowRight color="#070C15" size={18} />
           </TouchableOpacity>
-          <Text style={styles.footerNote}>Filing begins once both steps are complete</Text>
+          <Text style={styles.footerNote}>{isContinueEnabled ? 'Filing begins — redirecting to progress' : 'Filing begins once both steps are complete'}</Text>
+          {!isContinueEnabled && (
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 10 }}>
+              {!isShareholderDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: 10 }}>Shareholders pending</Text></View>}
+              {!isKycDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: 10 }}>KYC pending</Text></View>}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

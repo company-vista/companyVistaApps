@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setRedirectToLogin } from '../../../store/slices/authSlice';
+import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 // Import subcomponents
 import { HomeHeader } from './homeScreenComponent/HomeHeader';
@@ -30,6 +30,7 @@ import SubscriptionScreen from './subscription&services/SubscriptionScreen';
 import ExploreServicesScreen from './subscription&services/ExploreServicesScreen';
 import ServicesHistoryScreen from './subscription&services/ServicesHistoryScreen';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
+import RegistrationProgressScreen from '../../auth/screens/RegistrationProgressScreen';
 import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
 import OrderDetailsScreen from '../components/companyInformationSection/yourOrder/OrderDetailsScreen';
@@ -70,6 +71,7 @@ export default function HomeScreen() {
     const [isServicesHistoryOpen, setIsServicesHistoryOpen] = useState(false);
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
     const [trackingCompanyId, setTrackingCompanyId] = useState(null);
+    const [isRegistrationProgressOpen, setIsRegistrationProgressOpen] = useState(false);
     const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
     const [isQuoteOpen, setIsQuoteOpen] = useState(false);
     const [isQuoteBreakdownOpen, setIsQuoteBreakdownOpen] = useState(false);
@@ -98,12 +100,64 @@ export default function HomeScreen() {
         }
     }, [routePendingCompanySection]);
     const pendingOpenOrderDetails = useAppSelector((s) => s.auth.pendingOpenOrderDetails);
+    const pendingOpenRegistrationProgress = useAppSelector((s) => s.auth.pendingOpenRegistrationProgress);
+    const pendingOpenRegistrationTracking = useAppSelector((s) => s.auth.pendingOpenRegistrationTracking);
     useEffect(() => {
-        if (openOrderDetails || pendingOpenOrderDetails) {
-            setIsOrderDetailsOpen(true);
-            if (pendingOpenOrderDetails) dispatch(setPendingOpenOrderDetails(false));
+        if (pendingOpenRegistrationProgress) {
+            setIsRegistrationProgressOpen(true);
+            dispatch(setPendingOpenRegistrationProgress(false));
         }
-    }, [openOrderDetails, pendingOpenOrderDetails, dispatch]);
+    }, [pendingOpenRegistrationProgress, dispatch]);
+    const pendingOrderData = useAppSelector(s => s.auth.pendingOrderData);
+    useEffect(() => {
+        if (pendingOpenRegistrationTracking) {
+            const pendingId = pendingOrderData?.companyId || pendingOrderData?.company_id || user?.companies?.[0]?._id || user?.companies?.[0]?.id || null;
+            const firstPending = companyOptions.find(c => String(c.registrationStatus ?? c.raw?.registrationStatus ?? '').toLowerCase() === 'pending') || companyOptions[0] || selectedCompany;
+            const resolvedId = firstPending?.id || selectedCompany?.id || pendingId;
+            setTrackingCompanyId(resolvedId || null);
+            setIsRegistrationTrackingOpen(true);
+            dispatch(setPendingOpenRegistrationTracking(false));
+        }
+    }, [pendingOpenRegistrationTracking, dispatch, companyOptions, selectedCompany, pendingOrderData, user]);
+    // pending lock: sirf tab jab status pending ho AUR amount abhi 0/empty ho - jaise pehle wala Vista/SG case
+    // naya Xyz vista C-Corp jaise totalAmount 897 + status pending ho to company show karo (sab fill hai)
+    const isCompanyPending = (c) => {
+        const raw = c?.raw ?? c;
+        const status = String(c?.registrationStatus ?? raw?.registrationStatus ?? c?.status ?? raw?.status ?? '').toLowerCase();
+        const totalAmount = raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? c?.totalAmount ?? null;
+        const companyType = raw?.companyType ?? c?.companyType ?? '';
+        const isPendingStatus = status === 'pending';
+        const isZeroAmount = totalAmount === null || totalAmount === '' || Number(totalAmount) === 0;
+        // status pending + amount 0 => block, warna show karo
+        if (isPendingStatus && isZeroAmount) return true;
+        // agar companyType bhi empty aur amount 0 toh bhi pending (incomplete draft)
+        if (isZeroAmount && !companyType) return true;
+        return false;
+    };
+    const hasCompletedPaymentFlag = useAppSelector(s => s.auth.hasCompletedPayment);
+    // paid user ka auto-detect: agar koi company me totalAmount >0 hai to payment ho chuka maano (purane users ke liye fallback)
+    const hasPaidCompany = companyOptions.some(c => Number(c?.raw?.totalAmount ?? c?.raw?.registrationRequestData?.totalAmount ?? c?.totalAmount ?? 0) > 0) || (Array.isArray(user?.companies) && user.companies.some(c => Number(c?.totalAmount ?? c?.registrationRequestData?.totalAmount ?? 0) > 0));
+    const isPaid = hasCompletedPaymentFlag || hasPaidCompany;
+    // VerifyIdentity/payment ke baad Home dikhao, dubara login pe bhi Home (paid hone pe lock nahi)
+    const hasPendingRegistration = !isPaid && companyOptions.some(isCompanyPending);
+    // also check raw user.companies as fallback before fetch completes (login response) - but skip if payment already done
+    const hasPendingInUser = !isPaid && !hasPendingRegistration && Array.isArray(user?.companies) && user.companies.some(isCompanyPending);
+    const isOrderLockedPending = !isPaid && (hasPendingRegistration || hasPendingInUser);
+
+    // Your Order auto-open hata diya - sirf onOrderPress pe khulega, login ya bottom tabs se nahi
+    useEffect(() => {
+        if (pendingOpenOrderDetails) dispatch(setPendingOpenOrderDetails(false));
+    }, [pendingOpenOrderDetails, dispatch]);
+
+    // Pending lock active hai to back press + bottom tabs block
+    useEffect(() => {
+        if (!isOrderLockedPending || !isOrderDetailsOpen) return;
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            Toast.show({ type: 'info', text1: 'Complete payment to continue', text2: 'Your order is pending - please complete payment' });
+            return true;
+        });
+        return () => sub.remove();
+    }, [isOrderLockedPending, isOrderDetailsOpen]);
     useEffect(() => {
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
@@ -511,7 +565,14 @@ export default function HomeScreen() {
         return <QuoteScreen amount={quoteAmount} selectedCompany={selectedCompany} quote={currentQuote} onBackPress={() => { setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onViewBreakdown={(q) => { if(q) setCurrentQuote(q); setIsQuoteOpen(false); setIsQuoteBreakdownOpen(true); }} />;
     }
     if (isOrderDetailsOpen) {
-        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={() => setIsOrderDetailsOpen(false)} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
+        const handleOrderBack = () => {
+            if (isOrderLockedPending) {
+                Toast.show({ type: 'info', text1: 'Payment pending', text2: 'Please complete payment to access Home' });
+                return;
+            }
+            setIsOrderDetailsOpen(false);
+        };
+        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={handleOrderBack} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { if (isOrderLockedPending) { Toast.show({ type: 'info', text1: 'Payment pending' }); return; } setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
     }
     if (activeCompanySection) {
         return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);
@@ -542,6 +603,9 @@ export default function HomeScreen() {
     }
     if (isSubscriptionOpen) {
         return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
+    }
+    if (isRegistrationProgressOpen) {
+        return (<RegistrationProgressScreen navigation={{ goBack: () => setIsRegistrationProgressOpen(false) }} route={{ params: {} }} onActive={() => setIsRegistrationProgressOpen(false)} />);
     }
     if (isRegistrationTrackingOpen) {
         return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={trackingCompanyId ?? selectedCompany?.id} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={(companyId) => {

@@ -239,19 +239,25 @@ export default function BestMatchesScreen({ navigation, route }) {
   }, [purpose, customerLocation, priorities.join(','), dayOneNeeds.join(',')]);
 
   const best = selectedBest;
-  // sirf US, HK, UK, CA ka price dikhana hai baki me Custom quote
-  const PRICED_JURISDICTIONS = ['United States', 'Hong Kong', 'United Kingdom', 'Canada'];
+  // advisor me jis country ka price define hai uska price save karo - US + priced non-US (UK/HK/CA/AE/SG/EE)
+  const PRICED_JURISDICTIONS = ['United States', 'Hong Kong', 'United Kingdom', 'Canada', 'United Arab Emirates', 'Singapore', 'Estonia'];
   const PRICE_MAP = {
     'United States': '$399',
     'United Kingdom': 'from $595',
     'Hong Kong': 'from $899',
     'Canada': 'from $599',
+    'United Arab Emirates': 'from $1,499',
+    'Singapore': 'from $899',
+    'Estonia': 'from $499',
   };
   const PRICE_NUMERIC_MAP = {
     'United States': 399,
     'United Kingdom': 595,
     'Hong Kong': 899,
     'Canada': 599,
+    'United Arab Emirates': 1499,
+    'Singapore': 899,
+    'Estonia': 499,
   };
   const showPrice = PRICED_JURISDICTIONS.includes(best.name);
   const isUSA = best.code === 'US' || best.name === 'United States';

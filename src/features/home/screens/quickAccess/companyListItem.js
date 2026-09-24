@@ -144,6 +144,10 @@ export function mapCompanyToListItem(company, index) {
         countryOfIncorporation: getCountryOfIncorporation(company),
         ein: getCompanyEin(company),
         status: getCompanyStatus(company),
+        registrationStatus: company.registrationStatus ?? company.registration_status ?? company.status ?? '',
+        totalAmount: company.totalAmount ?? company.registrationRequestData?.totalAmount ?? 0,
+        // raw object preserve for pending check
+        raw: company,
         date: formatCompanyDate(company.createdAt ??
             company.created_at ??
             company.updatedAt ??

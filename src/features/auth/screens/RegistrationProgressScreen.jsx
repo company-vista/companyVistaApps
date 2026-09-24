@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -19,9 +19,15 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppSelector } from '../../../store/hooks';
 import { s } from '../../../theme/responsive';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
+import { BackHandler } from 'react-native';
+import { API_BASE_URL } from '../../../config/api';
 
-const RegistrationProgressScreen = ({ navigation, route }) => {
+const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
+  const token = useAppSelector(s => s.auth.token);
+  const user = useAppSelector(s => s.auth.user);
   const params = { ...pendingOrder, ...route?.params } || {};
   // review & confirm wala new client data ko priority
   const companyName = params.companyName || 'Meridian Global Ventures LLC';
@@ -31,16 +37,82 @@ const RegistrationProgressScreen = ({ navigation, route }) => {
   const shareholdersCount = params.shareholdersCount || (params.shareholders ? `${params.shareholders} people` : '3 people');
   const orderRef = params.orderId || params.invoiceId || params.referenceId || '#CV-2026-04821';
   const amount = params.amountPaid || (params.amount ? `$${params.amount}` : params.runningTotal ? `$${params.runningTotal}` : '$459');
+  const companyId = params.companyId || pendingOrder?.companyId || user?.companies?.[0]?._id || user?.companies?.[0]?.id || null;
+  const [backendStatus, setBackendStatus] = useState(null);
+  const isLockedPending = !backendStatus || String(backendStatus).toLowerCase() === 'pending';
+
+  // Hardware back bhi pending me block
+  useEffect(() => {
+    if (!isLockedPending) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      Toast.show({ type: 'info', text1: 'Registration pending', text2: 'Please wait until active' });
+      return true;
+    });
+    return () => sub.remove();
+  }, [isLockedPending]);
+
+  // Poll backend registrationStatus until active
+  const pollRef = useRef(null);
+  useEffect(() => {
+    if (!companyId || !token) return;
+    let mounted = true;
+    const fetchStatus = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/companies/${companyId}`, {
+          headers: { Authorization: `Bearer ${token}`, 'x-auth-token': token },
+          timeout: 8000,
+        });
+        const company = res.data?.data || res.data;
+        const status = company?.registrationStatus || company?.status || 'pending';
+        if (!mounted) return;
+        setBackendStatus(status);
+        const normalized = String(status).toLowerCase();
+        if (['active', 'completed', 'delivered'].includes(normalized)) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          Toast.show({ type: 'success', text1: 'Registration active!', text2: `Status: ${status}` });
+          if (onActive) onActive();
+          else {
+            // Auto-close after 1.5s so user sees success
+            setTimeout(() => {
+              if (navigation?.goBack) navigation.goBack();
+            }, 1500);
+          }
+        }
+      } catch (e) {
+        // keep pending on error
+      }
+    };
+    fetchStatus();
+    pollRef.current = setInterval(fetchStatus, 5000);
+    return () => {
+      mounted = false;
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [companyId, token]);
+
+  const handleBack = () => {
+    if (isLockedPending) {
+      Toast.show({ type: 'info', text1: 'Registration pending', text2: 'Please wait until status becomes active' });
+      return;
+    }
+    if (navigation?.goBack) navigation.goBack();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#070C15" />
 
-      {/* CompanyNaming jaisa Back + Logo */}
+      {/* CompanyNaming jaisa Back + Logo - pending me lock */}
       <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation?.goBack?.()} />
+        <View style={{ opacity: isLockedPending ? 0.4 : 1 }}>
+          <BackButton onPress={handleBack} disabled={false} />
+        </View>
         <Image source={logoR} style={styles.topLogo} />
+        <View style={{ width: 38, alignItems: 'center' }}>
+          {isLockedPending ? <Clock size={14} color="#EAB308" /> : null}
+        </View>
       </View>
+      {isLockedPending ? <Text style={{ color: '#EAB308', fontSize: 11, textAlign: 'center', marginBottom: 8 }}>Status: pending — waiting for active</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Title Section */}

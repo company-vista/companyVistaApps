@@ -58,6 +58,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
         <FontAwesome name={hasCompany || isLoadingCompanies ? "exchange" : "plus"} size={14} color={isLight ? colors.text : '#ffffff'} />
       </View>
     </Pressable>
+
     <View style={styles.heroMetaRow}>
       <View style={styles.heroMetaCol}>
         <Text style={[styles.heroMetaLabel, heroMetaStyle]}>EIN</Text>

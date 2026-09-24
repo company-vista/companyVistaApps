@@ -69,12 +69,12 @@ function getCookieToken(cookieHeader) {
     const tokenMatch = cookieHeader.match(/(?:^|;\s*)clientToken=([^;]+)/);
     return tokenMatch?.[1] ? decodeURIComponent(tokenMatch[1]) : '';
 }
-export async function handleSignupApi({ firstName, lastName, fullName, email, phone, phoneNumber, countryCode, countryIso, countryOfResidence, residence, companyName, rawCompanyName, selectedEnding, selectedStructure, selectedState, selectedCountry, bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, selectedJurisdiction, purpose, customerLocation, priorities, dayOneNeeds, physicalPresence, usStatePriority, selectedStructurePrice, selectedAddOns, addOnsTotal, runningTotal, address, registrationCountry, ...rest }) {
+export async function handleSignupApi({ firstName, lastName, fullName, email, phone, phoneNumber, countryCode, countryIso, countryOfResidence, residence, dateOfBirth, companyName, rawCompanyName, selectedEnding, selectedStructure, selectedState, selectedCountry, bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, selectedJurisdiction, purpose, customerLocation, priorities, dayOneNeeds, physicalPresence, usStatePriority, selectedStructurePrice, selectedAddOns, addOnsTotal, runningTotal, address, registrationCountry, expectedRevenue, businessDescription, residentialAddress, addressLine1, ...rest }) {
     const errors = {};
-    const trimmedFirstName = firstName.trim();
-    const trimmedLastName = lastName.trim();
-    const trimmedEmail = email.trim();
-    const trimmedPhone = phoneNumber.trim();
+    const trimmedFirstName = (firstName || '').trim();
+    const trimmedLastName = (lastName || '').trim();
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const trimmedPhone = (phoneNumber || phone || '').trim();
     if (!trimmedFirstName) {
         errors.firstName = 'First name is required';
     }
@@ -96,6 +96,9 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
     if (!trimmedPhone) {
         errors.phoneNumber = 'Phone number is required';
     }
+    if (!companyName?.trim() && !rawCompanyName?.trim()) {
+        errors.companyName = 'Company name is required';
+    }
     if (Object.keys(errors).length > 0) {
         Toast.show({
             type: 'error',
@@ -113,13 +116,16 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
         };
     }
     try {
-        const addr = (address || registrationCountry || countryOfResidence || residence || '').trim();
+        // Portal payload ke hisab se — address object ho sakta hai {addressLine1, country}
+        const isAddressObject = address && typeof address === 'object' && !Array.isArray(address);
+        const addrString = isAddressObject ? (address.addressLine1 || address.address || '').trim() : String(address || '').trim();
+        const addrVal = isAddressObject ? address : (addrString || registrationCountry || countryOfResidence || residence || '').trim();
+        const residenceVal = (countryOfResidence || residence || (isAddressObject ? address.country : '') || '').trim();
         const fullNameVal = (fullName || `${trimmedFirstName} ${trimmedLastName}`.trim()).trim();
         const phoneVal = (phone || phoneNumber || '').trim() || trimmedPhone;
-        const countryCodeVal = countryCode || '';
-        const countryIsoVal = countryIso || '';
-        const residenceVal = (countryOfResidence || residence || addr).trim();
-        // signup tak ka complete data
+        const countryCodeVal = (typeof countryCode === 'object' ? countryCode.code : countryCode || '').trim() || '+91';
+        const countryIsoVal = (typeof countryCode === 'object' ? countryCode.iso : countryIso || '').trim();
+        // Portal payload exact — backend createCompanySignup + computeOrderTotal ke liye raw data bhejo, waha calculate hoga
         const fullPayload = {
             firstName: trimmedFirstName,
             lastName: trimmedLastName,
@@ -131,17 +137,19 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
             countryIso: countryIsoVal,
             countryOfResidence: residenceVal,
             residence: residenceVal,
-            companyName,
-            rawCompanyName: rawCompanyName || companyName,
+            dateOfBirth: (dateOfBirth || rest.dateOfBirth || '').trim(),
+            companyName: (companyName || '').trim(),
+            rawCompanyName: (rawCompanyName || companyName || '').trim(),
             selectedEnding: selectedEnding || '',
             selectedStructure: selectedStructure || '',
             selectedState: selectedState || '',
             selectedCountry: selectedCountry || '',
+            registrationCountry: selectedCountry || registrationCountry || (isAddressObject ? address.country : addrString) || residenceVal,
             bestState: bestState || '',
-            bestStatePrice: bestStatePrice || 0,
+            bestStatePrice: bestStatePrice ?? 0,
             bestStatePriceNote: bestStatePriceNote || '',
             bestStateTimeframe: bestStateTimeframe || '',
-            advisorFlow: advisorFlow || false,
+            advisorFlow: !!advisorFlow,
             selectedJurisdiction: selectedJurisdiction || '',
             purpose: purpose || '',
             customerLocation: customerLocation || '',
@@ -149,12 +157,13 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
             dayOneNeeds: dayOneNeeds || [],
             physicalPresence: physicalPresence || '',
             usStatePriority: usStatePriority || '',
-            selectedStructurePrice: selectedStructurePrice || 0,
+            selectedStructurePrice: selectedStructurePrice ?? 0,
             selectedAddOns: selectedAddOns || {},
-            addOnsTotal: addOnsTotal || 0,
-            runningTotal: runningTotal || 0,
-            address: addr,
-            registrationCountry: addr,
+            addOnsTotal: addOnsTotal ?? 0,
+            runningTotal: runningTotal ?? 0,
+            address: isAddressObject ? address : { addressLine1: residentialAddress || addressLine1 || addrString || residenceVal, country: residenceVal },
+            expectedRevenue: expectedRevenue || rest.expectedRevenue || '',
+            businessDescription: (businessDescription || rest.businessDescription || '').trim(),
             ...rest,
         };
         console.log('=== COMPANY SIGNUP API CALL (createCompanySignup) ===', JSON.stringify(fullPayload, null, 2));
@@ -163,6 +172,9 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
         const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);
         const companyId = findDeepValue(response.data, ['companyId', 'company_id', 'companyID']);
         const pricingType = response.data?.pricingType || response.data?.data?.pricingType || '';
+        // backend computes totalAmount = pricingType==='fixed' ? computeOrderTotal(body) : 0 — response shape alag ho sakta hai isliye deep check
+        const totalAmount = response.data?.totalAmount ?? response.data?.total_amount ?? response.data?.data?.totalAmount ?? response.data?.data?.total_amount ?? response.data?.company?.totalAmount ?? response.data?.company?.total_amount ?? response.data?.data?.company?.totalAmount ?? response.data?.data?.company?.total_amount ?? 0;
+        console.log('=== SIGNUP RESPONSE totalAmount ===', totalAmount, 'pricingType', pricingType, 'full response', JSON.stringify(response.data, null, 2));
         Toast.show({
             type: 'success',
             text1: response.data?.message || 'Verification code sent. Please check your inbox.',
@@ -178,6 +190,7 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
             clientId,
             companyId,
             pricingType,
+            totalAmount,
             rawResponse: response.data,
         };
     }

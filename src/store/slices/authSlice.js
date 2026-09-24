@@ -17,6 +17,9 @@ const initialState = {
     redirectToLogin: false,
     pendingOrderData: null,
     pendingOpenOrderDetails: false,
+    pendingOpenRegistrationProgress: false,
+    pendingOpenRegistrationTracking: false,
+    hasCompletedPayment: false,
 };
 async function saveAuthSession(session) {
     try {
@@ -103,6 +106,7 @@ export const signupUser = createAsyncThunk('auth/signupUser', async (payload, { 
         clientId: result.clientId,
         companyId: result.companyId,
         pricingType: result.pricingType,
+        totalAmount: result.totalAmount,
         rawResponse: result.rawResponse,
     };
 });
@@ -159,7 +163,7 @@ const authSlice = createSlice({
             state.token = action.payload.token;
             state.isAuthenticated = true;
             state.isRestoring = false;
-            saveAuthSession({ user: action.payload.user, token: action.payload.token });
+            saveAuthSession({ user: action.payload.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         },
         setOnboardingComplete(state, action) {
             if (state.user) state.user.hasCompletedOnboarding = true;
@@ -178,6 +182,18 @@ const authSlice = createSlice({
         setPendingOpenOrderDetails(state, action) {
             state.pendingOpenOrderDetails = action.payload;
         },
+        setPendingOpenRegistrationProgress(state, action) {
+            state.pendingOpenRegistrationProgress = action.payload;
+        },
+        setPendingOpenRegistrationTracking(state, action) {
+            state.pendingOpenRegistrationTracking = action.payload;
+        },
+        setHasCompletedPayment(state, action) {
+            state.hasCompletedPayment = action.payload;
+            // persist with current session
+            const session = { user: state.user, token: state.token, hasCompletedPayment: action.payload };
+            saveAuthSession(session);
+        },
     },
     extraReducers: builder => {
         builder
@@ -189,6 +205,7 @@ const authSlice = createSlice({
             state.user = action.payload?.user ?? null;
             state.token = action.payload?.token ?? null;
             state.isAuthenticated = Boolean(action.payload?.token);
+            state.hasCompletedPayment = Boolean(action.payload?.hasCompletedPayment);
         })
             .addCase(restoreAuth.rejected, state => {
             state.isRestoring = false;
@@ -206,6 +223,8 @@ const authSlice = createSlice({
             state.token = action.payload.token;
             state.isAuthenticated = true;
             state.loginErrors = {};
+            // hasCompletedPayment ko preserve rakho (login ke baad bhi), save session with flag
+            saveAuthSession({ user: action.payload.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         })
             .addCase(loginUser.rejected, (state, action) => {
             state.isLoading = false;
@@ -238,12 +257,13 @@ const authSlice = createSlice({
             const cid = action.payload?.clientId;
             const compId = action.payload?.companyId;
             const pType = action.payload?.pricingType;
+            const tAmount = action.payload?.totalAmount;
             if (tok) {
                 state.token = tok;
-                // pendingOrderData me bhi token rakh do fallback ke liye (companyId/pricingType bhi)
-                state.pendingOrderData = { ...(state.pendingOrderData || {}), token: tok, clientId: cid, companyId: compId, pricingType: pType, email: action.payload?.email || state.pendingOrderData?.email };
+                // pendingOrderData me bhi token rakh do fallback ke liye (companyId/pricingType/totalAmount bhi)
+                state.pendingOrderData = { ...(state.pendingOrderData || {}), token: tok, clientId: cid, companyId: compId, pricingType: pType, totalAmount: tAmount, email: action.payload?.email || state.pendingOrderData?.email };
             } else if (compId) {
-                state.pendingOrderData = { ...(state.pendingOrderData || {}), companyId: compId, clientId: cid, pricingType: pType };
+                state.pendingOrderData = { ...(state.pendingOrderData || {}), companyId: compId, clientId: cid, pricingType: pType, totalAmount: tAmount };
             }
         })
             .addCase(signupUser.rejected, (state, action) => {
@@ -259,6 +279,9 @@ const authSlice = createSlice({
                 state.pendingAddCompany = false;
                 state.pendingOrderData = null;
                 state.pendingOpenOrderDetails = false;
+                state.pendingOpenRegistrationProgress = false;
+                state.pendingOpenRegistrationTracking = false;
+                state.hasCompletedPayment = false;
                 state.redirectToLogin = true;
             })
             .addCase(deactivateAccountThunk.fulfilled, state => {
@@ -279,5 +302,5 @@ const authSlice = createSlice({
             });
     },
 });
-export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, setRedirectToLogin, setPendingOpenOrderDetails } = authSlice.actions;
+export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, setRedirectToLogin, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setHasCompletedPayment } = authSlice.actions;
 export default authSlice.reducer;

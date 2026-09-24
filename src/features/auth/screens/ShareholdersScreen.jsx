@@ -18,6 +18,7 @@ import {
   ArrowRight,
   Check,
 } from 'lucide-react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import { useAppSelector } from '../../../store/hooks';
 import BackButton from '../../../components/buttons/BackButton';
@@ -39,30 +40,84 @@ const ShareholdersScreen = ({ navigation, route }) => {
   const authPhone = authUser?.phoneNumber || authUser?.phone || route?.params?.phone || '';
   const authCountryCode = authUser?.countryCode || route?.params?.countryCode || '';
 
-  const [shareholders, setShareholders] = useState([
-    {
-      id: '1',
-      initials: displayInitials,
-      name: displayName,
-      role: 'Principal founder · Managing Member',
-      ownership: '60%',
-      avatarBg: '#3A311A',
-      avatarText: '#D97706',
-      borderColor: '#3A311A',
-      country: accountCountry,
-      designation: 'Director',
-      status: 'complete',
-    },
-   
-  ]);
+  // Pehle static 60% dikh raha tha - user ne bhara bhi nahi aur 100% allocated dikh jata tha, isliye dynamic kiya
+  const [shareholders, setShareholders] = useState(() => {
+    // Sirf logged-in user ko prefill karo par 0% se - user khud ownership bharega
+    if (displayName) {
+      return [
+        {
+          id: '1',
+          initials: displayInitials,
+          name: displayName,
+          role: 'Principal founder · Managing Member',
+          ownership: '', // khali - user Add/Edit se bharega
+          avatarBg: '#3A311A',
+          avatarText: '#D97706',
+          borderColor: '#3A311A',
+          country: accountCountry,
+          designation: 'Director',
+          status: 'incomplete',
+          address: '',
+          pincode: '',
+        },
+      ];
+    }
+    return [];
+  });
+  const totalAllocated = shareholders.reduce((sum, s) => sum + (parseInt(String(s.ownership).replace('%','')) || 0), 0);
+  const isFullyAllocated = totalAllocated === 100;
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [newName, setNewName] = useState('');
   const [newOwnership, setNewOwnership] = useState('');
+  const [newAddress, setNewAddress] = useState('');
+  const [newPincode, setNewPincode] = useState('');
+  const [newPassport, setNewPassport] = useState('');
+
+  const handleEditShareholder = (item) => {
+    setEditingId(item.id);
+    setNewName(item.name || '');
+    setNewOwnership(String(item.ownership || '').replace('%',''));
+    setNewAddress(item.address || '');
+    setNewPincode(item.pincode || '');
+    setNewPassport(item.passportNumber || item.passport || '');
+    setShowAddModal(true);
+  };
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingId(null);
+    setNewName('');
+    setNewOwnership('');
+    setNewAddress('');
+    setNewPincode('');
+    setNewPassport('');
+  };
 
   const handleAddShareholder = () => {
     if (!newName.trim()) {
       Toast.show({ type: 'error', text1: 'Name is required' });
+      return;
+    }
+    if (!newOwnership.trim()) {
+      Toast.show({ type: 'error', text1: 'Ownership % is required' });
+      return;
+    }
+    const ownershipNum = parseInt(newOwnership, 10);
+    if (isNaN(ownershipNum) || ownershipNum <= 0 || ownershipNum > 100) {
+      Toast.show({ type: 'error', text1: 'Ownership must be between 1% and 100%' });
+      return;
+    }
+    if (!newAddress.trim()) {
+      Toast.show({ type: 'error', text1: 'Address is required' });
+      return;
+    }
+    if (!newPincode.trim()) {
+      Toast.show({ type: 'error', text1: 'Pincode is required' });
+      return;
+    }
+    if (!newPassport.trim()) {
+      Toast.show({ type: 'error', text1: 'Passport number is required' });
       return;
     }
     const initials = newName.trim().split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
@@ -71,19 +126,31 @@ const ShareholdersScreen = ({ navigation, route }) => {
       initials: initials || 'NS',
       name: newName.trim(),
       role: 'Member',
-      ownership: newOwnership ? `${newOwnership}%` : '0%',
+      ownership: `${ownershipNum}%`,
       avatarBg: '#1E293B',
       avatarText: '#EAB308',
       borderColor: 'transparent',
       country: '🌐 Global',
       designation: 'Member',
       status: 'awaiting_kyc',
+      address: newAddress.trim(),
+      pincode: newPincode.trim(),
+      passportNumber: newPassport.trim().toUpperCase(),
     };
-    setShareholders(prev => [...prev, newItem]);
+    if (editingId) {
+      setShareholders(prev => prev.map(s => s.id === editingId ? { ...s, name: newName.trim(), initials: initials || s.initials, ownership: `${ownershipNum}%`, address: newAddress.trim(), pincode: newPincode.trim(), passportNumber: newPassport.trim().toUpperCase() } : s));
+      Toast.show({ type: 'success', text1: 'Shareholder updated' });
+    } else {
+      setShareholders(prev => [...prev, newItem]);
+      Toast.show({ type: 'success', text1: 'Shareholder added' });
+    }
     setNewName('');
     setNewOwnership('');
+    setNewAddress('');
+    setNewPincode('');
+    setNewPassport('');
+    setEditingId(null);
     setShowAddModal(false);
-    Toast.show({ type: 'success', text1: 'Shareholder added' });
     // wapas es page pe redirect - stay on same ShareholdersScreen (already here)
   };
 
@@ -115,14 +182,14 @@ const ShareholdersScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
-        {/* 100% Allocated Success Banner */}
-        <View style={styles.allocatedBanner}>
-          <CheckCircle2 color="#10B981" size={20} />
+        {/* Allocated Banner - dynamic */}
+        <View style={[styles.allocatedBanner, !isFullyAllocated && { backgroundColor: 'rgba(234,179,8,0.08)', borderColor: 'rgba(234,179,8,0.3)' }]}>
+          {isFullyAllocated ? <CheckCircle2 color="#10B981" size={20} /> : <Info color="#EAB308" size={20} />}
           <Text style={styles.allocatedText}>
-            <Text style={{ fontWeight: 'bold', color: '#10B981' }}>
-              100% allocated
+            <Text style={{ fontWeight: 'bold', color: isFullyAllocated ? '#10B981' : '#EAB308' }}>
+              {totalAllocated}% allocated
             </Text>{' '}
-            — ownership adds up correctly
+            — {isFullyAllocated ? 'ownership adds up correctly' : `${100 - totalAllocated}% remaining — add/edit shareholders to reach 100%`}
           </Text>
         </View>
 
@@ -155,9 +222,12 @@ const ShareholdersScreen = ({ navigation, route }) => {
               </View>
 
               <View style={styles.ownershipGroup}>
-                <Text style={styles.ownershipValue}>{item.ownership}</Text>
+                <Text style={[styles.ownershipValue, !item.ownership && { color: '#EAB308' }]}>{item.ownership || '—'}</Text>
                 <Text style={styles.ownershipLabel}>OWNERSHIP</Text>
               </View>
+              <TouchableOpacity onPress={() => handleEditShareholder(item)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}>
+                <FontAwesome name="pencil" size={12} color="#EAB308" />
+              </TouchableOpacity>
             </View>
 
             {/* Tags / Badges Footer */}
@@ -181,6 +251,13 @@ const ShareholdersScreen = ({ navigation, route }) => {
                 </View>
               )}
             </View>
+            {(item.address || item.pincode || item.passportNumber) && (
+              <View style={{ marginTop: 8, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
+                {item.address ? <Text style={{ color: '#94A3B8', fontSize: 11, lineHeight: 14 }} numberOfLines={2}>{item.address}</Text> : null}
+                {item.pincode ? <Text style={{ color: '#64748B', fontSize: 10, marginTop: 2 }}>Pincode: {item.pincode}</Text> : null}
+                {item.passportNumber ? <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 2 }}>Passport: {item.passportNumber}</Text> : null}
+              </View>
+            )}
           </View>
         ))}
 
@@ -198,32 +275,55 @@ const ShareholdersScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
-        {/* Continue Button */}
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={() => navigation?.navigate?.('Status', { ...route?.params, shareholderCompleted: true })}>
+        {/* Continue Button - percentage mandatory, total 100% not required */}
+        <TouchableOpacity
+          style={styles.continueButton}
+          activeOpacity={0.85}
+          onPress={() => {
+            // har shareholder ka ownership mandatory, total ka koi limit nahi
+            const hasEmptyOwnership = shareholders.some(s => !s.ownership || String(s.ownership).trim() === '' || String(s.ownership) === '0%');
+            if (hasEmptyOwnership) {
+              Toast.show({ type: 'error', text1: 'Please set ownership % for all shareholders (tap edit icon)' });
+              return;
+            }
+            navigation?.navigate?.('VerifyIdentity', { ...route?.params, shareholderCompleted: true, shareholders });
+          }}>
           <Text style={styles.continueButtonText}>Continue to KYC</Text>
           <ArrowRight color="#070C15" size={20} />
         </TouchableOpacity>
       </ScrollView>
 
       {/* Add Shareholder Modal */}
-      <Modal visible={showAddModal} transparent animationType="fade" onRequestClose={() => setShowAddModal(false)}>
+      <Modal visible={showAddModal} transparent animationType="fade" onRequestClose={handleCloseModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Add Shareholder</Text>
+            <Text style={styles.modalTitle}>{editingId ? 'Edit Shareholder' : 'Add Shareholder'}</Text>
             <Text style={styles.modalLabel}>FULL NAME</Text>
             <View style={styles.modalInputBox}>
               <TextInput style={styles.modalInput} value={newName} onChangeText={setNewName} placeholder="Enter name" placeholderTextColor="#64748B" />
             </View>
-            <Text style={styles.modalLabel}>OWNERSHIP %</Text>
+            <Text style={styles.modalLabel}>OWNERSHIP % *</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newOwnership} onChangeText={t => setNewOwnership(t.replace(/[^0-9]/g,''))} placeholder="e.g. 10" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={3} />
+              <TextInput style={styles.modalInput} value={newOwnership} onChangeText={t => setNewOwnership(t.replace(/[^0-9]/g,''))} placeholder="e.g. 10 *" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={3} />
+            </View>
+            <Text style={styles.modalLabel}>ADDRESS</Text>
+            <View style={[styles.modalInputBox, { height: 60 }]}>
+              <TextInput style={[styles.modalInput, { textAlignVertical: 'top' }]} value={newAddress} onChangeText={setNewAddress} placeholder="Enter full address" placeholderTextColor="#64748B" multiline numberOfLines={2} />
+            </View>
+            <Text style={styles.modalLabel}>PINCODE</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newPincode} onChangeText={t => setNewPincode(t.replace(/[^0-9]/g,''))} placeholder="e.g. 110001" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={6} />
+            </View>
+            <Text style={styles.modalLabel}>PASSPORT NUMBER</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newPassport} onChangeText={t => setNewPassport(t.replace(/[^a-zA-Z0-9]/g,'').toUpperCase())} placeholder="e.g. A1234567" placeholderTextColor="#64748B" autoCapitalize="characters" maxLength={12} />
             </View>
             <View style={styles.modalBtnRow}>
-              <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setShowAddModal(false)}>
+              <TouchableOpacity style={styles.modalCancelBtn} onPress={handleCloseModal}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalSaveBtn} onPress={handleAddShareholder}>
-                <Text style={styles.modalSaveText}>Add</Text>
+                <Text style={styles.modalSaveText}>{editingId ? 'Update' : 'Add'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -476,8 +576,8 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     backgroundColor: '#EAB308',
-    borderRadius: 14,
-    paddingVertical: 16,
+    borderRadius: 24,
+    paddingVertical: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

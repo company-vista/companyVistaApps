@@ -9,6 +9,7 @@ import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
+import { useAppSelector } from '../../../../store/hooks';
 const STATUS_STEPS = {
     standard: [
         { title: 'Application Submitted', description: 'Your application is in queue for review.', timeframe: '0-1 day' },
@@ -95,6 +96,7 @@ const PACKAGE_TIMES = {
 export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, onEditPress, onContactSupport, companyId, onRefreshCompanies }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const token = useAppSelector(s => s.auth.token);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [company, setCompany] = useState(null);
@@ -108,8 +110,9 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
         try {
             if (!silent)
                 setLoading(true);
-            const res = await axios.get(`${API_BASE_URL}/api/companies/${companyId}`);
-            setCompany(res.data.data || res.data);
+            const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
+            const res = await axios.get(`${API_BASE_URL}/api/companies/${companyId}`, { headers, timeout: 8000 });
+            setCompany(res.data.data || res.data.company || res.data);
             setError(null);
         }
         catch (e) {
@@ -119,7 +122,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             setLoading(false);
             setRefreshing(false);
         }
-    }, [companyId]);
+    }, [companyId, token]);
     useEffect(() => {
         fetchCompany();
     }, [fetchCompany]);
