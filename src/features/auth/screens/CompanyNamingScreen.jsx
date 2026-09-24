@@ -177,8 +177,11 @@ const CompanyNamingScreen = ({ navigation, route }) => {
               // amount wala page nahi dikhana - direct FounderDetails, fir signup ke baad Your Order
               navigation.navigate('FounderDetails', baseParams);
             } else if (!isUS) {
-              // USA ke alawa other country -> StructureSelection skip, no structure (price 0)
-              navigation.navigate('WhatsIncluded', { ...baseParams, selectedStructure: '', selectedStructurePrice: 0 });
+              // Non-US priced (AE/SG/GB/EE) -> Structure skip but pricingType fixed rakho, totalAmount country price se banega
+              // selectedStructure empty rakhne se backend quoted bana deta tha - isliye default LLC rakho
+              const fallbackStructure = route.params?.selectedStructure || 'LLC';
+              const fallbackPrice = route.params?.selectedStructurePrice ?? 299;
+              navigation.navigate('WhatsIncluded', { ...baseParams, selectedStructure: fallbackStructure, selectedStructurePrice: fallbackPrice });
             } else {
               navigation.navigate('StructureSelection', baseParams);
             }

@@ -26,11 +26,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
     return { expeditedFiling: false, expressEin: false, bankAssurance: false, stripePaypal: false };
   });
 
-  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
-  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
-  // --- dono route ka alag calculation ---
-  // advisorFlow true => getAdvisorBasePrice, warna getDirectBasePrice
-  const basePrice = getBasePrice(route.params, structurePrice);
+  // Frontend me total calculate nahi karna — sirf raw selectedAddOns backend bhejenge, backend computeOrderTotal karega
   const prices = {
     expeditedFiling: 99,
     expressEin: 149,
@@ -43,17 +39,23 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
   };
 
   const selectedCount = Object.values(selectedAddOns).filter(Boolean).length;
-  const addOnsTotal = Object.keys(selectedAddOns).reduce((sum, key) => {
-    return selectedAddOns[key] ? sum + prices[key] : sum;
-  }, 0);
-  const hasPrice = hasPriceFn(route.params);
-  const runningTotal = hasPrice ? (basePrice + addOnsTotal) : 0;
+  const addOnsTotal = Object.keys(selectedAddOns).reduce((sum, key) => selectedAddOns[key] ? sum + (prices[key] || 0) : sum, 0);
+  // structure me jo total add hokar aaya (combinedTotal) + addons = final runningTotal backend me bhejna
+  // GB/AE jaise price wale non-US ke liye combinedTotal 0 hota hai, isliye countryPrice + structure se fallback
+  let baseTotal = Number(route.params?.combinedTotal ?? route.params?.runningTotal ?? route.params?.totalAmount ?? 0);
+  if (!baseTotal) {
+    const cp = Number(route.params?.selectedCountryPrice ?? 0);
+    const sp = Number(route.params?.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299));
+    const st = Number(route.params?.selectedStatePrice ?? 0);
+    if (cp > 0) baseTotal = cp + sp + st;
+    else if (sp > 0 || st > 0) baseTotal = sp + st;
+  }
+  const runningTotal = baseTotal + addOnsTotal;
 
   const handleContinue = () => {
     const updatedParams = {
       ...(route.params || {}),
       selectedStructure,
-      selectedStructurePrice: structurePrice,
       companyName,
       selectedEnding,
       selectedState,
@@ -61,7 +63,8 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
       selectedAddOns,
       addOnsTotal,
       runningTotal,
-      basePrice,
+      totalAmount: runningTotal,
+      combinedTotal: baseTotal,
       fromOptionalAddOns: true,
     };
     // Agar Review se Change karke aaye ho to seedha Review pe wapas jao taaki total update dikhe
@@ -99,12 +102,11 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
 
         <View style={styles.totalBanner}>
           <View>
-            <Text style={styles.runningTotalLabel}>Running total</Text>
-            <Text style={styles.runningTotalAmount}>${runningTotal}</Text>
+            <Text style={styles.runningTotalLabel}>Add-ons total</Text>
+            <Text style={styles.runningTotalAmount}>${addOnsTotal}</Text>
           </View>
           <View style={styles.runningTotalRight}>
-            <Text style={styles.basePriceText}>${basePrice} base</Text>
-            <Text style={styles.addOnsCountText}>+{selectedCount} add-ons</Text>
+            <Text style={styles.addOnsCountText}>{selectedCount} selected · Total backend se calculate hoga</Text>
           </View>
         </View>
 
@@ -237,7 +239,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
           <Text style={styles.continueButtonText}>Continue</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />
         </TouchableOpacity>
-        <Text style={styles.footerSubtext}>${runningTotal} total · {selectedCount} add-ons selected</Text>
+        <Text style={styles.footerSubtext}>${addOnsTotal} add-ons · {selectedCount} selected</Text>
       </View>
     </SafeAreaView>
   );
