@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,18 +15,15 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
-import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import { Linking, ActivityIndicator } from 'react-native';
-import { API_BASE_URL } from '../../../config/api';
-import { useAppSelector } from '../../../store/hooks';
-import { savePaymentConfirmApi } from '../api/orderApi';
+import { ActivityIndicator, Alert } from 'react-native';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { setHasCompletedPayment } from '../../../store/slices/authSlice';
+import { savePaymentConfirmApi, fetchReviewApi, createCheckoutApi, finalizeCheckoutApi } from '../api/orderApi';
+import StripeCheckoutModal from '../../../components/StripeCheckoutModal';
 import { s } from '../../../theme/responsive';
 
 export default function CompletePaymentScreen({ navigation, route }) {
-  React.useEffect(() => {
-    console.log('=== COMPLETE YOUR PAYMENT SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
-  }, []);
   const {
     selectedStructure = '',
     companyName = '',
@@ -43,16 +40,24 @@ export default function CompletePaymentScreen({ navigation, route }) {
   const [expiry, setExpiry] = useState('12 / 28');
   const [cvc, setCvc] = useState('***');
   const [paying, setPaying] = useState(false);
-  const token = useAppSelector(s => s.auth.token);
+  const [verifying, setVerifying] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState(null);
+  const [webViewVisible, setWebViewVisible] = useState(false);
+  const [pendingSession, setPendingSession] = useState(null);
+  const lastSuccessUrlRef = useRef(null);
+  const pendingSessionRef = useRef(null);
+  React.useEffect(() => { pendingSessionRef.current = pendingSession; }, [pendingSession]);
 
-  // RegistrationLanding se lekar sahi amount: runningTotal priority, fallback me advisorFlow aware calc
-  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 299 };
+  const token = useAppSelector(s => s.auth.token);
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
+  const dispatch = useAppDispatch();
+
+  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 399 };
   const structurePrice = route.params?.selectedStructurePrice ?? structurePriceMap[selectedStructure] ?? 299;
   const advisorPrice = route.params?.bestStatePrice ?? 0;
   const isAdvisorFlow = advisorPrice > 0;
   const directStateFee = route.params?.selectedStatePrice ?? 0;
   const countryPrice = route.params?.selectedCountryPrice ?? 0;
-  // USA additive: country + state + structure; non-USA: country only
   let packagePrice;
   let stateFee;
   if (isAdvisorFlow) {
@@ -75,60 +80,27 @@ export default function CompletePaymentScreen({ navigation, route }) {
     if (paying) return;
     setPaying(true);
     try {
-      const invoiceId = `INV-${Date.now()}`;
-      const companyId = companyName || route.params?.companyId || 'temp-company-id';
+      const companyId = route.params?.companyId || pendingOrder?.companyId || companyName || 'temp-company-id';
       const amount = Number(dueNow) || 0;
       if (amount <= 0) {
         Toast.show({ type: 'error', text1: 'Invalid amount' });
         return;
       }
-      const endpoint = `${API_BASE_URL}/api/payment/create-ontime-paynment`;
-      const payload = { companyId, invoiceId, amount, plan: 'invoice', currency: 'USD' };
-      const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
-      Toast.show({ type: 'info', text1: 'Initializing Stripe payment...' });
-      const { data } = await axios.post(endpoint, payload, { withCredentials: true, timeout: 10000, headers });
-      if (!data?.url) throw new Error('Payment URL is missing');
-      await Linking.openURL(data.url);
-      Toast.show({ type: 'success', text1: 'Stripe checkout opened' });
-      const statusParams = {
-        isPaid: false,
-        referenceId: invoiceId,
-        invoiceId: invoiceId,
-        companyName: companyName ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : 'Meridian Global Ventures GmbH',
-        country: selectedState || selectedCountry,
-        selectedState,
-        selectedCountry,
-        selectedStructure,
-        selectedEnding,
-        shareCapital: '€25,000',
-        shareholdersCount: '3 people',
-        userEmail: route.params?.email || 'rajesh@meridianglobal.com',
-        fullName: route.params?.fullName || '',
-        email: route.params?.email || '',
-        countryOfResidence: route.params?.countryOfResidence || selectedCountry,
-        phone: route.params?.phone || '',
-        orderId: invoiceId,
-        amountPaid: `$${amount}`,
-        amount: amount,
-        runningTotal: dueNow,
-        advisorFlow: route.params?.advisorFlow,
-        selectedJurisdiction: route.params?.selectedJurisdiction,
-        purpose: route.params?.purpose,
-        customerLocation: route.params?.customerLocation,
-        priorities: route.params?.priorities,
-        dayOneNeeds: route.params?.dayOneNeeds,
-        physicalPresence: route.params?.physicalPresence,
-        usStatePriority: route.params?.usStatePriority,
-        bestState: route.params?.bestState,
-        countryCode: route.params?.countryCode,
-        selectedAddOns,
-        addOnsTotal,
-      };
-      console.log('=== COMPLETE PAYMENT -> PAYMENT CONFIRM DATA ===', JSON.stringify(statusParams, null, 2));
-      // API 2: Payment confirm data alag API se save
-      await savePaymentConfirmApi(statusParams, token);
-      // pehle Details Received dikhao, StatusScreen khud poll karke Payment Confirmed pe toggle karega
-      navigation.navigate('Status', statusParams);
+      let realCompanyId = route.params?.companyId || route.params?.company_id || pendingOrder?.companyId || companyName;
+      if (!/^[a-f\d]{24}$/i.test(String(realCompanyId))) {
+        Toast.show({ type: 'error', text1: 'Invalid company ID', text2: 'Please restart signup' });
+        return;
+      }
+      Toast.show({ type: 'info', text1: 'Opening secure checkout...' });
+      let data = await createCheckoutApi({ companyId: String(realCompanyId), token });
+      data = data || {};
+      const checkoutUrlFromApi = data?.checkoutUrl || data?.url || data?.checkout_url;
+      if (!checkoutUrlFromApi) throw new Error(data?.message || 'Payment URL missing');
+      const sessionId = data?.sessionId || data?.session_id;
+      if (sessionId) setPendingSession({ sessionId, companyId: String(realCompanyId) });
+      setCheckoutUrl(checkoutUrlFromApi);
+      setWebViewVisible(true);
+      Toast.show({ type: 'success', text1: 'Secure checkout opened' });
     } catch (e) {
       const msg = e?.response?.data?.message || e?.message || 'Unable to start Stripe payment';
       Toast.show({ type: 'error', text1: msg });
@@ -136,6 +108,97 @@ export default function CompletePaymentScreen({ navigation, route }) {
       setPaying(false);
     }
   };
+
+  const handleFinalize = async (override = null) => {
+    const activeSession = override || pendingSessionRef.current || pendingSession;
+    const urlFromRef = lastSuccessUrlRef.current;
+    if (!activeSession?.sessionId) {
+      let parsedSid = null;
+      try { if (urlFromRef) parsedSid = new URL(urlFromRef).searchParams.get('session_id') || new URL(urlFromRef).searchParams.get('sessionId'); } catch {}
+      if (!parsedSid) {
+        Toast.show({ type: 'error', text1: 'Session not found' });
+        return;
+      }
+      activeSession.sessionId = parsedSid;
+    }
+    let verifyCompanyId = override?.companyId || activeSession?.companyId || pendingSessionRef.current?.companyId || pendingSession?.companyId;
+    if (!/^[a-f\d]{24}$/i.test(String(verifyCompanyId)) && urlFromRef) {
+      try {
+        const p = new URL(urlFromRef);
+        const urlCid = p.searchParams.get('companyId') || p.searchParams.get('company_id');
+        if (urlCid && /^[a-f\d]{24}$/i.test(String(urlCid))) verifyCompanyId = String(urlCid);
+      } catch {}
+    }
+    if (!/^[a-f\d]{24}$/i.test(String(verifyCompanyId))) {
+      const routeCid = route.params?.companyId || pendingOrder?.companyId;
+      if (routeCid && /^[a-f\d]{24}$/i.test(String(routeCid))) verifyCompanyId = String(routeCid);
+    }
+    if (!/^[a-f\d]{24}$/i.test(String(verifyCompanyId))) {
+      Toast.show({ type: 'error', text1: 'Invalid company ID for verify' });
+      return;
+    }
+    const activeSessionId = override?.sessionId || activeSession.sessionId;
+    const cleanCompanyId = String(verifyCompanyId).trim();
+    const cleanSessionId = String(activeSessionId).trim();
+    setVerifying(true);
+    try {
+      const respData = await finalizeCheckoutApi({ sessionId: cleanSessionId, companyId: cleanCompanyId, token });
+      if (!respData?.success) throw new Error(respData?.message || 'Verification failed');
+      Toast.show({ type: 'success', text1: 'Payment verified!', text2: respData.message });
+      dispatch(setHasCompletedPayment(true));
+      const statusParams = {
+        isPaid: true,
+        referenceId: cleanSessionId,
+        invoiceId: cleanSessionId,
+        companyName: companyName ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : 'Company',
+        country: selectedState || selectedCountry,
+        selectedState, selectedCountry, selectedStructure, selectedEnding,
+        userEmail: route.params?.email || '',
+        fullName: route.params?.fullName || '',
+        email: route.params?.email || '',
+        companyId: cleanCompanyId,
+        sessionId: cleanSessionId,
+        registrationStatus: respData.registrationStatus,
+      };
+      await savePaymentConfirmApi(statusParams, token).catch(()=>{});
+      navigation.navigate('Status', statusParams);
+    } catch (e) {
+      const fullErr = JSON.stringify(e?.response?.data || e.message, null, 2);
+      const errMsg = e?.response?.data?.message || e?.message || '';
+      Toast.show({ type: 'error', text1: errMsg || fullErr.slice(0,120) || 'Verification failed', text2: `companyId: ${cleanCompanyId.slice(-6)}` });
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleWebViewSuccess = useCallback(async (successUrl) => {
+    setWebViewVisible(false);
+    setCheckoutUrl(null);
+    lastSuccessUrlRef.current = successUrl;
+    let urlSessionId = pendingSessionRef.current?.sessionId || pendingSession?.sessionId;
+    let urlCompanyId = pendingSessionRef.current?.companyId || pendingSession?.companyId;
+    try {
+      const parsed = new URL(successUrl);
+      urlSessionId = parsed.searchParams.get('session_id') || parsed.searchParams.get('sessionId') || urlSessionId;
+      urlCompanyId = parsed.searchParams.get('companyId') || parsed.searchParams.get('company_id') || urlCompanyId;
+    } catch {}
+    if (urlSessionId && urlCompanyId) {
+      await handleFinalize({ sessionId: urlSessionId, companyId: String(urlCompanyId) });
+      return;
+    }
+    Toast.show({ type: 'success', text1: 'Payment successful!' });
+    if (pendingSession?.sessionId) await handleFinalize();
+  }, [pendingSession]);
+
+  const handleWebViewCancel = useCallback((cancelUrl) => {
+    setWebViewVisible(false);
+    setCheckoutUrl(null);
+    Alert.alert('Payment Cancelled', 'You cancelled the payment. You can try again when ready.');
+  }, []);
+
+  const handleWebViewClose = useCallback(() => {
+    setWebViewVisible(false);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -257,11 +320,40 @@ export default function CompletePaymentScreen({ navigation, route }) {
       </ScrollView>
 
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={[styles.payButton, paying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handlePay} disabled={paying}>
-          {paying ? <ActivityIndicator size="small" color="#0A111D" style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color="#0A111D" style={styles.lockIcon} />}
-          <Text style={styles.payButtonText}>{paying ? 'Processing...' : `Pay $${dueNow} Securely`}</Text>
-        </TouchableOpacity>
+        {!pendingSession ? (
+          <>
+            <TouchableOpacity style={[styles.payButton, paying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handlePay} disabled={paying}>
+              {paying ? <ActivityIndicator size="small" color="#0A111D" style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color="#0A111D" style={styles.lockIcon} />}
+              <Text style={styles.payButtonText}>{paying ? 'Processing...' : `Pay $${dueNow} Securely`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()} disabled={paying}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <View style={{ backgroundColor: 'rgba(16,185,129,0.08)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+              <Text style={{ color: '#10B981', fontSize: 12, fontWeight: '700' }}>Stripe checkout opened</Text>
+              <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 4 }}>Session: {pendingSession.sessionId.slice(0,20)}... · Complete payment then verify</Text>
+            </View>
+            <TouchableOpacity style={[styles.payButton, { backgroundColor: '#10B981' }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handleFinalize} disabled={verifying}>
+              {verifying ? <ActivityIndicator size="small" color="#fff" style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color="#fff" style={styles.lockIcon} />}
+              <Text style={[styles.payButtonText, { color: '#fff' }]}>{verifying ? 'Verifying...' : 'Verify Payment'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ marginTop: 10, alignItems: 'center' }} onPress={() => setPendingSession(null)}>
+              <Text style={{ color: '#64748B', fontSize: 11 }}>Cancel</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
+
+      <StripeCheckoutModal
+        visible={webViewVisible}
+        checkoutUrl={checkoutUrl}
+        onClose={handleWebViewClose}
+        onSuccess={handleWebViewSuccess}
+        onCancel={handleWebViewCancel}
+      />
     </SafeAreaView>
   );
 }
@@ -309,6 +401,8 @@ const styles = StyleSheet.create({
   securityText: { color: '#8E9BAE', fontSize: 11, flex: 1 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center' },
+  cancelBtnText: { color: '#8E9BAE', fontSize: 14, fontWeight: '600' },
   lockIcon: { marginRight: s(8) },
   payButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700' },
 });

@@ -10,14 +10,16 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Clock, Check, RefreshCw } from 'lucide-react-native';
+import { Clock, Check, RefreshCw, LogOut } from 'lucide-react-native';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
 import { useThemeColors } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
-import { useAppSelector } from '../../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
+import { logoutUser } from '../../../../../store/slices/authSlice';
 import { fetchQuote, isQuoteReady, formatCurrency } from './api/quoteApi';
+import { fetchReviewApi } from '../../../../../features/auth/api/orderApi';
 
 const OrderDetailsScreen = ({
   onBackPress,
@@ -87,8 +89,10 @@ const OrderDetailsScreen = ({
     pendingOrder?.orderId ??
     (selectedCompany?.id ? `#${String(selectedCompany.id).slice(-8).toUpperCase()}` : fallbackCompany?._id ? `#${String(fallbackCompany._id).slice(-8).toUpperCase()}` : '—');
 
+  const dispatch = useAppDispatch();
   const token = useAppSelector((state) => state.auth.token);
   const [quote, setQuote] = useState(null);
+  const [review, setReview] = useState(null);
   const [loadingQuote, setLoadingQuote] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const refreshQuote = async () => {
@@ -98,6 +102,9 @@ const OrderDetailsScreen = ({
     try {
       const res = await fetchQuote({ companyId: cid, token, invoiceId: pendingOrder?.orderId });
       setQuote(res.quote);
+      // also refresh review pricing via GET /review/:companyId
+      const r = await fetchReviewApi({ companyId: cid, token });
+      if (r.isSuccess) setReview(r.data);
     } finally {
       setRefreshing(false);
       setLoadingQuote(false);
@@ -109,17 +116,23 @@ const OrderDetailsScreen = ({
     fetchQuote({ companyId: cid, token, invoiceId: pendingOrder?.orderId })
       .then(res => { if (mounted) setQuote(res.quote); })
       .finally(() => { if (mounted) setLoadingQuote(false); });
+    // fetch review pricing — company & review page ke liye naya API
+    fetchReviewApi({ companyId: cid, token }).then(r => { if (mounted && r.isSuccess) setReview(r.data); });
     return () => { mounted = false; };
   }, [selectedCompany?.id, selectedCompany?._id, pendingOrder?.companyId, pendingOrder?.orderId, token]);
 
   const effectiveQuote = quote;
-  // Xyz LLC: admin ne totalAmount bheja ho to wo bhi pick karo, 0 ko skip karke first positive amount lo
+  // review pricing via GET /review/:companyId — company.totalAmount || computeOrderTotal(data) yahi se aata hai
+  const reviewAmount = review?.pricing?.totalAmount ?? review?.company?.totalAmount ?? 0;
+  const reviewPricingType = review?.pricingType;
+  // Xyz LLC: admin ne totalAmount bheja ho to wo bhi pick karo, 0 ko skip karke first positive amount lo — review amount ko priority do
   const rawAmount = [
+    reviewAmount,
     submission.amount, submission.adminAmount, submission.totalAmount,
     pendingOrder?.amount, pendingOrder?.runningTotal, pendingOrder?.totalAmount,
     selectedCompany?.quoteAmount, selectedCompany?.adminAmount, selectedCompany?.totalAmount,
     effectiveQuote?.total, effectiveQuote?.totalAmount, effectiveQuote?.raw?.total, effectiveQuote?.raw?.totalAmount,
-  ].find(v => Number(v) > 0) ?? 0;
+  ].find(v => Number(v) > 0) ?? reviewAmount ?? 0;
   const numericAmount = Number(rawAmount) || 0;
   const hasAmount = !loadingQuote && isQuoteReady(effectiveQuote) && numericAmount > 0;
   // progress: 1 = only Details submitted, 2 = Quote being prepared done -> Review & approve active
@@ -151,8 +164,8 @@ const OrderDetailsScreen = ({
             <BackButton onPress={handleBack} disabled={!!isNoPriceOrder} />
           </View>
           <Image source={logoR} style={styles.logoImage} resizeMode="contain" />
-          <TouchableOpacity style={[styles.iconButton, { backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderColor: colors.border }]}>
-            <Clock color={colors.text} size={20} />
+          <TouchableOpacity onPress={() => dispatch(logoutUser())} style={[styles.iconButton, { backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderColor: colors.border }]}>
+            <LogOut color={colors.text} size={20} />
           </TouchableOpacity>
         </View>
 

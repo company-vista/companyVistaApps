@@ -90,17 +90,12 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     ]).start();
   }, []);
 
-  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
-  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
-  const addOnsTotal = route.params?.addOnsTotal ?? 0;
-  const hasPrice = hasPriceFn(route.params);
-  // --- dono route ka alag calculation: advisorFlow true => advisor price, false => direct price ---
-  const basePrice = getBasePrice(route.params, structurePrice);
-  const runningTotalValue = hasPrice ? (route.params?.runningTotal ?? (basePrice + addOnsTotal)) : 0;
-  const summaryPrice = `$${structurePrice}`;
-  const totalPrice = hasPrice ? `$${runningTotalValue}` : 'Quote on request';
+  // Frontend me price calculate nahi karna — backend computeOrderTotal karega
+  // Sirf raw selections (selectedAddOns etc.) backend bhejenge, total backend se aayega
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // TESTING: true karo to email verify + SetNewPassword skip ho jayega (signup ke baad direct Register)
+  const SKIP_VERIFY_FOR_TESTING = false;
 
   const lastVerifiedEmailRef = useRef('');
 
@@ -130,6 +125,12 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   }, [email]);
 
   const handleVerifyEmail = async () => {
+    if (SKIP_VERIFY_FOR_TESTING) {
+      lastVerifiedEmailRef.current = email.trim();
+      setEmailVerified(true);
+      Toast.show({ type: 'success', text1: 'Skipped verification (testing)' });
+      return;
+    }
     if (!isEmailValid) {
       Toast.show({ type: 'error', text1: 'Enter valid email' });
       return;
@@ -142,71 +143,79 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     try {
       // New company signup: POST /api/company-signup -> createCompanySignup (replaces old POST /api/signup/step1)
       // Creates Client (pending) + Company (pending) + Quote (awaiting_quote if quoted pricing)
+      // Portal payload exact — backend computeOrderTotal ke liye raw data, frontend calculate nahi karega
       const parts = fullName.trim().split(/\s+/);
       const firstName = parts[0] || '';
-      const lastName = parts.slice(1).join(' ') || parts[0] || '';
+      const rest = parts.slice(1);
+      const lastName = rest.join(' ') || firstName;
+      const trimmedPhone = phone.trim();
+      const countryCodeObj = { code: countryCode || '+91', iso: countryIso || '' };
+      const residence = countryOfResidence || '';
+      const isUSA = (route.params?.selectedCountry === 'US' || route.params?.selectedCountry === 'USA' || !!route.params?.bestState || isUSFounder);
+      const legalEnding = selectedEnding || selectedStructure || '';
+      const usState = { name: route.params?.bestState || selectedState || '', timeframe: route.params?.bestStateTimeframe || '' };
+      const country = { name: route.params?.selectedCountry || '' };
+      const structure = { id: selectedStructure || route.params?.selectedStructure || '' };
+      const statePrice = route.params?.bestStatePrice ?? route.params?.selectedStatePrice ?? 0;
+      const structurePrice = route.params?.selectedStructurePrice ?? 299;
+      const residentialAddress = route.params?.residentialAddress || route.params?.addressLine1 || residence || '';
       const signupPayload = {
-        // founder details
         firstName,
         lastName,
         fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim() || '0000000000',
-        phoneNumber: phone.trim() || '0000000000',
-        countryCode,
-        countryIso,
-        countryOfResidence,
-        residence: countryOfResidence,
-        // company
-        companyName: displayCompanyName,
-        rawCompanyName: companyName,
-        selectedEnding,
-        registrationCountry: countryOfResidence,
-        // signup tak ka pura data (jurisdiction, structure, advisor, addons, totals)
-        selectedStructure,
-        selectedState,
-        selectedStatePrice: route.params?.selectedStatePrice,
-        selectedCountry: route.params?.selectedCountry,
-        selectedCountryPrice: route.params?.selectedCountryPrice,
-        bestState: route.params?.bestState,
-        bestStatePrice: route.params?.bestStatePrice,
-        bestStatePriceNote: route.params?.bestStatePriceNote,
-        bestStateTimeframe: route.params?.bestStateTimeframe,
-        advisorFlow: route.params?.advisorFlow,
-        selectedJurisdiction: route.params?.selectedJurisdiction,
-        purpose: route.params?.purpose,
-        customerLocation: route.params?.customerLocation,
-        priorities: route.params?.priorities,
-        dayOneNeeds: route.params?.dayOneNeeds,
-        physicalPresence: route.params?.physicalPresence,
-        usStatePriority: route.params?.usStatePriority,
-        selectedStructurePrice: route.params?.selectedStructurePrice,
-        selectedAddOns: route.params?.selectedAddOns,
-        addOnsTotal: route.params?.addOnsTotal,
-        runningTotal: route.params?.runningTotal ?? runningTotalValue,
-        countryCodeResidence: countryCode,
+        email: email.trim().toLowerCase(),
+        phone: trimmedPhone,
+        phoneNumber: trimmedPhone,
+        countryCode: countryCodeObj.code,
+        countryIso: countryCodeObj.iso,
+        countryOfResidence: residence.trim(),
+        residence: residence.trim(),
+        dateOfBirth: route.params?.dateOfBirth || '',
+        companyName: `${(companyName || '').trim()} ${isUSA ? legalEnding : ''}`.trim() || displayCompanyName.trim(),
+        rawCompanyName: (companyName || '').trim() || displayCompanyName.trim(),
+        selectedEnding: isUSA ? legalEnding : '',
+        selectedStructure: structure?.id || '',
+        selectedState: isUSA ? (usState?.name || '') : '',
+        selectedCountry: country?.name || '',
+        bestState: isUSA ? (usState?.name || '') : '',
+        bestStatePrice: statePrice,
+        bestStateTimeframe: isUSA ? (usState?.timeframe || '') : '',
+        selectedStructurePrice: structurePrice,
+        selectedAddOns: route.params?.selectedAddOns || {},
+        addOnsTotal: route.params?.addOnsTotal ?? 0,
+        runningTotal: route.params?.runningTotal ?? 0,
+        address: { addressLine1: residentialAddress.trim(), country: residence.trim() },
+        registrationCountry: country?.name || '',
+        purpose: route.params?.purpose || route.params?.industry || '',
+        priorities: route.params?.priorities || route.params?.advisorPriorities || [],
+        dayOneNeeds: route.params?.dayOneNeeds || route.params?.advisorNeeds || [],
+        customerLocation: route.params?.customerLocation || route.params?.advisorRegion || '',
+        expectedRevenue: route.params?.expectedRevenue || route.params?.revenueBand || '',
+        businessDescription: (route.params?.businessDescription || '').trim(),
+        advisorFlow: !!route.params?.advisorFlow,
       };
       console.log('=== SIGNUP STEP1 PAYLOAD (FounderDetails) ===', JSON.stringify(signupPayload, null, 2));
       console.log('FullName:', fullName.trim(), '| Email:', email.trim(), '| Phone:', phone.trim(), '| CountryCode:', countryCode, '| Residence:', countryOfResidence);
       const result = await dispatch(signupUser(signupPayload));
       if (signupUser.fulfilled.match(result)) {
-        const { token, clientId, companyId, pricingType } = result.payload;
-        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}${companyId ? ` · ${pricingType || ''}` : ''}` });
+        const { token, clientId, companyId, pricingType, totalAmount } = result.payload;
+        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}${companyId ? ` · ${pricingType || ''} $${totalAmount ?? ''}` : ''}` });
         navigation.navigate('EmailVerification', {
           ...(route.params || {}),
           email: email.trim(),
           signupToken: token,
           signupClientId: clientId,
+          companyId,
+          totalAmount,
+          pricingType,
           companyName: displayCompanyName,
           companyLocation: `${selectedState} · ${selectedStructure}`,
           from: 'FounderDetails',
           selectedStructure,
           selectedState,
           selectedEnding,
-          selectedCountry: countryOfResidence,
+          selectedCountry: route.params?.selectedCountry || countryOfResidence,
           selectedAddOns: route.params?.selectedAddOns,
-          addOnsTotal: route.params?.addOnsTotal,
-          runningTotal: route.params?.runningTotal,
           fullName: fullName.trim(),
           phone: phone.trim(),
           countryOfResidence,
@@ -224,28 +233,26 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   };
 
   const handleRegisterCompany = async () => {
-    console.log('=== FOUNDER DETAILS BUTTON CLICK ===');
-    console.log('route.params FULL:', JSON.stringify(route.params, null, 2));
-    console.log('advisorFlow:', route.params?.advisorFlow);
-    console.log('selectedJurisdiction:', route.params?.selectedJurisdiction);
-    console.log('purpose:', route.params?.purpose);
-    console.log('customerLocation:', route.params?.customerLocation);
-    console.log('priorities:', route.params?.priorities);
-    console.log('dayOneNeeds:', route.params?.dayOneNeeds);
-    console.log('physicalPresence:', route.params?.physicalPresence);
-    console.log('usStatePriority:', route.params?.usStatePriority);
-    console.log('bestState:', route.params?.bestState);
-    console.log('selectedCountry:', route.params?.selectedCountry);
-    console.log('selectedState:', route.params?.selectedState);
-    console.log('selectedStructure:', route.params?.selectedStructure);
-    console.log('companyName:', route.params?.companyName);
-    // Agar email verified nahi hai to pehle OTP send / verification karwao (Verify button ka logic yahi shift ho gaya)
+    // Testing: skip verify -> direct next page (ReviewAndConfirm) after Verify
+    if (SKIP_VERIFY_FOR_TESTING && !emailVerified) {
+      await handleVerifyEmail();
+      // after verify, auto-open next page (SetNewPassword ke baad wala ReviewAndConfirm)
+      const nextParams = {
+        ...(route.params || {}),
+        email: email.trim(),
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        countryOfResidence,
+        countryCode,
+      };
+      Toast.show({ type: 'success', text1: 'Skipped verify & password (testing)' });
+      setTimeout(() => navigation.navigate('ReviewAndConfirm', nextParams), 500);
+      return;
+    }
     if (!emailVerified) {
       await handleVerifyEmail();
       return;
     }
-    // Client already created as draft on Verify (signup/step1). Register just confirms.
-    // If backend later implements separate company-create endpoint, call it here instead.
     Toast.show({ type: 'success', text1: 'Company registered successfully!' });
     setTimeout(() => navigation.navigate('Login'), 800);
   };
@@ -286,12 +293,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
                 <Text style={styles.summaryFieldLabel}>COUNTRY</Text>
                 <Text style={styles.stateSubtitle}>{displayJurisdictionCountry}</Text>
               </View>
-              {hasPrice ? (
-                <View style={styles.summaryFieldHalfRight}>
-                  <Text style={styles.summaryFieldLabel}>TOTAL</Text>
-                  <Text style={styles.priceSummaryText}>{totalPrice}</Text>
-                </View>
-              ) : null}
+              {/* TOTAL frontend me calculate nahi karna — backend se aayega */}
             </View>
           </View>
 

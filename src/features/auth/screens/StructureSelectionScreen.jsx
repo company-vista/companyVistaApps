@@ -67,7 +67,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
       description:
         'Tax-efficient for US residents drawing a salary. Not available to non-resident owners.',
       tags: ['✓ Self-employment savings', '⚠️ US residents only'],
-      price: null,
+      price: '$399',
       badge: null,
       badgeType: null,
     },
@@ -93,9 +93,19 @@ const StructureSelectionScreen = ({ navigation, route }) => {
     }
   }, [shouldShowOnlyLLC, structures.length]);
 
-  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 299 };
+  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 399 };
   const getStructurePrice = (id) => structurePriceMap[id] ?? 299;
   const selectedItem = structures.find((s) => s.id === selectedStructure);
+  // RegisterJurisdiction se aaya country+state total — yahi dono add hua amount hai
+  const countryPrice = Number(p.selectedCountryPrice ?? 0);
+  const statePrice = Number(p.selectedStatePrice ?? p.bestStatePrice ?? 0);
+  const isUS = (p.selectedCountry || selectedCountry) === 'US';
+  // USA: structure + state fee ka total; non-USA: country price (state nahi)
+  const getTotalForStructure = (id) => {
+    const sp = getStructurePrice(id);
+    if (isUS) return sp + statePrice;
+    return countryPrice || sp;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -151,13 +161,19 @@ const StructureSelectionScreen = ({ navigation, route }) => {
                   <View style={styles.cardDivider} />
 
                   <View style={styles.cardFooterRow}>
-                    {item.price ? (
-                      <Text style={styles.priceText}>
-                        {item.price} <Text style={styles.stateFeeText}>+ state fee</Text>
-                      </Text>
-                    ) : (
-                      <View />
-                    )}
+                    {(() => {
+                      const total = getTotalForStructure(item.id);
+                      return (
+                        <View>
+                          <Text style={styles.priceText}>
+                            ${total} <Text style={styles.stateFeeText}>total</Text>
+                          </Text>
+                          <Text style={styles.stateFeeText}>
+                            {isUS ? `$${getStructurePrice(item.id)} + $${statePrice} state fee` : `${item.price || ''} incl.`}
+                          </Text>
+                        </View>
+                      );
+                    })()}
                     {item.badge && (
                       <View style={[styles.badge, item.badgeType === 'green' ? styles.badgeGreen : styles.badgeBlue]}>
                         <Text style={[styles.badgeText, item.badgeType === 'green' ? styles.badgeTextGreen : styles.badgeTextBlue]}>
@@ -182,8 +198,9 @@ const StructureSelectionScreen = ({ navigation, route }) => {
           onPress={() => {
             const { selectedEnding: _omit, ...restParams } = route.params || {};
             const structPrice = getStructurePrice(selectedStructure);
-            // advisor flow me bestStatePrice already includes LLC 299+govFee, adjustment downstream hoga
-            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
+            const combinedTotal = getTotalForStructure(selectedStructure);
+            // dono add hua total backend me bhejo — runningTotal/totalAmount ke roop me save hoga, backend bhi computeOrderTotal se verify karega
+            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, combinedTotal, runningTotal: combinedTotal, totalAmount: combinedTotal, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
           }}
         >
           <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
