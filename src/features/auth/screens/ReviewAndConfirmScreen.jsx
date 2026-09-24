@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,15 +8,18 @@ import {
   SafeAreaView,
   StatusBar,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { CommonActions } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingOrderData } from '../../../store/slices/authSlice';
-import { saveReviewOrderApi } from '../api/orderApi';
+import { saveReviewOrderApi, fetchReviewApi, confirmSignupApi } from '../api/orderApi';
+import { fetchClientCompanyDetails } from '../../../features/home/api/clientProfileApi';
 import { s } from '../../../theme/responsive';
 
 export default function ReviewAndConfirmScreen({ navigation, route }) {
@@ -41,16 +44,23 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     });
     return unsub;
   }, [navigation, route.params]);
+  // Signup ke baad sab data backend me save — Review sirf GET /review/:companyId se dikhayega (portal payload ke baad backend hi source of truth)
   const {
-    selectedStructure = '',
-    companyName = '',
-    selectedEnding = '',
-    selectedState = 'Delaware',
-    selectedCountry = 'US',
-    selectedAddOns = {},
-    addOnsTotal = 0,
-    runningTotal = 0,
+    selectedStructure: paramStructure = '',
+    companyName: paramCompanyName = '',
+    selectedEnding: paramEnding = '',
+    selectedState: paramState = 'Delaware',
+    selectedCountry: paramCountry = 'US',
+    selectedAddOns: paramAddOns = {},
   } = route.params || {};
+
+  // Backend se company + pricing aane ke baad wahi display — fallback me route.params
+  const companyName = reviewData?.company?.companyName || paramCompanyName || '';
+  const selectedStructure = reviewData?.company?.companyType || paramStructure || '';
+  const selectedState = reviewData?.company?.stateOfRegistration || paramState || '';
+  const selectedCountry = reviewData?.company?.countryOfIncorporation || paramCountry || '';
+  const selectedEnding = paramEnding || '';
+  const selectedAddOns = reviewData?.pricing?.addOns || paramAddOns || {};
 
   // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
   const getLegalName = () => {
@@ -96,61 +106,146 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     addOns.stripePaypal ? { title: 'Stripe + PayPal Setup', subtext: 'Payment processors ready', price: 179 } : null,
   ].filter(Boolean);
 
-  const computedAddOnsTotal = addOnList.reduce((s, i) => s + i.price, 0);
-  const displayAddOnsTotal = computedAddOnsTotal;
-  // RegistrationLanding se signup tak sahi amount - FounderDetails ka runningTotal hi dikhao, addOn change pe recompute
-  const { getBasePrice, getStructurePrice, hasPrice: hasPriceFn } = require('../../../utils/priceCalculator');
-  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
-  const packagePrice = structurePrice;
-  // --- dono route ka alag calculation ---
-  const baseTotal = getBasePrice(route.params, packagePrice);
-  const hasPrice = hasPriceFn(route.params);
-  const directStateFee = route.params?.selectedStatePrice ?? route.params?.bestStateGovFee ?? 0;
-  const passedRunningTotal = route.params?.runningTotal;
-  const isAddOnsUnchanged = JSON.stringify(localAddOns || {}) === JSON.stringify(route.params?.selectedAddOns || {});
-  const finalTotal = !hasPrice ? 0 : (passedRunningTotal != null && isAddOnsUnchanged) ? passedRunningTotal : (baseTotal + displayAddOnsTotal);
+  // Backend GET /review/:companyId -> {company:{companyName,countryOfIncorporation,stateOfRegistration,companyType}, founder, pricing:{structurePrice,statePrice,addOns,addOnsTotal,totalAmount}, pricingType} — frontend calculate nahi
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
+  const [reviewData, setReviewData] = useState(null);
+  const [backendTotal, setBackendTotal] = useState(
+    route.params?.totalAmount ?? route.params?.total_amount ?? pendingOrder?.totalAmount ?? null
+  );
+  const [loadingTotal, setLoadingTotal] = useState(!reviewData);
+  const pricingTypeState = route.params?.pricingType || pendingOrder?.pricingType || '';
+  const [fetchedPricingType, setFetchedPricingType] = useState(pricingTypeState);
+  const pricingType = fetchedPricingType || pricingTypeState;
+
+  useEffect(() => {
+    const cid = route.params?.companyId || pendingOrder?.companyId;
+    console.log('=== REVIEW fetch /review/:companyId (signup ke baad backend se) ===', { backendTotal, cid, hasToken: !!token, pricingType, params: route.params });
+    if (!cid) return;
+    let mounted = true;
+    setLoadingTotal(true);
+    fetchReviewApi({ companyId: cid, token })
+      .then(async res => {
+        if (!mounted) return;
+        if (res.isSuccess) {
+          const d = res.data;
+          setReviewData(d);
+          // backend: pricing.totalAmount = company.totalAmount || computeOrderTotal(data) — pehle sahi chal raha tha isliye frontend fallback bhi rakho
+          let amt = d?.pricing?.totalAmount ?? d?.totalAmount ?? 0;
+          if (!amt || Number(amt) === 0) {
+            const p = d?.pricing || {};
+            const sp = Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? p.structurePrice ?? 299);
+            const st = Number(route.params?.selectedStatePrice ?? route.params?.bestStatePrice ?? pendingOrder?.selectedStatePrice ?? pendingOrder?.bestStatePrice ?? p.statePrice ?? 0);
+            const at = Number(route.params?.addOnsTotal ?? pendingOrder?.addOnsTotal ?? p.addOnsTotal ?? 0);
+            const fallbackPricing = Number(p.structurePrice || 0) + Number(p.statePrice || 0) + Number(p.addOnsTotal || 0);
+            const fallbackCalc = sp + st + at; // pehle jaisa frontend calc — yahi sahi chal raha tha
+            const fallbackParams = Number(route.params?.runningTotal || route.params?.totalAmount || route.params?.combinedTotal || pendingOrder?.totalAmount || pendingOrder?.runningTotal || pendingOrder?.combinedTotal || 0);
+            let fallback = fallbackPricing > 0 ? fallbackPricing : fallbackCalc > 0 ? fallbackCalc : fallbackParams;
+            console.log('=== REVIEW fallback compute (backend 0) pehle jaisa calc ===', { pricing: p, sp, st, at, fallbackPricing, fallbackCalc, fallbackParams, fallback, routeParams: route.params, pendingOrder, rawData: d });
+            if ((!fallback || fallback === 0) && cid && token) {
+              try {
+                const compRes = await fetchClientCompanyDetails({ companyId: cid, token });
+                const directAmt = compRes.company?.totalAmount ?? compRes.company?.total_amount ?? 0;
+                console.log('=== REVIEW direct Company fetch fallback ===', directAmt, compRes.company);
+                if (Number(directAmt) > 0) fallback = Number(directAmt);
+              } catch (e) { console.log('=== REVIEW direct fetch failed', e.message); }
+            }
+            if (fallback > 0) amt = fallback;
+          }
+          if (amt != null) setBackendTotal(Number(amt));
+          // Fix: price wale country (allCountries price != '') ko fixed karo, chahe backend quoted de
+          const hasCountryPrice = Number(route.params?.selectedCountryPrice || pendingOrder?.selectedCountryPrice || 0) > 0;
+          if (hasCountryPrice && d?.pricingType === 'quoted') {
+            setFetchedPricingType('fixed');
+          } else if (d?.pricingType) setFetchedPricingType(d.pricingType);
+          console.log('=== REVIEW /review success ===', JSON.stringify(d, null, 2));
+        } else {
+          console.log('=== REVIEW /review failed ===', res.error);
+        }
+      })
+      .finally(() => mounted && setLoadingTotal(false));
+    return () => { mounted = false; };
+  }, [route.params?.companyId, pendingOrder?.companyId, token]);
+
+  // Agar backend 0 bhej raha hai to $0 dikhao (Quote note alag se), "Quote on request" se total hide nahi hoga
+  const displayTotal = loadingTotal ? '...' : backendTotal != null ? `$${backendTotal}` : '—';
 
   const handleConfirm = async () => {
-    const orderData = {
-      selectedStructure,
-      companyName,
-      selectedEnding,
-      selectedState,
-      selectedCountry,
-      selectedCountryPrice: route.params?.selectedCountryPrice,
-      selectedStatePrice: route.params?.selectedStatePrice,
-      selectedStructurePrice: route.params?.selectedStructurePrice,
-      bestState: route.params?.bestState,
-      bestStatePrice: route.params?.bestStatePrice,
-      bestStatePriceNote: route.params?.bestStatePriceNote,
-      bestStateTimeframe: route.params?.bestStateTimeframe,
-      selectedAddOns: addOns,
-      addOnsTotal: displayAddOnsTotal,
-      runningTotal: finalTotal,
-      fullName: route.params?.fullName,
-      email: route.params?.email,
-      countryOfResidence: route.params?.countryOfResidence,
-      phone: route.params?.phone,
-      companyState: selectedState,
-      structure: selectedStructure,
-      shareCapital: '€25,000',
-      shareholdersCount: '3 people',
-      orderId: `CV-${Date.now()}`,
-      advisorFlow: route.params?.advisorFlow,
-      selectedJurisdiction: route.params?.selectedJurisdiction,
-      purpose: route.params?.purpose,
-      customerLocation: route.params?.customerLocation,
-      priorities: route.params?.priorities,
-      dayOneNeeds: route.params?.dayOneNeeds,
-      physicalPresence: route.params?.physicalPresence,
-      usStatePriority: route.params?.usStatePriority,
-      countryCode: route.params?.countryCode,
-    };
-    console.log('=== REVIEW & SUBMIT -> COMPLETE PAYMENT DATA ===', JSON.stringify(orderData, null, 2));
-    // API 2: Review se Payment tak ka data alag API se save
-    await saveReviewOrderApi(orderData, token);
-    dispatch(setPendingOrderData(orderData));
-    navigation.navigate('CompletePayment', orderData);
+    const companyId = route.params?.companyId || pendingOrder?.companyId;
+    if (!companyId) {
+      Toast.show({ type: 'error', text1: 'Company ID missing' });
+      return;
+    }
+    try {
+      // Step 3 -> 4: Confirm & Pay — backend confirmSignup: computeOrderTotal + payment_pending (quoted pe error)
+      const confirmRes = await confirmSignupApi({ companyId, token });
+      const confirmedTotal = confirmRes.totalAmount ?? backendTotal;
+      Toast.show({ type: 'success', text1: confirmRes.message || 'Signup confirmed' });
+      const orderData = {
+        selectedStructure,
+        companyName,
+        selectedEnding,
+        selectedState,
+        selectedCountry,
+        selectedCountryPrice: route.params?.selectedCountryPrice,
+        selectedStatePrice: route.params?.selectedStatePrice,
+        selectedStructurePrice: route.params?.selectedStructurePrice,
+        bestState: route.params?.bestState,
+        bestStatePrice: route.params?.bestStatePrice,
+        bestStatePriceNote: route.params?.bestStatePriceNote,
+        bestStateTimeframe: route.params?.bestStateTimeframe,
+        selectedAddOns: addOns,
+        totalAmount: confirmedTotal,
+        pricingType: confirmRes.pricingType || pricingType,
+        fullName: route.params?.fullName,
+        email: route.params?.email,
+        countryOfResidence: route.params?.countryOfResidence,
+        phone: route.params?.phone,
+        companyState: selectedState,
+        structure: selectedStructure,
+        shareCapital: '€25,000',
+        shareholdersCount: '3 people',
+        orderId: `CV-${Date.now()}`,
+        advisorFlow: route.params?.advisorFlow,
+        selectedJurisdiction: route.params?.selectedJurisdiction,
+        purpose: route.params?.purpose,
+        customerLocation: route.params?.customerLocation,
+        priorities: route.params?.priorities,
+        dayOneNeeds: route.params?.dayOneNeeds,
+        physicalPresence: route.params?.physicalPresence,
+        usStatePriority: route.params?.usStatePriority,
+        countryCode: route.params?.countryCode,
+        companyId,
+        clientId: route.params?.clientId,
+        token: route.params?.token || token,
+      };
+      console.log('=== REVIEW confirmSignup -> COMPLETE PAYMENT DATA ===', JSON.stringify(orderData, null, 2));
+      dispatch(setPendingOrderData(orderData));
+      navigation.navigate('CompletePayment', orderData);
+    } catch (e) {
+      const msg = e?.response?.data?.message || e.message;
+      // Fix: price wale country ko fixed treat karo — quoted error aaye to bhi CompletePayment pe bhejo
+      const hasCountryPrice = Number(route.params?.selectedCountryPrice || pendingOrder?.selectedCountryPrice || 0) > 0;
+      if (hasCountryPrice && String(msg).toLowerCase().includes('quote')) {
+        const confirmedTotal = backendTotal;
+        const orderData = {
+          selectedStructure, companyName, selectedEnding, selectedState, selectedCountry,
+          selectedCountryPrice: route.params?.selectedCountryPrice, selectedStatePrice: route.params?.selectedStatePrice,
+          selectedStructurePrice: route.params?.selectedStructurePrice, bestState: route.params?.bestState, bestStatePrice: route.params?.bestStatePrice,
+          bestStatePriceNote: route.params?.bestStatePriceNote, bestStateTimeframe: route.params?.bestStateTimeframe,
+          selectedAddOns: addOns, totalAmount: confirmedTotal, pricingType: 'fixed',
+          fullName: route.params?.fullName, email: route.params?.email, countryOfResidence: route.params?.countryOfResidence, phone: route.params?.phone,
+          companyState: selectedState, structure: selectedStructure, orderId: `CV-${Date.now()}`,
+          advisorFlow: route.params?.advisorFlow, selectedJurisdiction: route.params?.selectedJurisdiction,
+          purpose: route.params?.purpose, customerLocation: route.params?.customerLocation, priorities: route.params?.priorities,
+          dayOneNeeds: route.params?.dayOneNeeds, physicalPresence: route.params?.physicalPresence, usStatePriority: route.params?.usStatePriority,
+          countryCode: route.params?.countryCode, companyId, clientId: route.params?.clientId, token: route.params?.token || token,
+        };
+        dispatch(setPendingOrderData(orderData));
+        navigation.navigate('CompletePayment', orderData);
+        return;
+      }
+      Toast.show({ type: 'error', text1: 'Confirm failed', text2: msg });
+    }
   };
 
   return (
@@ -185,7 +280,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           <Text style={styles.subtitle}>Check everything is correct before we file.</Text>
         </View>
 
-        {/* Company + Founder Summary - as per image */}
+        {/* GET /review/:companyId ka data — signup ke baad backend se */}
+        {loadingTotal && !reviewData ? (
+          <View style={[styles.companyCard, { alignItems: 'center', paddingVertical: 20 }]}>
+            <ActivityIndicator size="small" color="#D4AF37" />
+            <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 8 }}>Loading review from backend...</Text>
+          </View>
+        ) : null}
+        {/* Company + Founder Summary — reviewData.company + reviewData.founder + reviewData.pricing se */}
         <View style={styles.summarySection}>
           <View style={styles.companyCard}>
             <View style={styles.summaryHeader}>
@@ -193,7 +295,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                 <View style={styles.summaryIconBox}>
                   <Feather name="briefcase" size={12} color="#D4AF37" />
                 </View>
-                <Text style={styles.summaryHeaderTitle}>COMPANY</Text>
+                <Text style={styles.summaryHeaderTitle}>COMPANY {reviewData ? `· ${String(reviewData.companyId).slice(-6).toUpperCase()}` : ''}</Text>
               </View>
               <TouchableOpacity onPress={() => navigation.navigate('CompanyNaming')} style={styles.editBtn}>
                 <Feather name="edit-2" size={12} color="#D4AF37" />
@@ -204,14 +306,32 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
               <Text style={styles.summaryLabel}>Legal name</Text>
               <Text style={styles.summaryValueGold}>{legalName}</Text>
             </View>
+            {reviewData?.company?.alternateCompanyName ? (
+              <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Alternate name</Text>
+                <Text style={styles.summaryValue}>{reviewData.company.alternateCompanyName}</Text>
+              </View>
+            ) : null}
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Jurisdiction</Text>
-              <Text style={styles.summaryValue}>US {selectedState}, USA</Text>
+              <Text style={styles.summaryValue}>{reviewData?.company ? `${reviewData.company.countryOfIncorporation || 'US'} ${reviewData.company.stateOfRegistration || selectedState}, ${reviewData.company.countryOfIncorporation || 'USA'}` : `US ${selectedState}, USA`}</Text>
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Structure</Text>
-              <Text style={styles.summaryValue}>{selectedStructure}</Text>
+              <Text style={styles.summaryValue}>{reviewData?.company?.companyType || selectedStructure}</Text>
             </View>
+            {reviewData?.registrationStatus ? (
+              <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Status</Text>
+                <Text style={[styles.summaryValue, { color: '#10B981' }]}>{reviewData.registrationStatus}</Text>
+              </View>
+            ) : null}
+            {reviewData?.pricingType ? (
+              <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Pricing</Text>
+                <Text style={styles.summaryValue}>{reviewData.pricingType}</Text>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.companyCard}>
@@ -229,19 +349,25 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Full name</Text>
-              <Text style={styles.summaryValue}>{route.params?.fullName || 'Rajesh Kumar Sharma'}</Text>
+              <Text style={styles.summaryValue}>{reviewData?.founder ? `${reviewData.founder.firstName || ''} ${reviewData.founder.lastName || ''}`.trim() : (route.params?.fullName || 'Rajesh Kumar Sharma')}</Text>
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Email</Text>
-              <Text style={styles.summaryValue} numberOfLines={1}>{route.params?.email || 'rajesh@meridianglobal.com'}</Text>
+              <Text style={styles.summaryValue} numberOfLines={1}>{reviewData?.founder?.email || route.params?.email || 'rajesh@meridianglobal.com'}</Text>
             </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Residence</Text>
               <View style={styles.residenceValue}>
-                <Text style={styles.summaryValueSmall}>IN</Text>
-                <Text style={styles.summaryValue}> {route.params?.countryOfResidence || 'India'}</Text>
+                <Text style={styles.summaryValueSmall}>{reviewData?.founder?.countryCode || 'IN'}</Text>
+                <Text style={styles.summaryValue}> {reviewData?.founder?.address?.country || reviewData?.founder?.phoneNumber || route.params?.countryOfResidence || 'India'}</Text>
               </View>
             </View>
+            {reviewData?.founder?.phoneNumber ? (
+              <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Phone</Text>
+                <Text style={styles.summaryValue}>{reviewData.founder.phoneNumber}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
@@ -311,37 +437,45 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         ) : null}
 
         <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <View>
-              <Text style={styles.summaryTitle}>CompanyVista package</Text>
-              <Text style={styles.summarySubtext}>5 services · $740 value</Text>
-            </View>
-            <Text style={styles.summaryPrice}>${packagePrice}</Text>
-          </View>
-
-          {!route.params?.advisorFlow && (
-          <View style={styles.summaryRow}>
-            <View>
-              <Text style={styles.summaryTitle}>{selectedState || 'Delaware'} state fee</Text>
-              <Text style={styles.summarySubtext}>Charged at cost</Text>
-            </View>
-            <Text style={styles.summaryPrice}>${directStateFee || 160}</Text>
-          </View>
+          {/* Backend pricing breakdown — signup ke baad GET /review/:companyId se */}
+          {reviewData?.pricing && (
+            <>
+              <View style={styles.summaryRow}>
+                <View>
+                  <Text style={styles.summaryTitle}>Structure price</Text>
+                  <Text style={styles.summarySubtext}>{selectedStructure}</Text>
+                </View>
+                <Text style={styles.summaryPrice}>${reviewData.pricing.structurePrice ?? 0}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <View>
+                  <Text style={styles.summaryTitle}>State fee</Text>
+                  <Text style={styles.summarySubtext}>{selectedState}</Text>
+                </View>
+                <Text style={styles.summaryPrice}>${reviewData.pricing.statePrice ?? 0}</Text>
+              </View>
+            </>
           )}
-
           <View style={styles.summaryRow}>
             <View>
               <Text style={styles.summaryTitle}>Add-ons ({addOnList.length})</Text>
               <Text style={styles.summarySubtext}>{addOnList.map(a => a.title.split(' ')[0]).join(' · ') || 'None'}</Text>
             </View>
+            {loadingTotal && <ActivityIndicator size="small" color="#D4AF37" />}
           </View>
 
           <View style={styles.summaryDivider} />
 
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>TOTAL</Text>
-            <Text style={styles.totalAmount}>${finalTotal}</Text>
+            <Text style={styles.totalAmount}>{displayTotal}</Text>
           </View>
+          {pricingType === 'quoted' && (
+            <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
+          )}
+          {reviewData && (
+            <Text style={{ color: '#64748B', fontSize: 10, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
+          )}
         </View>
 
         <View style={styles.timelineBanner}>
@@ -361,7 +495,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
       <View style={styles.footerContainer}>
         <TouchableOpacity style={[styles.confirmButton, !isChecked && { opacity: 0.5 }]} activeOpacity={0.8} onPress={handleConfirm} disabled={!isChecked}>
-          <Text style={styles.confirmButtonText}>Confirm & Pay ${finalTotal}</Text>
+          <Text style={styles.confirmButtonText}>{loadingTotal ? 'Confirm & Continue' : `Confirm & Pay ${displayTotal}`}</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />
         </TouchableOpacity>
 
