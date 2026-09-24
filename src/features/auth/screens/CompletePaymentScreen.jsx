@@ -154,6 +154,12 @@ export default function CompletePaymentScreen({ navigation, route }) {
         companyName: companyName ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : 'Company',
         country: selectedState || selectedCountry,
         selectedState, selectedCountry, selectedStructure, selectedEnding,
+        selectedCountryPrice: route.params?.selectedCountryPrice ?? 0,
+        selectedStatePrice: route.params?.selectedStatePrice ?? 0,
+        selectedStructurePrice: route.params?.selectedStructurePrice ?? 0,
+        runningTotal: route.params?.runningTotal ?? 0,
+        totalAmount: route.params?.runningTotal ?? route.params?.totalAmount ?? 0,
+        amount: route.params?.runningTotal ?? route.params?.totalAmount ?? 0,
         userEmail: route.params?.email || '',
         fullName: route.params?.fullName || '',
         email: route.params?.email || '',
@@ -162,11 +168,12 @@ export default function CompletePaymentScreen({ navigation, route }) {
         registrationStatus: respData.registrationStatus,
       };
       await savePaymentConfirmApi(statusParams, token).catch(()=>{});
-      // RootStack Main (isAuthenticated) me switch ho chuka hai, AuthStack ka navigate fail hota hai -> parent Main.Status pe bhejo
+      // RootStack Main (isAuthenticated) me switch ho chuka hai, AuthStack ka navigate fail hota hai -> root Main.Status pe bhejo
       setTimeout(() => {
-        const parent = navigation.getParent?.();
-        if (parent) {
-          try { parent.navigate('Main', { screen: 'Status', params: statusParams }); return; } catch {}
+        try { navigation.dispatch(CommonActions.navigate({ name: 'Main', params: { screen: 'Status', params: statusParams } })); return; } catch {}
+        const root = navigation.getParent?.()?.getParent?.() || navigation.getParent?.();
+        if (root) {
+          try { root.navigate('Main', { screen: 'Status', params: statusParams }); return; } catch {}
         }
         try { navigation.dispatch(CommonActions.navigate({ name: 'Status', params: statusParams })); } catch { navigation.navigate('Status', statusParams); }
       }, 300);
