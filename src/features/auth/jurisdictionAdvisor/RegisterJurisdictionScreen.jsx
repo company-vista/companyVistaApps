@@ -17,58 +17,12 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
 
-// allCountries from CountrySelectionScreen - merged here
+// allCountries - only FIXED_PRICE_COUNTRIES per backend: usa/us/united states, uk/united kingdom, canada, hong kong
 const allCountries = [
-  { id: 'US', code: 'US', name: 'USA (United States)', price: 'from $299' },
-  { id: 'AE', code: 'AE', name: 'UAE (United Arab Emirates)', price: 'from $1,499' },
-  { id: 'GB', code: 'GB', name: 'UK (United Kingdom)', price: 'from $595' },
-  { id: 'SG', code: 'SG', name: 'Singapore', price: 'from $899' },
-  { id: 'EE', code: 'EE', name: 'Estonia', price: 'from $499' },
-  { id: 'HK', code: 'HK', name: 'Hong Kong', price: '' },
-  { id: 'CY', code: 'CY', name: 'Cyprus', price: '' },
-  { id: 'MT', code: 'MT', name: 'Malta', price: '' },
-  { id: 'CA', code: 'CA', name: 'Canada', price: '' },
-  { id: 'IN', code: 'IN', name: 'India', price: '' },
-  { id: 'CN', code: 'CN', name: 'China', price: '' },
-  { id: 'AU', code: 'AU', name: 'Australia', price: '' },
-  { id: 'DE', code: 'DE', name: 'Germany', price: '' },
-  { id: 'NL', code: 'NL', name: 'Netherlands', price: '' },
-  { id: 'IE', code: 'IE', name: 'Ireland', price: '' },
-  { id: 'CH', code: 'CH', name: 'Switzerland', price: '' },
-  { id: 'PA', code: 'PA', name: 'Panama', price: '' },
-  { id: 'MY', code: 'MY', name: 'Malaysia', price: '' },
-  { id: 'GE', code: 'GE', name: 'Georgia', price: '' },
-  { id: 'IL', code: 'IL', name: 'Israel', price: '' },
-  { id: 'JP', code: 'JP', name: 'Japan', price: '' },
-  { id: 'KR', code: 'KR', name: 'South Korea', price: '' },
-  { id: 'PT', code: 'PT', name: 'Portugal', price: '' },
-  { id: 'ES', code: 'ES', name: 'Spain', price: '' },
-  { id: 'FR', code: 'FR', name: 'France', price: '' },
-  { id: 'IT', code: 'IT', name: 'Italy', price: '' },
-  { id: 'PL', code: 'PL', name: 'Poland', price: '' },
-  { id: 'CZ', code: 'CZ', name: 'Czech Republic', price: '' },
-  { id: 'RO', code: 'RO', name: 'Romania', price: '' },
-  { id: 'BG', code: 'BG', name: 'Bulgaria', price: '' },
-  { id: 'LU', code: 'LU', name: 'Luxembourg', price: '' },
-  { id: 'TH', code: 'TH', name: 'Thailand', price: '' },
-  { id: 'ID', code: 'ID', name: 'Indonesia', price: '' },
-  { id: 'PH', code: 'PH', name: 'Philippines', price: '' },
-  { id: 'NZ', code: 'NZ', name: 'New Zealand', price: '' },
-  { id: 'SA', code: 'SA', name: 'Saudi Arabia', price: '' },
-  { id: 'QA', code: 'QA', name: 'Qatar', price: '' },
-  { id: 'BH', code: 'BH', name: 'Bahrain', price: '' },
-  { id: 'MX', code: 'MX', name: 'Mexico', price: '' },
-  { id: 'BR', code: 'BR', name: 'Brazil', price: '' },
-  { id: 'PE', code: 'PE', name: 'Peru', price: '' },
-  { id: 'CL', code: 'CL', name: 'Chile', price: '' },
-  { id: 'CO', code: 'CO', name: 'Colombia', price: '' },
-  { id: 'UY', code: 'UY', name: 'Uruguay', price: '' },
-  { id: 'MU', code: 'MU', name: 'Mauritius', price: '' },
-  { id: 'VG', code: 'VG', name: 'British Virgin Islands', price: '' },
-  { id: 'KY', code: 'KY', name: 'Cayman Islands', price: '' },
-  { id: 'BZ', code: 'BZ', name: 'Belize', price: '' },
-  { id: 'SC', code: 'SC', name: 'Seychelles', price: '' },
-  { id: 'BB', code: 'BB', name: 'Barbados', price: '' },
+  { id: 'US', code: 'US', name: 'USA (United States)', price: '$299' },
+  { id: 'GB', code: 'GB', name: 'UK (United Kingdom)', price: '$595' },
+  { id: 'CA', code: 'CA', name: 'Canada', price: '$899' },
+  { id: 'HK', code: 'HK', name: 'Hong Kong', price: '$799' },
 ];
 
 export const usStates = [
@@ -1161,7 +1115,15 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                       <Text style={[styles.countryNameList, isSelected && styles.goldText]}>{item.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                      {item.price ? <Text style={styles.countryPriceList}>{item.price}</Text> : <Text style={styles.customQuoteList}>Custom quote</Text>}
+                      {(() => {
+                        // USA select + state select hua toh country card me country price + state fees ka total dikhao
+                        if (item.id === 'US' && isSelected && selectedState) {
+                          const st = usStates.find(s => (s.code || s.id) === selectedState);
+                          const total = st?.totalFirstYear ?? ((st?.govtFees?.formation ?? 0) + 299);
+                          return <Text style={styles.countryPriceList}>${total}</Text>;
+                        }
+                        return item.price ? <Text style={styles.countryPriceList}>{String(item.price).replace(/^from\s+/i, '')}</Text> : <Text style={styles.customQuoteList}>Custom quote</Text>;
+                      })()}
                       {isSelected ? (
                         <View style={styles.checkmarkBadgeList}><Ionicons name="checkmark" size={12} color="#060913" /></View>
                       ) : (
