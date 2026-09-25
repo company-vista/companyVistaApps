@@ -20,14 +20,19 @@ import {
 } from 'lucide-react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
-import { useAppSelector } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import axios from 'axios';
+import { API_BASE_URL } from '../../../config/api';
+import { fetchReviewApi } from '../api/orderApi';
 
 const ShareholdersScreen = ({ navigation, route }) => {
   // signup ke time jo auth wala naam hai wahi dikhao (Redux user se), fallback route params
   const authUser = useAppSelector(s => s.auth.user);
+  const authToken = useAppSelector(s => s.auth.token);
+  const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
   const authName = authUser?.name || [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() || '';
   const routeName = route?.params?.fullName?.trim() || route?.params?.email?.split('@')[0] || '';
   const accountName = authName || routeName || '';
@@ -39,6 +44,8 @@ const ShareholdersScreen = ({ navigation, route }) => {
   const authEmail = authUser?.email || route?.params?.email || route?.params?.userEmail || '';
   const authPhone = authUser?.phoneNumber || authUser?.phone || route?.params?.phone || '';
   const authCountryCode = authUser?.countryCode || route?.params?.countryCode || '';
+  const companyId = route?.params?.companyId || pendingOrder?.companyId || '';
+  const token = route?.params?.token || authToken || pendingOrder?.token || '';
 
   // Pehle static 60% dikh raha tha - user ne bhara bhi nahi aur 100% allocated dikh jata tha, isliye dynamic kiya
   const [shareholders, setShareholders] = useState(() => {
@@ -70,15 +77,26 @@ const ShareholdersScreen = ({ navigation, route }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
   const [newOwnership, setNewOwnership] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newCountryCode, setNewCountryCode] = useState('+91');
+  const [newCountry, setNewCountry] = useState('India');
+  const [newDesignation, setNewDesignation] = useState('Shareholder');
   const [newAddress, setNewAddress] = useState('');
   const [newPincode, setNewPincode] = useState('');
   const [newPassport, setNewPassport] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const handleEditShareholder = (item) => {
     setEditingId(item.id);
     setNewName(item.name || '');
+    setNewEmail(item.email || '');
     setNewOwnership(String(item.ownership || '').replace('%',''));
+    setNewPhone(item.phone || '');
+    setNewCountryCode(item.countryCode || '+91');
+    setNewCountry(item.countryRaw || 'India');
+    setNewDesignation(item.designation || 'Shareholder');
     setNewAddress(item.address || '');
     setNewPincode(item.pincode || '');
     setNewPassport(item.passportNumber || item.passport || '');
@@ -88,15 +106,25 @@ const ShareholdersScreen = ({ navigation, route }) => {
     setShowAddModal(false);
     setEditingId(null);
     setNewName('');
+    setNewEmail('');
     setNewOwnership('');
+    setNewPhone('');
+    setNewCountryCode('+91');
+    setNewCountry('India');
+    setNewDesignation('Shareholder');
     setNewAddress('');
     setNewPincode('');
     setNewPassport('');
   };
 
-  const handleAddShareholder = () => {
+  // Backend integrate: POST /shareholders/:companyId
+  const handleAddShareholder = async () => {
     if (!newName.trim()) {
       Toast.show({ type: 'error', text1: 'Name is required' });
+      return;
+    }
+    if (!newEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail.trim())) {
+      Toast.show({ type: 'error', text1: 'Valid email is required' });
       return;
     }
     if (!newOwnership.trim()) {
@@ -108,50 +136,95 @@ const ShareholdersScreen = ({ navigation, route }) => {
       Toast.show({ type: 'error', text1: 'Ownership must be between 1% and 100%' });
       return;
     }
-    if (!newAddress.trim()) {
-      Toast.show({ type: 'error', text1: 'Address is required' });
+    if (!companyId) {
+      Toast.show({ type: 'error', text1: 'Company ID missing', text2: 'Please restart signup' });
       return;
     }
-    if (!newPincode.trim()) {
-      Toast.show({ type: 'error', text1: 'Pincode is required' });
+    // Frontend 100% check mirror backend: otherTotal + sharePercentage <=100
+    const otherTotal = shareholders.reduce((sum, s) => {
+      if (editingId && s.id === editingId) return sum;
+      return sum + (parseInt(String(s.ownership).replace('%','')) || 0);
+    }, 0);
+    if (otherTotal + ownershipNum > 100) {
+      Toast.show({ type: 'error', text1: `Ownership would total ${otherTotal + ownershipNum}% — must not exceed 100%` });
       return;
     }
-    if (!newPassport.trim()) {
-      Toast.show({ type: 'error', text1: 'Passport number is required' });
-      return;
+    setSaving(true);
+    try {
+      const body = {
+        name: newName.trim(),
+        email: newEmail.trim().toLowerCase(),
+        sharePercentage: ownershipNum,
+        phone: newPhone.trim(),
+        phoneNumber: newPhone.trim(),
+        countryCode: newCountryCode.trim() || '+91',
+        country: newCountry.trim() || 'India',
+        designation: ['Shareholder','Director','Authorized Representative'].includes(newDesignation) ? newDesignation : 'Shareholder',
+      };
+      const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
+      const endpoints = [
+        `${API_BASE_URL}/api/shareholders/${companyId}`,
+        `${API_BASE_URL}/api/company-signup/shareholders/${companyId}`,
+        `${API_BASE_URL}/api/company/${companyId}/shareholders`,
+        `${API_BASE_URL}/api/companies/${companyId}/shareholders`,
+      ];
+      let lastErr = null;
+      let resp = null;
+      for (const url of endpoints) {
+        try {
+          console.log('=== addShareholder TRY ===', url, body);
+          const r = await axios.post(url, body, { headers, timeout: 10000 });
+          console.log('=== addShareholder SUCCESS ===', url, JSON.stringify(r.data, null, 2));
+          resp = r.data;
+          lastErr = null;
+          break;
+        } catch (e) {
+          lastErr = e;
+          const status = e?.response?.status;
+          const msg = e?.response?.data?.message || e.message;
+          console.log(`=== addShareholder FAILED ${url} status`, status, msg);
+          if (status === 404) continue;
+          throw e;
+        }
+      }
+      if (lastErr) throw lastErr;
+      const clientId = resp?.clientId || resp?.data?.clientId || '';
+      const totalOwnership = resp?.totalOwnership ?? (otherTotal + ownershipNum);
+      Toast.show({ type: 'success', text1: resp?.message || 'Shareholder added', text2: clientId ? `OTP sent to ${body.email}` : `Total: ${totalOwnership}%` });
+      const initials = newName.trim().split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const newItem = {
+        id: editingId || clientId?.toString() || Date.now().toString(),
+        clientId,
+        initials: initials || 'NS',
+        name: newName.trim(),
+        email: body.email,
+        role: newDesignation === 'Director' ? 'Director' : newDesignation === 'Authorized Representative' ? 'Authorized Representative' : 'Shareholder',
+        ownership: `${ownershipNum}%`,
+        avatarBg: '#1E293B',
+        avatarText: '#EAB308',
+        borderColor: 'transparent',
+        country: `🌐 ${newCountry}`,
+        countryRaw: newCountry,
+        countryCode: newCountryCode,
+        phone: newPhone.trim(),
+        designation: body.designation,
+        status: 'awaiting_kyc',
+        address: newAddress.trim(),
+        pincode: newPincode.trim(),
+        passportNumber: newPassport.trim().toUpperCase(),
+      };
+      if (editingId) {
+        setShareholders(prev => prev.map(s => s.id === editingId ? { ...s, ...newItem, id: editingId } : s));
+      } else {
+        setShareholders(prev => [...prev, newItem]);
+      }
+      handleCloseModal();
+    } catch (e) {
+      const msg = e?.response?.data?.message || e.message || 'Failed to add shareholder';
+      Toast.show({ type: 'error', text1: 'Failed', text2: msg });
+    } finally {
+      setSaving(false);
     }
-    const initials = newName.trim().split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    const newItem = {
-      id: Date.now().toString(),
-      initials: initials || 'NS',
-      name: newName.trim(),
-      role: 'Member',
-      ownership: `${ownershipNum}%`,
-      avatarBg: '#1E293B',
-      avatarText: '#EAB308',
-      borderColor: 'transparent',
-      country: '🌐 Global',
-      designation: 'Member',
-      status: 'awaiting_kyc',
-      address: newAddress.trim(),
-      pincode: newPincode.trim(),
-      passportNumber: newPassport.trim().toUpperCase(),
-    };
-    if (editingId) {
-      setShareholders(prev => prev.map(s => s.id === editingId ? { ...s, name: newName.trim(), initials: initials || s.initials, ownership: `${ownershipNum}%`, address: newAddress.trim(), pincode: newPincode.trim(), passportNumber: newPassport.trim().toUpperCase() } : s));
-      Toast.show({ type: 'success', text1: 'Shareholder updated' });
-    } else {
-      setShareholders(prev => [...prev, newItem]);
-      Toast.show({ type: 'success', text1: 'Shareholder added' });
-    }
-    setNewName('');
-    setNewOwnership('');
-    setNewAddress('');
-    setNewPincode('');
-    setNewPassport('');
-    setEditingId(null);
-    setShowAddModal(false);
-    // wapas es page pe redirect - stay on same ShareholdersScreen (already here)
   };
 
   return (
@@ -216,8 +289,8 @@ const ShareholdersScreen = ({ navigation, route }) => {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.userName}>{item.name}</Text>
                   <Text style={styles.userRole}>{item.role}</Text>
-                  {item.id === '1' && authEmail ? <Text style={styles.userEmail}>{authEmail}</Text> : null}
-                  {item.id === '1' && authPhone ? <Text style={styles.userPhone}>{authCountryCode ? `${authCountryCode} ` : ''}{authPhone}</Text> : null}
+                  {item.email ? <Text style={styles.userEmail}>{item.email}</Text> : (item.id === '1' && authEmail ? <Text style={styles.userEmail}>{authEmail}</Text> : null)}
+                  {item.phone ? <Text style={styles.userPhone}>{item.countryCode ? `${item.countryCode} ` : ''}{item.phone}</Text> : (item.id === '1' && authPhone ? <Text style={styles.userPhone}>{authCountryCode ? `${authCountryCode} ` : ''}{authPhone}</Text> : null)}
                 </View>
               </View>
 
@@ -293,18 +366,43 @@ const ShareholdersScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Add Shareholder Modal */}
+      {/* Add Shareholder Modal - backend fields: name, email, sharePercentage, phone, countryCode, country, designation */}
       <Modal visible={showAddModal} transparent animationType="fade" onRequestClose={handleCloseModal}>
         <View style={styles.modalOverlay}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled">
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{editingId ? 'Edit Shareholder' : 'Add Shareholder'}</Text>
-            <Text style={styles.modalLabel}>FULL NAME</Text>
+            <Text style={styles.modalLabel}>FULL NAME *</Text>
             <View style={styles.modalInputBox}>
               <TextInput style={styles.modalInput} value={newName} onChangeText={setNewName} placeholder="Enter name" placeholderTextColor="#64748B" />
+            </View>
+            <Text style={styles.modalLabel}>EMAIL *</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newEmail} onChangeText={setNewEmail} placeholder="shareholder@email.com" placeholderTextColor="#64748B" keyboardType="email-address" autoCapitalize="none" />
             </View>
             <Text style={styles.modalLabel}>OWNERSHIP % *</Text>
             <View style={styles.modalInputBox}>
               <TextInput style={styles.modalInput} value={newOwnership} onChangeText={t => setNewOwnership(t.replace(/[^0-9]/g,''))} placeholder="e.g. 10 *" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={3} />
+            </View>
+            <Text style={styles.modalLabel}>PHONE</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newPhone} onChangeText={t => setNewPhone(t.replace(/[^0-9]/g,''))} placeholder="Phone number" placeholderTextColor="#64748B" keyboardType="phone-pad" />
+            </View>
+            <Text style={styles.modalLabel}>COUNTRY CODE</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newCountryCode} onChangeText={setNewCountryCode} placeholder="+91" placeholderTextColor="#64748B" />
+            </View>
+            <Text style={styles.modalLabel}>COUNTRY</Text>
+            <View style={styles.modalInputBox}>
+              <TextInput style={styles.modalInput} value={newCountry} onChangeText={setNewCountry} placeholder="India" placeholderTextColor="#64748B" />
+            </View>
+            <Text style={styles.modalLabel}>DESIGNATION</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 4 }}>
+              {['Shareholder','Director','Authorized Representative'].map(d => (
+                <TouchableOpacity key={d} onPress={() => setNewDesignation(d)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: newDesignation===d ? '#EAB308' : 'rgba(255,255,255,0.1)', backgroundColor: newDesignation===d ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.04)', alignItems: 'center' }}>
+                  <Text style={{ color: newDesignation===d ? '#EAB308' : '#94A3B8', fontSize: 11, fontWeight: '600' }}>{d}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
             <Text style={styles.modalLabel}>ADDRESS</Text>
             <View style={[styles.modalInputBox, { height: 60 }]}>
@@ -318,15 +416,17 @@ const ShareholdersScreen = ({ navigation, route }) => {
             <View style={styles.modalInputBox}>
               <TextInput style={styles.modalInput} value={newPassport} onChangeText={t => setNewPassport(t.replace(/[^a-zA-Z0-9]/g,'').toUpperCase())} placeholder="e.g. A1234567" placeholderTextColor="#64748B" autoCapitalize="characters" maxLength={12} />
             </View>
+            {!companyId ? <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 8 }}>Company ID missing — cannot save to backend</Text> : null}
             <View style={styles.modalBtnRow}>
-              <TouchableOpacity style={styles.modalCancelBtn} onPress={handleCloseModal}>
+              <TouchableOpacity style={styles.modalCancelBtn} onPress={handleCloseModal} disabled={saving}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalSaveBtn} onPress={handleAddShareholder}>
-                <Text style={styles.modalSaveText}>{editingId ? 'Update' : 'Add'}</Text>
+              <TouchableOpacity style={[styles.modalSaveBtn, saving && { opacity: 0.6 }]} onPress={handleAddShareholder} disabled={saving}>
+                <Text style={styles.modalSaveText}>{saving ? 'Saving...' : (editingId ? 'Update' : 'Add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
+          </ScrollView>
         </View>
       </Modal>
     </SafeAreaView>

@@ -100,11 +100,11 @@ const StructureSelectionScreen = ({ navigation, route }) => {
   const countryPrice = Number(p.selectedCountryPrice ?? 0);
   const statePrice = Number(p.selectedStatePrice ?? p.bestStatePrice ?? 0);
   const isUS = (p.selectedCountry || selectedCountry) === 'US';
-  // USA: structure + state fee ka total; non-USA: country price (state nahi)
+  // USA: structure + state fee ka total; non-USA: sirf country price (structure add nahi)
   const getTotalForStructure = (id) => {
     const sp = getStructurePrice(id);
     if (isUS) return sp + statePrice;
-    return countryPrice || sp;
+    return countryPrice;
   };
 
   return (
@@ -166,10 +166,10 @@ const StructureSelectionScreen = ({ navigation, route }) => {
                       return (
                         <View>
                           <Text style={styles.priceText}>
-                            ${total} <Text style={styles.stateFeeText}>total</Text>
+                            {total > 0 ? `$${total}` : 'Custom quote'} <Text style={styles.stateFeeText}>total</Text>
                           </Text>
                           <Text style={styles.stateFeeText}>
-                            {isUS ? `$${getStructurePrice(item.id)} + $${statePrice} state fee` : `${item.price || ''} incl.`}
+                            {isUS ? `$${getStructurePrice(item.id)} + $${statePrice} state fee` : (countryPrice ? `${countryPrice ? `$${countryPrice} package` : 'Custom quote'}` : 'Custom quote')}
                           </Text>
                         </View>
                       );

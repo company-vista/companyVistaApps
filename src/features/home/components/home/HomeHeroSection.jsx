@@ -6,6 +6,22 @@ import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 
 function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
+  const raw = selectedCompany?.raw ?? {};
+  const pricingType = String(selectedCompany?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? raw?.pricingType ?? '').toLowerCase();
+  const totalAmt = Number(selectedCompany?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
+  // quoted => Your Order, fixed => dashboard; fallback when pricingType missing: totalAmt 0 => treat as quoted (for pending quoted docs)
+  const isQuoted = pricingType === 'quoted' || (!pricingType && totalAmt === 0 && String(raw?.registrationStatus ?? selectedCompany?.registrationStatus ?? '').toLowerCase() === 'pending');
+  const handleCompanyPress = () => {
+    if (!selectedCompany) {
+      (onAddToCompanyPress ?? onCompanySwitcherPress)?.();
+      return;
+    }
+    if (isQuoted) {
+      onOrderPress?.();
+      return;
+    }
+    onCompanySwitcherPress?.();
+  };
   const colors = useThemeColors();
   const isLight = colors.mode === 'light';
   const hasCompany = !!selectedCompany;
@@ -50,14 +66,16 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
       <View style={{ flex: 1 }} />
       <Text style={[styles.heroAdded, heroMetaStyle]}>Created: {heroCompanyDate}</Text>
     </View>
-    <Pressable onPress={hasCompany ? onCompanySwitcherPress : (onAddToCompanyPress ?? onCompanySwitcherPress)} style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
-      <Text numberOfLines={1} style={[styles.heroCompany, heroCompanyStyle]}>
-        {hasCompany ? capitalizeCompanyName(heroCompanyName) : heroCompanyName}
-      </Text>
-      <View style={[styles.heroSwitchIcon, heroSwitchIconStyle]}>
+    <View style={[styles.heroCompanySwitcher, heroCompanySwitcherStyle]}>
+      <Pressable onPress={hasCompany ? handleCompanyPress : (onAddToCompanyPress ?? onCompanySwitcherPress)} style={{ flex: 1, justifyContent: 'center' }}>
+        <Text numberOfLines={1} style={[styles.heroCompany, heroCompanyStyle]}>
+          {hasCompany ? capitalizeCompanyName(heroCompanyName) : heroCompanyName}
+        </Text>
+      </Pressable>
+      <Pressable onPress={hasCompany ? onCompanySwitcherPress : (onAddToCompanyPress ?? onCompanySwitcherPress)} style={[styles.heroSwitchIcon, heroSwitchIconStyle]} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
         <FontAwesome name={hasCompany || isLoadingCompanies ? "exchange" : "plus"} size={14} color={isLight ? colors.text : '#ffffff'} />
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
 
     <View style={styles.heroMetaRow}>
       <View style={styles.heroMetaCol}>

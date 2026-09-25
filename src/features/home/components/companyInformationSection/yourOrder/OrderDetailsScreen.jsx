@@ -10,14 +10,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Clock, Check, RefreshCw, LogOut } from 'lucide-react-native';
+import { Clock, Check, RefreshCw } from 'lucide-react-native';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
 import { useThemeColors } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
-import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
-import { logoutUser } from '../../../../../store/slices/authSlice';
+import { useAppSelector } from '../../../../../store/hooks';
 import { fetchQuote, isQuoteReady, formatCurrency } from './api/quoteApi';
 import { fetchReviewApi } from '../../../../../features/auth/api/orderApi';
 
@@ -89,7 +88,6 @@ const OrderDetailsScreen = ({
     pendingOrder?.orderId ??
     (selectedCompany?.id ? `#${String(selectedCompany.id).slice(-8).toUpperCase()}` : fallbackCompany?._id ? `#${String(fallbackCompany._id).slice(-8).toUpperCase()}` : '—');
 
-  const dispatch = useAppDispatch();
   const token = useAppSelector((state) => state.auth.token);
   const [quote, setQuote] = useState(null);
   const [review, setReview] = useState(null);
@@ -152,7 +150,7 @@ const OrderDetailsScreen = ({
   const isNextEnabled = hasAmount && !loadingQuote;
   // price define nahi hai toh back band - quote + payment pura karke hi homepage
   const isNoPriceOrder = Number(pendingOrder?.selectedCountryPrice ?? 0) === 0 && Number(pendingOrder?.selectedStatePrice ?? 0) === 0 && Number(pendingOrder?.bestStatePrice ?? 0) === 0 && pendingOrder?.orderId;
-  const handleBack = isNoPriceOrder ? undefined : onBackPress;
+  const handleBack = onBackPress;
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom, backgroundColor: colors.background }]}>
       <StatusBar barStyle={isLight ? 'dark-content' : 'light-content'} backgroundColor={colors.background} />
@@ -160,13 +158,9 @@ const OrderDetailsScreen = ({
         
         {/* Header */}
         <View style={[styles.header, { marginTop: s(8) }]}>
-          <View style={{ opacity: isNoPriceOrder ? 0.3 : 1 }}>
-            <BackButton onPress={handleBack} disabled={!!isNoPriceOrder} />
-          </View>
+          <BackButton onPress={handleBack} />
           <Image source={logoR} style={styles.logoImage} resizeMode="contain" />
-          <TouchableOpacity onPress={() => dispatch(logoutUser())} style={[styles.iconButton, { backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)', borderColor: colors.border }]}>
-            <LogOut color={colors.text} size={20} />
-          </TouchableOpacity>
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Title */}

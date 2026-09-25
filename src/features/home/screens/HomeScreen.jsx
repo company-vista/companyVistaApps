@@ -144,20 +144,16 @@ export default function HomeScreen() {
     const hasPendingInUser = !isPaid && !hasPendingRegistration && Array.isArray(user?.companies) && user.companies.some(isCompanyPending);
     const isOrderLockedPending = !isPaid && (hasPendingRegistration || hasPendingInUser);
 
-    // Your Order auto-open hata diya - sirf onOrderPress pe khulega, login ya bottom tabs se nahi
+    // Quoted country (price undefined) -> Review ke baad auto OrderDetailsScreen khulega
     useEffect(() => {
-        if (pendingOpenOrderDetails) dispatch(setPendingOpenOrderDetails(false));
+        if (pendingOpenOrderDetails) {
+            setIsOrderDetailsOpen(true);
+            dispatch(setPendingOpenOrderDetails(false));
+        }
     }, [pendingOpenOrderDetails, dispatch]);
 
-    // Pending lock active hai to back press + bottom tabs block
-    useEffect(() => {
-        if (!isOrderLockedPending || !isOrderDetailsOpen) return;
-        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-            Toast.show({ type: 'info', text1: 'Complete payment to continue', text2: 'Your order is pending - please complete payment' });
-            return true;
-        });
-        return () => sub.remove();
-    }, [isOrderLockedPending, isOrderDetailsOpen]);
+    // Back allow — quoted/fixed chahe pending ho, back pe dusri company dekh sake (toast block hata diya)
+    // Previous block: BackHandler return true + toast "Complete payment to continue" removed
     useEffect(() => {
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
@@ -543,9 +539,34 @@ export default function HomeScreen() {
         setIsServicesOpen(true);
     }
     function selectCompanyFromSwitcher(company) {
+        const raw = company?.raw ?? {};
+        const pType = String(company?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? '').toLowerCase();
+        const totalAmt = Number(company?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
+        const status = String(raw?.registrationStatus ?? company?.registrationStatus ?? '').toLowerCase();
+        const isQuotedSel = pType === 'quoted' || (!pType && totalAmt === 0 && status === 'pending');
         setSelectedCompany(company);
         closeCompanySwitcher();
+        if (isQuotedSel) {
+            // quoted company pe click -> Your Order dikhe, fixed -> dashboard
+            setIsOrderDetailsOpen(true);
+        } else {
+            setIsOrderDetailsOpen(false);
+        }
     }
+    // quoted company auto open Your Order when selected (hero or switcher initial load), fixed pe dashboard
+    useEffect(() => {
+        if (!selectedCompany) return;
+        const raw = selectedCompany?.raw ?? {};
+        const pType = String(selectedCompany?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? '').toLowerCase();
+        const totalAmt = Number(selectedCompany?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
+        const status = String(raw?.registrationStatus ?? selectedCompany?.registrationStatus ?? '').toLowerCase();
+        const isQuotedAuto = pType === 'quoted' || (!pType && totalAmt === 0 && status === 'pending');
+        if (isQuotedAuto && !isOrderDetailsOpen) {
+            setIsOrderDetailsOpen(true);
+        } else if (!isQuotedAuto && isOrderDetailsOpen) {
+            setIsOrderDetailsOpen(false);
+        }
+    }, [selectedCompany?.id]);
     if (isVerifyIdentityOpen) {
         return <VerifyIdentityScreen onBackPress={() => { setIsVerifyIdentityOpen(false); setIsShareholdersOpen(true); }} />;
     }
@@ -566,13 +587,9 @@ export default function HomeScreen() {
     }
     if (isOrderDetailsOpen) {
         const handleOrderBack = () => {
-            if (isOrderLockedPending) {
-                Toast.show({ type: 'info', text1: 'Payment pending', text2: 'Please complete payment to access Home' });
-                return;
-            }
             setIsOrderDetailsOpen(false);
         };
-        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={handleOrderBack} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { if (isOrderLockedPending) { Toast.show({ type: 'info', text1: 'Payment pending' }); return; } setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
+        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={handleOrderBack} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
     }
     if (activeCompanySection) {
         return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);

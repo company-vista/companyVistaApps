@@ -47,8 +47,15 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
     const cp = Number(route.params?.selectedCountryPrice ?? 0);
     const sp = Number(route.params?.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299));
     const st = Number(route.params?.selectedStatePrice ?? 0);
-    if (cp > 0) baseTotal = cp + sp + st;
-    else if (sp > 0 || st > 0) baseTotal = sp + st;
+    const isUS = (route.params?.selectedCountry || selectedCountry) === 'US';
+    if (isUS) {
+      baseTotal = sp + st;
+      // US direct me countryPrice usually 0, but agar ho to add karo
+      if (cp > 0) baseTotal += cp;
+    } else {
+      // non-USA: sirf country price, structure add nahi
+      baseTotal = cp;
+    }
   }
   const runningTotal = baseTotal + addOnsTotal;
 

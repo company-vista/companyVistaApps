@@ -20,7 +20,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setAuthSession, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress } from '../../../store/slices/authSlice';
+import { setAuthSession, setPendingOpenRegistrationProgress } from '../../../store/slices/authSlice';
 
 const StatusScreen = ({ navigation, route }) => {
   const params = route?.params || {};
@@ -41,24 +41,8 @@ const StatusScreen = ({ navigation, route }) => {
   const authToken = useAppSelector((s) => s.auth.token);
   const pendingOrder = useAppSelector((s) => s.auth.pendingOrderData);
 
-  // price define nahi hai toh StatusScreen skip -> direct Your Order (OrderDetailsScreen)
-  const hasPrice = Number(params.selectedCountryPrice || 0) > 0 || Number(params.selectedStatePrice || 0) > 0 || Number(params.bestStatePrice || 0) > 0 || Number(params.amount || 0) > 0 || Number(params.runningTotal || 0) > 0;
-  React.useEffect(() => {
-    if (!hasPrice) {
-      const token = params.signupToken || params.token || pendingOrder?.token || authToken || '';
-      const clientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
-      const emailForSession = params.email || params.userEmail || userEmail || pendingOrder?.email || '';
-      const fullName = params.fullName || pendingOrder?.fullName || '';
-      if (!isAuthenticated) {
-        if (token) {
-          dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
-        } else {
-          dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
-        }
-      }
-      dispatch(setPendingOpenOrderDetails(true));
-    }
-  }, [hasPrice]);
+  // hasPrice check sirf display ke liye — Home auto-open nahi karna, Home sirf Continue press pe khulega
+  const hasPrice = Number(params.selectedCountryPrice || 0) > 0 || Number(params.selectedStatePrice || 0) > 0 || Number(params.bestStatePrice || 0) > 0 || Number(params.amount || 0) > 0 || Number(params.runningTotal || 0) > 0 || Number(params.totalAmount || 0) > 0;
 
   const isContinueEnabled = isShareholderDone && isKycDone;
   const handlePrimaryPress = () => {
@@ -87,8 +71,7 @@ const StatusScreen = ({ navigation, route }) => {
     navigation?.navigate?.('Support');
   };
 
-  // price nahi hai toh Status UI skip - direct Your Order
-  if (!hasPrice) return null;
+  // quoted price pe bhi Status dikhana hai — skip nahi karna
 
   return (
     <SafeAreaView style={styles.container}>

@@ -17,7 +17,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { CommonActions } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setPendingOrderData } from '../../../store/slices/authSlice';
+import { setPendingOrderData, setAuthSession, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
 import { saveReviewOrderApi, fetchReviewApi, confirmSignupApi } from '../api/orderApi';
 import { fetchClientCompanyDetails } from '../../../features/home/api/clientProfileApi';
 import { s } from '../../../theme/responsive';
@@ -130,16 +130,26 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           const d = res.data;
           setReviewData(d);
           // backend: pricing.totalAmount = company.totalAmount || computeOrderTotal(data) — pehle sahi chal raha tha isliye frontend fallback bhi rakho
+          // NOTE: structure price sirf USA ke case me add hoga, non-USA me nahi
           let amt = d?.pricing?.totalAmount ?? d?.totalAmount ?? 0;
           if (!amt || Number(amt) === 0) {
             const p = d?.pricing || {};
-            const sp = Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? p.structurePrice ?? 299);
-            const st = Number(route.params?.selectedStatePrice ?? route.params?.bestStatePrice ?? pendingOrder?.selectedStatePrice ?? pendingOrder?.bestStatePrice ?? p.statePrice ?? 0);
+            const selectedCountryCheck = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? d?.company?.countryOfIncorporation ?? selectedCountry ?? 'US';
+            const isUS = selectedCountryCheck === 'US';
+            const sp = isUS ? Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? p.structurePrice ?? 299) : 0;
+            const st = isUS ? Number(route.params?.selectedStatePrice ?? route.params?.bestStatePrice ?? pendingOrder?.selectedStatePrice ?? pendingOrder?.bestStatePrice ?? p.statePrice ?? 0) : 0;
             const at = Number(route.params?.addOnsTotal ?? pendingOrder?.addOnsTotal ?? p.addOnsTotal ?? 0);
             const fallbackPricing = Number(p.structurePrice || 0) + Number(p.statePrice || 0) + Number(p.addOnsTotal || 0);
-            const fallbackCalc = sp + st + at; // pehle jaisa frontend calc — yahi sahi chal raha tha
+            // non-USA me structure add nahi - fallbackCalc me bhi sirf country price ya 0
+            const countryPriceFallback = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0);
+            const fallbackCalc = isUS ? (sp + st + at) : (countryPriceFallback || 0) + at;
             const fallbackParams = Number(route.params?.runningTotal || route.params?.totalAmount || route.params?.combinedTotal || pendingOrder?.totalAmount || pendingOrder?.runningTotal || pendingOrder?.combinedTotal || 0);
+            // non-USA quoted case me fallback 0 hi rehne do — backend quote ka intezar
             let fallback = fallbackPricing > 0 ? fallbackPricing : fallbackCalc > 0 ? fallbackCalc : fallbackParams;
+            if (!isUS && Number(countryPriceFallback) === 0) {
+              // quoted non-USA ke liye fallback ko 0 rakho (price define nahi)
+              fallback = 0;
+            }
             console.log('=== REVIEW fallback compute (backend 0) pehle jaisa calc ===', { pricing: p, sp, st, at, fallbackPricing, fallbackCalc, fallbackParams, fallback, routeParams: route.params, pendingOrder, rawData: d });
             if ((!fallback || fallback === 0) && cid && token) {
               try {
@@ -168,11 +178,61 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
   // Agar backend 0 bhej raha hai to $0 dikhao (Quote note alag se), "Quote on request" se total hide nahi hoga
   const displayTotal = loadingTotal ? '...' : backendTotal != null ? `$${backendTotal}` : '—';
+  // Button logic: quoted (price nahi) -> Continue -> Your Order, price hai -> Confirm & Pay
+  const selectedCountryForBtn = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
+  const isUSForBtn = selectedCountryForBtn === 'US';
+  const hasPriceForBtn = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
+    || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
+    || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
+    || (isUSForBtn && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
+    || Number(backendTotal ?? 0) > 0;
+  const isQuotedForBtn = pricingType === 'quoted' || !hasPriceForBtn;
 
   const handleConfirm = async () => {
     const companyId = route.params?.companyId || pendingOrder?.companyId;
     if (!companyId) {
       Toast.show({ type: 'error', text1: 'Company ID missing' });
+      return;
+    }
+    // jis country ka price define nahi hai (custom quote) -> Confirm ke baad direct OrderDetailsScreen (Your Order)
+    // structure price sirf USA me count hoga
+    const selectedCountryForConfirm = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
+    const isUSForConfirm = selectedCountryForConfirm === 'US';
+    const hasPriceForConfirm = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
+      || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
+      || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
+      || (isUSForConfirm && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
+      || Number(backendTotal ?? 0) > 0;
+    const isQuoted = pricingType === 'quoted' || !hasPriceForConfirm;
+    if (isQuoted) {
+      const orderData = {
+        selectedStructure, companyName, selectedEnding, selectedState, selectedCountry,
+        selectedCountryPrice: route.params?.selectedCountryPrice ?? 0,
+        selectedStatePrice: route.params?.selectedStatePrice ?? 0,
+        selectedStructurePrice: route.params?.selectedStructurePrice ?? 0,
+        bestState: route.params?.bestState, bestStatePrice: route.params?.bestStatePrice,
+        bestStatePriceNote: route.params?.bestStatePriceNote, bestStateTimeframe: route.params?.bestStateTimeframe,
+        selectedAddOns: addOns, totalAmount: 0, pricingType: 'quoted',
+        fullName: route.params?.fullName, email: route.params?.email, countryOfResidence: route.params?.countryOfResidence, phone: route.params?.phone,
+        companyState: selectedState, structure: selectedStructure, orderId: `CV-${Date.now()}`,
+        advisorFlow: route.params?.advisorFlow, selectedJurisdiction: route.params?.selectedJurisdiction,
+        purpose: route.params?.purpose, customerLocation: route.params?.customerLocation, priorities: route.params?.priorities,
+        dayOneNeeds: route.params?.dayOneNeeds, physicalPresence: route.params?.physicalPresence, usStatePriority: route.params?.usStatePriority,
+        countryCode: route.params?.countryCode, companyId, clientId: route.params?.clientId || pendingOrder?.clientId, token: route.params?.token || token,
+      };
+      console.log('=== REVIEW quoted -> OrderDetails (no price) ===', JSON.stringify(orderData, null, 2));
+      dispatch(setPendingOrderData({ ...orderData, amount: 0, runningTotal: 0 }));
+      const emailForSession = route.params?.email || pendingOrder?.email || '';
+      const full = route.params?.fullName || '';
+      const tkn = route.params?.token || token;
+      const cId = route.params?.clientId || pendingOrder?.clientId;
+      if (tkn) {
+        dispatch(setAuthSession({ user: { _id: cId || undefined, id: cId || undefined, email: emailForSession, name: full || emailForSession || 'User', firstName: full.split(' ')[0] || '', lastName: full.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: tkn }));
+      } else {
+        dispatch(setAuthSession({ user: { _id: cId || 'demo-id', id: cId || 'demo-id', email: emailForSession || 'user@demo.com', name: full || 'User', firstName: full.split(' ')[0] || 'User', lastName: full.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
+      }
+      dispatch(setPendingOpenOrderDetails(true));
+      Toast.show({ type: 'info', text1: 'Quote requested', text2: 'Track status in Your Order' });
       return;
     }
     try {
@@ -495,12 +555,12 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
       <View style={styles.footerContainer}>
         <TouchableOpacity style={[styles.confirmButton, !isChecked && { opacity: 0.5 }]} activeOpacity={0.8} onPress={handleConfirm} disabled={!isChecked}>
-          <Text style={styles.confirmButtonText}>{loadingTotal ? 'Confirm & Continue' : `Confirm & Pay ${displayTotal}`}</Text>
+          <Text style={styles.confirmButtonText}>{loadingTotal ? 'Confirm & Continue' : isQuotedForBtn ? 'Continue' : `Confirm & Pay ${displayTotal}`}</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />
         </TouchableOpacity>
 
         <Text style={styles.footerSubtext}>
-          Secure payment · <Text style={styles.footerSubtextBold}>100% refund if we can't form</Text>
+          {isQuotedForBtn ? 'Continue to Your Order · Quote will be prepared' : <>Secure payment · <Text style={styles.footerSubtextBold}>100% refund if we can't form</Text></>}
         </Text>
       </View>
     </SafeAreaView>

@@ -23,6 +23,8 @@ import { setAuthSession, setHasCompletedPayment } from '../../../store/slices/au
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
+import axios from 'axios';
+import { API_BASE_URL } from '../../../config/api';
 
 const VerifyIdentityScreen = ({ navigation, route }) => {
   const dispatch = useAppDispatch();
@@ -33,6 +35,11 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
   const authName = authUser?.name || [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() || route?.params?.fullName || 'Rajesh Kumar Sharma';
   const initials = authName.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0,2).toUpperCase() || 'RS';
   const shareholders = route?.params?.shareholders || [];
+  const companyId = route?.params?.companyId || pendingOrder?.companyId || '';
+  const token = route?.params?.token || authToken || pendingOrder?.token || '';
+  // clientId: prefer founder clientId (pendingOrder/authUser) else first shareholder's clientId
+  const primaryShareholderForId = shareholders.find(s => s.clientId) || null;
+  const clientId = route?.params?.clientId || pendingOrder?.clientId || authUser?._id || authUser?.id || primaryShareholderForId?.clientId || '';
 
   const handleContinue = () => {
     const token = route?.params?.signupToken || route?.params?.token || pendingOrder?.token || authToken || '';
@@ -52,6 +59,46 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
   const [passportUri, setPassportUri] = React.useState(null);
   const [addressUri, setAddressUri] = React.useState(null);
   const [selfieUri, setSelfieUri] = React.useState(null);
+  const [uploading, setUploading] = React.useState(false);
+  const [kycStatus, setKycStatus] = React.useState(null); // 'pending' | 'complete' | null
+  const [fetchingKyc, setFetchingKyc] = React.useState(false);
+
+  // GET /kyc/:companyId — show current status (fallback chain, 404 -> next)
+  React.useEffect(() => {
+    if (!companyId) return;
+    let mounted = true;
+    const fetchKyc = async () => {
+      setFetchingKyc(true);
+      const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
+      const endpoints = [
+        `${API_BASE_URL}/api/kyc/${companyId}`,
+        `${API_BASE_URL}/api/company-signup/kyc/${companyId}`,
+        `${API_BASE_URL}/api/company/kyc/${companyId}`,
+        `${API_BASE_URL}/api/client/kyc/${companyId}`,
+        `${API_BASE_URL}/api/clients/kyc/${companyId}`,
+        `${API_BASE_URL}/api/companies/kyc/${companyId}`,
+      ];
+      for (const url of endpoints) {
+        try {
+          console.log('=== getKycStatus TRY ===', url);
+          const r = await axios.get(url, { headers, timeout: 8000 });
+          if (!mounted) return;
+          const status = r.data?.kycStatus || r.data?.status || r.data?.data?.kycStatus || null;
+          console.log('=== getKycStatus SUCCESS ===', url, JSON.stringify(r.data, null, 2));
+          if (status) setKycStatus(String(status).toLowerCase());
+          break;
+        } catch (e) {
+          const code = e?.response?.status;
+          console.log('=== getKycStatus FAILED ===', url, code, e?.response?.data || e.message);
+          if (code === 404) continue;
+          break;
+        }
+      }
+      if (mounted) setFetchingKyc(false);
+    };
+    fetchKyc();
+    return () => { mounted = false; };
+  }, [companyId, token]);
 
   const openGallery = (type) => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, (res) => {
@@ -60,13 +107,79 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
         Toast.show({ type: 'error', text1: res.errorMessage || 'Gallery error' });
         return;
       }
-      const uri = res.assets?.[0]?.uri;
+      const asset = res.assets?.[0];
+      const uri = asset?.uri;
       if (!uri) return;
       if (type === 'passport') setPassportUri(uri);
       if (type === 'address') setAddressUri(uri);
       if (type === 'selfie') setSelfieUri(uri);
-      Toast.show({ type: 'success', text1: `${type} uploaded` });
+      Toast.show({ type: 'success', text1: `${type} selected — tap Upload to send` });
     });
+  };
+
+  const buildFile = (uri, field) => {
+    const name = uri.split('/').pop() || `${field}.jpg`;
+    const ext = name.split('.').pop()?.toLowerCase() || 'jpg';
+    const mime = ext === 'png' ? 'image/png' : ext === 'pdf' ? 'application/pdf' : 'image/jpeg';
+    return { uri, type: mime, name };
+  };
+
+  const handleUploadKyc = async () => {
+    if (!companyId || !clientId) {
+      Toast.show({ type: 'error', text1: 'Missing IDs', text2: 'companyId/clientId required' });
+      return;
+    }
+    if (!passportUri && !addressUri && !selfieUri) {
+      Toast.show({ type: 'error', text1: 'No files', text2: 'Select passport, addressProof and/or selfie' });
+      return;
+    }
+    setUploading(true);
+    try {
+      const form = new FormData();
+      if (passportUri) form.append('passport', buildFile(passportUri, 'passport'));
+      if (addressUri) form.append('addressProof', buildFile(addressUri, 'addressProof'));
+      if (selfieUri) form.append('selfie', buildFile(selfieUri, 'selfie'));
+      // Do NOT set Content-Type manually — axios will add boundary
+      const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
+      const endpoints = [
+        `${API_BASE_URL}/api/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/company-signup/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/company/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/client/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/clients/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/companies/kyc/${companyId}/${clientId}`,
+        `${API_BASE_URL}/api/company/${companyId}/kyc/${clientId}`,
+      ];
+      let lastErr = null;
+      let success = null;
+      for (const url of endpoints) {
+        try {
+          console.log('=== submitKyc TRY ===', url, { hasPassport: !!passportUri, hasAddress: !!addressUri, hasSelfie: !!selfieUri });
+          const r = await axios.post(url, form, { headers, timeout: 25000 });
+          console.log('=== submitKyc SUCCESS ===', url, JSON.stringify(r.data, null, 2));
+          success = r.data;
+          lastErr = null;
+          break;
+        } catch (e) {
+          lastErr = e;
+          const code = e?.response?.status;
+          const msg = e?.response?.data?.message || e.message;
+          console.log('=== submitKyc FAILED ===', url, code, JSON.stringify(e?.response?.data || msg, null, 2));
+          if (code === 404) continue; // try next prefix
+          throw e;
+        }
+      }
+      if (lastErr) throw lastErr;
+      const status = String(success?.kycStatus || '').toLowerCase();
+      if (status) setKycStatus(status);
+      Toast.show({ type: 'success', text1: success?.message || 'Documents uploaded', text2: status ? `KYC ${status}` : '' });
+    } catch (e) {
+      console.log('=== submitKyc FINAL FAILED ===', JSON.stringify(e?.response?.data || e.message, null, 2));
+      const msg = e?.response?.data?.message || e.message || 'Upload failed — route not found (check backend mount)';
+      Toast.show({ type: 'error', text1: 'KYC upload failed', text2: msg });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const primaryShareholder = shareholders.find(s => s.passportNumber) || shareholders[0] || null;
@@ -109,7 +222,7 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
               <Text style={styles.userRole}>60% owner · Managing Member</Text>
             </View>
           </View>
-          <Text style={styles.progressText}>0 of 3 done</Text>
+          <Text style={styles.progressText}>{kycStatus === 'complete' ? '3 of 3 done' : `${[passportUri, addressUri, selfieUri].filter(Boolean).length} of 3 selected`}{fetchingKyc ? '…' : ''}</Text>
         </View>
 
         {/* Upload Status Items - tap to open gallery */}
@@ -161,9 +274,21 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
+        {/* Upload KYC Button — POST /kyc/:companyId/:clientId */}
+        <TouchableOpacity
+          style={[styles.continueButton, { backgroundColor: '#0F172A', borderWidth: 1, borderColor: 'rgba(234,179,8,0.3)' }, uploading && { opacity: 0.6 }]}
+          activeOpacity={0.85}
+          onPress={handleUploadKyc}
+          disabled={uploading || (!passportUri && !addressUri && !selfieUri)}
+        >
+          <Text style={[styles.continueButtonText, { color: '#EAB308' }]}>{uploading ? 'Uploading...' : kycStatus === 'complete' ? 'KYC Complete — Re-upload?' : 'Upload KYC Documents'}</Text>
+        </TouchableOpacity>
+        {kycStatus ? <Text style={{ color: kycStatus === 'complete' ? '#10B981' : '#EAB308', fontSize: 11, textAlign: 'center', marginTop: 6 }}>KYC Status: {kycStatus}{fetchingKyc ? ' (refreshing...)' : ''}</Text> : null}
+        {!companyId || !clientId ? <Text style={{ color: '#EF4444', fontSize: 11, textAlign: 'center', marginTop: 6 }}>Missing companyId/clientId — upload will fail</Text> : null}
+
         {/* Bottom Button - KYC complete -> direct RegistrationTracking */}
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.85} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+        <TouchableOpacity style={[styles.continueButton, kycStatus !== 'complete' && { opacity: 0.7 }]} activeOpacity={0.85} onPress={handleContinue}>
+          <Text style={styles.continueButtonText}>Continue{kycStatus !== 'complete' ? ' (skip KYC)' : ''}</Text>
         </TouchableOpacity>
 
         <Text style={styles.footerNote}>Filing starts once all KYC is verified</Text>

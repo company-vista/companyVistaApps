@@ -19,10 +19,9 @@ import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setPendingAddCompany, setAuthSession, setPendingOrderData, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
+import { setPendingAddCompany, setPendingOrderData } from '../../../store/slices/authSlice';
 import { setPasswordApi } from '../api/orderApi';
 import { s } from '../../../theme/responsive';
-import { hasPrice } from '../../../utils/priceCalculator';
 
 export default function SetNewPasswordScreen(props) {
   const { navigation, route } = props;
@@ -87,7 +86,8 @@ export default function SetNewPasswordScreen(props) {
       } else {
         dispatch(setPendingAddCompany(true));
         const from = route?.params?.from;
-        if (from === 'FounderDetails') {
+        // from check ko loose kiya — companyId ho to FounderDetails flow hi hai, Review pe jana chahiye
+        if (from === 'FounderDetails' || companyIdFromStore || route?.params?.companyId) {
           // FounderDetails flow: after password -> ReviewAndConfirm
           if (navigation?.navigate) {
             const reviewParams = {
@@ -129,27 +129,11 @@ export default function SetNewPasswordScreen(props) {
               token,
             };
             console.log('=== SET PASSWORD -> REVIEW & SUBMIT DATA ===', JSON.stringify(reviewParams, null, 2));
-            // Advisor + Direct dono routes: price define hai -> ReviewAndConfirm, price empty (custom quote) -> Your Order (Home lock)
-            const hasPriceValue = hasPrice(route.params);
-            if (!hasPriceValue) {
-              const orderId = `INV-${Date.now()}`;
-              const orderData = { ...reviewParams, orderId, token, clientId, amount: 0, runningTotal: 0 };
-              dispatch(setPendingOrderData(orderData));
-              // auto-login so RootStack switches to Main/Home
-              const emailForSession = email || route.params?.email || '';
-              const fullName = route.params?.fullName || '';
-              if (token) {
-                dispatch(setAuthSession({ user: { _id: clientId || undefined, id: clientId || undefined, email: emailForSession, name: fullName || emailForSession || 'User', firstName: fullName.split(' ')[0] || '', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token }));
-              } else {
-                dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
-              }
-              dispatch(setPendingOpenOrderDetails(true));
-              // RootStack will auto switch to Main/Home with OrderDetails open - no manual navigate to Status
-              return;
-            } else {
-              if (navigation.replace) navigation.replace('ReviewAndConfirm', reviewParams);
-              else navigation.navigate('ReviewAndConfirm', reviewParams);
-            }
+            // FIX: Always go to ReviewAndConfirm -> CompletePayment -> Status -> Home (no direct Home)
+            // Chahe price 0 (quoted) ho tab bhi Review pe bhejo, Home sirf Status ke Continue ke baad khulega
+            dispatch(setPendingOrderData(reviewParams));
+            if (navigation.replace) navigation.replace('ReviewAndConfirm', reviewParams);
+            else navigation.navigate('ReviewAndConfirm', reviewParams);
           }
         } else {
           // Non-founder: auto-login ho gaya, Root Main pe switch karega - Login pe bhejne ki zarurat nahi
