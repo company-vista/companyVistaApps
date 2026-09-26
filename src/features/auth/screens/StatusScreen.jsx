@@ -5,9 +5,9 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {
   CheckCircle,

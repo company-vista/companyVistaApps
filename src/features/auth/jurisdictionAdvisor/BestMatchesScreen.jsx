@@ -7,8 +7,8 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
@@ -239,37 +239,33 @@ export default function BestMatchesScreen({ navigation, route }) {
   }, [purpose, customerLocation, priorities.join(','), dayOneNeeds.join(',')]);
 
   const best = selectedBest;
-  // advisor me jis country ka price define hai uska price save karo - US + priced non-US (UK/HK/CA/AE/SG/EE)
-  const PRICED_JURISDICTIONS = ['United States', 'Hong Kong', 'United Kingdom', 'Canada', 'United Arab Emirates', 'Singapore', 'Estonia'];
+  // advisor me jis country ka price define hai uska price save karo - same as RegisterJurisdictionScreen allCountries
+  const PRICED_JURISDICTIONS = ['United States', 'United Kingdom', 'Hong Kong', 'Canada'];
   const PRICE_MAP = {
-    'United States': '$399',
-    'United Kingdom': 'from $595',
-    'Hong Kong': 'from $899',
-    'Canada': 'from $599',
-    'United Arab Emirates': 'from $1,499',
-    'Singapore': 'from $899',
-    'Estonia': 'from $499',
+    'United States': '$299',
+    'United Kingdom': '$595',
+    'Hong Kong': '$799',
+    'Canada': '$899',
   };
   const PRICE_NUMERIC_MAP = {
-    'United States': 399,
+    'United States': 299,
     'United Kingdom': 595,
-    'Hong Kong': 899,
-    'Canada': 599,
-    'United Arab Emirates': 1499,
-    'Singapore': 899,
-    'Estonia': 499,
+    'Hong Kong': 799,
+    'Canada': 899,
   };
   const showPrice = PRICED_JURISDICTIONS.includes(best.name);
   const isUSA = best.code === 'US' || best.name === 'United States';
   const getPriceNumeric = (name) => PRICE_NUMERIC_MAP[name] ?? 0;
   const handleContinue = () => {
     const baseParams = { ...params, bestCountry: best.code, bestCountryName: best.name, advisorFlow: true };
+    // country price yahan se aage ke screens (StructureSelection) me dikhane ke liye bhej do
+    const numericPrice = getPriceNumeric(best.name);
     if (isUSA) {
-      navigation.navigate('USStatePhysicalPresence', baseParams);
+      // US: country price + state fee (state fee BestStatesForYou me add hota hai)
+      navigation.navigate('USStatePhysicalPresence', { ...baseParams, selectedCountry: best.code, selectedCountryPrice: numericPrice, bestCountryPrice: numericPrice });
     } else {
       // Non-US: skip US state screens, go directly to CompanyNaming
       // priced jurisdiction ka price calculate karo, non-priced ka 0 (Custom quote -> Your Order)
-      const numericPrice = getPriceNumeric(best.name);
       navigation.navigate('CompanyNaming', { ...baseParams, selectedCountry: best.code, selectedCountryPrice: numericPrice, bestCountryPrice: numericPrice });
     }
   };
@@ -360,12 +356,12 @@ export default function BestMatchesScreen({ navigation, route }) {
             </Text>
           </View>
 
-          {/* Price Footer - only US/HK/UK/CA show price, others Custom quote */}
+          {/* Price Footer - only US/UK/HK/CA show price (same as RegisterJurisdiction), others Custom quote */}
           <View style={styles.cardFooter}>
             {showPrice ? (
               <View style={styles.priceContainer}>
-                <Text style={styles.priceAmount}>{PRICE_MAP[best.name] || '$399'}</Text>
-                <Text style={styles.priceNote}>from · incl. state fee</Text>
+                <Text style={styles.priceAmount}>{PRICE_MAP[best.name] || '$299'}</Text>
+                <Text style={styles.priceNote}>incl. service package</Text>
               </View>
             ) : (
               <View style={styles.priceContainer}>

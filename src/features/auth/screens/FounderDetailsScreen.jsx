@@ -5,7 +5,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Animated,
   StatusBar,
@@ -13,6 +12,7 @@ import {
   Modal,
   FlatList,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -43,6 +43,13 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   const isUSFounder = (route.params?.selectedCountry || jurisdictionCountry) === 'US' || (!jurisdictionCountry && !route.params?.selectedCountry);
   const jurisdictionCountryName = jurisdictionCountry ? ({ US: 'USA', GB: 'UK', AE: 'UAE', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta' }[jurisdictionCountry] || jurisdictionCountry) : (bestState ? 'USA' : null);
   const displayJurisdictionCountry = advisorFlow ? (bestState ? 'USA' : jurisdictionCountryName || 'USA') : (jurisdictionCountryName || 'USA');
+  // ownership note dynamic: US me state name (advisor me bestState), non-US me country name
+  const ownershipJurisdiction = isUSFounder
+    ? (bestState || selectedState || 'a US')
+    : (route.params?.bestCountryName || jurisdictionCountryName || displayJurisdictionCountry);
+  const ownershipNote = isUSFounder
+    ? `Non-US residents can own 100% of ${String(ownershipJurisdiction).startsWith('a ') ? ownershipJurisdiction : `a ${ownershipJurisdiction}`} LLC`
+    : `Foreign-owned ${ownershipJurisdiction} companies are allowed · a local director may be required`;
 
   useEffect(() => {
     console.log('=== SIGNUP PAGE DATA (FounderDetails - FINAL) ===');
@@ -290,7 +297,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             <View style={styles.summaryRowBottom}>
               <View style={styles.summaryFieldHalf}>
                 <Text style={styles.summaryFieldLabel}>JURISDICTION</Text>
-                <Text style={styles.stateSubtitle}>{isUSFounder ? `${bestState || selectedState} · ${selectedStructure}` : (displayJurisdictionCountry || jurisdictionCountry || selectedCountry || '—')}</Text>
+                <Text style={styles.stateSubtitle}>{isUSFounder ? `${bestState || selectedState} · ${selectedStructure}` : (displayJurisdictionCountry || jurisdictionCountry || route.params?.selectedCountry || '—')}</Text>
               </View>
               <View style={styles.summaryFieldHalf}>
                 <Text style={styles.summaryFieldLabel}>COUNTRY</Text>
@@ -390,7 +397,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           <View style={styles.successRow}>
             <Ionicons name="checkmark-circle" size={12} color="#10B981" />
             <Text style={styles.successText}>
-              Non-US residents can own 100% of a Delaware LLC
+              {ownershipNote}
             </Text>
           </View>
 
@@ -535,11 +542,11 @@ const styles = StyleSheet.create({
   summaryFieldHalfRight: { flex: 1, alignItems: 'flex-end' },
   summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
   usBadgeRow: { flexDirection: 'row', alignItems: 'center' },
-  countryCodeBadge: { color: '#64748B', fontSize: 11, fontWeight: 'bold', marginRight: s(6) },
+  countryCodeBadge: { color: '#64748B', fontSize: s(12), fontWeight: 'bold', marginRight: s(6) },
   summaryLabel: { color: '#64748B', fontSize: 11 },
   companyNameText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
   summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: s(12) },
-  stateSubtitle: { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
+  stateSubtitle: { color: '#94A3B8', fontSize: s(15), fontWeight: '600' },
   priceSummaryText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(14), marginBottom: s(8) },
   inputLabel: { color: '#64748B', fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
@@ -587,7 +594,7 @@ const styles = StyleSheet.create({
   warningText: { color: '#D97706', fontSize: 10 },
   helperText: { color: '#64748B', fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
   successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(18), gap: s(6) },
-  successText: { color: '#10B981', fontSize: 10 },
+  successText: { color: '#10B981', fontSize: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10 },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',

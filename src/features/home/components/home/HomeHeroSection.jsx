@@ -101,11 +101,11 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     </View>
     <View style={styles.heroStats}>
 
-      <Pressable onPress={onOrderPress ?? onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FFF7ED' : 'rgba(249,115,22,0.18)' }]}>
-          <FontAwesome name="shopping-cart" size={14} color={isLight ? '#EA580C' : '#FB923C'} />
+      <Pressable onPress={onAddToCompanyPress ?? onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
+        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#ECFDF5' : 'rgba(52,211,153,0.18)' }]}>
+          <FontAwesome name="plus-circle" size={14} color={isLight ? '#047857' : '#34D399'} />
         </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Your Order</Text>
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Create Company</Text>
       </Pressable>
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>

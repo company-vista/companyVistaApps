@@ -24,7 +24,7 @@ import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
 // import logoImage from './src/assets/images/Logo1.png';
-import companyLogo from './src/assets/images/company-vista-logo.gif';
+import companyLogo from './src/assets/images/newSplashScreen.gif';
 import logoR from './src/assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';

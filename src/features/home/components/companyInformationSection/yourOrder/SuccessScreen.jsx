@@ -5,8 +5,8 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import { useThemeColors } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';

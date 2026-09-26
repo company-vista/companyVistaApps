@@ -9,11 +9,48 @@ import { BackButton } from '../../../../components/buttons';
 import { useThemeColors } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import { styles } from './TransactionDetailScreenStyles';
+// Transaction ka asli status derive karo - list screen ke normalized status ('success'/'pending'/'failed')
+// ya kabhi raw backend value. Pehle yahan "Success" hardcoded tha aur "Status" row me isActive dikhta tha.
+function getDisplayStatus(txn) {
+    const raw = String(txn?.status ?? '').trim().toLowerCase();
+    if (!raw) {
+        return txn?.isActive ? 'Active' : 'Pending';
+    }
+    if (raw.includes('fail') || raw.includes('decline') || raw.includes('cancel')) {
+        return 'Failed';
+    }
+    if (raw.includes('pending') || raw.includes('unpaid') || raw.includes('not paid') || raw.includes('awaiting')) {
+        return 'Pending';
+    }
+    if (raw.includes('success') || raw.includes('succeed') || raw.includes('paid') || raw.includes('completed') || raw.includes('confirmed')) {
+        return 'Success';
+    }
+    if (raw.includes('active')) {
+        return 'Active';
+    }
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+function getStatusColor(status) {
+    switch (status) {
+        case 'Success': return '#16a34a';
+        case 'Pending': return '#ca8a04';
+        case 'Active': return '#2563eb';
+        default: return '#dc2626';
+    }
+}
+function getStatusTagStyle(status) {
+    switch (status) {
+        case 'Success': return { color: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.1)' };
+        case 'Pending': return { color: '#ca8a04', backgroundColor: 'rgba(202, 138, 4, 0.1)' };
+        case 'Active': return { color: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)' };
+        default: return { color: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.1)' };
+    }
+}
 export default function TransactionDetailScreen({ transaction, onBackPress, }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     console.log(transaction);
-    const formatDate = (dateString) => {
+    const displayStatus = getDisplayStatus(transaction);    const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
@@ -49,11 +86,7 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
         return '-';
     };
     const handleDownload = async () => {
-        const statusColor = transaction.status === 'completed' || transaction.status === 'active'
-            ? '#16a34a'
-            : transaction.status === 'pending'
-                ? '#ca8a04'
-                : '#dc2626';
+        const statusColor = getStatusColor(getDisplayStatus(transaction));
         const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -91,7 +124,7 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
       <div style="text-align:right;">
         <div class="receipt-title">PAYMENT RECEIPT</div>
         <div class="receipt-id">${transaction.transactionId || transaction._id}</div>
-        <span class="status-badge">${transaction.status.toUpperCase()}</span>
+        <span class="status-badge">${getDisplayStatus(transaction).toUpperCase()}</span>
       </div>
     </div>
 
@@ -224,9 +257,9 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
           </View>
           {(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') && (<Text style={[
                 styles.amountModeTag,
-                { color: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)' },
+                getStatusTagStyle(displayStatus),
             ]}>
-                Success
+                {displayStatus}
               </Text>)}
           {transaction.paymentMethod === 'cash' && (<Text style={[
                 styles.amountModeTag,
@@ -263,7 +296,7 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Additional Information</Text>
           <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {transaction.notes && (<DetailRow label="Notes" value={transaction.notes} colors={colors}/>)}
-            <DetailRow label="Status" value={transaction.isActive ? 'Active' : 'Inactive'} colors={colors}/>
+            <DetailRow label="Status" value={displayStatus} colors={colors}/>
             {transaction.invoice && (<DetailRow label="Invoice" value={formatDetailValue(transaction.invoice)} colors={colors}/>)}
           </View>
         </View>

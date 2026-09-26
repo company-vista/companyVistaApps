@@ -4,11 +4,11 @@ import {
   Text,
   View,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Animated,
   StatusBar,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
@@ -96,15 +96,27 @@ const StructureSelectionScreen = ({ navigation, route }) => {
   const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 399 };
   const getStructurePrice = (id) => structurePriceMap[id] ?? 299;
   const selectedItem = structures.find((s) => s.id === selectedStructure);
-  // RegisterJurisdiction se aaya country+state total — yahi dono add hua amount hai
-  const countryPrice = Number(p.selectedCountryPrice ?? 0);
-  const statePrice = Number(p.selectedStatePrice ?? p.bestStatePrice ?? 0);
+  // country price: direct flow selectedCountryPrice, advisor flow BestMatches se aata hai
+  const countryPrice = Number(p.selectedCountryPrice ?? p.bestCountryPrice ?? 0);
+  // state ka govt fee: direct flow me selectedStatePrice, advisor flow me bestStateGovFee
+  // (bestStatePrice = 299 package + state fee hota hai, isliye use nahi karte - double count ho jata hai)
+  const advisorStateTotal = Number(p.bestStatePrice ?? 0);
+  const stateFee = Number(
+    p.selectedStatePrice
+    ?? p.bestStateGovFee
+    ?? (advisorStateTotal > 0 ? advisorStateTotal - (countryPrice || 299) : 0)
+  );
   const isUS = (p.selectedCountry || selectedCountry) === 'US';
-  // USA: structure + state fee ka total; non-USA: sirf country price (structure add nahi)
+  // USA: country/structure package + state fee; non-USA: sirf country price (structure add nahi)
   const getTotalForStructure = (id) => {
     const sp = getStructurePrice(id);
-    if (isUS) return sp + statePrice;
+    if (isUS) return sp + stateFee;
     return countryPrice;
+  };
+  const getBreakdownForStructure = (id) => {
+    const sp = getStructurePrice(id);
+    if (!isUS) return countryPrice > 0 ? `$${countryPrice} package` : 'Custom quote';
+    return stateFee > 0 ? `$${sp} structure + $${stateFee} state fee` : `$${sp} package`;
   };
 
   return (
@@ -169,7 +181,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
                             {total > 0 ? `$${total}` : 'Custom quote'} <Text style={styles.stateFeeText}>total</Text>
                           </Text>
                           <Text style={styles.stateFeeText}>
-                            {isUS ? `$${getStructurePrice(item.id)} + $${statePrice} state fee` : (countryPrice ? `${countryPrice ? `$${countryPrice} package` : 'Custom quote'}` : 'Custom quote')}
+                            {getBreakdownForStructure(item.id)}
                           </Text>
                         </View>
                       );
@@ -200,7 +212,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
             const structPrice = getStructurePrice(selectedStructure);
             const combinedTotal = getTotalForStructure(selectedStructure);
             // dono add hua total backend me bhejo — runningTotal/totalAmount ke roop me save hoga, backend bhi computeOrderTotal se verify karega
-            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, combinedTotal, runningTotal: combinedTotal, totalAmount: combinedTotal, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
+            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, selectedCountryPrice: countryPrice || restParams.selectedCountryPrice, selectedStatePrice: isUS && stateFee > 0 ? stateFee : restParams.selectedStatePrice, combinedTotal, runningTotal: combinedTotal, totalAmount: combinedTotal, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
           }}
         >
           <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
@@ -219,10 +231,10 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(8) },
+  mainTitle: { color: '#FFFFFF', fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(8) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   goldText: { color: '#C9A84C' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
+  subtitle: { color: '#94A3B8', fontSize: s(14), lineHeight: s(21), marginBottom: s(20) },
   listContainer: { gap: 14 },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 16,

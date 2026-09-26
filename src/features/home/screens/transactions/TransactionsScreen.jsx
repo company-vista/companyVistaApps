@@ -13,6 +13,7 @@ import { matchesTransactionSearch, } from './transactionsUtils';
 import { formatCurrency } from '../../../../constants/currencyConverter';
 import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
+import { UNPAID_REGISTRATION_STATUSES, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
 
 
 function formatAmountField(value, currency) {
@@ -39,24 +40,43 @@ function getApiStatus(value, isActive) {
     if (isActive)
         return 'Active';
     if (typeof value === 'string' && value.trim()) {
-        const normalized = value.trim().toLowerCase();
-        if (normalized.includes('active'))
-            return 'Active';
-        if (normalized.includes('success') ||
-            normalized.includes('paid') ||
-            normalized.includes('su')) {
-            return 'Success';
-        }
-        if (normalized.includes('fail') ||
-            normalized.includes('decline') ||
-            normalized.includes('cancel')) {
+        const normalized = value.trim().toLowerCase().replace(/[_\-]+/g, ' ').trim();
+        const isSuccess = normalized === 'success' || normalized === 'succeeded' || normalized === 'successful' || normalized === 'paid' || normalized === 'completed' || normalized === 'confirmed';
+        const isFailed = normalized === 'failed' || normalized === 'fail' || normalized === 'declined' || normalized === 'cancelled' || normalized === 'canceled' || normalized === 'error';
+        const isPending = normalized === 'pending' || normalized === 'unpaid' || normalized === 'not paid' || normalized === 'awaiting payment' || normalized === 'payment pending' || normalized === 'processing' || normalized === 'incomplete';
+        // Check in strict order - "not paid" / "unpaid" ko "paid" mat samjho
+        if (isFailed) return 'Failed';
+        if (isPending) return 'Pending';
+        if (isSuccess) return 'Success';
+        if (normalized.includes('active')) return 'Active';
+        if (normalized.includes('fail') || normalized.includes('decline') || normalized.includes('cancel')) {
             return 'Failed';
+        }
+        if (normalized.includes('pending') || normalized.includes('unpaid') || normalized.includes('awaiting')) {
+            return 'Pending';
+        }
+        if (normalized.includes('success') || normalized.includes('succeed') || normalized.includes('paid') || normalized.includes('paid')) {
+            return 'Success';
         }
         return value.trim().charAt(0).toUpperCase() + value.trim().slice(1);
     }
     return 'Pending';
 }
-function normalizeApiTransaction(item) {
+// Company ka registration status unpaid hai to uska transaction "Success" nahi ho sakta.
+// Backend kabhi payment record me galat success bhej deta hai, isliye company status se cross-check karo.
+const normalizeRegStatus = normalizeRegistrationStatus;
+const UNPAID_REG_STATUSES = UNPAID_REGISTRATION_STATUSES;
+function buildCompanyStatusIndex(companies) {
+    const index = {};
+    (Array.isArray(companies) ? companies : []).forEach(company => {
+        if (!company) return;
+        const id = String(company._id ?? company.id ?? company.companyId ?? '').trim();
+        if (!id) return;
+        index[id] = normalizeRegStatus(company.registrationStatus ?? company.registration_status ?? company.status ?? '');
+    });
+    return index;
+}
+function normalizeApiTransaction(item, companyStatusIndex = {}) {
     const title = item.title ||
         item.name ||
         (typeof item.company === 'object' && item.company !== null
@@ -72,6 +92,11 @@ function normalizeApiTransaction(item) {
     const companyId = typeof item.company === 'object' && item.company !== null
         ? String(item.company._id ?? item.company.id ?? '')
         : String(item.company ?? '');
+    // Company registration payment_pending hai par backend ne "success" bheja -> Pending dikhao
+    const regStatus = companyStatusIndex[companyId] ?? '';
+    const finalStatus = UNPAID_REG_STATUSES.includes(regStatus) && statusValue === 'Success'
+        ? 'Pending'
+        : statusValue;
     const details = {
         _id: String(item._id ?? item.id ?? item.transactionId ?? 'unknown'),
         amount: amountNumber,
@@ -83,7 +108,7 @@ function normalizeApiTransaction(item) {
             : undefined,
         currency: String(item.currency ?? 'USD').toUpperCase(),
         date: item.date ?? item.createdAt ?? '',
-        status: statusValue.toLowerCase(),
+        status: finalStatus.toLowerCase(),
         type: String(item.type ?? item.category ?? 'payment'),
         description: String(item.description ?? item.title ?? 'Payment record'),
         notes: String(item.notes ?? ''),
@@ -116,11 +141,33 @@ function normalizeApiTransaction(item) {
         cashAmount: Number.isFinite(cashAmountNumber)
             ? formatAmountField(cashAmountNumber, item.currency)
             : undefined,
-        status: statusValue,
+        status: finalStatus,
         method: String(item.method ?? item.paymentMethod ?? 'Unknown'),
         category: String(item.category ?? item.type ?? 'Payment'),
         details,
     };
+}
+// Backend kabhi ek hi payment record ko multiple rows me bhej deta hai (ya _id ke bina).
+// Isliye stable identity se ek hi entry rakhte hain - warna list me duplicate dikhta hai.
+function dedupeApiTransactions(items) {
+    const seen = new Set();
+    return (Array.isArray(items) ? items : []).filter(item => {
+        const details = item?.details ?? {};
+        const strongId = String(details._id ?? '').trim();
+        const txnId = String(details.transactionId ?? '').trim();
+        const refId = String(details.referenceId ?? '').trim();
+        const identity = strongId && strongId !== 'unknown'
+            ? `id:${strongId}`
+            : (txnId || refId)
+                ? `txn:${txnId || refId}`
+                // Koi id nahi to content se banana padega, warna alag payments merge ho jayenge
+                : `composite:${details.company ?? ''}|${details.amount ?? item?.amount ?? ''}|${item?.date ?? ''}|${item?.type ?? item?.category ?? ''}|${item?.status ?? ''}`;
+        if (seen.has(identity)) {
+            return false;
+        }
+        seen.add(identity);
+        return true;
+    });
 }
 export default function TransactionsScreen() {
     const route = useRoute();
@@ -130,7 +177,7 @@ export default function TransactionsScreen() {
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const rawCompanies = useAppSelector(state => state.auth.user?.companies);
-    const userCompanies = rawCompanies ?? [];
+    const userCompanies = useMemo(() => rawCompanies ?? [], [rawCompanies]);
     const hasNoCompany = userCompanies.length === 0;
     const [activeFilter, setActiveFilter] = useState('All');
     const [selectedCurrency, setSelectedCurrency] = useState(null);
@@ -139,6 +186,9 @@ export default function TransactionsScreen() {
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
+    // Company registration status ka index - payment pending wali company ka transaction
+    // Success nahi dikhna chahiye, chahe backend payment record me aisa bhej de
+    const companyStatusIndex = useMemo(() => buildCompanyStatusIndex(userCompanies), [userCompanies]);
     useEffect(() => {
         let isMounted = true;
         async function loadTransactions() {
@@ -149,8 +199,8 @@ export default function TransactionsScreen() {
                 if (!isMounted)
                     return;
                 if (response.isSuccess) {
-                    const normalized = response.payments.map(normalizeApiTransaction);
-                    setTransactions(normalized);
+                    const normalized = response.payments.map(payment => normalizeApiTransaction(payment, companyStatusIndex));
+                    setTransactions(dedupeApiTransactions(normalized));
                 }
                 else {
                     setErrorMessage(response.error || 'Unable to load transactions.');
@@ -169,7 +219,7 @@ export default function TransactionsScreen() {
         return () => {
             isMounted = false;
         };
-    }, [token]);
+    }, [token, companyStatusIndex]);
     const filteredTransactions = useMemo(() => {
         if (hasNoCompany) return [];
         return transactions.filter(item => {
@@ -332,7 +382,7 @@ export default function TransactionsScreen() {
             ]}>
                 {errorMessage}
             </Text>
-        </View>) : (<FlatList data={currencyFilteredTransactions} keyExtractor={item => item.id} contentContainerStyle={{
+        </View>) : (<FlatList data={currencyFilteredTransactions} keyExtractor={(item, index) => `${item.id}-${index}`} contentContainerStyle={{
             paddingHorizontal: s(20),
             paddingBottom: safeAreaInsets.bottom + s(24),
         }} ListEmptyComponent={<View style={[

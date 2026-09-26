@@ -7,8 +7,8 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
@@ -24,9 +24,7 @@ const FILTER_TAGS = [
 const FEATURES = [
   {
     boldText: '$100 state fee',
-    normalText: ' and only ',
-    boldText2: '$60 a year',
-    normalText2: ' after — the lowest running cost of any credible state.',
+    normalText: ' — the lowest running cost of any credible state.',
   },
   {
     boldText: 'No state income, franchise or gross receipts tax',
@@ -49,7 +47,7 @@ const CLOSE_ALTERNATIVES = [
 ];
 
 export const STATES_DATA = [
-  { code: 'WY', name: 'Wyoming', popularityRank: 1, tag: 'Best value', tagline: 'Best value, strong privacy', snippet: 'Lowest running costs in the US with no income tax and members kept off public record.', bestFor: 'Solo founders, e-commerce, holding companies, cost-conscious setups', keyPoints: ['$100 state fee — excellent value', 'No state income, franchise or gross receipts tax', 'Members not disclosed on public filings', 'Lifetime proxy permitted for added anonymity'], govtFees: { formation: 100, annual: 60, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report licence tax, $60 minimum, based on assets located in Wyoming.', verified: true, source: 'CompanyVista official rate card' }, timeline: '3–5 days', serviceFee: 299, stateIncomeTax: 'None', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 399, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false }, icon: '⛰️', subtitle: 'LLC · best value overall', match: '94%', price: '$399', priceNote: '$299 package + $100 state', features: FEATURES, warning: 'if you later raise VC money, expect investors to ask you to redomesticate to Delaware.', desc: '$100 state fee and only $60 a year after' },
+  { code: 'WY', name: 'Wyoming', popularityRank: 1, tag: 'Best value', tagline: 'Best value, strong privacy', snippet: 'Lowest running costs in the US with no income tax and members kept off public record.', bestFor: 'Solo founders, e-commerce, holding companies, cost-conscious setups', keyPoints: ['$100 state fee — excellent value', 'No state income, franchise or gross receipts tax', 'Members not disclosed on public filings', 'Lifetime proxy permitted for added anonymity'], govtFees: { formation: 100, annual: 60, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report licence tax, $60 minimum, based on assets located in Wyoming.', verified: true, source: 'CompanyVista official rate card' }, timeline: '3–5 days', serviceFee: 299, stateIncomeTax: 'None', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 399, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false }, icon: '⛰️', subtitle: 'LLC · best value overall', match: '94%', price: '$399', priceNote: '$299 package + $100 state', features: FEATURES, warning: 'if you later raise VC money, expect investors to ask you to redomesticate to Delaware.', desc: '$100 state fee' },
   { code: 'DE', name: 'Delaware', popularityRank: 2, tag: 'Top pick', tagline: 'What investors expect', snippet: 'The state VCs insist on. Court of Chancery gives the deepest business-law precedent anywhere.', bestFor: 'Startups raising VC, companies issuing equity, holding structures', keyPoints: ['Preferred by the overwhelming majority of US VCs', 'Court of Chancery — judges, no juries, deep precedent', 'No state income tax on income earned outside Delaware', 'Members and managers not on public record'], govtFees: { formation: 160, annual: 300, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual franchise tax, $300 minimum for LLCs. Corporations calculated on authorised shares.', verified: true, source: 'CompanyVista official rate card' }, timeline: '5–7 days', serviceFee: 299, stateIncomeTax: 'None on out-of-state income', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 459, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false }, icon: '⚖️', subtitle: 'Only if raising capital', match: '64%', price: '$459', priceNote: '$299 package + $160 state', features: [{ boldText: 'Investor standard', normalText: ' — VCs prefer Delaware C-Corp.' }, { boldText: '$300/yr franchise tax', normalText: ' — expensive to maintain.' }, { boldText: 'Court of Chancery', normalText: ' — strong legal precedent.' }, { boldText: '5–7 days', normalText: ' to form.' }], warning: 'overkill and costly if you are not raising VC money.', desc: '$160 state fee + $300/yr' },
   { code: 'NM', name: 'New Mexico', popularityRank: 3, tag: 'No annual fee', tagline: 'No annual report, ever', snippet: 'File once and it stays active. The only state with no annual filing at all.', bestFor: 'Passive holding entities, long-term dormant structures, IP holding', keyPoints: ['$50 state fee — joint cheapest', 'No annual report ever required', 'No recurring state fee at all', 'Members not disclosed publicly'], govtFees: { formation: 50, annual: 0, annualFrequency: 'none', currency: 'USD', annualNote: 'No annual report or fee required for LLCs at any point.', verified: true, source: 'CompanyVista official rate card' }, timeline: '4–6 days', serviceFee: 299, stateIncomeTax: '5.9% top rate on NM-sourced income', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 349, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence.', verified: false }, icon: '🌵', subtitle: 'No annual report ever', match: '91%', price: '$349', priceNote: '$299 package + $50 state', features: [{ boldText: 'No annual report ever', normalText: ' — truly set and forget.' }, { boldText: 'Anonymous LLC', normalText: ' — members not on public record.' }, { boldText: '$50 state fee', normalText: ' — cheapest credible option.' }, { boldText: '4–6 days', normalText: ' to form.' }], warning: 'less prestige than Wyoming with banks and vendors.', desc: '$349 · no annual report ever · anonymous' },
   { code: 'FL', name: 'Florida', popularityRank: 4, tag: 'Popular', tagline: 'No personal income tax', snippet: 'Fast processing and no state income tax. Strong for real estate and consumer businesses.', bestFor: 'Real estate holdings, consumer businesses, LatAm-connected founders', keyPoints: ['$125 state fee', 'No personal state income tax', 'Strong real estate framework', '$138.75 annual report, strictly enforced'], govtFees: { formation: 125, annual: 138.75, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report due 1 May. $400 penalty if filed late — this is strictly enforced.', verified: true, source: 'CompanyVista official rate card' }, timeline: '4–6 days', serviceFee: 299, stateIncomeTax: '5.5% corporate', anonymousLLC: false, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 424, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: "No general staffing licence, but workers' comp is strictly enforced.", verified: false }, icon: '🌴', subtitle: 'No personal income tax', match: '88%', price: '$424', priceNote: '$299 package + $125 state', features: [{ boldText: '$125 state fee', normalText: '' }, { boldText: 'No personal income tax', normalText: '' }, { boldText: 'Strong real estate framework', normalText: '' }, { boldText: '4–6 days', normalText: ' to form.' }], warning: 'Annual report strictly enforced.', desc: '$125 state fee · $138.75/yr' },
@@ -105,6 +103,8 @@ export const STATES_DATA = [
 export default function BestStatesForYouScreen({ navigation, route }) {
   const [selected, setSelected] = useState(STATES_DATA[0]);
   const alternatives = STATES_DATA.filter(s => s.name !== selected.name);
+  const stateFee = selected.govtFees?.formation ?? 0;
+  const stateFeeLabel = `$${stateFee}`;
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
@@ -194,8 +194,8 @@ export default function BestStatesForYouScreen({ navigation, route }) {
           {/* Pricing Footer - dynamic */}
           <View style={styles.cardFooter}>
             <View style={styles.priceContainer}>
-              <Text style={styles.priceAmount}>{selected.price}</Text>
-              <Text style={styles.priceNote}>{selected.priceNote}</Text>
+              <Text style={styles.priceAmount}>{stateFeeLabel}</Text>
+              <Text style={styles.priceNote}>State fee</Text>
             </View>
             <Text style={styles.timeframeText}>{selected.timeline || selected.timeframe}</Text>
           </View>
@@ -237,7 +237,7 @@ export default function BestStatesForYouScreen({ navigation, route }) {
           navigation.navigate('CompanyNaming', { ...(route?.params || {}), bestState: selected.name, bestStatePrice: priceNum, bestStatePriceNote: selected.priceNote, bestStateTimeframe: selected.timeline || selected.timeframe, bestStateGovFee: govFee, bestStateCode: selected.code, advisorFlow: true, selectedCountry: 'US', selectedState: selected.name });
         }}>
           <Text style={styles.actionButtonText}>
-            Continue with {selected.name} · {selected.price}  →
+            Continue with {selected.name} · {stateFeeLabel} state fee  →
           </Text>
         </TouchableOpacity>
 

@@ -5,10 +5,10 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   Image,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -344,7 +344,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         {loadingTotal && !reviewData ? (
           <View style={[styles.companyCard, { alignItems: 'center', paddingVertical: 20 }]}>
             <ActivityIndicator size="small" color="#D4AF37" />
-            <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 8 }}>Loading review from backend...</Text>
+            <Text style={{ color: '#94A3B8', fontSize: 12, marginTop: 8 }}>Loading review from backend...</Text>
           </View>
         ) : null}
         {/* Company + Founder Summary — reviewData.company + reviewData.founder + reviewData.pricing se */}
@@ -492,7 +492,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
               </View>
               <Text style={styles.summaryPrice}>${route.params.bestStatePrice}</Text>
             </View>
-            <Text style={{ color: '#10B981', fontSize: 11, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
+            <Text style={{ color: '#10B981', fontSize: 12, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
           </View>
         ) : null}
 
@@ -531,10 +531,10 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             <Text style={styles.totalAmount}>{displayTotal}</Text>
           </View>
           {pricingType === 'quoted' && (
-            <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
+            <Text style={{ color: '#94A3B8', fontSize: 12, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
           )}
           {reviewData && (
-            <Text style={{ color: '#64748B', fontSize: 10, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
+            <Text style={{ color: '#64748B', fontSize: 11, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
           )}
         </View>
 
@@ -579,55 +579,55 @@ const styles = StyleSheet.create({
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   summaryIconBox: { width: 26, height: 26, borderRadius: 7, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.25)', justifyContent: 'center', alignItems: 'center' },
-  summaryHeaderTitle: { color: '#8E9BAE', fontSize: 10, fontWeight: '700', letterSpacing: 0.8 },
+  summaryHeaderTitle: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  editText: { color: '#D4AF37', fontSize: 11, fontWeight: '600' },
+  editText: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
   summaryRowSmall: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
-  summaryLabel: { color: '#6C7A8E', fontSize: 12 },
-  summaryValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
-  summaryValueGold: { color: '#D4AF37', fontSize: 12, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
-  summaryValueSmall: { color: '#8E9BAE', fontSize: 10, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
+  summaryLabel: { color: '#6C7A8E', fontSize: 13 },
+  summaryValue: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
+  summaryValueGold: { color: '#D4AF37', fontSize: 13, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
+  summaryValueSmall: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
   residenceValue: { flexDirection: 'row', alignItems: 'center' },
   titleContainer: { marginVertical: s(10) },
   mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: 14 },
+  subtitle: { color: '#8E9BAE', fontSize: 15 },
   includedCard: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
   checkGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 8, columnGap: 16 },
   checkItem: { flexDirection: 'row', alignItems: 'center' },
-  checkItemText: { color: '#8E9BAE', fontSize: 12, marginLeft: s(6) },
+  checkItemText: { color: '#8E9BAE', fontSize: 13, marginLeft: s(6) },
   addOnsCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(12) },
   addOnsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   addOnsTitleRow: { flexDirection: 'row', alignItems: 'center' },
-  addOnsHeaderText: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
+  addOnsHeaderText: { color: '#8E9BAE', fontSize: 12, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
   changeButton: { flexDirection: 'row', alignItems: 'center' },
-  changeText: { color: '#D4AF37', fontSize: 12, fontWeight: '600', marginLeft: s(4) },
+  changeText: { color: '#D4AF37', fontSize: 13, fontWeight: '600', marginLeft: s(4) },
   addOnItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
   addOnTextGroup: { flex: 1, paddingRight: s(10) },
-  addOnTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  addOnSubtext: { color: '#6C7A8E', fontSize: 11, marginTop: s(2) },
-  addOnPrice: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  addOnTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  addOnSubtext: { color: '#6C7A8E', fontSize: 12, marginTop: s(2) },
+  addOnPrice: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   itemSeparator: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)', marginVertical: s(10) },
   summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginBottom: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  summarySubtext: { color: '#6C7A8E', fontSize: 11, marginTop: s(2) },
-  summaryPrice: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  summarySubtext: { color: '#6C7A8E', fontSize: 12, marginTop: s(2) },
+  summaryPrice: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(4) },
-  totalLabel: { color: '#8E9BAE', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  totalLabel: { color: '#8E9BAE', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
   timelineBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: s(12), flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
   timelineIcon: { marginRight: s(10) },
-  timelineText: { color: '#8E9BAE', fontSize: 12, flex: 1 },
+  timelineText: { color: '#8E9BAE', fontSize: 13, flex: 1 },
   timelineBold: { color: '#00E676', fontWeight: '700' },
   checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
   checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: '#4A5768', backgroundColor: '#0C1622', justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
   checkboxActive: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
-  checkboxLabel: { color: '#8E9BAE', fontSize: 12, flex: 1, lineHeight: 16 },
+  checkboxLabel: { color: '#8E9BAE', fontSize: 13, flex: 1, lineHeight: 18 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   confirmButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   confirmButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700', marginRight: s(8) },
-  footerSubtext: { color: '#5B6B7C', fontSize: 11, textAlign: 'center', marginTop: s(10) },
+  footerSubtext: { color: '#5B6B7C', fontSize: 12, textAlign: 'center', marginTop: s(10) },
   footerSubtextBold: { color: '#D4AF37', fontWeight: '600' },
 });

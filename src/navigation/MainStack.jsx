@@ -39,6 +39,9 @@ const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/
 const DeleteAccountScreen = lazy(() => import('../features/settings/screens/DeleteAccountScreen'));
 const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
 const StatusScreen = lazy(() => import('../features/auth/screens/StatusScreen'));
+const ResumePaymentScreen = lazy(() => import('../features/auth/screens/ResumePaymentScreen'));
+const ShareholdersScreen = lazy(() => import('../features/auth/screens/ShareholdersScreen'));
+const VerifyIdentityScreen = lazy(() => import('../features/auth/screens/VerifyIdentityScreen'));
 
 const Stack = createNativeStackNavigator();
 
@@ -100,6 +103,11 @@ export default function MainStack() {
       <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Delete Account' }}/>
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
       <Stack.Screen name="Status" component={StatusScreen} options={{ headerShown: false }}/>
+      {/* Unpaid company ka real Stripe checkout (app restart / login ke baad) */}
+      <Stack.Screen name="ResumePayment" component={ResumePaymentScreen} options={{ headerShown: false }}/>
+      {/* Payment ke baad real KYC - AuthStack ke same screens, taaki Home se resume flow poora chale */}
+      <Stack.Screen name="Shareholders" component={ShareholdersScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="VerifyIdentity" component={VerifyIdentityScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
     </Suspense>);
 }

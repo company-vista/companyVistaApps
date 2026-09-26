@@ -1,5 +1,17 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  StatusBar,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { s } from '../theme/responsive';

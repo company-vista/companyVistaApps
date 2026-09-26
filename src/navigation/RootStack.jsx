@@ -17,6 +17,9 @@ export default function RootStack() {
     // Login ke baad sabhi authenticated users Main (HomeScreen) pe jayenge
     // Dashboard block logic HomeScreen me handle hota hai (isCompleteRegistration === false pe auto-overlay)
     const canAccessDashboard = isAuthenticated;
+    // Auth screen ka key logout/cold-start par change hota hai taaki AuthStack naya mount ho.
+    // Bina key ke React same position ka Stack.Screen reuse kar leta hai aur AuthStack
+    // purane route (Onboarding/deep signup) par atak jata hai - Login kabhi nahi khulta.
     return (<NavigationContainer theme={appTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0f172a' } }}>
         {canAccessDashboard ? (<Stack.Screen name="Main" component={MainStack}/>) : (<Stack.Screen key={redirectToLogin ? 'auth-login' : 'auth-onboarding'} name="Auth" component={AuthStack}/>)}

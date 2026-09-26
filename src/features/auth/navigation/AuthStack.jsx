@@ -36,18 +36,40 @@ import BestStatesForYouScreen from '../jurisdictionAdvisor/BestStatesForYouScree
 import { useThemeColors } from '../../../theme/colors';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setRedirectToLogin } from '../../../store/slices/authSlice';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { useNavigation } from '@react-navigation/native';
 const Stack = createNativeStackNavigator();
 export default function AuthStack() {
     const colors = useThemeColors();
     const dispatch = useAppDispatch();
-    const redirectToLogin = useAppSelector(s => s.auth.redirectToLogin);
+    const navigation = useNavigation();
+    // Optional chaining: Fast Refresh ke dauraan hook order shift hote hue ye values
+    // undefined aa sakti hain - us dauraan AuthStack crash nahi karna chahiye.
+    const redirectToLogin = useAppSelector(s => s?.auth?.redirectToLogin);
+    const isAuthenticated = useAppSelector(s => s?.auth?.isAuthenticated);
+    const didResetRef = useRef(false);
     useEffect(() => {
-        if (redirectToLogin) {
-            const t = setTimeout(() => dispatch(setRedirectToLogin(false)), 500);
-            return () => clearTimeout(t);
+        if (!redirectToLogin) {
+            didResetRef.current = false;
+            return undefined;
         }
-    }, [redirectToLogin, dispatch]);
+        // Logout/cold-start par Login hi khulna chahiye. AuthStack kabhi kabhi purane route
+        // (Onboarding / beech ka signup step) par reuse ho jata hai, isliye current route
+        // chahe kuch bhi ho - reset Login par kar do. isReady() guard early mount par
+        // "RESET not handled by any navigator" warning rokta hai.
+        if (!didResetRef.current && navigation?.isReady?.()) {
+            didResetRef.current = true;
+            navigation.reset({ routes: [{ name: 'Login' }] });
+        }
+        // Flag tabhi clear karo jab user authenticated ho (login successful).
+        // Logout ke baad clear karne se RootStack ka key badal jata hai, AuthStack dobara
+        // mount hota hai aur initialRouteName 'Onboarding' ban kar user wahi chala jata tha.
+        if (!isAuthenticated) {
+            return undefined;
+        }
+        const t = setTimeout(() => dispatch(setRedirectToLogin(false)), 500);
+        return () => clearTimeout(t);
+    }, [redirectToLogin, isAuthenticated, dispatch, navigation]);
     return (<Stack.Navigator initialRouteName={redirectToLogin ? 'Login' : 'Onboarding'} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0a0f1e' } }}>
       <Stack.Screen name="Onboarding" component={OnboardingSlide}/>
       <Stack.Screen name="BusinessServices" component={BusinessServicesScreen}/>

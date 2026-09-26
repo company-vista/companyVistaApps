@@ -1,13 +1,14 @@
 import React from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {
   Check,
@@ -20,11 +21,24 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setAuthSession, setHasCompletedPayment } from '../../../store/slices/authSlice';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
+
+const DocUploadButton = ({ filled, onPress }) => (
+  <TouchableOpacity
+    activeOpacity={0.8}
+    onPress={onPress}
+    style={[styles.uploadBtn, filled && styles.uploadBtnFilled]}
+  >
+    {filled ? <Check color="#10B981" size={14} /> : <Camera color="#EAB308" size={14} />}
+    <Text style={[styles.uploadBtnText, filled && styles.uploadBtnTextFilled]}>
+      {filled ? 'Change' : 'Upload'}
+    </Text>
+  </TouchableOpacity>
+);
 
 const VerifyIdentityScreen = ({ navigation, route }) => {
   const dispatch = useAppDispatch();
@@ -40,6 +54,11 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
   // clientId: prefer founder clientId (pendingOrder/authUser) else first shareholder's clientId
   const primaryShareholderForId = shareholders.find(s => s.clientId) || null;
   const clientId = route?.params?.clientId || pendingOrder?.clientId || authUser?._id || authUser?.id || primaryShareholderForId?.clientId || '';
+  // founder ka percentage ShareholdersScreen se aata hai (ownership '60%' ya sharePercentage)
+  const founderShareholder = primaryShareholderForId || shareholders[0] || null;
+  const sharePercentNum = parseInt(String(founderShareholder?.ownership ?? founderShareholder?.sharePercentage ?? '').replace('%', ''), 10);
+  const founderRoleText = String(founderShareholder?.role || founderShareholder?.designation || '').trim();
+  const userRoleText = [sharePercentNum > 0 ? `${sharePercentNum}% owner` : '', founderRoleText || 'Managing Member'].filter(Boolean).join(' · ');
 
   const handleContinue = () => {
     const token = route?.params?.signupToken || route?.params?.token || pendingOrder?.token || authToken || '';
@@ -55,6 +74,12 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
     }
     // Payment ho chuka hai -> Home dikhao, tracking nahi. Dubara login pe bhi Home dikhe isliye flag persist karo
     dispatch(setHasCompletedPayment(true));
+    // Already logged-in (Home se resume kiye hue payment) ho to AuthStack switch nahi hoga,
+    // isliye khud Home par wapas jao - warna user KYC screen pe hi atak jayega
+    if (isAuthenticated) {
+      if (navigation?.popToTop) navigation.popToTop();
+      else navigation?.navigate?.('Home');
+    }
   };
   const [passportUri, setPassportUri] = React.useState(null);
   const [addressUri, setAddressUri] = React.useState(null);
@@ -100,8 +125,27 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
     return () => { mounted = false; };
   }, [companyId, token]);
 
+  // camera se photo (client se seedha photo lena hai)
+  const openCamera = (type) => {
+    launchCamera({ mediaType: 'photo', quality: 0.9, saveToPhotos: false }, (res) => {
+      if (res.didCancel) return;
+      if (res.errorCode) {
+        Toast.show({ type: 'error', text1: res.errorMessage || 'Camera error' });
+        return;
+      }
+      const asset = res.assets?.[0];
+      const uri = asset?.uri;
+      if (!uri) return;
+      if (type === 'passport') setPassportUri(uri);
+      if (type === 'address') setAddressUri(uri);
+      if (type === 'selfie') setSelfieUri(uri);
+      Toast.show({ type: 'success', text1: `${type} photo captured — tap Upload to send` });
+    });
+  };
+
+  // gallery se file/photo pick (PDF bhi chalega)
   const openGallery = (type) => {
-    launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, (res) => {
+    launchImageLibrary({ mediaType: 'mixed', selectionLimit: 1 }, (res) => {
       if (res.didCancel) return;
       if (res.errorCode) {
         Toast.show({ type: 'error', text1: res.errorMessage || 'Gallery error' });
@@ -113,8 +157,18 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
       if (type === 'passport') setPassportUri(uri);
       if (type === 'address') setAddressUri(uri);
       if (type === 'selfie') setSelfieUri(uri);
-      Toast.show({ type: 'success', text1: `${type} selected — tap Upload to send` });
+      Toast.show({ type: 'success', text1: `${type} file selected — tap Upload to send` });
     });
+  };
+
+  // dono option dene wala picker: camera ya gallery
+  const openPicker = (type) => {
+    const title = { passport: 'Passport photo', address: 'Proof of address', selfie: 'Selfie verification' }[type] || 'Upload document';
+    Alert.alert(title, 'Take a photo or choose an existing file', [
+      { text: 'Take Photo', onPress: () => openCamera(type) },
+      { text: 'Choose from Gallery', onPress: () => openGallery(type) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const buildFile = (uri, field) => {
@@ -182,12 +236,9 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
     }
   };
 
-  const primaryShareholder = shareholders.find(s => s.passportNumber) || shareholders[0] || null;
-  const passportNumber = primaryShareholder?.passportNumber || primaryShareholder?.passport || '';
-  const shareholderAddress = primaryShareholder?.address || '';
-  const shareholderPincode = primaryShareholder?.pincode || '';
-  const isPassportFilled = !!passportNumber || !!passportUri;
-  const isAddressFilled = !!shareholderAddress || !!addressUri;
+  // fill state sirf photo/file se — passport number ya address text nahi, client se capture/upload hoga
+  const isPassportFilled = !!passportUri;
+  const isAddressFilled = !!addressUri;
   const isSelfieFilled = !!selfieUri;
 
   return (
@@ -219,7 +270,7 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
             </View>
             <View>
               <Text style={styles.userName}>{authName}</Text>
-              <Text style={styles.userRole}>60% owner · Managing Member</Text>
+              <Text style={styles.userRole}>{userRoleText}</Text>
             </View>
           </View>
           <Text style={styles.progressText}>{kycStatus === 'complete' ? '3 of 3 done' : `${[passportUri, addressUri, selfieUri].filter(Boolean).length} of 3 selected`}{fetchingKyc ? '…' : ''}</Text>
@@ -228,39 +279,39 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
         {/* Upload Status Items - tap to open gallery */}
         <View style={styles.documentsContainer}>
           {/* Passport */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('passport')} style={[styles.docCard, isPassportFilled && styles.verifiedCard]}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('passport')} style={[styles.docCard, isPassportFilled && styles.verifiedCard]}>
             <View style={[styles.docIconBox, { backgroundColor: isPassportFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
               <CreditCard color={isPassportFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Passport</Text>
-              <Text style={[styles.docSub, isPassportFilled && styles.docSubYellow]} numberOfLines={1}>{passportUri ? `Selected: ${passportUri.split('/').pop()}` : isPassportFilled ? `Passport: ${passportNumber}` : 'Not uploaded · tap to upload'}</Text>
+              <Text style={[styles.docSub, isPassportFilled && styles.docSubYellow]} numberOfLines={1}>{passportUri ? `Added: ${passportUri.split('/').pop()}` : 'Not uploaded · tap to add photo'}</Text>
             </View>
-            {isPassportFilled ? <Check color="#10B981" size={18} /> : <Camera color="#94A3B8" size={16} />}
+            <DocUploadButton filled={isPassportFilled} onPress={() => openPicker('passport')} />
           </TouchableOpacity>
 
           {/* Proof of address */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('address')} style={[styles.docCard, isAddressFilled && styles.verifiedCard]}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('address')} style={[styles.docCard, isAddressFilled && styles.verifiedCard]}>
             <View style={[styles.docIconBox, { backgroundColor: isAddressFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
               <FileText color={isAddressFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Proof of address</Text>
-              <Text style={[styles.docSub, isAddressFilled && styles.docSubYellow]} numberOfLines={2}>{addressUri ? `Selected: ${addressUri.split('/').pop()}` : isAddressFilled ? `${shareholderAddress}${shareholderPincode ? ` — ${shareholderPincode}` : ''}` : 'Not uploaded · tap to upload'}</Text>
+              <Text style={[styles.docSub, isAddressFilled && styles.docSubYellow]} numberOfLines={2}>{addressUri ? `Added: ${addressUri.split('/').pop()}` : 'Not uploaded · tap to add photo or bill'}</Text>
             </View>
-            {isAddressFilled ? <Check color="#10B981" size={18} /> : <Camera color="#94A3B8" size={16} />}
+            <DocUploadButton filled={isAddressFilled} onPress={() => openPicker('address')} />
           </TouchableOpacity>
 
           {/* Selfie verification */}
-          <TouchableOpacity activeOpacity={0.8} onPress={() => openGallery('selfie')} style={[styles.docCard, isSelfieFilled && styles.verifiedCard]}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('selfie')} style={[styles.docCard, isSelfieFilled && styles.verifiedCard]}>
             <View style={[styles.docIconBox, { backgroundColor: isSelfieFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
               <Camera color={isSelfieFilled ? '#10B981' : '#94A3B8'} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Selfie verification</Text>
-              <Text style={[styles.docSub, isSelfieFilled && styles.docSubYellow]}>{selfieUri ? `Selected: ${selfieUri.split('/').pop()}` : 'Not uploaded · tap to upload'}</Text>
+              <Text style={[styles.docSub, isSelfieFilled && styles.docSubYellow]}>{selfieUri ? `Added: ${selfieUri.split('/').pop()}` : 'Not uploaded · tap to take a selfie'}</Text>
             </View>
-            {isSelfieFilled ? <Check color="#10B981" size={18} /> : null}
+            <DocUploadButton filled={isSelfieFilled} onPress={() => openPicker('selfie')} />
           </TouchableOpacity>
         </View>
 
@@ -442,6 +493,30 @@ const styles = StyleSheet.create({
     color: '#EAB308',
     fontSize: 12,
     marginTop: 2,
+  },
+  uploadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginLeft: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(234, 179, 8, 0.35)',
+    backgroundColor: 'rgba(234, 179, 8, 0.08)',
+  },
+  uploadBtnFilled: {
+    borderColor: 'rgba(16, 185, 129, 0.35)',
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+  },
+  uploadBtnText: {
+    color: '#EAB308',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  uploadBtnTextFilled: {
+    color: '#10B981',
   },
   progressTrack: {
     height: 3,

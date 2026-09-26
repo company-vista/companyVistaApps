@@ -1,14 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  Image,
-  SafeAreaView,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, Animated } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import logoR from '../../../assets/images/logoR.png';

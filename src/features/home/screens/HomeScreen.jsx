@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, BackHandler, Easing, Pressable, StyleSheet, Text, View, } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -16,6 +16,7 @@ import { CompanySwitcherModal } from './homeScreenComponent/CompanySwitcherModal
 import { notifications } from '../../notifications/data/notifications';
 import { fetchNotifications } from '../../notifications/api/notificationsApi';
 import { fetchClientCompanies, fetchClientCompanyDetails, } from '../api/clientProfileApi';
+import { getCompanyTotalAmount, isRegistrationUnpaid } from '../../../utils/companyStatus';
 import { mapCompanyToListItem } from './quickAccess/companyListItem';
 import PullToRefresh from './homeScreenComponent/PullToRefresh';
 import BillingTabContent from './invoices/InvoicesTabContent';
@@ -109,6 +110,7 @@ export default function HomeScreen() {
         }
     }, [pendingOpenRegistrationProgress, dispatch]);
     const pendingOrderData = useAppSelector(s => s.auth.pendingOrderData);
+    const pendingSignup = useAppSelector(s => s.auth.pendingSignup);
     useEffect(() => {
         if (pendingOpenRegistrationTracking) {
             const pendingId = pendingOrderData?.companyId || pendingOrderData?.company_id || user?.companies?.[0]?._id || user?.companies?.[0]?.id || null;
@@ -143,6 +145,62 @@ export default function HomeScreen() {
     // also check raw user.companies as fallback before fetch completes (login response) - but skip if payment already done
     const hasPendingInUser = !isPaid && !hasPendingRegistration && Array.isArray(user?.companies) && user.companies.some(isCompanyPending);
     const isOrderLockedPending = !isPaid && (hasPendingRegistration || hasPendingInUser);
+
+    // ---- Unpaid company detection (per company, global isPaid flag par depend nahi) ----
+    // Shared logic: src/utils/companyStatus.js (HomeScreen + Transactions + RegistrationTracking)
+    // Banner sirf SELECTED company ka dikhega - doosri company select karne par CTA nahi banega.
+    const isCompanyUnpaid = (c) => {
+        if (!c) return false;
+        if (isRegistrationUnpaid(c)) return true;
+        const pendingId = pendingSignup?.companyId;
+        if (pendingId && String(c?.id ?? '') === String(pendingId)) return true;
+        return false;
+    };
+    // Sirf selected company ka unpaid state matter karta hai.
+    // Exception: koi company selected hi nahi hai (list abhi load nahi hui) tab persisted pending
+    // signup se CTA dikhao - taaki app restart ke baad resume payment ka raasta na toote.
+    const unpaidCompany = (() => {
+        if (isCompanyUnpaid(selectedCompany)) return selectedCompany;
+        if (selectedCompany) return null;
+        if (pendingSignup?.companyId) {
+            const amount = Number(pendingSignup.totalAmount) || 0;
+            return {
+                id: pendingSignup.companyId,
+                name: 'your company',
+                registrationStatus: 'payment_pending',
+                totalAmount: amount,
+                raw: { totalAmount: amount },
+            };
+        }
+        return null;
+    })();
+    const unpaidCompanyAmount = getCompanyTotalAmount(unpaidCompany);
+    const unpaidCompanyLabel = unpaidCompany?.name || 'your company';
+    const handleResumePaymentPress = useCallback(() => {
+        if (!unpaidCompany?.id) {
+            Toast.show({ type: 'error', text1: 'Company not found', text2: 'Please contact support to complete this payment' });
+            return;
+        }
+        navigation.navigate('ResumePayment', {
+            companyId: String(unpaidCompany.id),
+            companyName: unpaidCompanyLabel,
+            totalAmount: unpaidCompanyAmount,
+            registrationStatus: unpaidCompany?.registrationStatus ?? '',
+            state: unpaidCompany?.raw?.state ?? unpaidCompany?.state ?? pendingSignup?.selectedState ?? null,
+            country: unpaidCompany?.raw?.countryOfIncorporation ?? pendingSignup?.selectedCountry ?? null,
+        });
+    }, [unpaidCompany, unpaidCompanyAmount, unpaidCompanyLabel, navigation, pendingSignup?.selectedState, pendingSignup?.selectedCountry]);
+
+    // Payment complete hone ke baad Home par wapas aane par company list refresh karo,
+    // warna "Payment pending" banner stale status ki wajah se ghoomta rahega
+    const [refreshTick, setRefreshTick] = useState(0);
+    const refreshedAfterPaymentRef = useRef(false);
+    useFocusEffect(useCallback(() => {
+        if (hasCompletedPaymentFlag && !refreshedAfterPaymentRef.current) {
+            refreshedAfterPaymentRef.current = true;
+            setRefreshTick(t => t + 1);
+        }
+    }, [hasCompletedPaymentFlag]));
 
     // Quoted country (price undefined) -> Review ke baad auto OrderDetailsScreen khulega
     useEffect(() => {
@@ -301,19 +359,20 @@ export default function HomeScreen() {
         return () => {
             isMounted = false;
         };
-    }, [token, userCompanies, userId]);
+    }, [token, userCompanies, userId, refreshTick]);
     // Registration incomplete (false) -> dashboard block
+    // Agar koi company ka payment pending hai to Add Company force mat karo - user ko pehle pay karne do
     useEffect(() => {
-        if (user?.isCompleteRegistration === false && !isAddCompanyOpen && !isRegistrationTrackingOpen && token) {
+        if (user?.isCompleteRegistration === false && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && !unpaidCompany) {
             setIsAddCompanyOpen(true);
         }
-    }, [user?.isCompleteRegistration, isAddCompanyOpen, isRegistrationTrackingOpen, token]);
+    }, [user?.isCompleteRegistration, isAddCompanyOpen, isRegistrationTrackingOpen, token, unpaidCompany]);
     // Ensure onboarding AddCompany auto-opens only for incomplete registration with no companies
     useEffect(() => {
-        if (!isLoadingCompanies && companyOptions.length === 0 && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && user?.isCompleteRegistration === false) {
+        if (!isLoadingCompanies && companyOptions.length === 0 && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && user?.isCompleteRegistration === false && !unpaidCompany) {
             setIsAddCompanyOpen(true);
         }
-    }, [isLoadingCompanies, companyOptions.length, isAddCompanyOpen, isRegistrationTrackingOpen, token, user?.isCompleteRegistration]);
+    }, [isLoadingCompanies, companyOptions.length, isAddCompanyOpen, isRegistrationTrackingOpen, token, user?.isCompleteRegistration, unpaidCompany]);
     useEffect(() => {
         if (isDemoToken) return;
         if (!selectedCompany?.id) {
@@ -625,7 +684,22 @@ export default function HomeScreen() {
         return (<RegistrationProgressScreen navigation={{ goBack: () => setIsRegistrationProgressOpen(false) }} route={{ params: {} }} onActive={() => setIsRegistrationProgressOpen(false)} />);
     }
     if (isRegistrationTrackingOpen) {
-        return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={trackingCompanyId ?? selectedCompany?.id} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={(companyId) => {
+        return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={trackingCompanyId ?? selectedCompany?.id} onPayPress={() => {
+            const payTarget = companyOptions.find(c => String(c.id) === String(trackingCompanyId ?? selectedCompany?.id)) ?? selectedCompany;
+            if (!isRegistrationUnpaid(payTarget)) {
+                handleResumePaymentPress();
+                return;
+            }
+            const amount = getCompanyTotalAmount(payTarget);
+            navigation.navigate('ResumePayment', {
+                companyId: String(payTarget?.id ?? ''),
+                companyName: payTarget?.name ?? 'your company',
+                totalAmount: amount,
+                registrationStatus: payTarget?.registrationStatus ?? '',
+                state: payTarget?.raw?.state ?? payTarget?.state ?? null,
+                country: payTarget?.raw?.countryOfIncorporation ?? null,
+            });
+        }} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={(companyId) => {
             setIsRegistrationTrackingOpen(false);
             setEditingCompanyId(companyId || selectedCompany?.id || null);
             setIsAddCompanyOpen(true);
@@ -689,6 +763,20 @@ export default function HomeScreen() {
                 paddingBottom: safeAreaInsets.bottom + 75,
             },
         ]} showsVerticalScrollIndicator={false}>
+            {activeTab === 'home' && unpaidCompany ? (
+                <View style={styles.pendingPaymentBanner}>
+                    <Text style={styles.pendingPaymentTitle}>Payment pending</Text>
+                    <Text style={styles.pendingPaymentText}>
+                        Payment is still pending for {unpaidCompanyLabel}{unpaidCompanyAmount > 0 ? ` · $${unpaidCompanyAmount} due` : ''}
+                    </Text>
+                    <Pressable style={styles.pendingPaymentButton} onPress={handleResumePaymentPress}>
+                        <FontAwesome name="credit-card" size={15} color="#0A111D" />
+                        <Text style={styles.pendingPaymentButtonText}>
+                            {unpaidCompanyAmount > 0 ? `Pay $${unpaidCompanyAmount} now` : 'Pay now'}
+                        </Text>
+                    </Pressable>
+                </View>
+            ) : null}
             {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')

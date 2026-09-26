@@ -5,11 +5,11 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Animated,
   StatusBar,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
@@ -205,9 +205,9 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90), gap: s(2) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(12), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: s(20), fontWeight: '500', lineHeight: s(34), marginBottom: s(10) },
+  mainTitle: { color: '#FFFFFF', fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(10) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: s(12), lineHeight: s(18), marginBottom: s(24) },
+  subtitle: { color: '#94A3B8', fontSize: s(14), lineHeight: s(21), marginBottom: s(24) },
   jurisdictionCard: {
     width: '100%',
     flexDirection: 'row', alignItems: 'center',
@@ -215,9 +215,9 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: s(14), paddingVertical: s(12), marginBottom: s(14),
   },
-  countryCodeBadge: { color: '#64748B', fontSize: 12, fontWeight: 'bold', marginRight: s(8) },
-  jurisdictionLabel: { color: '#64748B', fontSize: 12, flex: 1 },
-  jurisdictionValue: { color: '#C9A84C', fontSize: 12, fontWeight: 'bold' },
+  countryCodeBadge: { color: '#64748B', fontSize: s(13), fontWeight: 'bold', marginRight: s(8) },
+  jurisdictionLabel: { color: '#64748B', fontSize: s(14), flex: 1 },
+  jurisdictionValue: { color: '#C9A84C', fontSize: s(15), fontWeight: 'bold' },
   inputLabel: { color: '#64748B', fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(12) },
   requiredAsterisk: { color: '#EF4444' },
   successInputContainer: {

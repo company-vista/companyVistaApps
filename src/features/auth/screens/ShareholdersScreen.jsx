@@ -5,11 +5,11 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   TextInput,
   Modal,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {
   CheckCircle2,

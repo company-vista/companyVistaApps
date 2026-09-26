@@ -8,6 +8,38 @@ const styles = StyleSheet.create({
     content: {
         paddingHorizontal: s(18),
     },
+    pendingPaymentBanner: {
+        backgroundColor: '#0C1622',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(212, 175, 55, 0.35)',
+        padding: s(16),
+        marginBottom: s(16),
+    },
+    pendingPaymentTitle: {
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: '700',
+    },
+    pendingPaymentText: {
+        color: '#8E9BAE',
+        fontSize: 12,
+        marginTop: s(4),
+    },
+    pendingPaymentButton: {
+        marginTop: s(12),
+        backgroundColor: '#D4AF37',
+        height: 44,
+        borderRadius: 22,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    pendingPaymentButtonText: {
+        color: '#0A111D',
+        fontSize: 14,
+        fontWeight: '700',
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',

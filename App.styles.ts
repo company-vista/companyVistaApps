@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(201,168,76,0.12)',
   },
   globeImage: {
-    width: 200,
-    height: 200,
+    width: 230,
+    height: 230,
     borderRadius: 100,
   },
   toastCard: {

@@ -10,6 +10,7 @@ import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
+import { getCompanyTotalAmount, isRegistrationUnpaid, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
 const STATUS_STEPS = {
     standard: [
         { title: 'Application Submitted', description: 'Your application is in queue for review.', timeframe: '0-1 day' },
@@ -33,17 +34,43 @@ const STATUS_STEPS = {
         { title: 'Completed', description: 'Your company registration is complete.', timeframe: 'Done' },
     ],
 };
-const STATUS_ORDER = ['pending', 'submitted', 'under_review', 'action_required', 'processing', 'completed', 'delivered', 'active'];
+// Backend status ko 5-step timeline ke step index par map karo.
+// Pehle STATUS_ORDER (8 items) ka index directly steps (5 items) me use ho raha tha,
+// jiski wajah se 'formation_in_progress' aur 'payment_pending' dono ko step 0 mil raha tha.
+const STATUS_TO_STEP = {
+    payment_pending: 0,
+    payment_failed: 0,
+    initiated: 0,
+    not_paid: 0,
+    unpaid: 0,
+    pending: 0,
+    submitted: 0,
+    application_submitted: 0,
+    under_review: 1,
+    review: 1,
+    action_required: 2,
+    info_required: 2,
+    processing: 3,
+    formation_in_progress: 3,
+    ein_in_progress: 3,
+    kyc_pending: 3,
+    completed: 4,
+    delivered: 4,
+    active: 4,
+    registered: 4,
+    approved: 4,
+    payment_confirmed: 4,
+    confirmed: 4,
+    paid: 4,
+};
+const TOTAL_STEPS = 5;
 function getStatusIndex(status) {
-    const normalized = status?.toLowerCase().replace(/\s+/g, '_') || 'pending';
-    const idx = STATUS_ORDER.indexOf(normalized);
-    return idx >= 0 ? idx : 0;
+    const normalized = normalizeRegistrationStatus(status) || 'pending';
+    return STATUS_TO_STEP[normalized] ?? 0;
 }
 function getProgressPercent(status) {
     const idx = getStatusIndex(status);
-    const totalSteps = STATUS_STEPS.standard.length;
-    const mappedIdx = Math.min(idx, totalSteps - 1);
-    return Math.round(((mappedIdx + 1) / totalSteps) * 100);
+    return Math.round(((idx + 1) / TOTAL_STEPS) * 100);
 }
 function formatDate(dateStr) {
     if (!dateStr)
@@ -93,7 +120,7 @@ const PACKAGE_TIMES = {
     express: ['• Priority Filing (12-24 hrs)', '• Express EIN (5-15 days)'],
     premium: ['• Premium Filing (6-12 hrs)', '• Premium EIN (3-7 days)'],
 };
-export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, onEditPress, onContactSupport, companyId, onRefreshCompanies }) {
+export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, onEditPress, onContactSupport, onPayPress, companyId, onRefreshCompanies }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const token = useAppSelector(s => s.auth.token);
@@ -146,7 +173,8 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
         onRefreshCompanies?.();
     }, [fetchCompany, onRefreshCompanies]);
     const status = company?.registrationStatus || 'pending';
-    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_');
+    const isPaymentPending = isRegistrationUnpaid(company);
+    const pendingAmount = getCompanyTotalAmount(company);
     const selectedPkg = company?.selectedPackage || 'standard';
     const steps = STATUS_STEPS[selectedPkg] || STATUS_STEPS.standard;
     const statusIdx = company ? getStatusIndex(status) : 0;
@@ -198,6 +226,18 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </TouchableOpacity>)}
         </View>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: safeAreaInsets.bottom + 24 }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
+            {isPaymentPending ? (<View style={[styles.paymentAlert, { backgroundColor: 'rgba(234, 179, 8, 0.12)', borderColor: '#eab308' }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <FontAwesome name="credit-card" color="#eab308" size={16} style={{ marginRight: 8 }}/>
+                    <Text style={[styles.paymentAlertTitle, { color: colors.text }]}>Payment pending</Text>
+                </View>
+                <Text style={[styles.paymentAlertText, { color: colors.muted }]}>
+                    {`Registration is on hold until payment is completed${pendingAmount > 0 ? ` · $${pendingAmount} due` : ''}.`}
+                </Text>
+                {onPayPress ? (<TouchableOpacity style={[styles.payButton, { backgroundColor: '#eab308' }]} onPress={onPayPress}>
+                    <Text style={styles.payButtonText}>Pay now</Text>
+                </TouchableOpacity>) : null}
+            </View>) : null}
             <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                 <View style={styles.headerRow}>
                     <View style={[styles.iconContainer, { backgroundColor: colors.surfaceAlt }]}>
@@ -224,7 +264,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                     {nextStep.title} ({nextStep.timeframe})
                 </Text>)}
 
-                {normalizedStatus === 'completed' || normalizedStatus === 'delivered' || normalizedStatus === 'active' ? (<View style={[styles.editIconBtn, { backgroundColor: '#22c55e', alignSelf: 'flex-end' }]}>
+                {statusIdx === steps.length - 1 ? (<View style={[styles.editIconBtn, { backgroundColor: '#22c55e', alignSelf: 'flex-end' }]}>
                     <FontAwesome name="check" size={16} color="#ffffff" />
                 </View>) : (<TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
                     <FontAwesome name="pencil" size={16} color="#ffffff" />
@@ -477,6 +517,32 @@ const styles = StyleSheet.create({
         fontSize: font.lg,
         fontWeight: '500',
         marginTop: 2,
+    },
+    paymentAlert: {
+        borderRadius: 14,
+        borderWidth: 1,
+        padding: 16,
+        marginBottom: 16,
+    },
+    paymentAlertTitle: {
+        fontSize: font.lg,
+        fontWeight: '700',
+    },
+    paymentAlertText: {
+        fontSize: font.md,
+        lineHeight: 20,
+    },
+    payButton: {
+        marginTop: 12,
+        height: 44,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    payButtonText: {
+        fontSize: font.lg,
+        fontWeight: '700',
+        color: '#0f172a',
     },
     stepContainer: {
         flexDirection: 'row',
