@@ -20,7 +20,7 @@ import {
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setAuthSession, setHasCompletedPayment } from '../../../store/slices/authSlice';
+import { setAuthSession, setHasCompletedPayment, setPendingCloseAddCompany } from '../../../store/slices/authSlice';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
@@ -46,6 +46,12 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
   const isAuthenticated = useAppSelector(s => s.auth.isAuthenticated);
   const authToken = useAppSelector(s => s.auth.token);
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
+  // Add Company flow: RegistrationStack ye screens apne params me aage nahi
+  // bhejta, to origin ka asli pata yahi hai ki hum modal ke andar hain ya nahi.
+  // FounderDetails → ReviewAndConfirm → CompletePayment → Status →
+  // Shareholders → VerifyIdentity, har screen pe params spread hota hai, is liye
+  // ye flag poore chain me survive karta hai.
+  const isAddCompanyFlow = route?.params?.isAddCompanyFlow === true;
   const authName = authUser?.name || [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() || route?.params?.fullName || 'Rajesh Kumar Sharma';
   const initials = authName.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0,2).toUpperCase() || 'RS';
   const shareholders = route?.params?.shareholders || [];
@@ -74,11 +80,31 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
     }
     // Payment ho chuka hai -> Home dikhao, tracking nahi. Dubara login pe bhi Home dikhe isliye flag persist karo
     dispatch(setHasCompletedPayment(true));
-    // Already logged-in (Home se resume kiye hue payment) ho to AuthStack switch nahi hoga,
-    // isliye khud Home par wapas jao - warna user KYC screen pe hi atak jayega
     if (isAuthenticated) {
-      if (navigation?.popToTop) navigation.popToTop();
-      else navigation?.navigate?.('Home');
+      // ── Add Company (RegistrationStack modal) vs MainStack ke screens ──────
+      // Ye screen DONO jagah mounted hai: AuthStack (signup), RegistrationStack
+      // (Home se Add Company — modal ke andar) aur MainStack (resume payment).
+      //
+      // Pehle yahan popToTop() tha, jo dono me galat tha:
+      //  - MainStack me: screen seedha pop ho jata tha, company list refresh
+      //    nahi hota tha.
+      //  - RegistrationStack me: popToTop sirf modal ke ANDAR RegistrationLanding
+      //    par wapas jata hai. Modal kabhi nahi band hota, to Home screen
+      //    chhupi rehti hai — nayi company list me dikhti hi nahi.
+      //
+      // Ab dono ka ek hi raasta: Home ko signal bhejo, wo navigation.goBack()
+      // se modal band karega aur apne focus effect se list refresh + nayi
+      // company auto-select karega. Ye signal tabhi bhejna chahiye jab
+      // Add Company flow chal raha hai (route param ke through), warna
+      // MainStack ke resume-payment flow me Home par koi extra goBack kar
+      // dobara peeche nikal dega.
+      if (isAddCompanyFlow) {
+        dispatch(setPendingCloseAddCompany(true));
+      } else if (navigation?.popToTop) {
+        navigation.popToTop();
+      } else {
+        navigation?.navigate?.('Home');
+      }
     }
   };
   const [passportUri, setPassportUri] = React.useState(null);

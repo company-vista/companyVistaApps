@@ -17,8 +17,8 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { CommonActions } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setPendingOrderData, setAuthSession, setPendingOpenOrderDetails } from '../../../store/slices/authSlice';
-import { saveReviewOrderApi, fetchReviewApi, confirmSignupApi } from '../api/orderApi';
+import { setPendingOrderData, setAuthSession, setPendingOpenOrderDetails, setPendingCloseAddCompany, setPendingAddCompany, signupUser } from '../../../store/slices/authSlice';
+import { fetchReviewApi, confirmSignupApi } from '../api/orderApi';
 import { fetchClientCompanyDetails } from '../../../features/home/api/clientProfileApi';
 import { s } from '../../../theme/responsive';
 
@@ -28,10 +28,13 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   React.useEffect(() => {
     console.log('=== REVIEW & SUBMIT SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
   }, []);
-  // Hardware back pe bhi Signup (FounderDetails) par bhejo - intermediate screens skip
+  // Add Company flow me existing client auto-skip hota hai FounderDetails se —
+  // Review ke back par wapas FounderDetails par kyun bhyeja (form khulna galat hai).
+  // Sirf normal signup flow me back → FounderDetails reset zaroori hai taaki
+  // EmailVerify/SetNewPassword intermediate screens skip ho jayen.
   React.useEffect(() => {
     const unsub = navigation.addListener('beforeRemove', (e) => {
-      if (e.data.action.type === 'GO_BACK' && (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow)) {
+      if (e.data.action.type === 'GO_BACK' && !route?.params?.isAddCompanyFlow && (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow)) {
         e.preventDefault();
         // Reset stack to keep only FounderDetails so back won't show EmailVerify/SetPassword
         navigation.dispatch(
@@ -65,7 +68,8 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
   const getLegalName = () => {
     if (!companyName) return 'Meridian Global Ventures LLC';
-    const suffix = String(selectedEnding || selectedStructure || '').trim();
+    // LLC/structure suffix sirf USA ke liye — quoted/non-US me backend bhi LLC add nahi karta
+    const suffix = selectedCountry === 'US' ? String(selectedEnding || selectedStructure || '').trim() : '';
     if (!suffix) return String(companyName).trim();
     const normalize = (s) => s.toLowerCase().replace(/[\.\s-]/g, '');
     const normSuffix = normalize(suffix);
@@ -81,6 +85,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
   const [isChecked, setIsChecked] = useState(false);
   const [localAddOns, setLocalAddOns] = useState(selectedAddOns || {});
+  const [confirming, setConfirming] = useState(false);
 
   // Sync if params change (e.g. coming back from OptionalAddOns)
   React.useEffect(() => { setLocalAddOns(selectedAddOns || {}); }, [JSON.stringify(selectedAddOns)]);
@@ -109,9 +114,24 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   // Backend GET /review/:companyId -> {company:{companyName,countryOfIncorporation,stateOfRegistration,companyType}, founder, pricing:{structurePrice,statePrice,addOns,addOnsTotal,totalAmount}, pricingType} — frontend calculate nahi
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
   const [reviewData, setReviewData] = useState(null);
-  const [backendTotal, setBackendTotal] = useState(
-    route.params?.totalAmount ?? route.params?.total_amount ?? pendingOrder?.totalAmount ?? null
-  );
+  // Deferred Add-Company flow: company abhi backend me bani hi nahi => backend me
+  // se total nahi aayega. Params se compute karke dikhao (fixed) ya 0 (quoted).
+  const [backendTotal, setBackendTotal] = useState(() => {
+    const fromParams = route.params?.totalAmount ?? route.params?.total_amount ?? pendingOrder?.totalAmount ?? null;
+    if (fromParams != null) return Number(fromParams);
+    const hasDeferredPayload = !!(route.params?.signupPayload || pendingOrder?.signupPayload);
+    if (hasDeferredPayload) {
+      const cCheck = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? 'US';
+      const isUSCalc = cCheck === 'US';
+      const cp = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0);
+      const stp = isUSCalc ? Number(route.params?.selectedStatePrice ?? route.params?.bestStatePrice ?? pendingOrder?.selectedStatePrice ?? pendingOrder?.bestStatePrice ?? 0) : 0;
+      const scp = isUSCalc ? Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 299) : 0;
+      const at = Number(route.params?.addOnsTotal ?? pendingOrder?.addOnsTotal ?? 0);
+      if (isUSCalc) return scp + stp + at;
+      return cp > 0 ? cp + at : 0;
+    }
+    return null;
+  });
   const [loadingTotal, setLoadingTotal] = useState(!reviewData);
   const pricingTypeState = route.params?.pricingType || pendingOrder?.pricingType || '';
   const [fetchedPricingType, setFetchedPricingType] = useState(pricingTypeState);
@@ -120,7 +140,12 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   useEffect(() => {
     const cid = route.params?.companyId || pendingOrder?.companyId;
     console.log('=== REVIEW fetch /review/:companyId (signup ke baad backend se) ===', { backendTotal, cid, hasToken: !!token, pricingType, params: route.params });
-    if (!cid) return;
+    if (!cid) {
+      // Add Company deferred flow — company abhi backend me nahi bani, "Your Order"
+      // click par banege. Loading state mat atko (button label freeze na ho).
+      setLoadingTotal(false);
+      return;
+    }
     let mounted = true;
     setLoadingTotal(true);
     fetchReviewApi({ companyId: cid, token })
@@ -182,16 +207,65 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   const selectedCountryForBtn = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
   const isUSForBtn = selectedCountryForBtn === 'US';
   const hasPriceForBtn = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
+    || Number(route.params?.bestCountryPrice ?? pendingOrder?.bestCountryPrice ?? 0) > 0
     || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
     || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
     || (isUSForBtn && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
+    || Number(route.params?.runningTotal ?? route.params?.combinedTotal ?? route.params?.totalAmount ?? pendingOrder?.runningTotal ?? pendingOrder?.combinedTotal ?? pendingOrder?.totalAmount ?? 0) > 0
     || Number(backendTotal ?? 0) > 0;
-  const isQuotedForBtn = pricingType === 'quoted' || !hasPriceForBtn;
+  // Fixed-price jurisdiction ke liye kabhi "quoted/Your Order" mat dikhao —
+  // chahe stale param ya backend pricingType 'quoted' kyun na ho. Jaise hi koi
+  // price present hota hai company fixed hai. Sach price-less (custom quote)
+  // country hi quoted dikh sakti hai.
+  const isQuotedForBtn = !hasPriceForBtn;
 
   const handleConfirm = async () => {
-    const companyId = route.params?.companyId || pendingOrder?.companyId;
+    if (confirming) return; // double-click se duplicate company na bane
+    setConfirming(true);
+    // Deferred flow me pendingOrder purani company ka companyId carry kar sakta hai —
+    // ise kabhi reuse mat karo (nai company tabhi banegi jab client yahan click kare).
+    const hasDeferredParams = !!(route.params?.signupPayload || route.params?.signupDeferred);
+    let companyId = route.params?.companyId || (hasDeferredParams ? undefined : pendingOrder?.companyId);
+    // ── Deferred backend save (Add Company flow) ─────────────────────────
+    // FounderDetails auto-skip me signupUser call NAHI hota — wahan signupPayload
+    // params me carry hota hai. Company backend me tabhi save hoti hai jab client
+    // yahan "Your Order"/"Continue" button dabata hai. Isse back/forward loop me
+    // duplicate companies nahi banti.
+    const deferredPayload = route.params?.signupPayload || pendingOrder?.signupPayload;
+    let resolvedClientId = route.params?.clientId || pendingOrder?.clientId;
+    let resolvedToken = route.params?.token || pendingOrder?.token || token;
+    if (!companyId && deferredPayload) {
+      try {
+        const res = await dispatch(signupUser(deferredPayload));
+        if (!signupUser.fulfilled.match(res) || !res.payload?.companyId) {
+          const msg = res.payload?.errors?.email || res.payload?.message || 'Signup failed';
+          Toast.show({ type: 'error', text1: 'Could not create company', text2: msg });
+          setConfirming(false);
+          return;
+        }
+        companyId = res.payload.companyId;
+        resolvedClientId = resolvedClientId || res.payload?.clientId;
+        resolvedToken = resolvedToken || res.payload?.token;
+        // Recreate the params flow — backend response ke companyId/clientId ke saath
+        const confirmedPayload = {
+          ...(route.params || {}),
+          ...(pendingOrder || {}),
+          companyId,
+          clientId: resolvedClientId,
+          token: resolvedToken,
+          isAddCompanyFlow: true,
+        };
+        dispatch(setPendingOrderData(confirmedPayload));
+        console.log('=== REVIEW deferred signup created company ===', companyId, 'clientId', res.payload?.clientId);
+      } catch (e) {
+        Toast.show({ type: 'error', text1: 'Could not create company', text2: e?.message || 'Network error' });
+        setConfirming(false);
+        return;
+      }
+    }
     if (!companyId) {
       Toast.show({ type: 'error', text1: 'Company ID missing' });
+      setConfirming(false);
       return;
     }
     // jis country ka price define nahi hai (custom quote) -> Confirm ke baad direct OrderDetailsScreen (Your Order)
@@ -199,11 +273,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     const selectedCountryForConfirm = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
     const isUSForConfirm = selectedCountryForConfirm === 'US';
     const hasPriceForConfirm = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
+      || Number(route.params?.bestCountryPrice ?? pendingOrder?.bestCountryPrice ?? 0) > 0
       || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
       || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
       || (isUSForConfirm && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
+      || Number(route.params?.runningTotal ?? route.params?.combinedTotal ?? route.params?.totalAmount ?? pendingOrder?.runningTotal ?? pendingOrder?.combinedTotal ?? pendingOrder?.totalAmount ?? 0) > 0
       || Number(backendTotal ?? 0) > 0;
-    const isQuoted = pricingType === 'quoted' || !hasPriceForConfirm;
+    // Same rule as button above — price ho to confirm hamesha fixed rahe
+    const isQuoted = !hasPriceForConfirm;
     if (isQuoted) {
       const orderData = {
         selectedStructure, companyName, selectedEnding, selectedState, selectedCountry,
@@ -218,26 +295,35 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         advisorFlow: route.params?.advisorFlow, selectedJurisdiction: route.params?.selectedJurisdiction,
         purpose: route.params?.purpose, customerLocation: route.params?.customerLocation, priorities: route.params?.priorities,
         dayOneNeeds: route.params?.dayOneNeeds, physicalPresence: route.params?.physicalPresence, usStatePriority: route.params?.usStatePriority,
-        countryCode: route.params?.countryCode, companyId, clientId: route.params?.clientId || pendingOrder?.clientId, token: route.params?.token || token,
+        countryCode: route.params?.countryCode, companyId, clientId: resolvedClientId, token: resolvedToken,
+        isAddCompanyFlow: route.params?.isAddCompanyFlow === true,
       };
       console.log('=== REVIEW quoted -> OrderDetails (no price) ===', JSON.stringify(orderData, null, 2));
       dispatch(setPendingOrderData({ ...orderData, amount: 0, runningTotal: 0 }));
       const emailForSession = route.params?.email || pendingOrder?.email || '';
       const full = route.params?.fullName || '';
-      const tkn = route.params?.token || token;
-      const cId = route.params?.clientId || pendingOrder?.clientId;
+      const tkn = resolvedToken;
+      const cId = resolvedClientId;
       if (tkn) {
         dispatch(setAuthSession({ user: { _id: cId || undefined, id: cId || undefined, email: emailForSession, name: full || emailForSession || 'User', firstName: full.split(' ')[0] || '', lastName: full.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: tkn }));
       } else {
         dispatch(setAuthSession({ user: { _id: cId || 'demo-id', id: cId || 'demo-id', email: emailForSession || 'user@demo.com', name: full || 'User', firstName: full.split(' ')[0] || 'User', lastName: full.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
       }
       dispatch(setPendingOpenOrderDetails(true));
+      // Quoted (Your Order) confirm par wizard DONE hai — AddCompany/RegistrationLanding
+      // dobara auto-open mat karo (SetNewPassword ne pendingAddCompany true kiya tha)
+      dispatch(setPendingAddCompany(false));
+      // Add Company (modal) me ho to modal band karo — HomeScreen pendingOpenOrderDetails
+      // dekhega aur OrderDetailsScreen (Your Order) auto-khulega. Status/VerifyIdentity wala hi pattern.
+      if (route?.params?.isAddCompanyFlow === true) {
+        dispatch(setPendingCloseAddCompany(true));
+      }
       Toast.show({ type: 'info', text1: 'Quote requested', text2: 'Track status in Your Order' });
       return;
     }
     try {
       // Step 3 -> 4: Confirm & Pay — backend confirmSignup: computeOrderTotal + payment_pending (quoted pe error)
-      const confirmRes = await confirmSignupApi({ companyId, token });
+      const confirmRes = await confirmSignupApi({ companyId, token: resolvedToken });
       const confirmedTotal = confirmRes.totalAmount ?? backendTotal;
       Toast.show({ type: 'success', text1: confirmRes.message || 'Signup confirmed' });
       const orderData = {
@@ -275,11 +361,20 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         usStatePriority: route.params?.usStatePriority,
         countryCode: route.params?.countryCode,
         companyId,
-        clientId: route.params?.clientId,
-        token: route.params?.token || token,
+        clientId: resolvedClientId,
+        token: resolvedToken,
+        // Add Company flow ki identity poore chain me carried karni hai —
+        // CompletePayment ise Status tak aage bhejta hai, aur Status/VerifyIdentity
+        // isi se decide karte hain ki modal band karna hai ya nahi.
+        isAddCompanyFlow: route.params?.isAddCompanyFlow === true,
       };
       console.log('=== REVIEW confirmSignup -> COMPLETE PAYMENT DATA ===', JSON.stringify(orderData, null, 2));
       dispatch(setPendingOrderData(orderData));
+      // SetNewPassword ne pendingAddCompany true kiya tha. Ab company ban rahi
+      // hai (payment + KYC chain), to wo flag HONA hi chahiye — warna VerifyIdentity
+      // ke baad Home mount hote hi us flag par AddCompany wizard (RegistrationLanding)
+      // khul jaata tha. Quoted path upar ye same clear karta hai.
+      dispatch(setPendingAddCompany(false));
       navigation.navigate('CompletePayment', orderData);
     } catch (e) {
       const msg = e?.response?.data?.message || e.message;
@@ -298,13 +393,17 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           advisorFlow: route.params?.advisorFlow, selectedJurisdiction: route.params?.selectedJurisdiction,
           purpose: route.params?.purpose, customerLocation: route.params?.customerLocation, priorities: route.params?.priorities,
           dayOneNeeds: route.params?.dayOneNeeds, physicalPresence: route.params?.physicalPresence, usStatePriority: route.params?.usStatePriority,
-          countryCode: route.params?.countryCode, companyId, clientId: route.params?.clientId, token: route.params?.token || token,
+          countryCode: route.params?.countryCode, companyId, clientId: resolvedClientId, token: resolvedToken,
+          isAddCompanyFlow: route.params?.isAddCompanyFlow === true,
         };
         dispatch(setPendingOrderData(orderData));
+        // Same reason as success path — ye bhi payment chain start karta hai
+        dispatch(setPendingAddCompany(false));
         navigation.navigate('CompletePayment', orderData);
         return;
       }
       Toast.show({ type: 'error', text1: 'Confirm failed', text2: msg });
+      setConfirming(false);
     }
   };
 
@@ -314,8 +413,10 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
       <View style={styles.header}>
         <BackButton onPress={() => {
-          // Review se back pe direct Signup (FounderDetails) par jao - skip EmailVerify/SetPassword
-          if (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow) {
+          // Add Company flow me FounderDetails auto-skip hota hai — back par wapas
+          // founder page dikhana galat hai. Normal goBack (CompanyNaming/OptionalAddOns)
+          // karo. Sirf normal signup flow me reset to FounderDetails skip ke liye.
+          if (!route?.params?.isAddCompanyFlow && (route?.params?.from === 'FounderDetails' || route?.params?.advisorFlow)) {
             navigation.dispatch(
               CommonActions.reset({
                 index: 0,
@@ -357,11 +458,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                 </View>
                 <Text style={styles.summaryHeaderTitle}>COMPANY {reviewData ? `· ${String(reviewData.companyId).slice(-6).toUpperCase()}` : ''}</Text>
               </View>
-              <TouchableOpacity onPress={() => navigation.navigate('CompanyNaming')} style={styles.editBtn}>
-                <Feather name="edit-2" size={12} color="#D4AF37" />
-                <Text style={styles.editText}>Edit</Text>
-              </TouchableOpacity>
-            </View>
+              </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Legal name</Text>
               <Text style={styles.summaryValueGold}>{legalName}</Text>
@@ -374,12 +471,21 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             ) : null}
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Jurisdiction</Text>
-              <Text style={styles.summaryValue}>{reviewData?.company ? `${reviewData.company.countryOfIncorporation || 'US'} ${reviewData.company.stateOfRegistration || selectedState}, ${reviewData.company.countryOfIncorporation || 'USA'}` : `US ${selectedState}, USA`}</Text>
+              <Text style={styles.summaryValue}>
+                {reviewData?.company
+                  ? (selectedCountry === 'US'
+                    ? `${reviewData.company.countryOfIncorporation || 'US'} ${reviewData.company.stateOfRegistration || selectedState}, ${reviewData.company.countryOfIncorporation || 'USA'}`
+                    : String(selectedCountry || reviewData.company.countryOfIncorporation || '—'))
+                  : `US ${selectedState}, USA`}
+              </Text>
             </View>
-            <View style={styles.summaryRowSmall}>
-              <Text style={styles.summaryLabel}>Structure</Text>
-              <Text style={styles.summaryValue}>{reviewData?.company?.companyType || selectedStructure}</Text>
-            </View>
+            {/* Structure sirf USA jurisdiction me dikhao — quoted/non-US me LLC galat dikhta hai */}
+            {selectedCountry === 'US' && (
+              <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Structure</Text>
+                <Text style={styles.summaryValue}>{reviewData?.company?.companyType || selectedStructure}</Text>
+              </View>
+            )}
             {reviewData?.registrationStatus ? (
               <View style={styles.summaryRowSmall}>
                 <Text style={styles.summaryLabel}>Status</Text>
@@ -402,11 +508,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                 </View>
                 <Text style={styles.summaryHeaderTitle}>PRINCIPAL FOUNDER</Text>
               </View>
-              <TouchableOpacity onPress={() => navigation.navigate('FounderDetails', route.params)} style={styles.editBtn}>
-                <Feather name="edit-2" size={12} color="#D4AF37" />
-                <Text style={styles.editText}>Edit</Text>
-              </TouchableOpacity>
-            </View>
+              </View>
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Full name</Text>
               <Text style={styles.summaryValue}>{reviewData?.founder ? `${reviewData.founder.firstName || ''} ${reviewData.founder.lastName || ''}`.trim() : (route.params?.fullName || 'Rajesh Kumar Sharma')}</Text>
@@ -448,40 +550,43 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           </View>
         </View>
 
-        <View style={styles.addOnsCard}>
-          <View style={styles.addOnsHeader}>
-            <View style={styles.addOnsTitleRow}>
-              <Feather name="zap" size={16} color="#D4AF37" />
-              <Text style={styles.addOnsHeaderText}>ADD-ONS SELECTED</Text>
-            </View>
-            <TouchableOpacity activeOpacity={0.7} style={styles.changeButton} onPress={() => navigation.navigate('OptionalAddOns', route.params)}>
-              <Feather name="edit-2" size={12} color="#D4AF37" />
-              <Text style={styles.changeText}>Change</Text>
-            </TouchableOpacity>
-          </View>
-
-          {addOnList.length === 0 ? (
-            <Text style={styles.addOnSubtext}>No add-ons selected</Text>
-          ) : (
-            addOnList.map((item, idx) => (
-              <View key={item.title}>
-                <View style={styles.addOnItem}>
-                  <View style={styles.addOnTextGroup}>
-                    <Text style={styles.addOnTitle}>{item.title}</Text>
-                    <Text style={styles.addOnSubtext}>{item.subtext}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={styles.addOnPrice}>${item.price}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveAddOn(item.title)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                      <Ionicons name="close-circle" size={18} color="#EF4444" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {idx < addOnList.length - 1 && <View style={styles.itemSeparator} />}
+        {/* Add-ons sirf priced (fixed) jurisdictions me dikhte hain — quoted me hidden */}
+        {!isQuotedForBtn && (
+          <View style={styles.addOnsCard}>
+            <View style={styles.addOnsHeader}>
+              <View style={styles.addOnsTitleRow}>
+                <Feather name="zap" size={16} color="#D4AF37" />
+                <Text style={styles.addOnsHeaderText}>ADD-ONS SELECTED</Text>
               </View>
-            ))
-          )}
-        </View>
+              <TouchableOpacity activeOpacity={0.7} style={styles.changeButton} onPress={() => navigation.navigate('OptionalAddOns', route.params)}>
+                <Feather name="edit-2" size={12} color="#D4AF37" />
+                <Text style={styles.changeText}>Change</Text>
+              </TouchableOpacity>
+            </View>
+
+            {addOnList.length === 0 ? (
+              <Text style={styles.addOnSubtext}>No add-ons selected</Text>
+            ) : (
+              addOnList.map((item, idx) => (
+                <View key={item.title}>
+                  <View style={styles.addOnItem}>
+                    <View style={styles.addOnTextGroup}>
+                      <Text style={styles.addOnTitle}>{item.title}</Text>
+                      <Text style={styles.addOnSubtext}>{item.subtext}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={styles.addOnPrice}>${item.price}</Text>
+                      <TouchableOpacity onPress={() => handleRemoveAddOn(item.title)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                        <Ionicons name="close-circle" size={18} color="#EF4444" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  {idx < addOnList.length - 1 && <View style={styles.itemSeparator} />}
+                </View>
+              ))
+            )}
+          </View>
+        )}
 
         {route.params?.advisorFlow && route.params?.bestState ? (
           <View style={[styles.summaryCard, { borderColor: 'rgba(16,185,129,0.3)' }]}>
@@ -498,15 +603,19 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
         <View style={styles.summaryCard}>
           {/* Backend pricing breakdown — signup ke baad GET /review/:companyId se */}
-          {reviewData?.pricing && (
+          {/* Quoted (custom quote) me structure/state fee nahi dikhate — quoted country ke liye ye price add hi nahi hota */}
+          {reviewData?.pricing && pricingType !== 'quoted' && (
             <>
-              <View style={styles.summaryRow}>
-                <View>
-                  <Text style={styles.summaryTitle}>Structure price</Text>
-                  <Text style={styles.summarySubtext}>{selectedStructure}</Text>
+              {/* Structure price sirf USA jurisdiction me dikhta hai — quoted/non-US me nahi */}
+              {selectedCountry === 'US' && (
+                <View style={styles.summaryRow}>
+                  <View>
+                    <Text style={styles.summaryTitle}>Structure price</Text>
+                    <Text style={styles.summarySubtext}>{selectedStructure}</Text>
+                  </View>
+                  <Text style={styles.summaryPrice}>${reviewData.pricing.structurePrice ?? 0}</Text>
                 </View>
-                <Text style={styles.summaryPrice}>${reviewData.pricing.structurePrice ?? 0}</Text>
-              </View>
+              )}
               <View style={styles.summaryRow}>
                 <View>
                   <Text style={styles.summaryTitle}>State fee</Text>
@@ -516,20 +625,25 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
               </View>
             </>
           )}
-          <View style={styles.summaryRow}>
-            <View>
-              <Text style={styles.summaryTitle}>Add-ons ({addOnList.length})</Text>
-              <Text style={styles.summarySubtext}>{addOnList.map(a => a.title.split(' ')[0]).join(' · ') || 'None'}</Text>
+          {!isQuotedForBtn && (
+            <View style={styles.summaryRow}>
+              <View>
+                <Text style={styles.summaryTitle}>Add-ons ({addOnList.length})</Text>
+                <Text style={styles.summarySubtext}>{addOnList.map(a => a.title.split(' ')[0]).join(' · ') || 'None'}</Text>
+              </View>
+              {loadingTotal && <ActivityIndicator size="small" color="#D4AF37" />}
             </View>
-            {loadingTotal && <ActivityIndicator size="small" color="#D4AF37" />}
-          </View>
+          )}
 
-          <View style={styles.summaryDivider} />
-
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>TOTAL</Text>
-            <Text style={styles.totalAmount}>{displayTotal}</Text>
-          </View>
+          {!isQuotedForBtn && (
+            <>
+              <View style={styles.summaryDivider} />
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>TOTAL</Text>
+                <Text style={styles.totalAmount}>{displayTotal}</Text>
+              </View>
+            </>
+          )}
           {pricingType === 'quoted' && (
             <Text style={{ color: '#94A3B8', fontSize: 12, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
           )}
@@ -554,13 +668,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
       </ScrollView>
 
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={[styles.confirmButton, !isChecked && { opacity: 0.5 }]} activeOpacity={0.8} onPress={handleConfirm} disabled={!isChecked}>
-          <Text style={styles.confirmButtonText}>{loadingTotal ? 'Confirm & Continue' : isQuotedForBtn ? 'Continue' : `Confirm & Pay ${displayTotal}`}</Text>
+        <TouchableOpacity style={[styles.confirmButton, (confirming || !isChecked) && { opacity: 0.5 }]} activeOpacity={0.8} onPress={handleConfirm} disabled={confirming || !isChecked}>
+          {/* quoted -> "Your Order" (OrderDetails pe le jata hai), fixed -> "Continue" (payment ke liye) */}
+          <Text style={styles.confirmButtonText}>{confirming ? 'Creating…' : loadingTotal ? 'Confirm & Continue' : isQuotedForBtn ? 'Your Order' : 'Continue'}</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />
         </TouchableOpacity>
 
         <Text style={styles.footerSubtext}>
-          {isQuotedForBtn ? 'Continue to Your Order · Quote will be prepared' : <>Secure payment · <Text style={styles.footerSubtextBold}>100% refund if we can't form</Text></>}
+          {isQuotedForBtn ? 'Your Order · Quote will be prepared' : <>Secure payment · <Text style={styles.footerSubtextBold}>100% refund if we can't form</Text></>}
         </Text>
       </View>
     </SafeAreaView>

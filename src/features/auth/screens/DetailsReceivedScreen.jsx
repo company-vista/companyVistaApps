@@ -25,9 +25,11 @@ export default function DetailsReceivedScreen({ navigation, route }) {
     fullName = 'Rajesh Kumar Sharma',
     countryOfResidence = 'India',
   } = route.params || {};
-  const legalName = companyName ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : 'Meridian Global Ventures LLC';
-  const jurisdiction = selectedState ? `US ${selectedState}, USA` : 'US Delaware, USA';
-  const structure = selectedStructure || 'LLC';
+  const isUS = selectedCountry === 'US';
+  // LLC/structure suffix sirf USA ke liye — quoted/non-US me LLC galat dikhta hai
+  const legalName = companyName ? (isUS ? `${companyName} ${selectedEnding || selectedStructure}`.trim() : String(companyName).trim()) : 'Meridian Global Ventures LLC';
+  const jurisdiction = isUS ? (selectedState ? `US ${selectedState}, USA` : 'US Delaware, USA') : String(selectedCountry || selectedState || '');
+  const structure = isUS ? (selectedStructure || 'LLC') : '—';
   const founderName = fullName || 'Rajesh Kumar Sharma';
   const founderEmail = email || 'rajesh@meridianglobal.com';
   const residence = countryOfResidence || 'India';

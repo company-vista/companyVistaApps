@@ -13,7 +13,7 @@ import { matchesTransactionSearch, } from './transactionsUtils';
 import { formatCurrency } from '../../../../constants/currencyConverter';
 import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
-import { UNPAID_REGISTRATION_STATUSES, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
+import { UNPAID_REGISTRATION_STATUSES, getSuccessfulPaymentCompanyIds, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
 
 
 function formatAmountField(value, currency) {
@@ -37,8 +37,10 @@ function parseApiAmount(value) {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 function getApiStatus(value, isActive) {
-    if (isActive)
-        return 'Active';
+    // NOTE: status string ko isActive pe precedence do. Backend pending payment
+    // records me kabhi status='pending' + isActive=true dono bhej deta hai — us
+    // case me pahle isActive check karo to transaction galat 'Active' ban
+    // jaata hai (aur detail screen amount dikha deti hai, jabki pending hai).
     if (typeof value === 'string' && value.trim()) {
         const normalized = value.trim().toLowerCase().replace(/[_\-]+/g, ' ').trim();
         const isSuccess = normalized === 'success' || normalized === 'succeeded' || normalized === 'successful' || normalized === 'paid' || normalized === 'completed' || normalized === 'confirmed';
@@ -60,10 +62,15 @@ function getApiStatus(value, isActive) {
         }
         return value.trim().charAt(0).toUpperCase() + value.trim().slice(1);
     }
+    // Status string nahi hai to tabhi isActive se decide karo.
+    if (isActive)
+        return 'Active';
     return 'Pending';
 }
 // Company ka registration status unpaid hai to uska transaction "Success" nahi ho sakta.
 // Backend kabhi payment record me galat success bhej deta hai, isliye company status se cross-check karo.
+// Lekin paidCompanyIds me hai to company actually pay kar chuki hai — stale unpaid status ko
+// uske against ignore karo (enter-success ko galat Pending mat banao).
 const normalizeRegStatus = normalizeRegistrationStatus;
 const UNPAID_REG_STATUSES = UNPAID_REGISTRATION_STATUSES;
 function buildCompanyStatusIndex(companies) {
@@ -76,7 +83,7 @@ function buildCompanyStatusIndex(companies) {
     });
     return index;
 }
-function normalizeApiTransaction(item, companyStatusIndex = {}) {
+function normalizeApiTransaction(item, companyStatusIndex = {}, paidCompanyIds = new Set()) {
     const title = item.title ||
         item.name ||
         (typeof item.company === 'object' && item.company !== null
@@ -92,9 +99,11 @@ function normalizeApiTransaction(item, companyStatusIndex = {}) {
     const companyId = typeof item.company === 'object' && item.company !== null
         ? String(item.company._id ?? item.company.id ?? '')
         : String(item.company ?? '');
-    // Company registration payment_pending hai par backend ne "success" bheja -> Pending dikhao
+    // Company registration payment_pending hai par backend ne "success" bheja -> Pending dikhao.
+    // Exception: company ki payment already SUCCESS hai (paidCompanyIds) — stale pending
+    // registrationStatus ko mat maano, real success ko Success hi dikhao.
     const regStatus = companyStatusIndex[companyId] ?? '';
-    const finalStatus = UNPAID_REG_STATUSES.includes(regStatus) && statusValue === 'Success'
+    const finalStatus = UNPAID_REG_STATUSES.includes(regStatus) && statusValue === 'Success' && !paidCompanyIds.has(companyId)
         ? 'Pending'
         : statusValue;
     const details = {
@@ -120,7 +129,12 @@ function normalizeApiTransaction(item, companyStatusIndex = {}) {
         bankName: String(item.bankName ?? ''),
         accountLast4: String(item.accountLast4 ?? ''),
         createdBy: String(item.createdBy ?? ''),
-        isActive: Boolean(item.isActive ?? true),
+        // isActive sirf tabhi true jab backend waqi me Active bheje. `?? true`
+        // default galat hai — backend isActive field na bheje to detail screen
+        // transaction ko 'Active' maan leta tha, jabki list me undefined isActive
+        // getApiStatus ke andar falsy hai aur 'Pending' deta hai (line 40). Dono
+        // ko consistent rakhne ke liye undefined => false chahiye.
+        isActive: Boolean(item.isActive ?? false),
         createdAt: item.createdAt ?? item.date ?? '',
         updatedAt: item.updatedAt ?? item.date ?? '',
         invoice: item.invoice ?? null,
@@ -169,6 +183,36 @@ function dedupeApiTransactions(items) {
         return true;
     });
 }
+// Ek hi company ke stale Pending + Success dono records dikh sakte hain:
+// user pehle checkout kholega (Pending ban gaya), pay nahi karega, dobara
+// checkout karke pay kar dega (naya Success record) — backend purana Pending
+// record update/cancel nai karta. Isliye jab kisi company ki eSI payment
+// (same company + type + amount) Success ho chuki hai, to us company ka
+// Pending record list me dikhana matlab stale transaction — chhupa do.
+function suppressStalePendingTransactions(items) {
+    const list = Array.isArray(items) ? items : [];
+    const groupKey = item => {
+        const amount = Number(String(item.amount ?? '').replace(/[^0-9.-]+/g, '')) || 0;
+        const company = String(item.details?.company ?? '').trim();
+        const type = String(item.category ?? item.details?.type ?? '').toLowerCase().trim();
+        return `${company}|${type}|${amount}`;
+    };
+    const groups = {};
+    list.forEach(item => {
+        const key = groupKey(item);
+        (groups[key] = groups[key] || []).push(item);
+    });
+    const successKeys = new Set();
+    Object.entries(groups).forEach(([key, group]) => {
+        if (group.some(item => item.status === 'Success')) {
+            successKeys.add(key);
+        }
+    });
+    if (successKeys.size === 0) {
+        return list;
+    }
+    return list.filter(item => !(successKeys.has(groupKey(item)) && item.status === 'Pending'));
+}
 export default function TransactionsScreen() {
     const route = useRoute();
     const navigation = useNavigation();
@@ -199,8 +243,12 @@ export default function TransactionsScreen() {
                 if (!isMounted)
                     return;
                 if (response.isSuccess) {
-                    const normalized = response.payments.map(payment => normalizeApiTransaction(payment, companyStatusIndex));
-                    setTransactions(dedupeApiTransactions(normalized));
+                    // Jo companies pay kar chuki hain unhe paid maano — unki success transaction
+                    // ko stale pending registrationStatus ki wajah se Pending mat dikhao. Ye set
+                    // khud payments se derive hota hai, isliye backend ke stale fields se independent hai.
+                    const paidCompanyIds = getSuccessfulPaymentCompanyIds(response.payments);
+                    const normalized = response.payments.map(payment => normalizeApiTransaction(payment, companyStatusIndex, paidCompanyIds));
+                    setTransactions(suppressStalePendingTransactions(dedupeApiTransactions(normalized)));
                 }
                 else {
                     setErrorMessage(response.error || 'Unable to load transactions.');

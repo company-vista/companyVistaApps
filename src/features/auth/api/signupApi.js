@@ -69,7 +69,7 @@ function getCookieToken(cookieHeader) {
     const tokenMatch = cookieHeader.match(/(?:^|;\s*)clientToken=([^;]+)/);
     return tokenMatch?.[1] ? decodeURIComponent(tokenMatch[1]) : '';
 }
-export async function handleSignupApi({ firstName, lastName, fullName, email, phone, phoneNumber, countryCode, countryIso, countryOfResidence, residence, dateOfBirth, companyName, rawCompanyName, selectedEnding, selectedStructure, selectedState, selectedCountry, bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, selectedJurisdiction, purpose, customerLocation, priorities, dayOneNeeds, physicalPresence, usStatePriority, selectedStructurePrice, selectedAddOns, addOnsTotal, runningTotal, address, registrationCountry, expectedRevenue, businessDescription, residentialAddress, addressLine1, ...rest }) {
+export async function handleSignupApi({ firstName, lastName, fullName, email, phone, phoneNumber, countryCode, countryIso, countryOfResidence, residence, dateOfBirth, companyName, rawCompanyName, selectedEnding, selectedStructure, selectedState, selectedCountry, bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, selectedJurisdiction, purpose, customerLocation, priorities, dayOneNeeds, physicalPresence, usStatePriority, selectedStructurePrice, selectedAddOns, addOnsTotal, runningTotal, address, registrationCountry, expectedRevenue, businessDescription, residentialAddress, addressLine1, authToken, ...rest }) {
     const errors = {};
     const trimmedFirstName = (firstName || '').trim();
     const trimmedLastName = (lastName || '').trim();
@@ -166,8 +166,20 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
             businessDescription: (businessDescription || rest.businessDescription || '').trim(),
             ...rest,
         };
+        // authToken sirf Authorization header ke liye hai, body me nahi bhejna.
+        delete fullPayload.authToken;
         console.log('=== COMPANY SIGNUP API CALL (createCompanySignup) ===', JSON.stringify(fullPayload, null, 2));
-        const response = await axios.post(SIGNUP_STEP1_ROUTE, fullPayload, { timeout: API_REQUEST_TIMEOUT_MS });
+        // ── Session token zaroori hai ────────────────────────────────────────
+        // Add-Company flow me user pehle se login hai. Backend ka
+        // protectClient Bearer token padhta hai; token na bhejne par
+        // req.client undefined hota hai aur controller email se verify karke
+        // 409 "account already exists" de deta hai — yani dusri company banane
+        // ke bajaye user se dobara signup karwaya jata hai.
+        const config = { timeout: API_REQUEST_TIMEOUT_MS };
+        if (authToken) {
+            config.headers = { Authorization: `Bearer ${authToken}` };
+        }
+        const response = await axios.post(SIGNUP_STEP1_ROUTE, fullPayload, config);
         const token = findDeepValue(response.data, TOKEN_KEYS) || getHeaderToken(response.headers);
         const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);
         const companyId = findDeepValue(response.data, ['companyId', 'company_id', 'companyID']);
@@ -175,10 +187,12 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
         // backend computes totalAmount = pricingType==='fixed' ? computeOrderTotal(body) : 0 — response shape alag ho sakta hai isliye deep check
         const totalAmount = response.data?.totalAmount ?? response.data?.total_amount ?? response.data?.data?.totalAmount ?? response.data?.data?.total_amount ?? response.data?.company?.totalAmount ?? response.data?.company?.total_amount ?? response.data?.data?.company?.totalAmount ?? response.data?.data?.company?.total_amount ?? 0;
         console.log('=== SIGNUP RESPONSE totalAmount ===', totalAmount, 'pricingType', pricingType, 'full response', JSON.stringify(response.data, null, 2));
+        // Logged-in user ko OTP nahi bheja jaata (backend verified client par
+        // skip karta hai), to "code sent" message mislead karta hai.
         Toast.show({
             type: 'success',
-            text1: response.data?.message || 'Verification code sent. Please check your inbox.',
-            text2: companyId ? `Company: ${companyId.slice(-6)}` : 'Please login.',
+            text1: authToken ? (response.data?.message || 'Company created.') : (response.data?.message || 'Verification code sent. Please check your inbox.'),
+            text2: companyId ? `Company: ${companyId.slice(-6)}` : (authToken ? 'Continue to review.' : 'Please login.'),
         });
         return {
             errors: {},
@@ -195,11 +209,17 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
         };
     }
     catch (error) {
+        const status = error.response?.status;
         const message = error.response?.data?.message || 'Something went wrong.';
+        // 409 ka matlab: is email ka account pehle se verified hai. Naye
+        // client ke liye ye sahi error hai, par logged-in client ke liye ye
+        // bug signal hai (token nahi gaya / backend nahi patch hua). Saaf
+        // message do warna user ko lagta hai signup hi nahi ho raha.
+        const isConflict = status === 409;
         Toast.show({
             type: 'error',
-            text1: 'Signup failed',
-            text2: message,
+            text1: isConflict && authToken ? 'Could not create company' : 'Signup failed',
+            text2: isConflict && authToken ? 'This account already has access. Please try again.' : message,
         });
         return {
             errors: { email: message },

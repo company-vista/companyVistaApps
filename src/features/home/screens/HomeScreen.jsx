@@ -6,7 +6,7 @@ import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/nativ
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setRedirectToLogin } from '../../../store/slices/authSlice';
+import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setPendingCloseAddCompany, setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 // Import subcomponents
 import { HomeHeader } from './homeScreenComponent/HomeHeader';
@@ -16,7 +16,8 @@ import { CompanySwitcherModal } from './homeScreenComponent/CompanySwitcherModal
 import { notifications } from '../../notifications/data/notifications';
 import { fetchNotifications } from '../../notifications/api/notificationsApi';
 import { fetchClientCompanies, fetchClientCompanyDetails, } from '../api/clientProfileApi';
-import { getCompanyTotalAmount, isRegistrationUnpaid } from '../../../utils/companyStatus';
+import { fetchSubscriptionPayments } from '../api/subscriptionPaymentsApi';
+import { getCompanyTotalAmount, getSuccessfulPaymentCompanyIds, isCompanyQuoted, isRegistrationUnpaid } from '../../../utils/companyStatus';
 import { mapCompanyToListItem } from './quickAccess/companyListItem';
 import PullToRefresh from './homeScreenComponent/PullToRefresh';
 import BillingTabContent from './invoices/InvoicesTabContent';
@@ -44,6 +45,10 @@ import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
 const emptyCompanies = [];
+// userCompanies ki array identity har profile update par nayi ho jaati hai
+// (updateProfileUser naya object banata hai), jabki contents same rehte hain.
+// Is liye dep me array nahi, uska content-key use hota hai.
+const companyIdsKey = list => (list || []).map(c => String(c?.id ?? c?._id ?? '')).join('|');
 export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
@@ -55,6 +60,11 @@ export default function HomeScreen() {
     const token = useAppSelector(state => state.auth.token);
     const userId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? emptyCompanies);
+    // Fetch effect ko company list ke CONTENTS se trigger karana hai, identity
+    // se nahi — warna har profile update par dobara fetch hota.
+    const userCompaniesKey = companyIdsKey(userCompanies);
+    const userCompaniesRef = useRef(userCompanies);
+    userCompaniesRef.current = userCompanies;
     const pendingAddCompany = useAppSelector(state => state.auth.pendingAddCompany);
     const [activeTab, setActiveTab] = useState(initialTab ?? 'home');
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -64,7 +74,6 @@ export default function HomeScreen() {
     const [activeCompanySection, setActiveCompanySection] = useState(null);
     const [isManageOptionsOpen, setIsManageOptionsOpen] = useState(false);
     const [isManageScreenOpen, setIsManageScreenOpen] = useState(false);
-    const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
     const [searchOpenedScreen, setSearchOpenedScreen] = useState(null);
@@ -82,12 +91,26 @@ export default function HomeScreen() {
     const [isVerifyIdentityOpen, setIsVerifyIdentityOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [supportFromRegistrationTracking, setSupportFromRegistrationTracking] = useState(false);
-    const [editingCompanyId, setEditingCompanyId] = useState(null);
+    // AddCompany ab ek alag modal route hai, is liye local "open" boolean se
+    // pata nahi chalta ki modal sach me khula hai ya nahi. Ye flag navigate
+    // karte waqt set hota hai aur Home dobara focus hone par clear hota hai —
+    // is tarah ye hamesha modal ke lifetime se matched rehta hai.
+    const [isAddCompanyFlowActive, setIsAddCompanyFlowActive] = useState(false);
     const prevNotificationCount = useRef(0);
     const [companyOptions, setCompanyOptions] = useState([]);
     const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
     const [selectedDocumentForView, setSelectedDocumentForView] = useState(null);
-    const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
+    // true se shuru karo, false nahi. Warna first render pe companyOptions
+    // khali hone ki wajah se real (khaali) Home dikhta hai, phir fetch effect
+    // loading true karta hai aur skeleton aa jaata hai — user ko content →
+    // skeleton ka flash dikhta hai. true se pehla frame hi skeleton hota hai.
+    const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
+    // Company list me stale 'payment_pending' status dikhne par bhi, agar us
+    // company ki koi SUCCESS payment hui hai to use unpaid na maano.
+    // (Backend payment success par purana Payment record update karta hi nahi —
+    // DB me pending + success dono reh jaate hain, isliye subscription payments
+    // se cross-check kar ke paidCompanyIdsSet banate hain.)
+    const [paidCompanyIdsSet, setPaidCompanyIdsSet] = useState(() => new Set());
     const fabMenuAnim = useRef(new Animated.Value(0)).current;
     const companySwitcherAnim = useRef(new Animated.Value(0)).current;
     const moreSlideAnim = useRef(new Animated.Value(320)).current;
@@ -109,6 +132,24 @@ export default function HomeScreen() {
             dispatch(setPendingOpenRegistrationProgress(false));
         }
     }, [pendingOpenRegistrationProgress, dispatch]);
+    // AddCompany wizard poora ho gaya (payment + KYC). Ab modal band karo.
+    //
+    // Ye Home ke focus pe nahi, plain useEffect me hai — kyun ki abhi Home
+    // ke peeche PEECHE chhupa hua hai (modal open hai), to useFocusEffect
+    // chalega hi nahi. Wizard screens (VerifyIdentity/Status) khud ye
+    // dispatch karte hain, kyunki wo modal ke andar hain aur unke paas
+    // MainStack ka navigation nahi hai.
+    //
+    // Order zaroori: goBack() se pehle flag clear karna, warna effect dobara
+    // chal kar dobara goBack() karega.
+    const pendingCloseAddCompany = useAppSelector((s) => s.auth.pendingCloseAddCompany);
+    useEffect(() => {
+        if (!pendingCloseAddCompany) {
+            return;
+        }
+        dispatch(setPendingCloseAddCompany(false));
+        navigation.goBack();
+    }, [pendingCloseAddCompany, dispatch, navigation]);
     const pendingOrderData = useAppSelector(s => s.auth.pendingOrderData);
     const pendingSignup = useAppSelector(s => s.auth.pendingSignup);
     useEffect(() => {
@@ -125,6 +166,11 @@ export default function HomeScreen() {
     // naya Xyz vista C-Corp jaise totalAmount 897 + status pending ho to company show karo (sab fill hai)
     const isCompanyPending = (c) => {
         const raw = c?.raw ?? c;
+        // Payment success -> pending order-lock mat lagao (stale status ki wajah se
+        // company list atki na rehne jaye).
+        if (paidCompanyIdsSet.has(String(c?.id ?? '').trim())) {
+            return false;
+        }
         const status = String(c?.registrationStatus ?? raw?.registrationStatus ?? c?.status ?? raw?.status ?? '').toLowerCase();
         const totalAmount = raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? c?.totalAmount ?? null;
         const companyType = raw?.companyType ?? c?.companyType ?? '';
@@ -149,8 +195,17 @@ export default function HomeScreen() {
     // ---- Unpaid company detection (per company, global isPaid flag par depend nahi) ----
     // Shared logic: src/utils/companyStatus.js (HomeScreen + Transactions + RegistrationTracking)
     // Banner sirf SELECTED company ka dikhega - doosri company select karne par CTA nahi banega.
+    //
+    // QUOTED company kabhi unpaid count nahi hoti: uska price define hi nahi hota,
+    // admin quote banata hai. Uski payment "pending" status me hoti hai par uske
+    // paise maange hi nahi gaye - is liye "Payment pending" + "Pay now" CTA galat
+    // message hota. Wo companies apna "Your Order" screen par track hoti hain.
     const isCompanyUnpaid = (c) => {
         if (!c) return false;
+        // Payment success ho chuki hai to unpaid check laga hi mat - registrationStatus
+        // stale pending bhi ho to paid maano (backend ke stale fields se cross-check tarjeeh).
+        if (paidCompanyIdsSet.has(String(c?.id ?? '').trim())) return false;
+        if (isCompanyQuoted(c)) return false;
         if (isRegistrationUnpaid(c)) return true;
         const pendingId = pendingSignup?.companyId;
         if (pendingId && String(c?.id ?? '') === String(pendingId)) return true;
@@ -163,6 +218,9 @@ export default function HomeScreen() {
         if (isCompanyUnpaid(selectedCompany)) return selectedCompany;
         if (selectedCompany) return null;
         if (pendingSignup?.companyId) {
+            // persisted quoted signup ka resume-payment CTA bhi nahi chahiye -
+            // quote admin se aata hai, user se nahi
+            if (isCompanyQuoted({ pricingType: pendingSignup.pricingType, totalAmount: pendingSignup.totalAmount })) return null;
             const amount = Number(pendingSignup.totalAmount) || 0;
             return {
                 id: pendingSignup.companyId,
@@ -191,34 +249,154 @@ export default function HomeScreen() {
         });
     }, [unpaidCompany, unpaidCompanyAmount, unpaidCompanyLabel, navigation, pendingSignup?.selectedState, pendingSignup?.selectedCountry]);
 
-    // Payment complete hone ke baad Home par wapas aane par company list refresh karo,
-    // warna "Payment pending" banner stale status ki wajah se ghoomta rahega
-    const [refreshTick, setRefreshTick] = useState(0);
-    const refreshedAfterPaymentRef = useRef(false);
-    useFocusEffect(useCallback(() => {
-        if (hasCompletedPaymentFlag && !refreshedAfterPaymentRef.current) {
-            refreshedAfterPaymentRef.current = true;
-            setRefreshTick(t => t + 1);
+    // ---- Naya company banane ka entry point ----
+    // Do guards:
+    //
+    // 1. loading — list abhi aayi hi nahi, to "0 companies" ka conclusion
+    //    galat hoga aur unpaid-company ka pata hi nahi chalega. Is liye
+    //    isLoadingCompanies par block karte hain.
+    //
+    // 2. Koi bhi ek company payment pending hai → naya company mat banao. Ye
+    //    deliberate rule hai: pichle order ki payment register hone tak aage
+    //    ki company nahi banti. Reason technical bhi hai — pendingOrderData /
+    //    pendingSignup redux me ek hi slot wale globals hain, do saath chal
+    //    rahe orders aapas me data corrupt kar denge.
+    //
+    //    Ye guard payment registration se khud release hota hai: payment hone
+    //    par company ka registrationStatus 'formation_in_progress' ho jaata
+    //    hai (finalizeCheckout ya Stripe webhook), isRegistrationUnpaid false
+    //    ho jaata hai, aur guard unlock ho jaata hai.
+    //
+    //    Agar payment KARNE KE BAAD bhi company pending atki rahe, to asli
+    //    masla guard ka nahi balki payment status ka hai — us company ka
+    //    registrationRequestData.packagePayment.paymentIntentId dekhein.
+    const hasUnpaidAnyCompany = companyOptions.some(isCompanyUnpaid);
+    const addCompanyBlocked = isLoadingCompanies || hasUnpaidAnyCompany;
+    const unpaidCompanies = companyOptions.filter(isCompanyUnpaid);
+    const addCompanyBlockedReason = hasUnpaidAnyCompany
+        ? (unpaidCompanies.length > 1
+            ? `${unpaidCompanies.length} companies ka payment pending hai. Pehle unki payment complete karein.`
+            : `Payment pending: ${unpaidCompanies[0]?.name || 'company'}. Pehle iski payment complete karein.`)
+        : null;
+    // Company list fetch karte waqt ka "loading" snapshot, ref me — kyun ki
+    // isLoadingCompanies state se ye effect khud trigger hota hai (upar note
+    // dekho). isAddCompanyMandatory is ref ko padhta hai taaki back-press
+    // force-logout list load hone tak na ho.
+    const isLoadingCompaniesRef = useRef(false);
+    // AddCompany modal khola tha ya nahi. Home dobara focus hone par iska pata
+    // lagta hai — tabhi company list refresh karni hoti hai (nayi company add
+    // hone ke baad). Modal close hone se pehle kabhi focus nahi hota, is liye
+    // ye ref poore modal lifetime ko sahi se track karta hai.
+    const addCompanyFlowWasOpenRef = useRef(false);
+    // skipGuards: sirf apne flow ke internal auto-open ke liye
+    // (signup ke baad ka redirect, deep-link 'addCompany'). Wo trigger tabhi
+    // chalti hai jab app jaanta hai is user ko company banana hai, is liye
+    // loading/unpaid guard wahan rona galat hota — list us waqt load ya
+    // payment pending hoti hai. User ke apne tap par guards lagte rahenge.
+    const openAddCompanyFlow = useCallback(({ skipGuards = false } = {}) => {
+        if (!skipGuards && addCompanyBlocked) {
+            Toast.show({
+                type: 'error',
+                text1: 'Payment pending',
+                text2: addCompanyBlockedReason ?? 'Please wait for the current request to finish.',
+            });
+            return;
         }
-    }, [hasCompletedPaymentFlag]));
+        setIsAddCompanyFlowActive(true);
+        addCompanyFlowWasOpenRef.current = true;
+        navigation.navigate('AddCompany');
+    }, [addCompanyBlocked, addCompanyBlockedReason, navigation]);
+    // Auto-open (signup redirect / fresh incomplete registration) ke liye
+    // one-shot guard. Bina iske company list har refresh par re-navigate hui
+    // to user jab bhi fetch settle hota, uska wizard RegistrationLanding par
+    // wapas reset ho jata — bahut aakhri aur confusing behaviour.
+    const hasAutoOpenedAddCompanyRef = useRef(false);
+    const autoOpenAddCompanyFlow = useCallback(() => {
+        if (hasAutoOpenedAddCompanyRef.current) return;
+        hasAutoOpenedAddCompanyRef.current = true;
+        openAddCompanyFlow({ skipGuards: true });
+    }, [openAddCompanyFlow]);
+    // Company-list fetch effect ise CALL karta hai, is liye us callback ko
+    // ref me rakhna zaroori hai — nahi to openAddCompanyFlow ki identity
+    // (jo addCompanyBlocked se badalti hai) dep ban kar loading flip ke saath
+    // effect ko dobara chala degi: setLoading(true) → refetch →
+    // setLoading(false) → refetch... yani home/skeleton baar-baar flash.
+    const autoOpenAddCompanyFlowRef = useRef(autoOpenAddCompanyFlow);
+    autoOpenAddCompanyFlowRef.current = autoOpenAddCompanyFlow;
 
-    // Quoted country (price undefined) -> Review ke baad auto OrderDetailsScreen khulega
+    // Payment/registration complete hone ke baad user jab Home par wapas aata
+    // hai, company list stale hoti hai — nayi company dikhti hi nahi aur
+    // "Payment pending" banner ghoomta rehta hai.
+    //
+    // Signal: AddCompany modal band hua (Home dobara focus hua) aur wo tab
+    // se khula tha. Pehle ka ref-based check har mount par sirf ek refresh
+    // karta tha, is liye ye transition miss ho jati thi.
+    // ref me hota hai kyunki ye effect kabhi bhi future refresh par chalta
+    // hai (jaise app resume), tab tak tab band ho chuka hota hai.
+    const pendingSignupCompanyIdToSelectRef = useRef(null);
+    const [refreshTick, setRefreshTick] = useState(0);
+    // AddCompany modal band hone par nayi company ko select karne ke liye
+    // target id. Ref isliye ki focus effect ke `[]` deps me pendingSignup
+    // stale na ho — latest value hamesha ref se padhi jaati hai.
+    // Sticky rakha gaya hai (sirf non-null par update): payment complete hote
+    // hi redux se pendingSignup clear ho jaata hai, aur tab modal band hota
+    // hai — agar ref har render par reset hota to yahan null milta aur
+    // auto-select kabhi hota hi nahi.
+    const latestPendingSignupIdRef = useRef(pendingSignup?.companyId ?? null);
+    if (pendingSignup?.companyId) {
+        latestPendingSignupIdRef.current = pendingSignup.companyId;
+    }
+    useFocusEffect(useCallback(() => {
+        const flowJustClosed = addCompanyFlowWasOpenRef.current;
+        addCompanyFlowWasOpenRef.current = false;
+        setIsAddCompanyFlowActive(false);
+        if (!flowJustClosed) return;
+        // Nayi company ka id yahan khoch lete hain. Refetch ke baad list me
+        // wo mil jaayegi to neeche wala effect usko select kar dega. Agar
+        // backend list me abhi nahi dikhi (eventual consistency / stale
+        // profile cache) to ref reh jaata hai aur agli refresh par select
+        // ho jaati hai — current selection tab tak bachayi rehti hai.
+        pendingSignupCompanyIdToSelectRef.current = latestPendingSignupIdRef.current;
+        // refetch karte waqt poora skeleton mat dikhao. Companies already
+        // loaded hain, to refresh ke dauran existing list hi dikhti rahegi —
+        // sirf nayi company add hone par content naturally update hoga. Warna
+        // har Add-Company close par skeleton flash hota.
+        setRefreshTick(t => t + 1);
+    }, []));
+
+    // Quoted country (price undefined) -> Review ke baad Your Order (OrderDetailsScreen) khulega.
+    // Ab real route par navigate karte hain — pehle setIsOrderDetailsOpen() se sirf
+    // Home ka internal state badalta tha, jo tab kaam karta tha jab Home screen pehle se
+    // mounted ho. Signup ke baad AuthStack poora unmount ho jaata hai, to navigate karna hi
+    // sahi tareeka hai.
     useEffect(() => {
         if (pendingOpenOrderDetails) {
-            setIsOrderDetailsOpen(true);
             dispatch(setPendingOpenOrderDetails(false));
+            navigation.navigate('YourOrder');
         }
-    }, [pendingOpenOrderDetails, dispatch]);
+    }, [pendingOpenOrderDetails, dispatch, navigation]);
 
     // Back allow — quoted/fixed chahe pending ho, back pe dusri company dekh sake (toast block hata diya)
     // Previous block: BackHandler return true + toast "Complete payment to continue" removed
+    // Route param sirf ek hi baar handle karna hai. openAddCompanyFlow ki
+    // identity har render badal sakti hai (guard state change hone par), to
+    // bina ref ke ye effect dobara chal kar user ko beech me kahi aur bhej
+    // deta — is liye last handled action yaad rakhte hain.
+    const handledRouteActionRef = useRef(null);
     useEffect(() => {
+        if (!routePendingHomeAction) {
+            return;
+        }
+        if (handledRouteActionRef.current === routePendingHomeAction) {
+            return;
+        }
+        handledRouteActionRef.current = routePendingHomeAction;
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
             setSearchOpenedScreen('subscription');
         }
         else if (routePendingHomeAction === 'addCompany') {
-            setIsAddCompanyOpen(true);
+            openAddCompanyFlow({ skipGuards: true });
         }
         else if (routePendingHomeAction === 'manageOptions') {
             setIsManageOptionsOpen(true);
@@ -234,15 +412,21 @@ export default function HomeScreen() {
         else if (routePendingHomeAction === 'transactions') {
             navigation.navigate('Transactions', { companyId: selectedCompany?.id });
         }
-    }, [routePendingHomeAction]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- handledRouteActionRef upar hi ek hi action ko ek hi baar handle karne ki guarantee kar raha hai, is liye extra deps (jo beech me identity badal sakte hain) add karne se effect dobara trigger hoga aur user beech me redirect ho jayega.
+    }, [routePendingHomeAction, navigation, openAddCompanyFlow, selectedCompany?.id]);
     // Signup flow: after login, open AddCompany directly without showing Home (per requirement)
     useEffect(() => {
         if (pendingAddCompany) {
-            setIsAddCompanyOpen(true);
+            autoOpenAddCompanyFlow();
             dispatch(setPendingAddCompany(false));
         }
-    }, [pendingAddCompany, dispatch]);
-    const isAddCompanyMandatory = isAddCompanyOpen && !editingCompanyId && companyOptions.length === 0 && user?.isCompleteRegistration === false;
+    }, [pendingAddCompany, dispatch, autoOpenAddCompanyFlow]);
+    // Back-out block: ek brand-new user jiske paas 0 company hai aur
+    // registration complete nahi hui, wizard se back nahi nikal sakta.
+    // Ye sirf tab chalta hai jab AddCompany modal ACTUALLY khula hai —
+    // isliye isLoadingCompanies guard zaroori hai, warna list load hone tak
+    // user ko force-logout kar deta.
+    const isAddCompanyMandatory = isAddCompanyFlowActive && !isLoadingCompaniesRef.current && companyOptions.length === 0 && user?.isCompleteRegistration === false;
     useEffect(() => {
         if (!isAddCompanyMandatory) return;
         const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -331,27 +515,59 @@ export default function HomeScreen() {
     useEffect(() => {
         if (isDemoToken) { setIsLoadingCompanies(false); return; }
         let isMounted = true;
-        setIsLoadingCompanies(true);
+        // Skeleton sirf tab dikhao jab list actually khaali ho. Refresh
+        // (refreshTick) ke dauran purani list screen par rehne di jayegi,
+        // warna har Add-Company close par skeleton flash hota.
+        const isInitialLoad = companyOptions.length === 0;
+        if (isInitialLoad) {
+            setIsLoadingCompanies(true);
+        }
+        // NOTE: isLoadingCompanies/companyOptions ko is effect ke dep me
+        // nahi daala jaata. Ye effect khud inhe set karta hai, to dep me hone
+        // se har change par dobara chalega → refetch → state change → refetch
+        // (infinite loop). companyOptions.length sirf effect ke shuru me padha
+        // jaata hai, live value ke liye ref use hota hai.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        isLoadingCompaniesRef.current = isInitialLoad;
         fetchClientCompanies({ token, userId })
             .then(result => {
                 if (!isMounted) {
                     return;
                 }
-                const loadedCompanies = result.companies.length > 0 ? result.companies : userCompanies;
+                const loadedCompanies = result.companies.length > 0 ? result.companies : userCompaniesRef.current;
                 const mappedCompanies = loadedCompanies.map(mapCompanyToListItem);
                 setCompanyOptions(mappedCompanies);
-                setSelectedCompany(currentCompany => {
-                    if (currentCompany) {
-                        return currentCompany;
+                // AddCompany ke baad band hua tha → nayi company yahan se
+                // select karo. Pehle current selection bachayi rehti thi, jisse
+                // user ko nayi company dekhne ke liye manually switch karna
+                // padta tha. List me mil jaaye to select, warna ref reh jaata
+                // hai aur agli refresh par resolve ho jaata hai.
+                const targetId = pendingSignupCompanyIdToSelectRef.current;
+                if (targetId) {
+                    const match = mappedCompanies.find(c => String(c.id) === String(targetId));
+                    if (match) {
+                        pendingSignupCompanyIdToSelectRef.current = null;
+                        setSelectedCompany(match);
                     }
-                    return mappedCompanies[0] ?? null;
-                });
-                // Auto-open Add Company only if registration incomplete (fresh signup) and no companies
-                if (mappedCompanies.length === 0 && !isLoadingCompanies && user?.isCompleteRegistration === false) {
-                    setIsAddCompanyOpen(true);
+                } else {
+                    setSelectedCompany(currentCompany => {
+                        if (currentCompany) {
+                            return currentCompany;
+                        }
+                        return mappedCompanies[0] ?? null;
+                    });
+                }
+                // Auto-open Add Company only if registration incomplete (fresh signup) and no companies.
+                // hasCompletedPayment guard zaroori hai: signup ke baad backend ka
+                // isCompleteRegistration abhi bhi false bhej sakta hai aur company list
+                // abhi empty dikh sakti hai — dono hone par user payment+KYC poora kar
+                // chuka hota hai phir bhi RegistrationLanding par wapas aa jaata.
+                if (mappedCompanies.length === 0 && user?.isCompleteRegistration === false && !hasCompletedPaymentFlag) {
+                    autoOpenAddCompanyFlowRef.current?.();
                 }
             })
             .finally(() => {
+                isLoadingCompaniesRef.current = false;
                 if (isMounted) {
                     setIsLoadingCompanies(false);
                 }
@@ -359,20 +575,43 @@ export default function HomeScreen() {
         return () => {
             isMounted = false;
         };
-    }, [token, userCompanies, userId, refreshTick]);
-    // Registration incomplete (false) -> dashboard block
-    // Agar koi company ka payment pending hai to Add Company force mat karo - user ko pehle pay karne do
+        // autoOpenAddCompanyFlow jaan-boojh kar dep me NAHI hai — wo
+        // addCompanyBlocked (→ isLoadingCompanies) se derive hota hai, to
+        // loading flip par ye effect dobara chalta aur skeleton flash hota.
+        // Upar ref ke through call hota hai, jo hamesha latest fn deta hai.
+        // companyOptions.length bhi jaan-boojh kar bahar hai (upar padha ja
+        // raha hai), warna ye effect apne hi setCompanyOptions se trigger hota.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, userCompaniesKey, userId, refreshTick, isDemoToken, user?.isCompleteRegistration]);
+    // Subscription payments se cross-check: agar kisi company ki payment success
+    // ho chuki hai to use paid maano - chahe company ka registrationStatus abhi
+    // bhi stale 'payment_pending' bheja ja raha ho. Ye pending banner + AddCompany
+    // guard dono ko release karta hai. Fail ho jaye to paidCompanyIdsSet khaali
+    // rahega, koi galat release nahi - sirf cross-check skip hoga.
     useEffect(() => {
-        if (user?.isCompleteRegistration === false && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && !unpaidCompany) {
-            setIsAddCompanyOpen(true);
+        if (isDemoToken) {
+            setPaidCompanyIdsSet(new Set());
+            return;
         }
-    }, [user?.isCompleteRegistration, isAddCompanyOpen, isRegistrationTrackingOpen, token, unpaidCompany]);
-    // Ensure onboarding AddCompany auto-opens only for incomplete registration with no companies
-    useEffect(() => {
-        if (!isLoadingCompanies && companyOptions.length === 0 && !isAddCompanyOpen && !isRegistrationTrackingOpen && token && user?.isCompleteRegistration === false && !unpaidCompany) {
-            setIsAddCompanyOpen(true);
-        }
-    }, [isLoadingCompanies, companyOptions.length, isAddCompanyOpen, isRegistrationTrackingOpen, token, user?.isCompleteRegistration, unpaidCompany]);
+        let isMounted = true;
+        fetchSubscriptionPayments(token ?? undefined).then(result => {
+            if (!isMounted) return;
+            setPaidCompanyIdsSet(getSuccessfulPaymentCompanyIds(result.payments));
+        });
+        return () => { isMounted = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, refreshTick, isDemoToken, userCompaniesKey]);
+    // ResumePayment/payment ke baad Home wapas focus par banner release
+    // karne ke liye subscription payments dobara gross karo. Pehle ye set khaali
+    // ya purana reh jaata tha jab user Add-Company modal se nahi balki Home ke
+    // banner → ResumePayment flow se payment karke lautta tha.
+    useFocusEffect(useCallback(() => {
+        if (isDemoToken) return;
+        fetchSubscriptionPayments(token ?? undefined).then(result => {
+            setPaidCompanyIdsSet(getSuccessfulPaymentCompanyIds(result.payments));
+        }).catch(() => {});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, isDemoToken, setPaidCompanyIdsSet]));
     useEffect(() => {
         if (isDemoToken) return;
         if (!selectedCompany?.id) {
@@ -564,21 +803,30 @@ export default function HomeScreen() {
         setTrackingCompanyId(selectedCompany?.id ?? null);
         setIsRegistrationTrackingOpen(true);
     }
+    // selectCompanyId diya ho to usi company ko select karo, warna "jo company
+    // pehle selected thi wo bani rahi hai" usko prefer karo. Default
+    // mappedCompanies[0] lena WRONG hai — API order badalne par user ka
+    // selected company silently switch ho jata hai.
     const refreshCompanies = useCallback((selectCompanyId) => {
-        fetchClientCompanies({ token, userId }).then(result => {
-            const loadedCompanies = result.companies.length > 0 ? result.companies : userCompanies;
+        return fetchClientCompanies({ token, userId }).then(result => {
+            const loadedCompanies = result.companies.length > 0 ? result.companies : userCompaniesRef.current;
             const mappedCompanies = loadedCompanies.map(mapCompanyToListItem);
             setCompanyOptions(mappedCompanies);
-            if (selectCompanyId) {
-                const found = mappedCompanies.find(c => c.id === selectCompanyId);
-                if (found)
-                    setSelectedCompany(found);
-            }
-            else if (mappedCompanies.length > 0) {
-                setSelectedCompany(mappedCompanies[0]);
-            }
+            setSelectedCompany(current => {
+                const targetId = selectCompanyId ?? current?.id;
+                if (targetId) {
+                    const found = mappedCompanies.find(c => String(c.id) === String(targetId));
+                    // Target list me abhi nahi hai (backend ne abhi sync kiya
+                    // hua ho) to current selection ko mat todho.
+                    if (found)
+                        return found;
+                    return current;
+                }
+                return mappedCompanies[0] ?? null;
+            });
+            return mappedCompanies;
         });
-    }, [token, userId, userCompanies]);
+    }, [token, userId]);
     function closeRegistrationTrackingScreen() {
         setIsRegistrationTrackingOpen(false);
         setTrackingCompanyId(null);
@@ -598,14 +846,9 @@ export default function HomeScreen() {
         setIsServicesOpen(true);
     }
     function selectCompanyFromSwitcher(company) {
-        const raw = company?.raw ?? {};
-        const pType = String(company?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? '').toLowerCase();
-        const totalAmt = Number(company?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
-        const status = String(raw?.registrationStatus ?? company?.registrationStatus ?? '').toLowerCase();
-        const isQuotedSel = pType === 'quoted' || (!pType && totalAmt === 0 && status === 'pending');
         setSelectedCompany(company);
         closeCompanySwitcher();
-        if (isQuotedSel) {
+        if (isCompanyQuoted(company)) {
             // quoted company pe click -> Your Order dikhe, fixed -> dashboard
             setIsOrderDetailsOpen(true);
         } else {
@@ -615,11 +858,7 @@ export default function HomeScreen() {
     // quoted company auto open Your Order when selected (hero or switcher initial load), fixed pe dashboard
     useEffect(() => {
         if (!selectedCompany) return;
-        const raw = selectedCompany?.raw ?? {};
-        const pType = String(selectedCompany?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? '').toLowerCase();
-        const totalAmt = Number(selectedCompany?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
-        const status = String(raw?.registrationStatus ?? selectedCompany?.registrationStatus ?? '').toLowerCase();
-        const isQuotedAuto = pType === 'quoted' || (!pType && totalAmt === 0 && status === 'pending');
+        const isQuotedAuto = isCompanyQuoted(selectedCompany);
         if (isQuotedAuto && !isOrderDetailsOpen) {
             setIsOrderDetailsOpen(true);
         } else if (!isQuotedAuto && isOrderDetailsOpen) {
@@ -699,10 +938,13 @@ export default function HomeScreen() {
                 state: payTarget?.raw?.state ?? payTarget?.state ?? null,
                 country: payTarget?.raw?.countryOfIncorporation ?? null,
             });
-        }} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={(companyId) => {
+        }} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={() => {
             setIsRegistrationTrackingOpen(false);
-            setEditingCompanyId(companyId || selectedCompany?.id || null);
-            setIsAddCompanyOpen(true);
+            // Pehle ye 'add company' wizard kholta tha — jo company EDIT karne
+            // ke bajaye ek NAYI company bana deta tha. Wizard me koi edit mode
+            // nahi hai, is liye ab user ko usi company ke detail screen par
+            // bheja ja raha hai.
+            setActiveCompanySection('menu');
         }} onContactSupport={() => {
             setIsRegistrationTrackingOpen(false);
             setSupportFromRegistrationTracking(true);
@@ -777,7 +1019,7 @@ export default function HomeScreen() {
                     </Pressable>
                 </View>
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => setIsAddCompanyOpen(true)} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -805,7 +1047,7 @@ export default function HomeScreen() {
 
         {activeTab === 'home' ? <QuickActionFab isFabMenuOpen={isFabMenuOpen} fabMenuOpacity={fabMenuOpacity} fabMenuScale={fabMenuScale} fabMenuTranslateY={fabMenuTranslateY} fabIconRotate={fabIconRotate} onToggleMenu={toggleFabMenu} onCloseMenu={closeFabMenu} colors={colors} safeAreaInsets={safeAreaInsets} onTransactionsPress={openTransactionsScreen} onAddCompanyPress={() => {
             closeFabMenu();
-            setIsAddCompanyOpen(true);
+            openAddCompanyFlow();
         }} onRegistrationTrackingPress={openRegistrationTrackingScreen} /> : null}
 
         <BottomNavBar activeTab={activeTab} isMoreOpen={isMoreOpen} onTabPress={handleTabPress} colors={colors} safeAreaInsets={safeAreaInsets} />
@@ -836,6 +1078,6 @@ export default function HomeScreen() {
             </Animated.View>
         </View>) : null}
 
-        <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} colors={colors} safeAreaInsets={safeAreaInsets} />
+        <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} onAddCompany={openAddCompanyFlow} addCompanyBlocked={addCompanyBlocked} addCompanyBlockedReason={addCompanyBlockedReason} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);
 }

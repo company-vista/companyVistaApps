@@ -24,9 +24,13 @@ export async function saveReviewOrderApi(orderData, token) {
     console.log('=== REVIEW SAVE SUCCESS ===', JSON.stringify(response.data, null, 2));
     return { isSuccess: true, data: response.data };
   } catch (error) {
-    // agar backend route abhi nahi bana toh mock success - taki flow na tute
-    console.log('=== REVIEW SAVE API FALLBACK (mock success) ===', error?.response?.data || error.message);
-    return { isSuccess: true, data: orderData, isMock: true };
+    // Pehle yahan mock success return hota tha (isMock: true) — yaani backend
+    // save fail ho raha ho tab bhi app ko "saved" pata chalta tha aur order
+    // backend me exist hi nahi karta. Ab real error propagate karte hain, taaki
+    // calling screen user ko bata sake order save nahi hua.
+    const msg = error?.response?.data?.message || error?.message || 'Unable to save order';
+    console.log('=== REVIEW SAVE API FAILED ===', msg);
+    return { isSuccess: false, error: msg, data: error?.response?.data ?? null };
   }
 }
 
@@ -38,8 +42,11 @@ export async function savePaymentConfirmApi(paymentData, token) {
     console.log('=== PAYMENT CONFIRM SUCCESS ===', JSON.stringify(response.data, null, 2));
     return { isSuccess: true, data: response.data };
   } catch (error) {
-    console.log('=== PAYMENT CONFIRM FALLBACK (mock success) ===', error?.response?.data || error.message);
-    return { isSuccess: true, data: paymentData, isMock: true };
+    // Payment confirm likhna fail hua to ise swallow karna galat hai — backend
+    // ke paas payment record nahi bana, par app "saved" dikha raha tha.
+    const msg = error?.response?.data?.message || error?.message || 'Unable to save payment confirmation';
+    console.log('=== PAYMENT CONFIRM SAVE FAILED ===', msg);
+    return { isSuccess: false, error: msg, data: error?.response?.data ?? null };
   }
 }
 

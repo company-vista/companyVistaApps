@@ -62,8 +62,8 @@ export default function SetNewPasswordScreen(props) {
       Toast.show({ type: 'error', text1: 'Password is required' });
       return;
     }
-    if (!checks.length || !checks.caseMix || !checks.number || !checks.special) {
-      Toast.show({ type: 'error', text1: 'Password does not meet requirements' });
+    if (newPassword.length < 8) {
+      Toast.show({ type: 'error', text1: 'Password must be at least 8 characters' });
       return;
     }
     if (!passwordsMatch) {

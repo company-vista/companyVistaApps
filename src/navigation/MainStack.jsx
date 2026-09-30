@@ -39,9 +39,20 @@ const DeactivateAccountScreen = lazy(() => import('../features/settings/screens/
 const DeleteAccountScreen = lazy(() => import('../features/settings/screens/DeleteAccountScreen'));
 const ChangePasswordScreen = lazy(() => import('../features/settings/screens/ChangePasswordScreen'));
 const StatusScreen = lazy(() => import('../features/auth/screens/StatusScreen'));
+// "Your Order" (OrderDetails) — pehle sirf HomeScreen ke internal state se
+// khulti thi. ReviewAndConfirm ke baad AuthStack unmount ho jaata hai
+// (RootStack Auth -> Main switch), to wahan se navigate karna possible nahi tha.
+// Ab ye MainStack ka real route hai — Home pendingOpenOrderDetails flag se
+// yahan navigate karta hai.
+const YourOrderScreen = lazy(() => import('../features/home/screens/YourOrderScreen'));
 const ResumePaymentScreen = lazy(() => import('../features/auth/screens/ResumePaymentScreen'));
 const ShareholdersScreen = lazy(() => import('../features/auth/screens/ShareholdersScreen'));
 const VerifyIdentityScreen = lazy(() => import('../features/auth/screens/VerifyIdentityScreen'));
+// Naya company banane ka poora wizard. AuthStack me hai wo sirf logged-out
+// users ke liye, to signed-in client ke liye yahan dobara mount kiya gaya hai.
+// Poora file lazy hai → wizard ke ~24 screens tabhi load hote hain jab user
+// actually "Add new company" kholta hai.
+const RegistrationStack = lazy(() => import('../features/auth/navigation/RegistrationStack'));
 
 const Stack = createNativeStackNavigator();
 
@@ -103,11 +114,19 @@ export default function MainStack() {
       <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} options={{ title: 'Delete Account' }}/>
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Change Password' }}/>
       <Stack.Screen name="Status" component={StatusScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="YourOrder" component={YourOrderScreen} options={{ headerShown: false }}/>
       {/* Unpaid company ka real Stripe checkout (app restart / login ke baad) */}
       <Stack.Screen name="ResumePayment" component={ResumePaymentScreen} options={{ headerShown: false }}/>
       {/* Payment ke baad real KYC - AuthStack ke same screens, taaki Home se resume flow poora chale */}
       <Stack.Screen name="Shareholders" component={ShareholdersScreen} options={{ headerShown: false }}/>
       <Stack.Screen name="VerifyIdentity" component={VerifyIdentityScreen} options={{ headerShown: false }}/>
+      {/* Signed-in client ke liye "Add new company" — RegistrationLanding se shuru,
+          Onboarding/login screens jaan-boojh kar skip kiye gaye hain */}
+      <Stack.Screen
+        name="AddCompany"
+        component={RegistrationStack}
+        options={{ headerShown: false, presentation: 'modal' }}
+      />
     </Stack.Navigator>
     </Suspense>);
 }

@@ -18,8 +18,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
-import { useAppDispatch } from '../../../store/hooks';
-import { signupUser } from '../../../store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { signupUser, setPendingOrderData } from '../../../store/slices/authSlice';
+import { fetchClientProfile } from '../../profile/api/clientProfileDetailsApi';
 import { s } from '../../../theme/responsive';
 
 const COUNTRIES = [
@@ -39,6 +40,13 @@ const COUNTRIES = [
 
 const FounderDetailsScreen = ({ navigation, route }) => {
   const dispatch = useAppDispatch();
+  // Add-Company flow me user pehle se login hai. Uska email already verified hai
+  // aur password set hai, is liye EmailVerification + SetNewPassword screens
+  // RegistrationStack me hamesha skip karne padte hain — warna unregistered
+  // route par navigation fail ho jayegi.
+  const isAuthenticated = useAppSelector(s => s?.auth?.isAuthenticated);
+  const sessionToken = useAppSelector(s => s?.auth?.token);
+  const authUser = useAppSelector(s => s?.auth?.user);
   const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '', selectedCountry: jurisdictionCountry, bestState, advisorFlow } = route.params || {};
   const isUSFounder = (route.params?.selectedCountry || jurisdictionCountry) === 'US' || (!jurisdictionCountry && !route.params?.selectedCountry);
   const jurisdictionCountryName = jurisdictionCountry ? ({ US: 'USA', GB: 'UK', AE: 'UAE', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta' }[jurisdictionCountry] || jurisdictionCountry) : (bestState ? 'USA' : null);
@@ -74,18 +82,23 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     if (!isUSFounder) return companyName || 'Your Company';
     return companyName ? `${companyName} ${suffix}`.trim() : `Your Company ${suffix}`;
   })();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const [countryIso, setCountryIso] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryOfResidence, setCountryOfResidence] = useState('');
-  const [residenceIso, setResidenceIso] = useState('');
+  const [fullName, setFullName] = useState(() => {
+    if (isAuthenticated && authUser) return [authUser.firstName, authUser.lastName].filter(Boolean).join(' ').trim();
+    return '';
+  });
+  const [email, setEmail] = useState(() => (isAuthenticated && authUser?.email ? authUser.email : ''));
+  const [countryCode, setCountryCode] = useState(() => (isAuthenticated && authUser?.countryCode ? authUser.countryCode : ''));
+  const [countryIso, setCountryIso] = useState(() => (isAuthenticated ? (authUser?.countryIso || authUser?.iso || '') : ''));
+  const [phone, setPhone] = useState(() => (isAuthenticated ? (authUser?.phone || authUser?.phoneNumber || authUser?.mobile || '') : ''));
+  const [countryOfResidence, setCountryOfResidence] = useState(() => (isAuthenticated ? (authUser?.country || authUser?.countryOfResidence || '') : ''));
+  const [residenceIso, setResidenceIso] = useState(() => (isAuthenticated ? (authUser?.countryIso || '') : ''));
   const [isChecked, setIsChecked] = useState(false);
   const [showCodePicker, setShowCodePicker] = useState(false);
   const [showResidencePicker, setShowResidencePicker] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [isAutoContinuing, setIsAutoContinuing] = useState(false);
+  const autoContinueRef = useRef(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -131,18 +144,63 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     }
   }, [email]);
 
+  // Existing client (Add Company) ke liye form HAMESHA skip hota hai — email hi
+  // criterion hai. Login ke waqt phone/countryCode store me missing ho sakte hain
+  // (login response me hamesha nahi aate), to backend GET profile se fetch
+  // karke fill karte hain, phir auto-submit Review par.
+  // IMPORTANT: agar client Review se wapas (back/Edit) aaya ho — params me
+  // `from: 'FounderDetails'` hota hai — to form dikhaya jaata hai taaki wo edit
+  // kar sake. Sirf fresh wizard entry par auto-skip hota hai.
+  useEffect(() => {
+    if (!isAuthenticated || autoContinueRef.current) return;
+    if (route.params?.from === 'FounderDetails') return;
+    const hasEmail = !!(email.trim() || authUser?.email);
+    if (!hasEmail) return;
+    autoContinueRef.current = true;
+    setIsAutoContinuing(true);
+    const run = async () => {
+      try {
+        await handleVerifyEmail();
+      } catch (e) {
+        Toast.show({ type: 'error', text1: 'Failed to load profile', text2: e?.message || 'Please fill the form manually' });
+      } finally {
+        setIsAutoContinuing(false);
+      }
+    };
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleVerifyEmail = async () => {
+    // Add-Company flow me login response me phone/countryCode na ho to backend
+    // profile se uthao — wo hamesha current saved values deta hai.
+    let profileUser = null;
+    const phoneMissing = !phone.trim();
+    const codeMissing = !countryCode.trim();
+    const residenceMissing = !countryOfResidence.trim();
+    if (isAuthenticated && sessionToken && (phoneMissing || codeMissing || residenceMissing)) {
+      const profileRes = await fetchClientProfile(sessionToken);
+      if (profileRes?.isSuccess && profileRes?.user) {
+        profileUser = profileRes.user;
+      }
+    }
+    const effPhone = (profileUser?.phone || profileUser?.phoneNumber || profileUser?.mobile || phone || '').trim();
+    const effCountryCode = profileUser?.countryCode || countryCode || '';
+    const effCountryIso = profileUser?.countryIso || countryIso || (profileUser?.countryCode ? profileUser.countryCode.replace(/[^A-Za-z]/g, '').toUpperCase() : '');
+    const effResidence = profileUser?.country || profileUser?.countryOfResidence || countryOfResidence || '';
+    const effFullName = [profileUser?.firstName, profileUser?.lastName].filter(Boolean).join(' ')?.trim() || fullName.trim();
+    const effEmail = (profileUser?.email || email).trim().toLowerCase();
     if (SKIP_VERIFY_FOR_TESTING) {
-      lastVerifiedEmailRef.current = email.trim();
+      lastVerifiedEmailRef.current = effEmail;
       setEmailVerified(true);
       Toast.show({ type: 'success', text1: 'Skipped verification (testing)' });
       return;
     }
-    if (!isEmailValid) {
+    if (!isEmailValid && !effEmail) {
       Toast.show({ type: 'error', text1: 'Enter valid email' });
       return;
     }
-    if (!fullName.trim()) {
+    if (!effFullName) {
       Toast.show({ type: 'error', text1: 'Enter full name first' });
       return;
     }
@@ -151,26 +209,29 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       // New company signup: POST /api/company-signup -> createCompanySignup (replaces old POST /api/signup/step1)
       // Creates Client (pending) + Company (pending) + Quote (awaiting_quote if quoted pricing)
       // Portal payload exact — backend computeOrderTotal ke liye raw data, frontend calculate nahi karega
-      const parts = fullName.trim().split(/\s+/);
+      const parts = effFullName.split(/\s+/);
       const firstName = parts[0] || '';
       const rest = parts.slice(1);
       const lastName = rest.join(' ') || firstName;
-      const trimmedPhone = phone.trim();
-      const countryCodeObj = { code: countryCode || '+91', iso: countryIso || '' };
-      const residence = countryOfResidence || '';
+      const trimmedPhone = effPhone;
+      const countryCodeObj = { code: effCountryCode || '+91', iso: effCountryIso || '' };
+      const residence = effResidence || '';
       const isUSA = (route.params?.selectedCountry === 'US' || route.params?.selectedCountry === 'USA' || !!route.params?.bestState || isUSFounder);
       const legalEnding = selectedEnding || selectedStructure || '';
       const usState = { name: route.params?.bestState || selectedState || '', timeframe: route.params?.bestStateTimeframe || '' };
       const country = { name: route.params?.selectedCountry || '' };
       const structure = { id: selectedStructure || route.params?.selectedStructure || '' };
       const statePrice = route.params?.bestStatePrice ?? route.params?.selectedStatePrice ?? 0;
-      const structurePrice = route.params?.selectedStructurePrice ?? 299;
+      // LLC structure price sirf USA me add hota hai. Quoted/custom country ho ya
+      // non-US fixed (GB/HK/CA) — structure price 0 hi bhejo, warna company me
+      // $299 structure + $299 state (registrationRequestData) leak ho jata hai.
+      const structurePrice = isUSA ? (route.params?.selectedStructurePrice ?? 299) : 0;
       const residentialAddress = route.params?.residentialAddress || route.params?.addressLine1 || residence || '';
       const signupPayload = {
         firstName,
         lastName,
-        fullName: fullName.trim(),
-        email: email.trim().toLowerCase(),
+        fullName: effFullName,
+        email: effEmail,
         phone: trimmedPhone,
         phoneNumber: trimmedPhone,
         countryCode: countryCodeObj.code,
@@ -203,16 +264,63 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         expectedRevenue: route.params?.expectedRevenue || route.params?.revenueBand || '',
         businessDescription: (route.params?.businessDescription || '').trim(),
         advisorFlow: !!route.params?.advisorFlow,
+        // Live session token. Backend ka protectClient Bearer token padhta hai;
+        // iske bina req.client undefined hota hai aur verified email par 409
+        // aata hai — yani dobara company banane ke liye signup flow chalta hai.
+        // Signup response ka token yahan use NAHI hota (wo naya client ke liye
+        // hota hai, hum to logged-in client hain).
+        authToken: sessionToken || undefined,
       };
       console.log('=== SIGNUP STEP1 PAYLOAD (FounderDetails) ===', JSON.stringify(signupPayload, null, 2));
-      console.log('FullName:', fullName.trim(), '| Email:', email.trim(), '| Phone:', phone.trim(), '| CountryCode:', countryCode, '| Residence:', countryOfResidence);
+      console.log('FullName:', effFullName, '| Email:', effEmail, '| Phone:', trimmedPhone, '| CountryCode:', effCountryCode, '| Residence:', effResidence);
+      // ── Already logged in (Add Company flow) ────────────────────────────
+      // Backend save yahan NAHI hota — ReviewAndConfirm ke "Your Order" /
+      // "Continue" click par signupUser call kiya jaata hai (handleConfirm me
+      // `signupPayload` se hai). Isse Review -> back -> CompanyNaming -> aage
+      // karne par har baar nayi company backend me nahi ban jaati (pehle
+      // FounderDetails auto-skip har mount par signupUser fire karta tha,
+      // duplicate companies create ho jaati thin).
+      if (isAuthenticated) {
+        const reviewParams = {
+          ...(route.params || {}),
+          email: effEmail,
+          companyName: displayCompanyName,
+          companyLocation: `${selectedState} · ${selectedStructure}`,
+          from: 'FounderDetails',
+          selectedStructure,
+          selectedState,
+          selectedEnding,
+          selectedCountry: route.params?.selectedCountry || effResidence,
+          selectedAddOns: route.params?.selectedAddOns,
+          addOnsTotal: route.params?.addOnsTotal ?? 0,
+          runningTotal: route.params?.runningTotal ?? 0,
+          fullName: effFullName,
+          phone: trimmedPhone,
+          countryOfResidence: effResidence,
+          countryCode: effCountryCode,
+          advisorFlow: !!route.params?.advisorFlow,
+          token: sessionToken || undefined,
+          signupPayload,
+          signupDeferred: true,
+        };
+        // isAddCompanyFlow poore wizard me spread hota hai (har screen
+        // `...route.params` aage bhejti hai). Iske bina Status aur
+        // VerifyIdentity ko pata hi nahi chalega ki wo modal ke andar
+        // hain, aur flow payment ke baad usi screen pe atak jayega —
+        // modal kabhi band nahi hota.
+        const addCompanyParams = { ...reviewParams, isAddCompanyFlow: true };
+        dispatch(setPendingOrderData(addCompanyParams));
+        Toast.show({ type: 'success', text1: 'Review your details', text2: 'Tap Your Order to save the company' });
+        navigation.replace('ReviewAndConfirm', addCompanyParams);
+        return;
+      }
       const result = await dispatch(signupUser(signupPayload));
       if (signupUser.fulfilled.match(result)) {
         const { token, clientId, companyId, pricingType, totalAmount } = result.payload;
-        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${email}${companyId ? ` · ${pricingType || ''} $${totalAmount ?? ''}` : ''}` });
+        Toast.show({ type: 'success', text1: 'Verification code sent', text2: `Code sent to ${effEmail}${companyId ? ` · ${pricingType || ''} $${totalAmount ?? ''}` : ''}` });
         navigation.navigate('EmailVerification', {
           ...(route.params || {}),
-          email: email.trim(),
+          email: effEmail,
           signupToken: token,
           signupClientId: clientId,
           companyId,
@@ -224,12 +332,12 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           selectedStructure,
           selectedState,
           selectedEnding,
-          selectedCountry: route.params?.selectedCountry || countryOfResidence,
+          selectedCountry: route.params?.selectedCountry || effResidence,
           selectedAddOns: route.params?.selectedAddOns,
-          fullName: fullName.trim(),
-          phone: phone.trim(),
-          countryOfResidence,
-          countryCode,
+          fullName: effFullName,
+          phone: trimmedPhone,
+          countryOfResidence: effResidence,
+          countryCode: effCountryCode,
         });
       } else {
         const msg = result.payload?.errors?.email || result.payload?.message || 'Failed to send OTP';
@@ -264,8 +372,26 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       return;
     }
     Toast.show({ type: 'success', text1: 'Company registered successfully!' });
+    // Add-Company flow: login pehle se hai, is liye Login screen par bhejne
+    // ka koi matlab nahi (wo route iss stack me hai hi nahi). Wapas Home.
+    if (isAuthenticated) {
+      setTimeout(() => navigation.navigate('Home'), 800);
+      return;
+    }
     setTimeout(() => navigation.navigate('Login'), 800);
   };
+
+  if (isAutoContinuing) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#D4AF37" />
+          <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>Using your saved profile — setting up your company…</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -443,12 +569,17 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           No payment required now · <Text style={styles.goldText}>Invoice auto-generated</Text>
         </Text>
 
-        <View style={styles.loginRow}>
-          <Text style={styles.loginHint}>Already have an account? </Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginLink}>Log in</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Logged-out users ke liye hi. Add-Company flow me user pehle se login
+            hai — "Log in" link confuse karta tha aur Login route iss stack me
+            registered bhi nahi hai. */}
+        {!isAuthenticated && (
+          <View style={styles.loginRow}>
+            <Text style={styles.loginHint}>Already have an account? </Text>
+            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Log in</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
       {/* Country Code Picker Modal */}

@@ -15,8 +15,11 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
 import { s } from '../../../theme/responsive';
+import { useAppSelector } from '../../../store/hooks';
 
 const RegistrationLandingScreen = ({ navigation }) => {
+  // Add-Company flow me user already logged in hota hai.
+  const isAuthenticated = useAppSelector(st => st?.auth?.isAuthenticated);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
@@ -167,13 +170,16 @@ const RegistrationLandingScreen = ({ navigation }) => {
             <Text style={styles.primaryBtnText}>🏢   Start My Company   →</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginBtn} activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginBtnText}>
-              Existing Client? <Text style={styles.goldText}>Log in</Text>
-            </Text>
-          </TouchableOpacity>
-
-
+          {/* Add-Company flow me user pehle se login hai. "Existing Client? Log in"
+              CTA yahan bekaar tha (Login route RegistrationStack me registered
+              nahi hai), is liye logged-in state me chhupa diya. */}
+          {!isAuthenticated && (
+            <TouchableOpacity style={styles.loginBtn} activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginBtnText}>
+                Existing Client? <Text style={styles.goldText}>Log in</Text>
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
       </ScrollView>

@@ -79,6 +79,37 @@ export function isRegistrationPaid(company) {
     return PAID_REGISTRATION_STATUSES.includes(getRegistrationStatus(company));
 }
 
+// Payment records se un company ids ka Set banata hai jinki payment success ho chuki hai.
+// DB me ek hi company ke pending + success DONO Payment records ho sakte hain
+// (payment success hone par purana pending record update nahi hota) - isliye
+// sirf success wale hi company ko "paid" treat karwate hain. Bina is cross-check
+// ke Home/AddCompany guard stale registrationStatus par atka rehta hai.
+export function getSuccessfulPaymentCompanyIds(payments = []) {
+    const paidIds = new Set();
+    (Array.isArray(payments) ? payments : []).forEach(payment => {
+        if (!payment) return;
+        const status = String(payment.status ?? payment.paymentStatus ?? payment.payment_status ?? '')
+            .toLowerCase()
+            .trim()
+            .replace(/[\s\-_]+/g, ' ');
+        const isSuccess =
+            status === 'success' ||
+            status === 'succeeded' ||
+            status === 'successful' ||
+            status === 'paid' ||
+            status === 'completed' ||
+            status === 'confirmed' ||
+            status === 'active' ||
+            status.includes('active');
+        if (!isSuccess) return;
+        const companyId = typeof payment.company === 'object' && payment.company !== null
+            ? String(payment.company._id ?? payment.company.id ?? payment.company.companyId ?? '')
+            : String(payment.company ?? '');
+        if (companyId.trim()) paidIds.add(companyId.trim());
+    });
+    return paidIds;
+}
+
 // Company ka total payable amount
 export function getCompanyTotalAmount(company) {
     const raw = company?.raw ?? company;
@@ -88,4 +119,33 @@ export function getCompanyTotalAmount(company) {
         company?.totalAmount ??
         0,
     ) || 0;
+}
+
+// Quoted jurisdiction ka price define hi nahi hota - admin quote banata hai.
+// Is liye "quoted" company par payment CTA / "Payment pending" banner kahin
+// dikhana galat hai, kyunki paisa maanga hi nahi gaya hai.
+//
+// pricingType har jagah same jagah nahi hota (list item, raw, registrationRequestData,
+// pricing object), is liye sab sources check karte hain. Backend field kabhi
+// bhejta hi nahi, tab amount === 0 + status 'pending' se infer karte hain -
+// tabhi company ka matlab hi "abhi price tay nahi hua" hai.
+export function isCompanyQuoted(company) {
+    if (!company) return false;
+    const raw = company.raw ?? company;
+    const pricingType = String(
+        company.pricingType ??
+        raw.pricingType ??
+        raw.pricing_type ??
+        raw.registrationRequestData?.pricingType ??
+        raw.registrationRequestData?.pricing_type ??
+        raw.pricing?.pricingType ??
+        '',
+    )
+        .toLowerCase()
+        .trim();
+    if (pricingType) return pricingType === 'quoted';
+    // pricingType missing - amount aur status se infer karo
+    const totalAmount = getCompanyTotalAmount(company);
+    const status = getRegistrationStatus(company);
+    return totalAmount === 0 && status === 'pending';
 }

@@ -105,8 +105,10 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#ECFDF5' : 'rgba(52,211,153,0.18)' }]}>
           <FontAwesome name="plus-circle" size={14} color={isLight ? '#047857' : '#34D399'} />
         </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Create Company</Text>
-      </Pressable>
+        {/* Company already hai to "Create" galat lagta hai — user sochega dobara
+            banau. Ab clear hota hai ki nayi company add ho rahi hai. */}
+        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>{hasCompany ? 'Add Company' : 'Create Company'}</Text>
+      </Pressable> 
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>
           <FontAwesome name="cog" size={16} color={isLight ? colors.accent : '#85B7EB'} />

@@ -20,10 +20,13 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setAuthSession, setPendingOpenRegistrationProgress } from '../../../store/slices/authSlice';
+import { setAuthSession, setPendingOpenRegistrationProgress, setPendingCloseAddCompany } from '../../../store/slices/authSlice';
 
 const StatusScreen = ({ navigation, route }) => {
   const params = route?.params || {};
+  // Add Company flow (RegistrationStack modal) — signup wale AuthStack flow
+  // se alag, kyunki wahan user pehle se authenticated hota hai.
+  const isAddCompanyFlow = params.isAddCompanyFlow === true;
   React.useEffect(() => {
     console.log('=== PAYMENT CONFIRM SCREEN DATA (Status) ===', JSON.stringify(route?.params, null, 2));
   }, []);
@@ -43,6 +46,13 @@ const StatusScreen = ({ navigation, route }) => {
 
   // hasPrice check sirf display ke liye — Home auto-open nahi karna, Home sirf Continue press pe khulega
   const hasPrice = Number(params.selectedCountryPrice || 0) > 0 || Number(params.selectedStatePrice || 0) > 0 || Number(params.bestStatePrice || 0) > 0 || Number(params.amount || 0) > 0 || Number(params.runningTotal || 0) > 0 || Number(params.totalAmount || 0) > 0;
+  // Shareholders/VerifyIdentity ke backend save (shareholders/:companyId) ke liye
+  // companyId/token bhi aage bhejo — bina inke edit/add par "Company ID missing" aata hai.
+  // CompletePayment/ResumePayment params me companyId dete hain; token pendingOrder/auth me hota hai.
+  const downstreamToken = params.signupToken || params.token || pendingOrder?.token || authToken || '';
+  const downstreamClientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
+  const downstreamCompanyId = params.companyId || pendingOrder?.companyId || '';
+  const downstreamParams = { companyId: downstreamCompanyId, clientId: downstreamClientId, token: downstreamToken };
 
   const isContinueEnabled = isShareholderDone && isKycDone;
   const handlePrimaryPress = () => {
@@ -61,6 +71,15 @@ const StatusScreen = ({ navigation, route }) => {
       } else {
         dispatch(setAuthSession({ user: { _id: clientId || 'demo-id', id: clientId || 'demo-id', email: emailForSession || 'user@demo.com', name: fullName || 'User', firstName: fullName.split(' ')[0] || 'User', lastName: fullName.split(' ').slice(1).join(' ') || '', isEmailVerified: true, hasCompletedOnboarding: true }, token: 'demo-token-' + Date.now() }));
       }
+    }
+    // Add Company flow: user pehle se login hai aur ye screen modal ke andar
+    // hai. Signup wale flow me flag set karna kaafi tha (RootStack Main pe
+    // switch hota tha), lekin yahan RootStack already Main par hai — flag set
+    // karne se kuch nahi hota aur modal band nahi hota, to user Status screen
+    // pe hi atak jata. Modal band karwao, Home refresh kar lega.
+    if (isAddCompanyFlow) {
+      dispatch(setPendingCloseAddCompany(true));
+      return;
     }
     // Auth ke baad RootStack Main pe switch hoga, isliye flag set karo jisse HomeScreen RegistrationProgress auto-open kare
     dispatch(setPendingOpenRegistrationProgress(true));
@@ -108,7 +127,7 @@ const StatusScreen = ({ navigation, route }) => {
         {/* Card List / Steps */}
         <View style={styles.cardsContainer}>
           <Text style={styles.sectionHeader}>NEXT: 2 QUICK STEPS</Text>
-          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Shareholders', { companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
+          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Shareholders', { ...downstreamParams, companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
             {isShareholderDone ? (
               <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
                 <Check color="#fff" size={16} strokeWidth={3} />
@@ -124,7 +143,7 @@ const StatusScreen = ({ navigation, route }) => {
             </View>
             {isShareholderDone ? <Check color="#10B981" size={18} /> : <ChevronRight color="#64748b" size={20} />}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('VerifyIdentity', { companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
+          <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('VerifyIdentity', { ...downstreamParams, companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
             {isKycDone ? (
               <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
                 <Check color="#fff" size={16} strokeWidth={3} />

@@ -177,12 +177,15 @@ export default function StripeOneTimePayment(props) {
                         if (nav?.navigate) {
                           nav.navigate('Status', {
                             isPaid: true,
+                            companyId: invoice?.companyId || props?.route?.params?.companyId,
                             companyName: props?.route?.params?.companyName || invoice?.companyId || 'Meridian Global Ventures GmbH',
                             country: props?.route?.params?.selectedState || 'Germany',
                             userEmail: props?.route?.params?.email || 'rajesh@meridianglobal.com',
                             orderId: referenceId,
                             amountPaid: `$${invoice?.amount || ''}`,
                             amount: invoice?.amount,
+                            token: props?.route?.params?.token,
+                            clientId: props?.route?.params?.clientId || props?.route?.params?.signupClientId,
                           });
                         }
                     },

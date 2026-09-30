@@ -22,6 +22,7 @@ const initialState = {
     pendingOpenOrderDetails: false,
     pendingOpenRegistrationProgress: false,
     pendingOpenRegistrationTracking: false,
+    pendingCloseAddCompany: false,
     hasCompletedPayment: false,
     pendingSignup: null,
 };
@@ -257,6 +258,15 @@ const authSlice = createSlice({
         setPendingOpenRegistrationTracking(state, action) {
             state.pendingOpenRegistrationTracking = action.payload;
         },
+        // AddCompany wizard (RegistrationStack) poora hone par modal band karne
+        // ka signal. Wizard screens navigation se khud nahi nikal sakti —
+        // wo MainStack ke andar ek modal screen hai, to popToTop sirf uske
+        // andar RegistrationLanding par wapas jata hai. Home ye flag padh kar
+        // navigation.goBack() karta hai aur tab useFocusEffect chalta hai
+        // (company list refresh + nayi company auto-select).
+        setPendingCloseAddCompany(state, action) {
+            state.pendingCloseAddCompany = action.payload;
+        },
         setHasCompletedPayment(state, action) {
             state.hasCompletedPayment = action.payload;
             // persist with current session
@@ -341,8 +351,22 @@ const authSlice = createSlice({
             const compId = action.payload?.companyId;
             const pType = action.payload?.pricingType;
             const tAmount = action.payload?.totalAmount;
-            if (tok) {
+            // ─────────────────────────────────────────────────────────────────
+            // Already logged-in client naya company bana raha hai (Add Company
+            // flow). Uski live session token ko signup token se REPLACE karna
+            // session tod dega — logout ho jayega aur RootStack AuthStack pe
+            // wapas bhej dega. Isliye state.token ko chhua nahi jata.
+            //
+            // Signup token (agar backend ne diya) phir bhi pendingOrderData /
+            // pendingSignup me store hota rehta hai, kyunki checkout jaise
+            // company-scoped endpoints ko alag token chahiye hua to wo wahin
+            // se resolve hoga. Screens dono ko fallback ke saath padhte hain.
+            // ─────────────────────────────────────────────────────────────────
+            const hasLiveSession = state.isAuthenticated === true;
+            if (tok && !hasLiveSession) {
                 state.token = tok;
+            }
+            if (tok) {
                 // pendingOrderData me bhi token rakh do fallback ke liye (companyId/pricingType/totalAmount bhi)
                 state.pendingOrderData = { ...(state.pendingOrderData || {}), token: tok, clientId: cid, companyId: compId, pricingType: pType, totalAmount: tAmount, email: action.payload?.email || state.pendingOrderData?.email };
             }
@@ -408,5 +432,5 @@ const authSlice = createSlice({
         });
     },
 });
-export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, clearPendingSignupState, setRedirectToLogin, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setHasCompletedPayment } = authSlice.actions;
+export const { clearAuthErrors, clearLoginError, clearSignupError, updateProfileUser, setAuthSession, setOnboardingComplete, setPendingAddCompany, setPendingOrderData, clearPendingSignupState, setRedirectToLogin, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setPendingCloseAddCompany, setHasCompletedPayment } = authSlice.actions;
 export default authSlice.reducer;

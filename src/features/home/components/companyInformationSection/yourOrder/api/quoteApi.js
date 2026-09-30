@@ -10,19 +10,17 @@ function getAuthHeaders(token) {
 }
 
 /**
- * Admin se quote fetch - GET /api/company-signup/quote/:companyId (primary)
- * Dummy hata diya gaya - sirf real API data return hoga, nahi to null/error
+ * Client-side quote fetch - GET /api/company-signup/quote/:companyId
+ * Step 4 (alt) — quoted path, client side (non fixed-price countries).
+ * Admin quote endpoints use NAHI hote.
  */
-export async function fetchQuote({ companyId, token, invoiceId } = {}) {
-  if (!companyId && !invoiceId) {
+export async function fetchQuote({ companyId, token } = {}) {
+  if (!companyId) {
     return { quote: null, isSuccess: false, error: 'companyId required' };
   }
 
   const endpoints = [
     companyId ? `${API_BASE_URL}/api/company-signup/quote/${companyId}` : null,
-    companyId ? `${API_BASE_URL}/api/quotes/${companyId}` : null,
-    invoiceId ? `${API_BASE_URL}/api/quotes/invoice/${invoiceId}` : null,
-    companyId ? `${API_BASE_URL}/api/admin/quote/${companyId}` : null,
   ].filter(Boolean);
 
   let lastError = '';
@@ -131,10 +129,7 @@ export async function requestQuoteChange({ companyId, token, clientId, text, rea
   };
 
   const endpoints = [
-    `${API_BASE_URL}/api/quote/${companyId}/messages`,
-    `${API_BASE_URL}/quote/${companyId}/messages`,
     `${API_BASE_URL}/api/company-signup/quote/${companyId}/messages`,
-    `${API_BASE_URL}/api/quotes/${companyId}/messages`,
   ];
 
   let lastError = '';
@@ -179,10 +174,7 @@ export async function acceptQuote({ companyId, token, clientId } = {}) {
   const body = clientId ? { clientId: String(clientId) } : {};
 
   const endpoints = [
-    `${API_BASE_URL}/api/quote/${companyId}/accept`,
-    `${API_BASE_URL}/quote/${companyId}/accept`,
     `${API_BASE_URL}/api/company-signup/quote/${companyId}/accept`,
-    `${API_BASE_URL}/api/quotes/${companyId}/accept`,
   ];
 
   let lastError = '';
@@ -231,10 +223,7 @@ export async function declineQuote({ companyId, token, clientId, reason } = {}) 
   if (reason && String(reason).trim()) body.reason = String(reason).trim();
 
   const endpoints = [
-    `${API_BASE_URL}/api/quote/${companyId}/decline`,
-    `${API_BASE_URL}/quote/${companyId}/decline`,
     `${API_BASE_URL}/api/company-signup/quote/${companyId}/decline`,
-    `${API_BASE_URL}/api/quotes/${companyId}/decline`,
   ];
 
   let lastError = '';

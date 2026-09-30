@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,7 +7,6 @@ import {
   ScrollView,
   StatusBar,
   Image,
-  AppState,
   BackHandler,
   Alert,
 } from 'react-native';
@@ -27,8 +26,10 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
   const [selected, setSelected] = useState(null);
   const [upiExpanded, setUpiExpanded] = useState(false);
   const [selectedUpiApp, setSelectedUpiApp] = useState(null);
-  const stripeInitiatedRef = useRef(false);
-  const appStateRef = useRef(AppState.currentState);
+  // Payment chal raha hai? Tab tak back block. StatusStripeOneTimePayment ke
+  // onInitiated/onSuccess/onFailure se hi set hota hai — app se wapas aane par
+  // koi success assume nahi karte (Stripe WebView app ke andar hi rehta hai,
+  // to user wapas aa kar background/active transition nahi deta).
   const [isPaymentPending, setIsPaymentPending] = useState(false);
 
   const upiApps = [
@@ -50,7 +51,6 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
   const handleBackPress = () => {
     if (isPaymentPending) {
       Toast.show({ type: 'info', text1: 'Payment in progress', text2: 'Please complete or wait for payment verification' });
-      // optional: confirm if user really wants to cancel
       Alert.alert(
         'Payment in progress',
         'Payment is currently being verified. Do you want to cancel the payment and go back?',
@@ -59,7 +59,6 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
           {
             text: 'Cancel & Go Back', style: 'destructive', onPress: () => {
               setIsPaymentPending(false);
-              stripeInitiatedRef.current = false;
               onBackPress?.();
             }
           },
@@ -69,24 +68,6 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
     }
     onBackPress?.();
   };
-
-  // TEST: jab stripe payment pe jaye aur wapas aaye tab shareholder open karo
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (nextState) => {
-      if (appStateRef.current.match(/inactive|background/) && nextState === 'active') {
-        if (stripeInitiatedRef.current && selected === 'stripe') {
-          // pending rehne do jab tak pollPaymentStatus onSuccess/onGiveUp na bole
-          // testStripeReturn ko success nahi manenge jab payment pending hai
-          if (!isPaymentPending) {
-            stripeInitiatedRef.current = false;
-            onPaymentSuccess?.({ testStripeReturn: true });
-          }
-        }
-      }
-      appStateRef.current = nextState;
-    });
-    return () => sub.remove();
-  }, [selected, onPaymentSuccess, isPaymentPending]);
 
   const paymentInvoice = invoice ?? {
     id: 'Q-2026-0412',
@@ -136,20 +117,17 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
         <StripeOneTimePayment
           invoice={paymentInvoice}
           label="Pay with Stripe"
-          onInitiated={(data) => {
-            stripeInitiatedRef.current = true;
+          onInitiated={() => {
             setIsPaymentPending(true);
           }}
           onSuccess={(data) => {
-            stripeInitiatedRef.current = false;
             setIsPaymentPending(false);
             onPaymentSuccess?.(data);
             onSelectPayment?.(selected, data);
           }}
           onFailure={() => {
-            // giveUp pe bhi pending false kar do taaki user wapas ja sake, ya true rakhna hai toh yaha return kar do
+            // Abort ho gaya ya verification time out — user ko wapas jaane do
             setIsPaymentPending(false);
-            stripeInitiatedRef.current = false;
           }}
         />
       );

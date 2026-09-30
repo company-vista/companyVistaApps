@@ -50,7 +50,12 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     console.log(transaction);
-    const displayStatus = getDisplayStatus(transaction);    const formatDate = (dateString) => {
+    const displayStatus = getDisplayStatus(transaction);
+    // Pending transaction par amount "Pending (USD)" label ke saath dikhana hai —
+    // Success/Failed par normal "Total Amount" hi rahega.
+    const pendingAmountLabel = displayStatus === 'Pending' ? `Pending (${transaction.currency || 'USD'})` : 'Total Amount';
+    const displayAmount = displayStatus === 'Pending' ? 0 : transaction.amount;
+    const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
@@ -130,18 +135,18 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
 
     <div class="amount-section">
       <div class="amount-label">Total Amount</div>
-      <div class="amount-value">${formatCurrency(transaction.amount, transaction.currency)}</div>
+      <div class="amount-value">${formatCurrency(displayAmount, transaction.currency)}</div>
       <div class="breakdown">
         ${(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') ? `
         <div class="breakdown-item">
           <div class="breakdown-label">Online</div>
           <div class="breakdown-label" style="font-size:8px; letter-spacing:0.5px;">${transaction.paymentMethod.charAt(0).toUpperCase() + transaction.paymentMethod.slice(1)}</div>
-          <div class="breakdown-value" style="color:#2563eb;">${formatCurrency(transaction.amount, transaction.currency)}</div>
+          <div class="breakdown-value" style="color:#2563eb;">${formatCurrency(displayAmount, transaction.currency)}</div>
         </div>` : ''}
         ${transaction.paymentMethod === 'cash' ? `
         <div class="breakdown-item">
           <div class="breakdown-label">Cash</div>
-          <div class="breakdown-value" style="color:#059669;">${formatCurrency(transaction.amount, transaction.currency)}</div>
+          <div class="breakdown-value" style="color:#059669;">${formatCurrency(displayAmount, transaction.currency)}</div>
         </div>` : ''}
       </div>
     </div>
@@ -243,10 +248,10 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
         }} showsVerticalScrollIndicator={false}>
         {/* Amount Section */}
         <View style={[styles.amountCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.amountLabel, { color: colors.muted }]}>Total Amount</Text>
+          <Text style={[styles.amountLabel, { color: colors.muted }]}>{pendingAmountLabel}</Text>
           <View style={styles.amountRow}>
             <Text style={[styles.amountValue, { color: colors.text }]}>
-              {formatCurrency(transaction.amount, transaction.currency)}
+              {formatCurrency(displayAmount, transaction.currency)}
             </Text>
             {(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') && (<Text style={[styles.amountBracket, { color: '#2563eb' }]}>
                 (Online)

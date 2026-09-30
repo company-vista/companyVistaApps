@@ -212,7 +212,8 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             const structPrice = p.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299);
             if (p.selectedCountry && p.selectedCountry !== 'US') {
               const cPrice = p.selectedCountryPrice ?? 0;
-              return cPrice ? `$${cPrice} ${p.selectedCountry} package` : `$${structPrice} Structure package + $${stateFee} ${stateName} state fee`;
+              // Custom-quote country (price '') ke liye structure/state fee add mat karo — "Custom quote" dikhao
+              return cPrice ? `$${cPrice} ${p.selectedCountry} package` : 'Custom quote · final price after our team reviews';
             }
             return `$${structPrice} Structure package + $${stateFee} ${stateName} state fee`;
           })()}

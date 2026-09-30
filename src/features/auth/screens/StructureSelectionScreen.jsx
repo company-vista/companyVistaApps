@@ -211,8 +211,25 @@ const StructureSelectionScreen = ({ navigation, route }) => {
             const { selectedEnding: _omit, ...restParams } = route.params || {};
             const structPrice = getStructurePrice(selectedStructure);
             const combinedTotal = getTotalForStructure(selectedStructure);
-            // dono add hua total backend me bhejo — runningTotal/totalAmount ke roop me save hoga, backend bhi computeOrderTotal se verify karega
-            navigation.navigate('WhatsIncluded', { ...restParams, selectedStructure, selectedStructurePrice: structPrice, selectedCountryPrice: countryPrice || restParams.selectedCountryPrice, selectedStatePrice: isUS && stateFee > 0 ? stateFee : restParams.selectedStatePrice, combinedTotal, runningTotal: combinedTotal, totalAmount: combinedTotal, companyName, selectedEnding: '', selectedState, selectedCountry, bestState: restParams.bestState || selectedState, advisorFlow: restParams.advisorFlow || advisorFlow });
+            // Custom-quote wale country (non-USA, koi price define nahi) me LLC structure price add MAT karo:
+            // $299 leke jaane par backend ki review me bhi total $299 ban jata tha quoted country ke liye.
+            const isQuotedCountry = !isUS && !(countryPrice > 0);
+            navigation.navigate('WhatsIncluded', {
+              ...restParams,
+              selectedStructure,
+              selectedStructurePrice: isQuotedCountry ? 0 : structPrice,
+              selectedCountryPrice: countryPrice || restParams.selectedCountryPrice,
+              selectedStatePrice: isUS && stateFee > 0 ? stateFee : restParams.selectedStatePrice,
+              combinedTotal,
+              runningTotal: combinedTotal,
+              totalAmount: combinedTotal,
+              companyName,
+              selectedEnding: '',
+              selectedState,
+              selectedCountry,
+              bestState: restParams.bestState || selectedState,
+              advisorFlow: restParams.advisorFlow || advisorFlow,
+            });
           }}
         >
           <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>

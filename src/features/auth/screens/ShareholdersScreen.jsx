@@ -91,12 +91,19 @@ const ShareholdersScreen = ({ navigation, route }) => {
   const handleEditShareholder = (item) => {
     setEditingId(item.id);
     setNewName(item.name || '');
-    setNewEmail(item.email || '');
+    // Founder (id '1') ke object me email/phone store nahi hota — sirf display
+    // me authEmail/authPhone fallback hota hai. Edit karte waqt wahi prefill karo,
+    // warna "Valid email is required" pe Update button atak jaata tha.
+    const isFounder = String(item.id ?? item.clientId ?? '') === '1' && !item.email;
+    const emailSource = item.email || (isFounder ? authEmail : '');
+    const phoneSource = item.phone || (isFounder ? authPhone : '');
+    const countrySource = item.countryRaw || (isFounder ? _countryRaw || 'India' : 'India');
+    setNewEmail(emailSource || '');
     setNewOwnership(String(item.ownership || '').replace('%',''));
-    setNewPhone(item.phone || '');
-    setNewCountryCode(item.countryCode || '+91');
-    setNewCountry(item.countryRaw || 'India');
-    setNewDesignation(item.designation || 'Shareholder');
+    setNewPhone(phoneSource || '');
+    setNewCountryCode(item.countryCode || authCountryCode || '+91');
+    setNewCountry(countrySource);
+    setNewDesignation(item.designation || 'Director');
     setNewAddress(item.address || '');
     setNewPincode(item.pincode || '');
     setNewPassport(item.passportNumber || item.passport || '');
@@ -150,17 +157,45 @@ const ShareholdersScreen = ({ navigation, route }) => {
       return;
     }
     setSaving(true);
+    const isEdit = !!editingId;
+    const editItemId = isEdit ? editingId : null;
+    const body = {
+      name: newName.trim(),
+      email: newEmail.trim().toLowerCase(),
+      sharePercentage: ownershipNum,
+      phone: newPhone.trim(),
+      phoneNumber: newPhone.trim(),
+      countryCode: newCountryCode.trim() || '+91',
+      country: newCountry.trim() || 'India',
+      designation: ['Shareholder','Director','Authorized Representative'].includes(newDesignation) ? newDesignation : 'Shareholder',
+    };
+    // Local item pehle commit karo — update button bina backend ke bhi UI me
+    // change dikhaye. Backend best-effort: success par clientId/total sync ho
+    // jayega, failure par bhi add/edit UI me live rehta hai.
+    const initials = newName.trim().split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const pendingItem = {
+      id: editItemId || Date.now().toString(),
+      initials: initials || 'NS',
+      name: newName.trim(),
+      email: body.email,
+      role: newDesignation === 'Director' ? 'Director' : newDesignation === 'Authorized Representative' ? 'Authorized Representative' : 'Shareholder',
+      ownership: `${ownershipNum}%`,
+      avatarBg: '#1E293B',
+      avatarText: '#EAB308',
+      borderColor: 'transparent',
+      country: `🌐 ${newCountry}`,
+      countryRaw: newCountry,
+      countryCode: newCountryCode,
+      phone: newPhone.trim(),
+      designation: body.designation,
+      status: 'awaiting_kyc',
+      address: newAddress.trim(),
+      pincode: newPincode.trim(),
+      passportNumber: newPassport.trim().toUpperCase(),
+    };
+    handleCloseModal();
+    // Backend POST — best effort. Fail hone par bhi local update ho chuka hai.
     try {
-      const body = {
-        name: newName.trim(),
-        email: newEmail.trim().toLowerCase(),
-        sharePercentage: ownershipNum,
-        phone: newPhone.trim(),
-        phoneNumber: newPhone.trim(),
-        countryCode: newCountryCode.trim() || '+91',
-        country: newCountry.trim() || 'India',
-        designation: ['Shareholder','Director','Authorized Representative'].includes(newDesignation) ? newDesignation : 'Shareholder',
-      };
       const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
       const endpoints = [
         `${API_BASE_URL}/api/shareholders/${companyId}`,
@@ -190,38 +225,27 @@ const ShareholdersScreen = ({ navigation, route }) => {
       if (lastErr) throw lastErr;
       const clientId = resp?.clientId || resp?.data?.clientId || '';
       const totalOwnership = resp?.totalOwnership ?? (otherTotal + ownershipNum);
-      Toast.show({ type: 'success', text1: resp?.message || 'Shareholder added', text2: clientId ? `OTP sent to ${body.email}` : `Total: ${totalOwnership}%` });
-      const initials = newName.trim().split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-      const newItem = {
-        id: editingId || clientId?.toString() || Date.now().toString(),
-        clientId,
-        initials: initials || 'NS',
-        name: newName.trim(),
-        email: body.email,
-        role: newDesignation === 'Director' ? 'Director' : newDesignation === 'Authorized Representative' ? 'Authorized Representative' : 'Shareholder',
-        ownership: `${ownershipNum}%`,
-        avatarBg: '#1E293B',
-        avatarText: '#EAB308',
-        borderColor: 'transparent',
-        country: `🌐 ${newCountry}`,
-        countryRaw: newCountry,
-        countryCode: newCountryCode,
-        phone: newPhone.trim(),
-        designation: body.designation,
-        status: 'awaiting_kyc',
-        address: newAddress.trim(),
-        pincode: newPincode.trim(),
-        passportNumber: newPassport.trim().toUpperCase(),
-      };
-      if (editingId) {
-        setShareholders(prev => prev.map(s => s.id === editingId ? { ...s, ...newItem, id: editingId } : s));
-      } else {
-        setShareholders(prev => [...prev, newItem]);
+      Toast.show({ type: 'success', text1: resp?.message || (isEdit ? 'Shareholder updated' : 'Shareholder added'), text2: clientId ? `OTP sent to ${body.email}` : `Total: ${totalOwnership}%` });
+      // Backend se clientId mila to type karo, warna local id hi rakho
+      if (clientId) {
+        pendingItem.clientId = clientId;
+        pendingItem.id = isEdit ? editItemId : clientId;
       }
-      handleCloseModal();
+      if (isEdit) {
+        setShareholders(prev => prev.map(s => s.id === editItemId ? { ...s, ...pendingItem, id: editItemId } : s));
+      } else {
+        setShareholders(prev => [...prev, pendingItem]);
+      }
     } catch (e) {
       const msg = e?.response?.data?.message || e.message || 'Failed to add shareholder';
-      Toast.show({ type: 'error', text1: 'Failed', text2: msg });
+      // Backend unavailable ho tab bhi user ka update UI me aa jaye —
+      // next attempt ya KYC submit par hi backend sync hoga.
+      Toast.show({ type: isEdit ? 'warning' : 'error', text1: isEdit ? 'Updated locally' : 'Failed', text2: isEdit ? `${msg} — changes saved on device` : msg });
+      if (isEdit) {
+        setShareholders(prev => prev.map(s => s.id === editItemId ? { ...s, ...pendingItem, id: editItemId } : s));
+      } else {
+        setShareholders(prev => [...prev, pendingItem]);
+      }
     } finally {
       setSaving(false);
     }

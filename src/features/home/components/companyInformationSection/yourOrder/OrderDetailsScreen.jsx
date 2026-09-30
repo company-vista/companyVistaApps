@@ -36,10 +36,12 @@ const OrderDetailsScreen = ({
   const pendingOrder = useAppSelector((state) => state.auth.pendingOrderData);
   // Build display values: priority -> submission prop -> pendingOrder (ReviewAndConfirm data) -> selectedCompany -> registration
   // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
+  const isUSOrder = pendingOrder?.selectedCountry === 'US' || pendingOrder?.selectedJurisdiction === 'US';
   const buildPendingCompanyName = () => {
     if (!pendingOrder?.companyName) return null;
     const base = String(pendingOrder.companyName).trim();
-    const suffix = String(pendingOrder.selectedEnding || pendingOrder.selectedStructure || '').trim();
+    // LLC/structure suffix sirf USA ke liye — quoted/non-US me LLC galat dikhta hai
+    const suffix = isUSOrder ? String(pendingOrder.selectedEnding || pendingOrder.selectedStructure || '').trim() : '';
     if (!suffix) return base;
     const normalize = (s) => s.toLowerCase().replace(/[\.\s-]/g, '');
     const normSuffix = normalize(suffix);
@@ -53,7 +55,9 @@ const OrderDetailsScreen = ({
     return `${cleaned} ${suffix}`.trim();
   };
   const pendingCompanyName = buildPendingCompanyName();
-  const pendingJurisdiction = pendingOrder?.selectedState ? `US ${pendingOrder.selectedState}, USA` : pendingOrder?.selectedJurisdiction ? String(pendingOrder.selectedJurisdiction) : null;
+  const pendingJurisdiction = isUSOrder
+    ? `US ${pendingOrder?.selectedState || ''}, USA`
+    : String(pendingOrder?.selectedCountry || pendingOrder?.selectedJurisdiction || pendingOrder?.selectedState || '').trim() || null;
   const companyVal =
     submission.company ??
     pendingCompanyName ??
@@ -70,11 +74,13 @@ const OrderDetailsScreen = ({
     registration.jurisdictionName ??
     '—';
   const structureVal =
-    submission.structure ??
-    pendingOrder?.selectedStructure ??
-    selectedCompany?.companyType ??
-    registration.entityType ??
-    '—';
+    !isUSOrder
+      ? '—'
+      : (submission.structure ??
+        pendingOrder?.selectedStructure ??
+        selectedCompany?.companyType ??
+        registration.entityType ??
+        '—');
   const shareholdersVal =
     submission.shareholders ??
     pendingOrder?.shareholdersCount ??

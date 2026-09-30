@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  TextInput,
   ScrollView,
   StatusBar,
   Image,
@@ -12,17 +11,16 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import Toast from 'react-native-toast-message';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setHasCompletedPayment } from '../../../store/slices/authSlice';
-import { savePaymentConfirmApi, fetchReviewApi, createCheckoutApi, finalizeCheckoutApi } from '../api/orderApi';
+import { savePaymentConfirmApi, createCheckoutApi, finalizeCheckoutApi } from '../api/orderApi';
 import StripeCheckoutModal from '../../../components/StripeCheckoutModal';
+import { getStructurePrice } from '../../../utils/priceCalculator';
 import { s } from '../../../theme/responsive';
-import { CommonActions } from '@react-navigation/native';
 
 export default function CompletePaymentScreen({ navigation, route }) {
   const {
@@ -31,15 +29,13 @@ export default function CompletePaymentScreen({ navigation, route }) {
     selectedEnding = '',
     selectedState = 'Delaware',
     selectedCountry = 'US',
-    selectedAddOns = {},
     addOnsTotal = 0,
     runningTotal = 0,
   } = route.params || {};
 
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
-  const [expiry, setExpiry] = useState('12 / 28');
-  const [cvc, setCvc] = useState('***');
+  // Card details collect nahi hoti — Stripe hosted checkout (handlePay →
+  // createCheckoutApi → StripeCheckoutModal) khud card form dikhata hai.
+  // App ke paas sirf checkoutUrl aur sessionId hote hain.
   const [paying, setPaying] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState(null);
@@ -53,8 +49,10 @@ export default function CompletePaymentScreen({ navigation, route }) {
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
   const dispatch = useAppDispatch();
 
-  const structurePriceMap = { LLC: 299, 'C-Corp': 399, 'S-Corp': 399 };
-  const structurePrice = route.params?.selectedStructurePrice ?? structurePriceMap[selectedStructure] ?? 299;
+  // Structure price ka single source: src/utils/priceCalculator.js
+  // STRUCTURE_PRICE_MAP. Pehle yahan apna alag inline map tha jisme S-Corp
+  // 399 tha jabki calculator me 299 — dono flows alag total dikhate the.
+  const structurePrice = getStructurePrice(selectedStructure, route.params?.selectedStructurePrice);
   const advisorPrice = route.params?.bestStatePrice ?? 0;
   const isAdvisorFlow = advisorPrice > 0;
   const directStateFee = route.params?.selectedStatePrice ?? 0;
@@ -81,7 +79,6 @@ export default function CompletePaymentScreen({ navigation, route }) {
     if (paying) return;
     setPaying(true);
     try {
-      const companyId = route.params?.companyId || pendingOrder?.companyId || companyName || 'temp-company-id';
       const amount = Number(dueNow) || 0;
       if (amount <= 0) {
         Toast.show({ type: 'error', text1: 'Invalid amount' });
@@ -166,9 +163,24 @@ export default function CompletePaymentScreen({ navigation, route }) {
         companyId: cleanCompanyId,
         sessionId: cleanSessionId,
         registrationStatus: respData.registrationStatus,
+        // Add Company flow ki identity Status/VerifyIdentity tak pahunchana
+        // zaroori hai — wo isi flag se decide karte hain ki modal band
+        // karna hai ya nahi. Bina iske payment ke baad flow atak jata hai.
+        isAddCompanyFlow: route.params?.isAddCompanyFlow === true,
       };
-      await savePaymentConfirmApi(statusParams, token).catch(()=>{});
-      // Status AuthStack aur MainStack dono me hai, direct navigate karo (Main dispatch conditional rendering me handle nahi hota)
+      // Payment VERIFY ho chuka hai (finalizeCheckoutApi), is liye ye save
+      // fail hona user ka payment rokne ki wajah nahi — order backend me
+      // ban chuka hai. Isliye result check karke aage badhte hain, par
+      // fail hone par bhi user ko silently Status par nahi bhejte: wo
+      // background record backend me rehne dega aur reconciliation se
+      // theek hoga, jabki agar yahan ruk jaate to user ko pata hi nahi
+      // chalta ki payment ho gaya.
+      const saveRes = await savePaymentConfirmApi(statusParams, token).catch(e => ({ isSuccess: false, error: e?.message }));
+      if (!saveRes?.isSuccess) {
+        console.log('=== PAYMENT CONFIRM SAVE FAILED (payment verified, continuing) ===', saveRes?.error);
+      }
+      // Status AuthStack, RegistrationStack aur MainStack — teenon me hai,
+      // direct navigate karo
       navigation.navigate('Status', statusParams);
     } catch (e) {
       const fullErr = JSON.stringify(e?.response?.data || e.message, null, 2);
@@ -196,6 +208,10 @@ export default function CompletePaymentScreen({ navigation, route }) {
     }
     Toast.show({ type: 'success', text1: 'Payment successful!' });
     if (pendingSession?.sessionId) await handleFinalize();
+    // handleFinalize har render pe naya function banta hai (useCallback nahi
+    // hai), is liye ise dep me daalne se ye callback har render dobara
+    // banta — par ye useCallback ki wajah se koi behaviour depend nahi karta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSession]);
 
   const handleWebViewCancel = useCallback((cancelUrl) => {
@@ -253,7 +269,12 @@ export default function CompletePaymentScreen({ navigation, route }) {
           <View style={styles.sectionLine} />
         </View>
 
-        <TouchableOpacity activeOpacity={0.8} onPress={() => setPaymentMethod('card')} style={[styles.paymentCard, paymentMethod === 'card' && styles.selectedPaymentCard]}>
+        {/* Card details YAHAN nahi maangi jaati. Stripe hosted checkout page
+            inhe khud securely handle karta hai, aur app ko sirf checkoutUrl
+            chahiye. Pehle yahan number/expiry/cvc inputs the jo pre-filled
+            (4242...) the aur kabhi kahin bhejte bhi nahi the — user ko lagta
+            tha wo payment ho rahi hai, actually wo sirf UI tha. */}
+        <View style={[styles.paymentCard, styles.selectedPaymentCard]}>
           <View style={styles.paymentLeft}>
             <View style={styles.cardLogoBox}>
               <FontAwesome name="cc-visa" size={20} color="#5C6BC0" />
@@ -263,68 +284,18 @@ export default function CompletePaymentScreen({ navigation, route }) {
               <Text style={styles.paymentSubtext}>Visa, Mastercard, Amex</Text>
             </View>
           </View>
-          <View style={[styles.radioOuter, paymentMethod === 'card' && styles.radioOuterSelected]}>
-            {paymentMethod === 'card' && <Ionicons name="checkmark" size={12} color="#0A111D" />}
+          <View style={[styles.radioOuter, styles.radioOuterSelected]}>
+            <Ionicons name="checkmark" size={12} color="#0A111D" />
           </View>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity activeOpacity={0.8} onPress={() => setPaymentMethod('bank')} style={[styles.paymentCard, paymentMethod === 'bank' && styles.selectedPaymentCard]}>
-          <View style={styles.paymentLeft}>
-            <View style={styles.iconBox}>
-              <FontAwesome5 name="university" size={16} color="#8E9BAE" />
-            </View>
-            <View style={styles.paymentTextGroup}>
-              <Text style={styles.paymentTitle}>Bank transfer</Text>
-              <Text style={styles.paymentSubtext}>Wire / ACH · 1–2 days to clear</Text>
-            </View>
-          </View>
-          <View style={[styles.radioOuter, paymentMethod === 'bank' && styles.radioOuterSelected]}>
-            {paymentMethod === 'bank' && <Ionicons name="checkmark" size={12} color="#0A111D" />}
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity activeOpacity={0.8} onPress={() => setPaymentMethod('crypto')} style={[styles.paymentCard, paymentMethod === 'crypto' && styles.selectedPaymentCard]}>
-          <View style={styles.paymentLeft}>
-            <View style={styles.cryptoIconBox}>
-              <FontAwesome name="bitcoin" size={18} color="#FF9800" />
-            </View>
-            <View style={styles.paymentTextGroup}>
-              <Text style={styles.paymentTitle}>Crypto</Text>
-              <Text style={styles.paymentSubtext}>USDT, USDC, BTC</Text>
-            </View>
-          </View>
-          <View style={[styles.radioOuter, paymentMethod === 'crypto' && styles.radioOuterSelected]}>
-            {paymentMethod === 'crypto' && <Ionicons name="checkmark" size={12} color="#0A111D" />}
-          </View>
-        </TouchableOpacity>
-
-        {paymentMethod === 'card' && (
-          <View style={styles.cardInputSection}>
-            <Text style={styles.inputLabel}>CARD NUMBER</Text>
-            <View style={styles.inputBox}>
-              <Ionicons name="card-outline" size={18} color="#8E9BAE" style={styles.inputIcon} />
-              <TextInput style={styles.textInput} value={cardNumber} onChangeText={setCardNumber} keyboardType="numeric" placeholderTextColor="#5B6B7C" />
-            </View>
-            <View style={styles.rowInputs}>
-              <View style={styles.halfInputContainer}>
-                <Text style={styles.inputLabel}>EXPIRY</Text>
-                <View style={styles.inputBox}>
-                  <TextInput style={styles.textInput} value={expiry} onChangeText={setExpiry} keyboardType="numeric" placeholderTextColor="#5B6B7C" />
-                </View>
-              </View>
-              <View style={styles.halfInputContainer}>
-                <Text style={styles.inputLabel}>CVC</Text>
-                <View style={styles.inputBox}>
-                  <TextInput style={styles.textInput} value={cvc} onChangeText={setCvc} keyboardType="numeric" secureTextEntry placeholderTextColor="#5B6B7C" />
-                </View>
-              </View>
-            </View>
-            <View style={styles.securityBanner}>
-              <Ionicons name="shield-checkmark-outline" size={16} color="#00E676" style={styles.shieldIcon} />
-              <Text style={styles.securityText}>Payments processed by Stripe. We never store your card details.</Text>
-            </View>
-          </View>
-        )}
+        <View style={styles.securityBanner}>
+          <Ionicons name="shield-checkmark-outline" size={16} color="#00E676" style={styles.shieldIcon} />
+          <Text style={styles.securityText}>
+            Payment Stripe ke secure checkout page par hota hai. Card details app
+            tak nahi aati, hum kuch store nahi karte.
+          </Text>
+        </View>
       </ScrollView>
 
       <View style={styles.footerContainer}>
@@ -390,22 +361,13 @@ const styles = StyleSheet.create({
   selectedPaymentCard: { borderColor: '#D4AF37', backgroundColor: '#0E1A29' },
   paymentLeft: { flexDirection: 'row', alignItems: 'center' },
   cardLogoBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
-  iconBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
-  cryptoIconBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 152, 0, 0.1)', justifyContent: 'center', alignItems: 'center' },
   paymentTextGroup: { marginLeft: s(12) },
   paymentTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   paymentSubtext: { color: '#6C7A8E', fontSize: 11, marginTop: s(2) },
   radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: '#4A5768', justifyContent: 'center', alignItems: 'center' },
   radioOuterSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
-  cardInputSection: { marginTop: s(10) },
-  inputLabel: { color: '#6C7A8E', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: s(6) },
-  inputBox: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(12), marginBottom: s(12) },
-  inputIcon: { marginRight: s(8) },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  rowInputs: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  halfInputContainer: { flex: 1 },
-  securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
   shieldIcon: { marginRight: s(8) },
+  securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
   securityText: { color: '#8E9BAE', fontSize: 11, flex: 1 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },

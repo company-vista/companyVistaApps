@@ -94,10 +94,15 @@ android {
         applicationId "com.vistaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "1.5.0"
+        versionCode 9
+        versionName "1.5.3"
         manifestPlaceholders = [usesCleartextTraffic: "true"]
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
     splits {
         abi {
             reset()
@@ -147,6 +152,12 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+     implementation 'com.github.tiktok:tiktok-business-android-sdk:1.5.0' // replace the version with the one which suits your need
+    //to listen for app life cycle
+    implementation 'androidx.lifecycle:lifecycle-process:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.3.1'
+    //to get Google install referrer
+    implementation 'com.android.installreferrer:installreferrer:2.2'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

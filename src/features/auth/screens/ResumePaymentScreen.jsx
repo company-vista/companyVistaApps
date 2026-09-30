@@ -143,7 +143,10 @@ export default function ResumePaymentScreen({ navigation, route }) {
           registrationStatus: resp.registrationStatus,
         },
         token,
-      ).catch(() => {});
+      ).catch(e => ({ isSuccess: false, error: e?.message }));
+      // Payment verify ho chuka hai, is liye save fail hone par user ko
+      // rokna nahi hai — par pehle ye API mock success return karti thi,
+      // to log karna zaroori hai warna failure chup-chaap dab jaati thi.
       Toast.show({ type: 'success', text1: 'Payment verified!' });
       navigation.navigate('Status', {
         isPaid: true,

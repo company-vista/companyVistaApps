@@ -654,5 +654,42 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         textAlign: 'center',
     },
+    // ── "+ Add new company" row (multi-company entry point) ──
+    companySwitcherDivider: {
+        height: 1,
+        marginTop: s(10),
+        marginBottom: s(4),
+    },
+    companySwitcherAddRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: s(13),
+        paddingHorizontal: s(12),
+        borderRadius: 12,
+        borderWidth: 1,
+    },
+    companySwitcherAddRowDisabled: {
+        opacity: 0.5,
+    },
+    companySwitcherAddIcon: {
+        width: 34,
+        height: 34,
+        borderRadius: 17,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+    },
+    companySwitcherAddCopy: {
+        flex: 1,
+    },
+    companySwitcherAddLabel: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    companySwitcherAddHint: {
+        fontSize: 11,
+        fontWeight: '500',
+        marginTop: 2,
+    },
 });
 export default styles;

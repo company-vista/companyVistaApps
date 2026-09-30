@@ -7,16 +7,19 @@ import {
   ScrollView,
   Animated,
   StatusBar,
-  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import logoR from '../../../assets/images/logoR.png';
 import BackButton from '../../../components/buttons/BackButton';
 import { Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 
 const BusinessServicesScreen = ({ navigation }) => {
+  // react-native ka SafeAreaView deprecated ho chuka hai. Yahi pattern baaki
+  // screens me bhi use ho raha hai (SetNewPassword, OtpVerify, etc).
+  const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const float1 = useRef(new Animated.Value(0)).current;
@@ -53,7 +56,7 @@ const BusinessServicesScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
@@ -161,7 +164,7 @@ const BusinessServicesScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
