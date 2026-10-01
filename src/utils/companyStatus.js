@@ -1,6 +1,7 @@
 // Company registration ke paid/unpaid status ke liye ek hi source of truth.
 // Pehle ye logic HomeScreen, TransactionsScreen aur RegistrationTrackingScreen me
 // alag-alag tha - jiski wajah se "unpaid" company "Success"/"Submitted" dikha rahi thi.
+import { hasRealPrice } from './priceCalculator';
 
 // Backend 'payment_pending' / 'Payment Pending' / 'payment-pending' kuch bhi bhej sakta hai
 export function normalizeRegistrationStatus(value) {
@@ -121,6 +122,16 @@ export function getCompanyTotalAmount(company) {
     ) || 0;
 }
 
+// Company record me pricing fields kahan-kahan rehti hain - flat record,
+// registrationRequestData aur pricing object. Har source alag check karo
+// (merge karne se ek source ka 0 doosre ka asli price mita deta hai).
+function getPricingSources(company) {
+    const raw = company?.raw ?? company ?? {};
+    return [raw, raw.registrationRequestData, raw.pricing].filter(
+        source => source && typeof source === 'object',
+    );
+}
+
 // Quoted jurisdiction ka price define hi nahi hota - admin quote banata hai.
 // Is liye "quoted" company par payment CTA / "Payment pending" banner kahin
 // dikhana galat hai, kyunki paisa maanga hi nahi gaya hai.
@@ -143,7 +154,13 @@ export function isCompanyQuoted(company) {
     )
         .toLowerCase()
         .trim();
-    if (pricingType) return pricingType === 'quoted';
+    if (pricingType) {
+        if (pricingType !== 'quoted') return false;
+        // Backend non-US priced jurisdiction (GB/HK/CA) ko 'quoted' bhej deta
+        // hai, par company record me asli price (registrationRequestData /
+        // pricing) maujood hota hai. Price hai to company fixed hai.
+        return !getPricingSources(company).some(source => hasRealPrice(source));
+    }
     // pricingType missing - amount aur status se infer karo
     const totalAmount = getCompanyTotalAmount(company);
     const status = getRegistrationStatus(company);

@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     lineHeight: 32,
     marginBottom: s(12),

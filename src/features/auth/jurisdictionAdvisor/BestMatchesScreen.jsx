@@ -140,6 +140,19 @@ export default function BestMatchesScreen({ navigation, route }) {
   const priorityLabelMap = { banking: 'Banking', tax: 'Low tax', fast: 'Fast setup', cost: 'Lowest cost', investor: 'Investor', privacy: 'Privacy', visa: 'Visa', maintenance: 'Low maintenance', reputation: 'Reputation' };
   const dayOneLabelMap = { payments: '💳 Cards', workers: '👥 Workers', multicurrency: '💱 Multi-currency', investment: '📈 Investment', residence_visa: '🪪 Visa', physical_office: '🏢 Office' };
 
+  // allJurisdictions ke `profile` object ke keys ka display label. Values 0–3 hain
+  // aur scoring (advisorWeights * profile) isi par chalti hai — isliye best match
+  // card me ye dikhana ranking ka actual basis dikhata hai, guess nahi.
+  const PROFILE_LABELS = {
+    banking: 'Banking access',
+    credibility: 'Credibility',
+    lowTax: 'Low tax',
+    speed: 'Speed',
+    cost: 'Low running cost',
+    privacy: 'Privacy',
+    compliance: 'Compliance ease',
+  };
+
   const dynamicTags = [];
   if (purpose) dynamicTags.push({ id: 'purpose', label: purposeLabelMap[purpose] || purpose });
   if (customerLocation) dynamicTags.push({ id: 'customer', label: customerLabelMap[customerLocation] || customerLocation });
@@ -239,6 +252,31 @@ export default function BestMatchesScreen({ navigation, route }) {
   }, [purpose, customerLocation, priorities.join(','), dayOneNeeds.join(',')]);
 
   const best = selectedBest;
+
+  // ── Card ke andar wahi data jo ranking ka basis hai ────────────────────────
+  // Pehle card me sirf country + match% tha, isliye user ko pata hi nahi chalta
+  // tha ki YE wala hi kyun aage rakha gaya. Sab kuch `allJurisdictions` ke usi
+  // entry se derive hota hai — card aur ranking ek hi source se, to dono kabhi
+  // alag nahi ho sakte. `desc` US aur UK entries me missing hai, isliye fallback.
+  const bestDesc = best.desc || best.subtitle;
+  const bestRecommended = Boolean(selectedPurpose?.recommendedJurisdictions?.includes(best.code));
+  const bestCaution = Boolean(selectedPurpose?.cautionJurisdictions?.includes(best.code));
+  const bestPurposeMatch = Boolean(normalizedPurpose && (best.purposes || []).includes(normalizedPurpose));
+  const bestCustomerMatch = Boolean(customerLocation && (best.customers || []).includes(customerLocation));
+  const matchedPriorities = priorities.filter(p => (best.priorities || []).includes(p));
+  const matchedDayOne = dayOneNeeds.filter(d => (best.dayOne || []).includes(d));
+  const purposeLabel = purposeLabelMap[normalizedPurpose] || normalizedPurpose || '';
+  const bestFitReasons = [
+    bestRecommended && { label: `Recommended for ${purposeLabel}`, tone: 'strong' },
+    !bestRecommended && bestPurposeMatch && { label: `Built for ${purposeLabel}`, tone: 'good' },
+    bestCustomerMatch && { label: `Serves ${customerLabelMap[customerLocation] || customerLocation} customers`, tone: 'good' },
+    ...matchedPriorities.map(p => ({ label: priorityLabelMap[p] || p, tone: 'good' })),
+    ...matchedDayOne.map(d => ({ label: dayOneLabelMap[d] || d, tone: 'good' })),
+  ].filter(Boolean);
+  const profileRows = Object.keys(PROFILE_LABELS)
+    .map(key => ({ key, label: PROFILE_LABELS[key], value: Math.min(Math.max(Number(best.profile?.[key]) || 0, 0), 3) }))
+    .filter(row => best.profile?.[row.key] !== undefined);
+  const bestRankIndex = ranked.findIndex(j => j.name === best.name) + 1;
   // advisor me jis country ka price define hai uska price save karo - same as RegisterJurisdictionScreen allCountries
   const PRICED_JURISDICTIONS = ['United States', 'United Kingdom', 'Hong Kong', 'Canada'];
   const PRICE_MAP = {
@@ -334,6 +372,53 @@ export default function BestMatchesScreen({ navigation, route }) {
               <Text style={styles.matchLabel}>MATCH</Text>
             </View>
           </View>
+
+          {/* Why this jurisdiction — allJurisdictions ke usi entry se, live */}
+          <View style={styles.whyBlock}>
+            <Text style={styles.whyDesc}>{bestDesc}</Text>
+
+            <View style={styles.scoreRow}>
+              <Text style={styles.scoreText}>Match score {Math.round(best.score)}</Text>
+              <View style={styles.scoreDot} />
+              <Text style={styles.scoreText}>Rank #{bestRankIndex} of {ranked.length}</Text>
+            </View>
+
+            {bestFitReasons.length > 0 && (
+              <View style={styles.fitChips}>
+                {bestFitReasons.map((reason, index) => (
+                  <View key={`${reason.label}-${index}`} style={[styles.fitChip, reason.tone === 'strong' && styles.fitChipStrong]}>
+                    <Text style={[styles.fitChipIcon, reason.tone === 'strong' && styles.fitChipIconStrong]}>{reason.tone === 'strong' ? '★' : '✓'}</Text>
+                    <Text style={[styles.fitChipText, reason.tone === 'strong' && styles.fitChipTextStrong]}>{reason.label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {bestCaution && (
+              <View style={styles.cautionRow}>
+                <Text style={styles.cautionIcon}>⚠</Text>
+                <Text style={styles.cautionText}>
+                  <Text style={styles.cautionBold}>Caution:</Text> {purposeLabel} ke liye ye jurisdiction recommended nahi hai — kuch aur dekhna behtar hoga.
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Jurisdiction profile — wahi numbers jo score me multiply hue */}
+          {profileRows.length > 0 && (
+            <View style={styles.profileBlock}>
+              <Text style={styles.profileTitle}>JURISDICTION PROFILE</Text>
+              {profileRows.map(row => (
+                <View key={row.key} style={styles.profileRow}>
+                  <Text style={styles.profileLabel}>{row.label}</Text>
+                  <View style={styles.profileTrack}>
+                    <View style={[styles.profileFill, { width: `${(row.value / 3) * 100}%` }]} />
+                  </View>
+                  <Text style={styles.profileValue}>{row.value}/3</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Features List */}
           <View style={styles.featuresList}>
@@ -589,6 +674,139 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 'bold',
     letterSpacing: 1,
+  },
+  whyBlock: {
+    borderTopWidth: 1,
+    borderColor: '#1E2638',
+    paddingTop: s(14),
+    marginBottom: s(16),
+  },
+  whyDesc: {
+    color: '#CBD5E1',
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(8),
+    marginTop: s(10),
+  },
+  scoreText: {
+    color: '#64748B',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  scoreDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: '#334155',
+  },
+  fitChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: s(6),
+    marginTop: s(12),
+  },
+  fitChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0E1B18',
+    borderWidth: 1,
+    borderColor: '#1E3A34',
+    borderRadius: 14,
+    paddingHorizontal: s(9),
+    paddingVertical: s(4),
+  },
+  fitChipStrong: {
+    backgroundColor: '#262013',
+    borderColor: '#3D321D',
+  },
+  fitChipIcon: {
+    color: '#10B981',
+    fontSize: 10,
+    marginRight: s(5),
+  },
+  fitChipIconStrong: {
+    color: '#D1A253',
+  },
+  fitChipText: {
+    color: '#94A3B8',
+    fontSize: 11,
+  },
+  fitChipTextStrong: {
+    color: '#D1A253',
+    fontWeight: '700',
+  },
+  cautionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#1E1B18',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3D321D',
+    padding: s(10),
+    marginTop: s(10),
+  },
+  cautionIcon: {
+    color: '#D1A253',
+    fontSize: 12,
+    marginRight: s(8),
+    marginTop: s(1),
+  },
+  cautionText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 16,
+    flex: 1,
+  },
+  cautionBold: {
+    color: '#D1A253',
+    fontWeight: '700',
+  },
+  profileBlock: {
+    borderTopWidth: 1,
+    borderColor: '#1E2638',
+    paddingTop: s(14),
+    marginBottom: s(16),
+  },
+  profileTitle: {
+    color: '#64748B',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    marginBottom: s(10),
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: s(7),
+  },
+  profileLabel: {
+    width: s(104),
+    color: '#94A3B8',
+    fontSize: 11,
+  },
+  profileTrack: {
+    flex: 1,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#1E2638',
+    overflow: 'hidden',
+    marginRight: s(8),
+  },
+  profileFill: {
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D1A253',
+  },
+  profileValue: {
+    width: s(28),
+    color: '#64748B',
+    fontSize: 10,
+    textAlign: 'right',
   },
   featuresList: {
     borderTopWidth: 1,

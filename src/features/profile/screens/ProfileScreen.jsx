@@ -300,7 +300,7 @@ function ProfileScreen() {
     </Pressable>
 
     <Text style={[styles.versionText, { color: colors.subtle }]}>
-      App version 1.4.1
+      App version 1.5.2
     </Text>
 
     <Modal animationType="slide" transparent visible={isSwitchSheetVisible} onRequestClose={() => setIsSwitchSheetVisible(false)}>

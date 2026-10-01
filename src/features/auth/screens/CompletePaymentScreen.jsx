@@ -17,7 +17,7 @@ import Toast from 'react-native-toast-message';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setHasCompletedPayment } from '../../../store/slices/authSlice';
-import { savePaymentConfirmApi, createCheckoutApi, finalizeCheckoutApi } from '../api/orderApi';
+import { savePaymentConfirmApi, createCheckoutApi, finalizeCheckoutApi, cancelCheckoutApi } from '../api/orderApi';
 import StripeCheckoutModal from '../../../components/StripeCheckoutModal';
 import { getStructurePrice } from '../../../utils/priceCalculator';
 import { s } from '../../../theme/responsive';
@@ -43,6 +43,10 @@ export default function CompletePaymentScreen({ navigation, route }) {
   const [pendingSession, setPendingSession] = useState(null);
   const lastSuccessUrlRef = useRef(null);
   const pendingSessionRef = useRef(null);
+  // Payment verify ho chuka hai. Iske baad screen se nikalne par "checkout
+  // abandon" report karna galat hoga — payment poora ho chuka hai, aur
+  // beforeRemove har navigation par fire hota hai, including the navigate('Status').
+  const paidRef = useRef(false);
   React.useEffect(() => { pendingSessionRef.current = pendingSession; }, [pendingSession]);
 
   const token = useAppSelector(s => s.auth.token);
@@ -107,6 +111,40 @@ export default function CompletePaymentScreen({ navigation, route }) {
     }
   };
 
+  // ── Checkout chhodne par backend ko batana ─────────────────────────────────
+  // Sirf Stripe ke hosted page se cancel redirect aane par backend ko pata
+  // chalta tha. App ke apne Cancel/Back buttons aur gesture back par ye call
+  // KABHI nahi jaati thi — to pending payment record orphan reh jata tha aur
+  // transactions list me "Pending" row atak jati thi.
+  //
+  // Fire-and-forget: user ko is request ka wait nahi karna, aur fail ho jaye to
+  // bhi navigation aage badhni chahiye. Backend idempotent hai, isliye ek hi
+  // attempt 2-3 jagah se report ho jaye to bhi koi naya record nahi banta.
+  const reportCheckoutAbandoned = useCallback(() => {
+    const session = pendingSessionRef.current;
+    if (!session?.sessionId) return;
+    if (paidRef.current) return;
+    const cid = session.companyId || route.params?.companyId || pendingOrder?.companyId;
+    if (!cid) return;
+    cancelCheckoutApi({ companyId: String(cid), token });
+  }, [token, pendingOrder?.companyId, route.params?.companyId]);
+
+  // Saare leave-paths ke liye ek hi jagah: Stripe ka cancel redirect, app ke
+  // Cancel buttons, header back, aur gesture/hardware back.
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      reportCheckoutAbandoned();
+    });
+    return unsubscribe;
+  }, [navigation, reportCheckoutAbandoned]);
+
+  const handleCancelPayment = useCallback(() => {
+    reportCheckoutAbandoned();
+    setWebViewVisible(false);
+    setCheckoutUrl(null);
+    setPendingSession(null);
+  }, [reportCheckoutAbandoned]);
+
   const handleFinalize = async (override = null) => {
     const activeSession = override || pendingSessionRef.current || pendingSession;
     const urlFromRef = lastSuccessUrlRef.current;
@@ -142,6 +180,9 @@ export default function CompletePaymentScreen({ navigation, route }) {
     try {
       const respData = await finalizeCheckoutApi({ sessionId: cleanSessionId, companyId: cleanCompanyId, token });
       if (!respData?.success) throw new Error(respData?.message || 'Verification failed');
+      // Verify pass ho gaya — ab is screen se nikalne par cancel report NAHI
+      // jana chahiye, warna hum apna hi successful payment cancel kar denge.
+      paidRef.current = true;
       Toast.show({ type: 'success', text1: 'Payment verified!', text2: respData.message });
       dispatch(setHasCompletedPayment(true));
       const statusParams = {
@@ -214,11 +255,10 @@ export default function CompletePaymentScreen({ navigation, route }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSession]);
 
-  const handleWebViewCancel = useCallback((cancelUrl) => {
-    setWebViewVisible(false);
-    setCheckoutUrl(null);
+  const handleWebViewCancel = useCallback(() => {
+    handleCancelPayment();
     Alert.alert('Payment Cancelled', 'You cancelled the payment. You can try again when ready.');
-  }, []);
+  }, [handleCancelPayment]);
 
   const handleWebViewClose = useCallback(() => {
     setWebViewVisible(false);
@@ -229,7 +269,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
       <StatusBar barStyle="light-content" backgroundColor="#080E18" />
 
       <View style={styles.header}>
-        <BackButton onPress={() => navigation.goBack()} />
+        <BackButton onPress={() => { handleCancelPayment(); navigation.goBack(); }} />
         <Image source={logoR} style={styles.topLogo} />
         <View style={{ width: 38 }} />
       </View>
@@ -305,7 +345,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
               {paying ? <ActivityIndicator size="small" color="#0A111D" style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color="#0A111D" style={styles.lockIcon} />}
               <Text style={styles.payButtonText}>{paying ? 'Processing...' : `Pay $${dueNow} Securely`}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()} disabled={paying}>
+            <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => { handleCancelPayment(); navigation.goBack(); }} disabled={paying}>
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </>
@@ -319,7 +359,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
               {verifying ? <ActivityIndicator size="small" color="#fff" style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color="#fff" style={styles.lockIcon} />}
               <Text style={[styles.payButtonText, { color: '#fff' }]}>{verifying ? 'Verifying...' : 'Verify Payment'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginTop: 10, alignItems: 'center' }} onPress={() => setPendingSession(null)}>
+            <TouchableOpacity style={{ marginTop: 10, alignItems: 'center' }} onPress={handleCancelPayment}>
               <Text style={{ color: '#64748B', fontSize: 11 }}>Cancel</Text>
             </TouchableOpacity>
           </>

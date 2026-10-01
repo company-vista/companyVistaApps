@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingOrderData, setAuthSession, setPendingOpenOrderDetails, setPendingCloseAddCompany, setPendingAddCompany, signupUser } from '../../../store/slices/authSlice';
 import { fetchReviewApi, confirmSignupApi } from '../api/orderApi';
 import { fetchClientCompanyDetails } from '../../../features/home/api/clientProfileApi';
+import { resolvePricingType, hasRealPrice } from '../../../utils/priceCalculator';
 import { s } from '../../../theme/responsive';
 
 export default function ReviewAndConfirmScreen({ navigation, route }) {
@@ -110,6 +111,9 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     addOns.bankAssurance ? { title: 'Bank Approval Assurance', subtext: 'Guaranteed approval', price: 349 } : null,
     addOns.stripePaypal ? { title: 'Stripe + PayPal Setup', subtext: 'Payment processors ready', price: 179 } : null,
   ].filter(Boolean);
+  // Add-ons total yahi se nikalo (UI list ka hi source) — route param stale ho
+  // sakta hai aur CompletePayment dueNow is value par based hai.
+  const selectedAddOnsTotal = addOnList.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
 
   // Backend GET /review/:companyId -> {company:{companyName,countryOfIncorporation,stateOfRegistration,companyType}, founder, pricing:{structurePrice,statePrice,addOns,addOnsTotal,totalAmount}, pricingType} — frontend calculate nahi
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
@@ -135,7 +139,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   const [loadingTotal, setLoadingTotal] = useState(!reviewData);
   const pricingTypeState = route.params?.pricingType || pendingOrder?.pricingType || '';
   const [fetchedPricingType, setFetchedPricingType] = useState(pricingTypeState);
-  const pricingType = fetchedPricingType || pricingTypeState;
+  // Backend computeOrderTotal sirf USA ko 'fixed' maanta hai — GB/HK/CA jaise
+  // priced jurisdictions ko wo 'quoted' + total 0 bhej deta hai. Isliye params
+  // me koi real price hai to frontend 'fixed' resolve karta hai, warna backend.
+  // Ye companyId ke bina bhi chalta hai (Add Company deferred flow).
+  const pricingType = resolvePricingType(
+    { ...(pendingOrder || {}), ...(route.params || {}) },
+    fetchedPricingType || pricingTypeState
+  );
 
   useEffect(() => {
     const cid = route.params?.companyId || pendingOrder?.companyId;
@@ -172,7 +183,9 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             // non-USA quoted case me fallback 0 hi rehne do — backend quote ka intezar
             let fallback = fallbackPricing > 0 ? fallbackPricing : fallbackCalc > 0 ? fallbackCalc : fallbackParams;
             if (!isUS && Number(countryPriceFallback) === 0) {
-              // quoted non-USA ke liye fallback ko 0 rakho (price define nahi)
+              // Sach custom-quote (price define nahi) country ke liye 0 rakho.
+              // Priced non-US (GB/HK/CA) ka countryPriceFallback > 0 hota hai,
+              // isliye wo is block se guzarta nahi aur uska price dikhta hai.
               fallback = 0;
             }
             console.log('=== REVIEW fallback compute (backend 0) pehle jaisa calc ===', { pricing: p, sp, st, at, fallbackPricing, fallbackCalc, fallbackParams, fallback, routeParams: route.params, pendingOrder, rawData: d });
@@ -187,11 +200,14 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             if (fallback > 0) amt = fallback;
           }
           if (amt != null) setBackendTotal(Number(amt));
-          // Fix: price wale country (allCountries price != '') ko fixed karo, chahe backend quoted de
-          const hasCountryPrice = Number(route.params?.selectedCountryPrice || pendingOrder?.selectedCountryPrice || 0) > 0;
-          if (hasCountryPrice && d?.pricingType === 'quoted') {
-            setFetchedPricingType('fixed');
-          } else if (d?.pricingType) setFetchedPricingType(d.pricingType);
+          // Backend non-US priced country ko 'quoted' + total 0 bhejta hai —
+          // params me real price ho to resolved value hi use karo.
+          if (d?.pricingType) {
+            setFetchedPricingType(resolvePricingType(
+              { ...(pendingOrder || {}), ...(route.params || {}) },
+              d.pricingType
+            ));
+          }
           console.log('=== REVIEW /review success ===', JSON.stringify(d, null, 2));
         } else {
           console.log('=== REVIEW /review failed ===', res.error);
@@ -204,14 +220,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   // Agar backend 0 bhej raha hai to $0 dikhao (Quote note alag se), "Quote on request" se total hide nahi hoga
   const displayTotal = loadingTotal ? '...' : backendTotal != null ? `$${backendTotal}` : '—';
   // Button logic: quoted (price nahi) -> Continue -> Your Order, price hai -> Confirm & Pay
-  const selectedCountryForBtn = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
-  const isUSForBtn = selectedCountryForBtn === 'US';
-  const hasPriceForBtn = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
-    || Number(route.params?.bestCountryPrice ?? pendingOrder?.bestCountryPrice ?? 0) > 0
-    || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
-    || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
-    || (isUSForBtn && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
-    || Number(route.params?.runningTotal ?? route.params?.combinedTotal ?? route.params?.totalAmount ?? pendingOrder?.runningTotal ?? pendingOrder?.combinedTotal ?? pendingOrder?.totalAmount ?? 0) > 0
+  const hasPriceForBtn = hasRealPrice({ ...(pendingOrder || {}), ...(route.params || {}) })
     || Number(backendTotal ?? 0) > 0;
   // Fixed-price jurisdiction ke liye kabhi "quoted/Your Order" mat dikhao —
   // chahe stale param ya backend pricingType 'quoted' kyun na ho. Jaise hi koi
@@ -269,16 +278,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
       return;
     }
     // jis country ka price define nahi hai (custom quote) -> Confirm ke baad direct OrderDetailsScreen (Your Order)
-    // structure price sirf USA me count hoga
-    const selectedCountryForConfirm = route.params?.selectedCountry ?? pendingOrder?.selectedCountry ?? selectedCountry ?? 'US';
-    const isUSForConfirm = selectedCountryForConfirm === 'US';
-    const hasPriceForConfirm = Number(route.params?.selectedCountryPrice ?? pendingOrder?.selectedCountryPrice ?? 0) > 0
-      || Number(route.params?.bestCountryPrice ?? pendingOrder?.bestCountryPrice ?? 0) > 0
-      || Number(route.params?.selectedStatePrice ?? pendingOrder?.selectedStatePrice ?? 0) > 0
-      || Number(route.params?.bestStatePrice ?? pendingOrder?.bestStatePrice ?? 0) > 0
-      || (isUSForConfirm && Number(route.params?.selectedStructurePrice ?? pendingOrder?.selectedStructurePrice ?? 0) > 0)
-      || Number(route.params?.runningTotal ?? route.params?.combinedTotal ?? route.params?.totalAmount ?? pendingOrder?.runningTotal ?? pendingOrder?.combinedTotal ?? pendingOrder?.totalAmount ?? 0) > 0
-      || Number(backendTotal ?? 0) > 0;
+    const hasPriceForConfirm = hasPriceForBtn;
     // Same rule as button above — price ho to confirm hamesha fixed rahe
     const isQuoted = !hasPriceForConfirm;
     if (isQuoted) {
@@ -324,7 +324,12 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     try {
       // Step 3 -> 4: Confirm & Pay — backend confirmSignup: computeOrderTotal + payment_pending (quoted pe error)
       const confirmRes = await confirmSignupApi({ companyId, token: resolvedToken });
-      const confirmedTotal = confirmRes.totalAmount ?? backendTotal;
+      // Backend non-US priced country ka total 0 + pricingType 'quoted' bhejta
+      // hai. Params me price hai to frontend ka total/pricingType hi source hai.
+      const backendConfirmedTotal = Number(confirmRes.totalAmount ?? 0);
+      const confirmedTotal = hasPriceForConfirm && backendConfirmedTotal === 0
+        ? (Number(route.params?.runningTotal ?? route.params?.combinedTotal ?? route.params?.selectedCountryPrice ?? 0) || Number(backendTotal ?? 0))
+        : (confirmRes.totalAmount ?? backendTotal);
       Toast.show({ type: 'success', text1: confirmRes.message || 'Signup confirmed' });
       const orderData = {
         selectedStructure,
@@ -341,7 +346,16 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         bestStateTimeframe: route.params?.bestStateTimeframe,
         selectedAddOns: addOns,
         totalAmount: confirmedTotal,
-        pricingType: confirmRes.pricingType || pricingType,
+        // CompletePayment dueNow = runningTotal || (base + addOns). Add-ons ke
+        // saath total yahan se aata hai, warna payment amount se add-ons hat jate hain.
+        addOnsTotal: selectedAddOnsTotal,
+        runningTotal: confirmedTotal,
+        // Backend 'quoted' bhej sakta hai priced country ke liye — params me
+        // price hai to resolved pricingType ('fixed') hi use karo.
+        pricingType: resolvePricingType(
+          { ...(pendingOrder || {}), ...(route.params || {}) },
+          confirmRes.pricingType || pricingType
+        ),
         fullName: route.params?.fullName,
         email: route.params?.email,
         countryOfResidence: route.params?.countryOfResidence,
@@ -388,6 +402,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           selectedStructurePrice: route.params?.selectedStructurePrice, bestState: route.params?.bestState, bestStatePrice: route.params?.bestStatePrice,
           bestStatePriceNote: route.params?.bestStatePriceNote, bestStateTimeframe: route.params?.bestStateTimeframe,
           selectedAddOns: addOns, totalAmount: confirmedTotal, pricingType: 'fixed',
+          addOnsTotal: selectedAddOnsTotal, runningTotal: confirmedTotal,
           fullName: route.params?.fullName, email: route.params?.email, countryOfResidence: route.params?.countryOfResidence, phone: route.params?.phone,
           companyState: selectedState, structure: selectedStructure, orderId: `CV-${Date.now()}`,
           advisorFlow: route.params?.advisorFlow, selectedJurisdiction: route.params?.selectedJurisdiction,
@@ -492,10 +507,10 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                 <Text style={[styles.summaryValue, { color: '#10B981' }]}>{reviewData.registrationStatus}</Text>
               </View>
             ) : null}
-            {reviewData?.pricingType ? (
+            {pricingType ? (
               <View style={styles.summaryRowSmall}>
                 <Text style={styles.summaryLabel}>Pricing</Text>
-                <Text style={styles.summaryValue}>{reviewData.pricingType}</Text>
+                <Text style={styles.summaryValue}>{pricingType}</Text>
               </View>
             ) : null}
           </View>

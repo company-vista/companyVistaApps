@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
   },
   orbitalRing: {
     position: 'absolute',
-    width: 356,
-    height: 356,
+    width: 302,
+    height: 302,
     borderRadius: 178,
     borderWidth: 1,
     borderColor: 'rgba(201,168,76,0.2)',
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(201,168,76,0.12)',
   },
   globeImage: {
-    width: 230,
-    height: 230,
+    width: 225,
+    height: 225,
     borderRadius: 100,
   },
   toastCard: {
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: s(18),
     paddingVertical: 10,
-    backgroundColor: '#fffffff8',
+    backgroundColor: '#d8c4c4f8',
     borderWidth: 0.3,
     borderColor: '#2325294d',
     // shadowColor: '#000000',

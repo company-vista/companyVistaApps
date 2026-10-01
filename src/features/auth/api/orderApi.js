@@ -115,6 +115,25 @@ export async function createCheckoutApi({ companyId, token }) {
   return res.data;
 }
 
+// Checkout cancel hone par backend ko batao. Pehle ye call nahi hota tha, to
+// backend ka pending payment record update nahi hota tha aur retry par naye
+// pending records ban jate the (list me duplicate + 3x amount). Backend me ek
+// hi record reuse hota hai, ye call us attempt ko Stripe par expire karne
+// me madad karti hai.
+export async function cancelCheckoutApi({ companyId, token }) {
+  if (!companyId) return { success: true };
+  const headers = token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {};
+  const url = `${CHECKOUT_ROUTE}/${companyId}/cancel`;
+  try {
+    const res = await axios.post(url, {}, { headers, timeout: 10000 });
+    return res.data;
+  } catch (error) {
+    // Cancel best-effort hai — payment flow ko fail nahi karna chahiye
+    console.log('=== cancelCheckout FAILED (ignored) ===', error?.message);
+    return { success: false };
+  }
+}
+
 export async function finalizeCheckoutApi({ sessionId, companyId, token }) {
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}`, 'x-auth-token': token } : {}) };
   const url = `${CHECKOUT_ROUTE}/finalize`;

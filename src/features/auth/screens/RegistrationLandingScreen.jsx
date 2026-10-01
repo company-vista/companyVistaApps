@@ -91,18 +91,18 @@ const RegistrationLandingScreen = ({ navigation }) => {
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gridRow}>
               {jurisdictionsRow1.map((item, index) => (
-                <View key={index} style={styles.countryItem}>
-                  <View style={[styles.countryBadge, item.code === 'US' && styles.activeCountryBadge]}>
+                <TouchableOpacity key={index} style={styles.countryItem} activeOpacity={0.7} onPress={() => navigation.navigate('RegisterJurisdiction')}>
+                  <View style={styles.countryBadge}>
                     <Text style={styles.flagEmoji}>{FLAGS[item.code] || item.code}</Text>
                   </View>
                   <Text style={styles.countryLabel} numberOfLines={1}>{item.label}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gridRow}>
               {jurisdictionsRow2.map((item, index) => (
-                <View key={index} style={styles.countryItem}>
+                <TouchableOpacity key={index} style={styles.countryItem} activeOpacity={0.7} onPress={() => navigation.navigate('RegisterJurisdiction')}>
                   <View style={[styles.countryBadge, item.code === '+37' && styles.moreBadge]}>
                     {item.code === '+37' ? (
                       <Text style={[styles.countryCode, styles.moreText]}>{item.code}</Text>
@@ -111,7 +111,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
                     )}
                   </View>
                   <Text style={styles.countryLabel} numberOfLines={1}>{item.label}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
@@ -216,8 +216,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center', justifyContent: 'center', marginBottom: s(4),
   },
-  activeCountryBadge: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.1)' },
-  activeCountryText: { color: '#C9A84C' },
   moreBadge: { borderColor: 'rgba(201, 168, 76, 0.4)' },
   moreText: { color: '#C9A84C', fontWeight: 'bold' },
   countryCode: { color: '#CBD5E1', fontSize: 13, fontWeight: '600' },

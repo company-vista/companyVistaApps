@@ -52,7 +52,12 @@ const StatusScreen = ({ navigation, route }) => {
   const downstreamToken = params.signupToken || params.token || pendingOrder?.token || authToken || '';
   const downstreamClientId = params.clientId || params.signupClientId || pendingOrder?.clientId || pendingOrder?.orderId || '';
   const downstreamCompanyId = params.companyId || pendingOrder?.companyId || '';
-  const downstreamParams = { companyId: downstreamCompanyId, clientId: downstreamClientId, token: downstreamToken };
+  // isAddCompanyFlow bhi aage bhejna zaroori hai — Shareholders/VerifyIdentity
+  // isi flag se decide karte hain ki Home se modal band karna hai (flag true)
+  // ya apne stack me popToTop() karna (flag false). Iske bina VerifyIdentity
+  // par RegistrationLanding par pop ho jata tha (RegistrationStack ka
+  // initialRouteName), user ko Home tak back jaana padta tha.
+  const downstreamParams = { companyId: downstreamCompanyId, clientId: downstreamClientId, token: downstreamToken, isAddCompanyFlow };
 
   const isContinueEnabled = isShareholderDone && isKycDone;
   const handlePrimaryPress = () => {

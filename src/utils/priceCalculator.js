@@ -52,3 +52,45 @@ export function hasPrice(params) {
   const p = params || {};
   return Number(p.selectedCountryPrice || p.bestCountryPrice || p.bestStatePrice || p.selectedStatePrice || p.selectedStructurePrice || 0) > 0;
 }
+
+// Jurisdictions jinka package price define hai (RegisterJurisdictionScreen ke
+// allCountries `price` field se sourced). In sabka pricingType 'fixed' hona
+// chahiye — custom-quote wale (AE/SG/EE/CY/MT/IN/DE...) 'quoted' rahenge.
+export const PRICED_COUNTRY_PRICE = {
+  US: 299,
+  GB: 595,
+  HK: 799,
+  CA: 899,
+};
+
+export function getPricedCountryPrice(countryCode) {
+  return Number(PRICED_COUNTRY_PRICE[String(countryCode || '').toUpperCase()] ?? 0);
+}
+
+// Kya is params set me koi REAL price hai? Structure price jaan-boojh kar
+// shamil nahi kiya — wo default 299 rehta hai aur custom-quote country ko bhi
+// 'fixed' bana deta tha. Sirf wo fields jo user ne country/state se aaye.
+export function hasRealPrice(params) {
+  const p = params || {};
+  return (
+    Number(p.selectedCountryPrice ?? 0) > 0 ||
+    Number(p.bestCountryPrice ?? 0) > 0 ||
+    Number(p.selectedStatePrice ?? 0) > 0 ||
+    Number(p.bestStatePrice ?? 0) > 0 ||
+    Number(p.runningTotal ?? 0) > 0 ||
+    Number(p.combinedTotal ?? 0) > 0 ||
+    Number(p.totalAmount ?? 0) > 0
+  );
+}
+
+// Backend sirf USA ko 'fixed' maanta hai (computeOrderTotal me selectedCountry
+// === 'US' check). GB/HK/CA jaise priced jurisdictions ko wo 'quoted' + total 0
+// bhej deta hai — chahe frontend ne structure/state price bhar di ho.
+//
+// Isliye pricingType frontend se resolve karo: koi real price hai -> 'fixed',
+// warna backend ka value (custom quote -> 'quoted').
+export function resolvePricingType(params, backendPricingType) {
+  if (hasRealPrice(params)) return 'fixed';
+  const t = String(backendPricingType || '').toLowerCase();
+  return t || 'quoted';
+}

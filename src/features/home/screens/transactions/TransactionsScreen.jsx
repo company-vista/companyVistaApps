@@ -9,7 +9,7 @@ import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound
 import TransactionDetailScreen from './TransactionDetailScreen';
 import { fetchSubscriptionPayments } from '../../api/subscriptionPaymentsApi';
 import { formatDate } from '../../../../constants/dateFormatter';
-import { matchesTransactionSearch, } from './transactionsUtils';
+import { collapseDuplicatePendingTransactions, matchesTransactionSearch, } from './transactionsUtils';
 import { formatCurrency } from '../../../../constants/currencyConverter';
 import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
@@ -248,7 +248,7 @@ export default function TransactionsScreen() {
                     // khud payments se derive hota hai, isliye backend ke stale fields se independent hai.
                     const paidCompanyIds = getSuccessfulPaymentCompanyIds(response.payments);
                     const normalized = response.payments.map(payment => normalizeApiTransaction(payment, companyStatusIndex, paidCompanyIds));
-                    setTransactions(suppressStalePendingTransactions(dedupeApiTransactions(normalized)));
+                    setTransactions(collapseDuplicatePendingTransactions(suppressStalePendingTransactions(dedupeApiTransactions(normalized))));
                 }
                 else {
                     setErrorMessage(response.error || 'Unable to load transactions.');

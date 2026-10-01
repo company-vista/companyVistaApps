@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
    
   },
   globeImage: {
-    width: 265,
-    height: 265,
+    width: 245,
+    height: 245,
     borderRadius: 130,
     marginTop: s(16)
   },

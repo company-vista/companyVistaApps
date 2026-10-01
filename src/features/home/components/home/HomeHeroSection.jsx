@@ -4,13 +4,12 @@ import { font } from '../../../../theme/typography';
 import { useThemeColors } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { isCompanyQuoted } from '../../../../utils/companyStatus';
 
 function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
-  const raw = selectedCompany?.raw ?? {};
-  const pricingType = String(selectedCompany?.pricingType ?? raw?.pricingType ?? raw?.pricing_type ?? raw?.registrationRequestData?.pricingType ?? raw?.pricing?.pricingType ?? raw?.registrationRequestData?.pricing_type ?? raw?.pricingType ?? '').toLowerCase();
-  const totalAmt = Number(selectedCompany?.totalAmount ?? raw?.totalAmount ?? raw?.registrationRequestData?.totalAmount ?? 0);
-  // quoted => Your Order, fixed => dashboard; fallback when pricingType missing: totalAmt 0 => treat as quoted (for pending quoted docs)
-  const isQuoted = pricingType === 'quoted' || (!pricingType && totalAmt === 0 && String(raw?.registrationStatus ?? selectedCompany?.registrationStatus ?? '').toLowerCase() === 'pending');
+  // quoted => Your Order, fixed => dashboard. isCompanyQuoted ek hi jagah ka
+  // rule hai (backend ke 'quoted' ko priced-country price ke hisaab se theek karta hai).
+  const isQuoted = selectedCompany ? isCompanyQuoted(selectedCompany) : false;
   const handleCompanyPress = () => {
     if (!selectedCompany) {
       (onAddToCompanyPress ?? onCompanySwitcherPress)?.();

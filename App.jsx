@@ -96,7 +96,7 @@ function AppContent() {
   useEffect(() => {
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 2000);
+    }, 3000);
 
     return () => clearTimeout(splashTimer);
   }, []);
@@ -121,12 +121,36 @@ function AppContent() {
 function SplashScreen() {
   const spinValue = useRef(new Animated.Value(0)).current;
   const pulseValue = useRef(new Animated.Value(0)).current;
+  const logoRise = useRef(new Animated.Value(0)).current;
+  const textRise = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(logoRise, {
+      toValue: 1,
+      duration: 1200,
+      delay: 250,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [logoRise]);
+
+  // Logo ke baad text bhi niche se upar aaye — same motion, thoda late
+  // (stagger) taaki dono ek saath na lagein.
+  useEffect(() => {
+    Animated.timing(textRise, {
+      toValue: 1,
+      duration: 1200,
+      delay: 500,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [textRise]);
 
   useEffect(() => {
     Animated.loop(
       Animated.timing(spinValue, {
         toValue: 1,
-        duration: 22000,
+        duration: 25000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
@@ -135,7 +159,7 @@ function SplashScreen() {
     Animated.loop(
       Animated.timing(pulseValue, {
         toValue: 1,
-        duration: 3000,
+        duration: 8000,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       })
@@ -155,6 +179,16 @@ function SplashScreen() {
   const pulseOpacity = pulseValue.interpolate({
     inputRange: [0, 0.7, 1],
     outputRange: [0.9, 0, 0],
+  });
+
+  const logoTranslateY = logoRise.interpolate({
+    inputRange: [0, 1],
+    outputRange: [40, 0],
+  });
+
+  const textTranslateY = textRise.interpolate({
+    inputRange: [0, 1],
+    outputRange: [40, 0],
   });
 
   return (
@@ -187,8 +221,20 @@ function SplashScreen() {
           style={styles.globeImage}
           resizeMode={FastImage.resizeMode.contain}
         />
-        <Image source={logoR} style={{ position: 'absolute', bottom: -55, width: 210, height: 46, resizeMode: 'contain' }} />
-        <Text style={{ position: 'absolute', bottom: -82, color: 'rgba(201,168,76,0.4)', fontSize: 13, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 300 }}>Global Business Registration</Text>
+        {/* <Animated.Image
+          source={logoR}
+          style={{
+            position: 'absolute',
+            bottom: -116,
+            width: 120,
+            height: 42,
+            resizeMode: 'contain',
+            transform: [{ translateY: logoTranslateY }],
+            opacity: logoRise,
+          }}
+        /> */}
+        <Animated.Text style={{ position: 'absolute', bottom: -106, color: 'rgba(250, 234, 189, 0.64)', fontSize: 20, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>Company Vista Inc</Animated.Text>
+        <Animated.Text style={{ position: 'absolute', bottom: -138, color: 'rgba(250, 234, 189, 0.64)', fontSize: 12, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>--a Koshika company--</Animated.Text>
       </View>
     </View>
   );
