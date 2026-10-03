@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -31,47 +31,37 @@ import { restoreAuth } from './src/store/slices/authSlice';
 import { store } from './src/store';
 import { useThemeColors } from './src/theme/colors';
 
-const toastConfig: ToastConfig = {
-  success: ({ text1, text2 }) => (
-    <View style={[styles.toastCard, styles.successToast]}>
+// Toast config ko factory ki tarah rakhte hain kyunki Toast component ke andar
+// hooks nahi chal sakte — colors pass karna padta hai. Module-level const me
+// theme ke bina sab kuch hardcoded rehta tha, jo dark mode me wrong render hota tha.
+function createToastConfig(colors) {
+  // Dark mode me theme ka `border` (#33415575) card ke bg (#06080ecb) ke upar
+  // milke almost invisible ho jata tha. Halka white edge card ko surface se
+  // alag dikhata hai, alpha low rakha hai taaki 0.3px border ek hard white line
+  // na bane. Light me `colors.border` (#e5e7eb) sahi hi hai.
+  const borderColor = colors.mode === 'dark' ? 'rgba(248, 250, 252, 0.16)' : colors.border;
+
+  const renderToast = ({ text1, text2 }) => (
+    <View style={[styles.toastCard, { backgroundColor: colors.surface, borderColor }]}>
       <View style={styles.toastContent}>
         <View style={styles.toastTextWrap}>
-          <Text style={styles.toastTitle}>{text1}</Text>
-          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
+          <Text style={[styles.toastTitle, { color: colors.text }]}>{text1}</Text>
+          {text2 ? <Text style={[styles.toastMessage, { color: colors.muted }]}>{text2}</Text> : null}
         </View>
         <Pressable onPress={() => Toast.hide()} hitSlop={8}>
-          <Ionicons name="close" size={20} color="#64748b" />
+          <Ionicons name="close" size={20} color={colors.muted} />
         </Pressable>
       </View>
     </View>
-  ),
-  error: ({ text1, text2 }) => (
-    <View style={[styles.toastCard, styles.errorToast]}>
-      <View style={styles.toastContent}>
-        <View style={styles.toastTextWrap}>
-          <Text style={styles.toastTitle}>{text1}</Text>
-          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
-        </View>
-        <Pressable onPress={() => Toast.hide()} hitSlop={8}>
-          <Ionicons name="close" size={20} color="#64748b" />
-        </Pressable>
-      </View>
-    </View>
-  ),
-  info: ({ text1, text2 }) => (
-    <View style={[styles.toastCard]}>
-      <View style={styles.toastContent}>
-        <View style={styles.toastTextWrap}>
-          <Text style={styles.toastTitle}>{text1}</Text>
-          {text2 ? <Text style={styles.toastMessage}>{text2}</Text> : null}
-        </View>
-        <Pressable onPress={() => Toast.hide()} hitSlop={8}>
-          <Ionicons name="close" size={20} color="#64748b" />
-        </Pressable>
-      </View>
-    </View>
-  ),
-};
+  );
+
+  const toastConfig: ToastConfig = {
+    success: renderToast,
+    error: renderToast,
+    info: renderToast,
+  };
+  return toastConfig;
+}
 
 function App() {
   return (
@@ -88,6 +78,10 @@ function AppContent() {
   const isDarkMode = themeMode === 'dark';
   const colors = useThemeColors();
   const [showSplash, setShowSplash] = useState(true);
+
+  // appThemes module-level object hai, to same mode par `colors` ki identity
+  // stable rehti hai — config har render pe nahi banega, sirf theme switch par.
+  const toastConfig = useMemo(() => createToastConfig(colors), [colors]);
 
   useEffect(() => {
     dispatch(restoreAuth());

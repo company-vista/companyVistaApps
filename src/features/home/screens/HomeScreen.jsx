@@ -283,6 +283,31 @@ export default function HomeScreen() {
     // dekho). isAddCompanyMandatory is ref ko padhta hai taaki back-press
     // force-logout list load hone tak na ho.
     const isLoadingCompaniesRef = useRef(false);
+    // ── Selected company ko live list ke saath reconcile karo ──────────────
+    // Company delete/merge hone par wo list se hat jaati hai, par selection ek
+    // stale object pakde rehta tha — setCompanyOptions list theek karta hai,
+    // setSelectedCompany nahi. Isi wajah se hero card me ghost company dikhti
+    // rahi jabki list se hat chuki thi. List me current id dhoondh kar hi
+    // selection rakhte hain, warna pehli company par shift (ya null).
+    //
+    // Ye ek jagah se har path cover karta hai — initial fetch, refreshCompanies,
+    // pull-to-refresh. Setter ke andar check karna unsafe tha: wo turant
+    // chalta hai jab list set hoti hai, aur yahan list already final hai.
+    const companyOptionsKey = companyIdsKey(companyOptions);
+    useEffect(() => {
+        // Loading ke dauran list khaali/adhuri hoti hai — check karne se
+        // valid selection galat se null ho jayegi.
+        if (isLoadingCompanies) return;
+        const currentList = companyOptions;
+        setSelectedCompany(current => {
+            if (!current?.id) {
+                return currentList[0] ?? null;
+            }
+            const stillListed = currentList.some(c => String(c.id) === String(current.id));
+            return stillListed ? current : (currentList[0] ?? null);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [companyOptionsKey, isLoadingCompanies]);
     // AddCompany modal khola tha ya nahi. Home dobara focus hone par iska pata
     // lagta hai — tabhi company list refresh karni hoti hai (nayi company add
     // hone ke baad). Modal close hone se pehle kabhi focus nahi hota, is liye

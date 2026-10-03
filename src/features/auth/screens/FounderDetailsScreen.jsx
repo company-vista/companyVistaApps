@@ -59,24 +59,6 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     ? `Non-US residents can own 100% of ${String(ownershipJurisdiction).startsWith('a ') ? ownershipJurisdiction : `a ${ownershipJurisdiction}`} LLC`
     : `Foreign-owned ${ownershipJurisdiction} companies are allowed · a local director may be required`;
 
-  useEffect(() => {
-    console.log('=== SIGNUP PAGE DATA (FounderDetails - FINAL) ===');
-    console.log('route.params FULL:', JSON.stringify(route.params, null, 2));
-    console.log('advisorFlow:', route.params?.advisorFlow);
-    console.log('selectedJurisdiction:', route.params?.selectedJurisdiction);
-    console.log('purpose:', route.params?.purpose);
-    console.log('customerLocation:', route.params?.customerLocation);
-    console.log('priorities:', route.params?.priorities);
-    console.log('dayOneNeeds:', route.params?.dayOneNeeds);
-    console.log('physicalPresence:', route.params?.physicalPresence);
-    console.log('usStatePriority:', route.params?.usStatePriority);
-    console.log('bestState:', route.params?.bestState);
-    console.log('selectedCountry:', route.params?.selectedCountry);
-    console.log('selectedState:', route.params?.selectedState);
-    console.log('selectedStructure:', route.params?.selectedStructure);
-    console.log('companyName:', route.params?.companyName);
-    console.log('SARA DATA SIGNUP TAK:', route.params);
-  }, []);
   const displayCompanyName = (() => {
     const suffix = selectedEnding || selectedStructure;
     if (!isUSFounder) return companyName || 'Your Company';
@@ -271,8 +253,6 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         // hota hai, hum to logged-in client hain).
         authToken: sessionToken || undefined,
       };
-      console.log('=== SIGNUP STEP1 PAYLOAD (FounderDetails) ===', JSON.stringify(signupPayload, null, 2));
-      console.log('FullName:', effFullName, '| Email:', effEmail, '| Phone:', trimmedPhone, '| CountryCode:', effCountryCode, '| Residence:', effResidence);
       // ── Already logged in (Add Company flow) ────────────────────────────
       // Backend save yahan NAHI hota — ReviewAndConfirm ke "Your Order" /
       // "Continue" click par signupUser call kiya jaata hai (handleConfirm me

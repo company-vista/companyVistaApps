@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 import { font } from '../../../../theme/typography';
 import { useThemeColors } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
@@ -11,28 +12,28 @@ const dummyAlerts = [
     {
         id: '1',
         title: 'Agent & Address',
-        text: 'Your Registered Agent renewal is pending. Action required to keep your business address active.',
+        text: 'Comming Soon',
         action: 'Renew Now',
         tone: 'danger',
     },
     {
         id: '2',
         title: 'ITIN',
-        text: 'Document verification required for your ITIN application. Submit missing details to proceed.',
+        text: 'Comming Soon',
         action: 'Apply Now',
         tone: 'warning',
     },
     {
         id: '3',
         title: 'State Filing',
-        text: 'Your Annual State Report is due soon. File before the deadline to avoid state penalty fees.',
+        text: 'Comming Soon',
         action: 'File Now',
         tone: 'info',
     },
     {
         id: '4',
         title: 'Federal Filing',
-        text: 'Federal filing is overdue. Complete your filing immediately to stay in Good Standing.',
+        text: 'Comming Soon',
         action: 'Verify Now',
         tone: 'danger',
     },
@@ -176,7 +177,21 @@ function ActionRequiredSlider() {
                                         {alert.text}
                                     </Text>
                                 </View>
-                                <Pressable accessibilityRole="button" style={[styles.alertActionButton, !isDark && { borderWidth: 1, borderColor: tone.action }]}>
+                                {/* Ye cards abhi sirf dummy data hain — koi actual
+                                    filing/renewal flow inke peeche nahi hai. Button
+                                    isliye dead click nahi chhodte, toast se bata dete
+                                    hain ki feature aa raha hai. Jab real action
+                                    implement hoga to onPress yahin se replace hoga. */}
+                                <Pressable
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`${alert.title} — ${alert.action}`}
+                                    onPress={() => Toast.show({
+                                        type: 'info',
+                                        text1: 'Coming soon',
+                                        text2: `${alert.title} is not available yet`,
+                                    })}
+                                    style={[styles.alertActionButton, !isDark && { borderWidth: 1, borderColor: tone.action }]}
+                                >
                                     <Text style={[styles.alertActionText, !isDark && { color: tone.action }]}>{alert.action}</Text>
                                 </Pressable>
                             </View>

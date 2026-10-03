@@ -41,22 +41,22 @@ const styles = StyleSheet.create({
     height: 225,
     borderRadius: 100,
   },
+  // Toast ka background/border/text runtime me theme se aata hai (createToastConfig
+  // in App.jsx) — isliye yahan sirf layout hai, koi hardcoded color nahi.
+  // Pehle yahan '#d8c4c4f8' bg + '#1e1b4b'/'#475569' text hardcoded the, jo dark
+  // mode me light card par dark text de kar poora toast un-readable kar deta tha.
   toastCard: {
     width: '80%',
     borderRadius: 24,
     paddingHorizontal: s(18),
     paddingVertical: 10,
-    backgroundColor: '#d8c4c4f8',
     borderWidth: 0.3,
-    borderColor: '#2325294d',
     // shadowColor: '#000000',
     // shadowOffset: { width: 0, height: 2 },
     // shadowOpacity: 0.08,
     // shadowRadius: 8,
     zIndex: 9999,
   },
-  successToast: {},
-  errorToast: {},
   toastContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -66,12 +66,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   toastTitle: {
-    color: '#1e1b4b',
     fontSize: 15,
     fontWeight: '400',
   },
   toastMessage: {
-    color: '#475569',
     fontSize: 13,
     fontWeight: '400',
     marginTop: 4,
