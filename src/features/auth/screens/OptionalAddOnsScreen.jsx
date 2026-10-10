@@ -13,25 +13,38 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import { getStructurePrice } from '../../../utils/priceCalculator';
 
 export default function OptionalAddOnsScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
+  const insets = useSafeAreaInsets();
 
+  const ADD_ON_KEYS = ['expeditedFiling', 'expressEin', 'bankAssurance', 'stripePaypal', 'boiFiling', 'operatingAgreement', 'apostille', 'itin', 'usPhone'];
   const [selectedAddOns, setSelectedAddOns] = useState(() => {
     const init = route.params?.selectedAddOns;
-    if (init && typeof init === 'object' && Object.keys(init).length > 0) return { expeditedFiling: !!init.expeditedFiling, expressEin: !!init.expressEin, bankAssurance: !!init.bankAssurance, stripePaypal: !!init.stripePaypal };
-    return { expeditedFiling: false, expressEin: false, bankAssurance: false, stripePaypal: false };
+    const base = Object.fromEntries(ADD_ON_KEYS.map(k => [k, false]));
+    if (init && typeof init === 'object' && Object.keys(init).length > 0) {
+      return Object.fromEntries(ADD_ON_KEYS.map(k => [k, !!init[k]]));
+    }
+    return base;
   });
 
   // Frontend me total calculate nahi karna — sirf raw selectedAddOns backend bhejenge, backend computeOrderTotal karega
+  // (signup.js: computeOrderTotal = selectedStructurePrice + bestStatePrice + addOnsTotal → addOnsTotal frontend ka trust karta hai)
   const prices = {
     expeditedFiling: 99,
     expressEin: 149,
     bankAssurance: 349,
     stripePaypal: 179,
+    boiFiling: 99,
+    operatingAgreement: 149,
+    apostille: 199,
+    itin: 299,
+    usPhone: 99,
   };
 
   const toggleAddOn = (key) => {
@@ -45,7 +58,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
   let baseTotal = Number(route.params?.combinedTotal ?? route.params?.runningTotal ?? route.params?.totalAmount ?? 0);
   if (!baseTotal) {
     const cp = Number(route.params?.selectedCountryPrice ?? 0);
-    const sp = Number(route.params?.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299));
+    const sp = Number(route.params?.selectedStructurePrice ?? getStructurePrice(selectedStructure));
     const st = Number(route.params?.selectedStatePrice ?? 0);
     const isUS = (route.params?.selectedCountry || selectedCountry) === 'US';
     if (isUS) {
@@ -113,7 +126,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
             <Text style={styles.runningTotalAmount}>${addOnsTotal}</Text>
           </View>
           <View style={styles.runningTotalRight}>
-            <Text style={styles.addOnsCountText}>{selectedCount} selected · Total backend se calculate hoga</Text>
+            <Text style={styles.addOnsCountText}>{selectedCount} selected</Text>
           </View>
         </View>
 
@@ -239,9 +252,160 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
             </View>
           </View>
         </TouchableOpacity>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>COMPLIANCE</Text>
+          <View style={styles.sectionLine} />
+        </View>
+
+        <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('boiFiling')} style={[styles.card, selectedAddOns.boiFiling && styles.selectedCard]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconContainer}>
+              <Feather name="shield" size={18} color="#D4AF37" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>BOI Report Filing</Text>
+                <View style={styles.purpleBadge}><Text style={styles.purpleBadgeText}>OFTEN REQUIRED</Text></View>
+              </View>
+              <Text style={styles.cardDescription}>Beneficial Ownership Information filing with FinCEN.</Text>
+            </View>
+            <View style={[styles.checkbox, selectedAddOns.boiFiling && styles.checkboxSelected]}>
+              {selectedAddOns.boiFiling && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.tagRow}>
+              <View style={styles.tagGreen}><Text style={styles.tagGreenText}>FinCEN filing</Text></View>
+              <View style={styles.tagGray}><Text style={styles.tagGrayText}>Often required</Text></View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceText}>+${prices.boiFiling}</Text>
+              <Text style={styles.priceSubtext}>one-time</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('operatingAgreement')} style={[styles.card, selectedAddOns.operatingAgreement && styles.selectedCard]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconContainer}>
+              <Feather name="edit-3" size={18} color="#64B5F6" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>Custom Operating Agreement</Text>
+              </View>
+              <Text style={styles.cardDescription}>Drafted around your actual ownership split and voting rights.</Text>
+            </View>
+            <View style={[styles.checkbox, selectedAddOns.operatingAgreement && styles.checkboxSelected]}>
+              {selectedAddOns.operatingAgreement && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.tagRow}>
+              <View style={styles.tagGreen}><Text style={styles.tagGreenText}>Custom terms</Text></View>
+              <View style={styles.tagGray}><Text style={styles.tagGrayText}>Bank-ready</Text></View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceText}>+${prices.operatingAgreement}</Text>
+              <Text style={styles.priceSubtext}>one-time</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>INTERNATIONAL</Text>
+          <View style={styles.sectionLine} />
+        </View>
+
+        <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('apostille')} style={[styles.card, selectedAddOns.apostille && styles.selectedCard]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="certificate" size={18} color="#A78BFA" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>Apostilled Documents</Text>
+              </View>
+              <Text style={styles.cardDescription}>Legalised formation documents for banking outside the US.</Text>
+            </View>
+            <View style={[styles.checkbox, selectedAddOns.apostille && styles.checkboxSelected]}>
+              {selectedAddOns.apostille && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.tagRow}>
+              <View style={styles.tagGreen}><Text style={styles.tagGreenText}>Legalised</Text></View>
+              <View style={styles.tagGray}><Text style={styles.tagGrayText}>Banking outside the US</Text></View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceText}>+${prices.apostille}</Text>
+              <Text style={styles.priceSubtext}>one-time</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('itin')} style={[styles.card, selectedAddOns.itin && styles.selectedCard]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconContainer}>
+              <FontAwesome5 name="id-card" size={16} color="#00E676" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>ITIN Application</Text>
+              </View>
+              <Text style={styles.cardDescription}>Personal US tax ID for non-residents.</Text>
+            </View>
+            <View style={[styles.checkbox, selectedAddOns.itin && styles.checkboxSelected]}>
+              {selectedAddOns.itin && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.tagRow}>
+              <View style={styles.tagGreen}><Text style={styles.tagGreenText}>No SSN needed</Text></View>
+              <View style={styles.tagGray}><Text style={styles.tagGrayText}>Non-residents</Text></View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceText}>+${prices.itin}</Text>
+              <Text style={styles.priceSubtext}>one-time</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>EXTRAS</Text>
+          <View style={styles.sectionLine} />
+        </View>
+
+        <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('usPhone')} style={[styles.card, selectedAddOns.usPhone && styles.selectedCard]}>
+          <View style={styles.cardHeader}>
+            <View style={styles.iconContainer}>
+              <Feather name="phone" size={18} color="#64B5F6" />
+            </View>
+            <View style={styles.cardTextContainer}>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>US Phone Number</Text>
+              </View>
+              <Text style={styles.cardDescription}>A real US business line with voicemail-to-email.</Text>
+            </View>
+            <View style={[styles.checkbox, selectedAddOns.usPhone && styles.checkboxSelected]}>
+              {selectedAddOns.usPhone && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.tagRow}>
+              <View style={styles.tagGreen}><Text style={styles.tagGreenText}>Voicemail-to-email</Text></View>
+              <View style={styles.tagGray}><Text style={styles.tagGrayText}>US business line</Text></View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceText}>+${prices.usPhone}</Text>
+              <Text style={styles.priceSubtext}>one-time</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
 
-      <View style={styles.footerContainer}>
+      <View style={[styles.footerContainer, { paddingBottom: 24 + insets.bottom, paddingTop: 12 }]}>
         <TouchableOpacity style={styles.continueButton} activeOpacity={0.8} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />

@@ -2,8 +2,9 @@
 // ADVISOR ROUTE: BestMatches -> (USStateFlow) -> BestStatesForYou -> CompanyNaming -> Structure -> WhatsIncluded -> OptionalAddOns -> FounderDetails -> Review
 // DIRECT ROUTE: RegisterJurisdiction -> ... -> CompanyNaming -> Structure -> WhatsIncluded -> OptionalAddOns -> FounderDetails -> Review
 // advisorFlow === true ho to sirf advisor price (bestStatePrice / bestCountryPrice) use hoga, warna direct price (selectedCountryPrice + selectedStatePrice + structure)
+import { COUNTRIES, getCountryPrice } from '../constants/countries';
 
-export const STRUCTURE_PRICE_MAP = { LLC: 299, 'C-Corp': 399, 'S-Corp': 299 };
+export const STRUCTURE_PRICE_MAP = { LLC: 299, 'C-Corp': 399, 'S-Corp': 399, Nonprofit: 399 };
 
 export function getStructurePrice(selectedStructure, fallback) {
   if (fallback != null) return Number(fallback);
@@ -22,7 +23,7 @@ export function getAdvisorBasePrice(params, structurePrice) {
     const delta = (Number(structurePrice) || 299) - 299;
     return advisorStatePrice + (delta > 0 ? delta : 0);
   }
-  // non-US priced advisor (UK/HK/CA etc): country price direct
+  // non-US priced advisor (UK/SG/EE/AE etc): country price direct
   return advisorCountryPrice;
 }
 
@@ -53,18 +54,21 @@ export function hasPrice(params) {
   return Number(p.selectedCountryPrice || p.bestCountryPrice || p.bestStatePrice || p.selectedStatePrice || p.selectedStructurePrice || 0) > 0;
 }
 
-// Jurisdictions jinka package price define hai (RegisterJurisdictionScreen ke
-// allCountries `price` field se sourced). In sabka pricingType 'fixed' hona
-// chahiye — custom-quote wale (AE/SG/EE/CY/MT/IN/DE...) 'quoted' rahenge.
-export const PRICED_COUNTRY_PRICE = {
-  US: 299,
-  GB: 595,
-  HK: 799,
-  CA: 899,
-};
+// Jurisdictions jinka package price define hai — registry config (src/constants/countries.js)
+// ke fixed-price countries se sourced (single source of truth, packageFee se derive hota hai).
+// Baaki sab custom-quote ('quoted') rahenge.
+export const PRICED_COUNTRY_PRICE = COUNTRIES.reduce((map, c) => {
+  if (c.pricingModel === 'fixed' && c.packageFee) {
+    map[c.code] = Number(c.packageFee);
+  }
+  return map;
+}, {});
 
 export function getPricedCountryPrice(countryCode) {
-  return Number(PRICED_COUNTRY_PRICE[String(countryCode || '').toUpperCase()] ?? 0);
+  const code = String(countryCode || '').toUpperCase();
+  if (PRICED_COUNTRY_PRICE[code] != null) return Number(PRICED_COUNTRY_PRICE[code]);
+  // Registry ka packageFee fallback — naya fixed-price country bina map update add ho jaye
+  return getCountryPrice(code);
 }
 
 // Kya is params set me koi REAL price hai? Structure price jaan-boojh kar
@@ -84,7 +88,7 @@ export function hasRealPrice(params) {
 }
 
 // Backend sirf USA ko 'fixed' maanta hai (computeOrderTotal me selectedCountry
-// === 'US' check). GB/HK/CA jaise priced jurisdictions ko wo 'quoted' + total 0
+// === 'US' check). GB/SG/EE/AE jaise priced jurisdictions ko wo 'quoted' + total 0
 // bhej deta hai — chahe frontend ne structure/state price bhar di ho.
 //
 // Isliye pricingType frontend se resolve karo: koi real price hai -> 'fixed',

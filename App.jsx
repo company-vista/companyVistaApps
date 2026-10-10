@@ -40,9 +40,13 @@ function createToastConfig(colors) {
   // alag dikhata hai, alpha low rakha hai taaki 0.3px border ek hard white line
   // na bane. Light me `colors.border` (#e5e7eb) sahi hi hai.
   const borderColor = colors.mode === 'dark' ? 'rgba(248, 250, 252, 0.16)' : colors.border;
+  // Toast bg theme ke hisab se - dark me solid navy (#0F172A), light me white.
+  // Pehle colors.surface use hota tha jo dark me translucent (#06080ecb) tha aur
+  // background par ghul jaata tha.
+  const toastBackground = colors.mode === 'dark' ? '#0F172A' : '#FFFFFF';
 
   const renderToast = ({ text1, text2 }) => (
-    <View style={[styles.toastCard, { backgroundColor: colors.surface, borderColor }]}>
+    <View style={[styles.toastCard, { backgroundColor: toastBackground, borderColor }]}>
       <View style={styles.toastContent}>
         <View style={styles.toastTextWrap}>
           <Text style={[styles.toastTitle, { color: colors.text }]}>{text1}</Text>

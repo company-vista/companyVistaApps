@@ -13,63 +13,22 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
+import { COUNTRIES, getCountryPriceLabel } from '../../../constants/countries';
 
-// allCountries - FIXED: only backend FIXED_PRICE_COUNTRIES have price, rest quoted (price '')
-const allCountries = [
-  { id: 'US', code: 'US', name: 'USA (United States)', price: '$299' },
-  { id: 'AE', code: 'AE', name: 'UAE (United Arab Emirates)', price: '' },
-  { id: 'GB', code: 'GB', name: 'UK (United Kingdom)', price: '$595' },
-  { id: 'SG', code: 'SG', name: 'Singapore', price: '' },
-  { id: 'EE', code: 'EE', name: 'Estonia', price: '' },
-  { id: 'HK', code: 'HK', name: 'Hong Kong', price: '$799' },
-  { id: 'CY', code: 'CY', name: 'Cyprus', price: '' },
-  { id: 'MT', code: 'MT', name: 'Malta', price: '' },
-  { id: 'CA', code: 'CA', name: 'Canada', price: '$899' },
-  { id: 'IN', code: 'IN', name: 'India', price: '' },
-  { id: 'CN', code: 'CN', name: 'China', price: '' },
-  { id: 'AU', code: 'AU', name: 'Australia', price: '' },
-  { id: 'DE', code: 'DE', name: 'Germany', price: '' },
-  { id: 'NL', code: 'NL', name: 'Netherlands', price: '' },
-  { id: 'IE', code: 'IE', name: 'Ireland', price: '' },
-  { id: 'CH', code: 'CH', name: 'Switzerland', price: '' },
-  { id: 'PA', code: 'PA', name: 'Panama', price: '' },
-  { id: 'MY', code: 'MY', name: 'Malaysia', price: '' },
-  { id: 'GE', code: 'GE', name: 'Georgia', price: '' },
-  { id: 'IL', code: 'IL', name: 'Israel', price: '' },
-  { id: 'JP', code: 'JP', name: 'Japan', price: '' },
-  { id: 'KR', code: 'KR', name: 'South Korea', price: '' },
-  { id: 'PT', code: 'PT', name: 'Portugal', price: '' },
-  { id: 'ES', code: 'ES', name: 'Spain', price: '' },
-  { id: 'FR', code: 'FR', name: 'France', price: '' },
-  { id: 'IT', code: 'IT', name: 'Italy', price: '' },
-  { id: 'PL', code: 'PL', name: 'Poland', price: '' },
-  { id: 'CZ', code: 'CZ', name: 'Czech Republic', price: '' },
-  { id: 'RO', code: 'RO', name: 'Romania', price: '' },
-  { id: 'BG', code: 'BG', name: 'Bulgaria', price: '' },
-  { id: 'LU', code: 'LU', name: 'Luxembourg', price: '' },
-  { id: 'TH', code: 'TH', name: 'Thailand', price: '' },
-  { id: 'ID', code: 'ID', name: 'Indonesia', price: '' },
-  { id: 'PH', code: 'PH', name: 'Philippines', price: '' },
-  { id: 'NZ', code: 'NZ', name: 'New Zealand', price: '' },
-  { id: 'SA', code: 'SA', name: 'Saudi Arabia', price: '' },
-  { id: 'QA', code: 'QA', name: 'Qatar', price: '' },
-  { id: 'BH', code: 'BH', name: 'Bahrain', price: '' },
-  { id: 'MX', code: 'MX', name: 'Mexico', price: '' },
-  { id: 'BR', code: 'BR', name: 'Brazil', price: '' },
-  { id: 'PE', code: 'PE', name: 'Peru', price: '' },
-  { id: 'CL', code: 'CL', name: 'Chile', price: '' },
-  { id: 'CO', code: 'CO', name: 'Colombia', price: '' },
-  { id: 'UY', code: 'UY', name: 'Uruguay', price: '' },
-  { id: 'MU', code: 'MU', name: 'Mauritius', price: '' },
-  { id: 'VG', code: 'VG', name: 'British Virgin Islands', price: '' },
-  { id: 'KY', code: 'KY', name: 'Cayman Islands', price: '' },
-  { id: 'BZ', code: 'BZ', name: 'Belize', price: '' },
-  { id: 'SC', code: 'SC', name: 'Seychelles', price: '' },
-  { id: 'BB', code: 'BB', name: 'Barbados', price: '' },
-];
+// Country list sourced from the registry config (src/constants/countries.js).
+// Only fixed-price jurisdictions show a price; quoted ones show ''.
+export const allCountries = COUNTRIES.map((c) => ({
+  id: c.code,
+  code: c.code,
+  name: c.name,
+  flag: c.flag,
+  price: getCountryPriceLabel(c),
+  packageIncludes: c.packageIncludes,
+}));
 
 export const usStates = [
   {
@@ -1047,6 +1006,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const insets = useSafeAreaInsets();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -1071,7 +1031,10 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
     const statePrice = selectedStateObj?.govtFees?.formation ?? 0;
     // Direct jurisdiction selection = NOT advisor flow, clear advisor params if any
     const { bestState, bestStatePrice, bestStatePriceNote, bestStateTimeframe, advisorFlow, ...rest } = route?.params || {};
-    const payload = { ...rest, selectedState: stateName || (selectedCountry !== 'US' ? selectedCountry : null), selectedStatePrice: statePrice, selectedCountry, selectedCountryPrice: countryPrice, advisorFlow: false };
+    // selectedState: US ke liye usStates ka full state name (e.g. Delaware),
+    // non-US ke liye blank — pehle non-US me country code (GB) bhej rahe the
+    // jisse company me galat stateOfRegistration "GB" chala jaata tha.
+    const payload = { ...rest, selectedState: stateName || null, selectedStatePrice: statePrice, selectedCountry, selectedCountryPrice: countryPrice, advisorFlow: false };
     console.log('=== REGISTER JURISDICTION -> CompanyNaming (countryPrice & statePrice) ===', JSON.stringify(payload, null, 2));
     console.log('Country:', selectedCountry, 'price:', countryPrice, '| State:', stateName, 'price:', statePrice);
     navigation.navigate('CompanyNaming', payload);
@@ -1259,7 +1222,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
         </Animated.View>
       </ScrollView>
 
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom }]}>
         <TouchableOpacity
           style={[styles.submitButton, !selectedCountry && styles.submitButtonDisabled, selectedCountry === 'US' && !selectedState && styles.submitButtonDisabled]}
           activeOpacity={0.8}

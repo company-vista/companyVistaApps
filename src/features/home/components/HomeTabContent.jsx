@@ -9,7 +9,7 @@ import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOrderPress, onOpenComplianceHistory, selectedCompany, colors, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOrderPress, onOpenComplianceHistory, selectedCompany, colors, isPaymentLocked = false, onLockedCompliancePress, }) {
   const compliance = useCompanyCompliance(selectedCompany?.id);
 
   return (<View style={styles.container}>
@@ -22,7 +22,7 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onComp
     </AnimatedAppear>
 
     <AnimatedAppear index={2}>
-      <ComplianceStatusSection companyId={selectedCompany?.id} dueDatesByTitle={compliance.dueDatesByTitle} rawDueDatesByTitle={compliance.rawDueDatesByTitle} statusesByTitle={compliance.statusesByTitle} isLoadingDueDates={compliance.isLoading} onOpenComplianceHistory={onOpenComplianceHistory} />
+      <ComplianceStatusSection companyId={selectedCompany?.id} dueDatesByTitle={compliance.dueDatesByTitle} rawDueDatesByTitle={compliance.rawDueDatesByTitle} statusesByTitle={compliance.statusesByTitle} isLoadingDueDates={compliance.isLoading} onOpenComplianceHistory={onOpenComplianceHistory} isPaymentLocked={isPaymentLocked} onLockedPress={onLockedCompliancePress} />
     </AnimatedAppear>
 
     <AnimatedAppear index={3}>

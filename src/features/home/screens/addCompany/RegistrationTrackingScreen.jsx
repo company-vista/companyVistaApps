@@ -11,6 +11,7 @@ import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import { getCompanyTotalAmount, isRegistrationUnpaid, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
+import { getStateData } from '../../../../utils/jurisdictionData';
 const STATUS_STEPS = {
     standard: [
         { title: 'Application Submitted', description: 'Your application is in queue for review.', timeframe: '0-1 day' },
@@ -300,7 +301,7 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                     </View>
                     <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
                         <Text style={[styles.detailLabel, { color: colors.subtle }]}>STATE</Text>
-                        <Text style={[styles.detailValue, { color: colors.text }]}>{company.stateOfRegistration || '—'}</Text>
+                        <Text style={[styles.detailValue, { color: colors.text }]}>{getStateData(company.stateOfRegistration)?.name || company.stateOfRegistration || '—'}</Text>
                     </View>
                     <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
                         <Text style={[styles.detailLabel, { color: colors.subtle }]}>SUBMITTED ON</Text>

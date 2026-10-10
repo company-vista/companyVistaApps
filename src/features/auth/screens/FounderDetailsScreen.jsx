@@ -15,6 +15,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
@@ -81,6 +82,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   const [verifyingEmail, setVerifyingEmail] = useState(false);
   const [isAutoContinuing, setIsAutoContinuing] = useState(false);
   const autoContinueRef = useRef(false);
+  const insets = useSafeAreaInsets();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -205,7 +207,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       const structure = { id: selectedStructure || route.params?.selectedStructure || '' };
       const statePrice = route.params?.bestStatePrice ?? route.params?.selectedStatePrice ?? 0;
       // LLC structure price sirf USA me add hota hai. Quoted/custom country ho ya
-      // non-US fixed (GB/HK/CA) — structure price 0 hi bhejo, warna company me
+      // non-US fixed (GB/SG/EE/AE) — structure price 0 hi bhejo, warna company me
       // $299 structure + $299 state (registrationRequestData) leak ho jata hai.
       const structurePrice = isUSA ? (route.params?.selectedStructurePrice ?? 299) : 0;
       const residentialAddress = route.params?.residentialAddress || route.params?.addressLine1 || residence || '';
@@ -377,7 +379,11 @@ const FounderDetailsScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: s(32) + insets.bottom }]}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.headerRow}>
           <BackButton onPress={() => navigation.goBack()} />
@@ -634,6 +640,7 @@ export default FounderDetailsScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#060913' },
+  scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },

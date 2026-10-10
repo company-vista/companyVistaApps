@@ -25,7 +25,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
   const isLight = colors.mode === 'light';
   const hasCompany = !!selectedCompany;
   const heroCompanyName = hasCompany ? (capitalizeCompanyName(selectedCompany?.name) ?? selectedCompany?.name) : (isLoadingCompanies ? 'Loading company...' : 'Register Company Now');
-  const heroCompanyCountry = selectedCompany?.countryOfIncorporation ?? (isLoadingCompanies ? 'Fetching profile' : 'Company profile');
+  const heroCompanyCountry = selectedCompany?.countryOfIncorporation ?? (isLoadingCompanies ? 'Fetching company...' : 'Not available');
   const heroCompanyEin = selectedCompany?.ein ?? 'Not available';
   const heroCompanyFormationDate = selectedCompany?.formationDate ?? 'Not available';
   const heroCompanyState = selectedCompany?.state ?? 'Not available';

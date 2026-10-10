@@ -45,6 +45,9 @@ import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
 const emptyCompanies = [];
+// Payment pending hone par ye bottom-tab tabs lock rehte hain - tap par
+// "Pay now" toast dikhta hai. Payment success par ye automatically unlock ho jaate hain.
+const PAYMENT_LOCKED_TABS = ['reports', 'billing', 'documents'];
 // userCompanies ki array identity har profile update par nayi ho jaati hai
 // (updateProfileUser naya object banata hai), jabki contents same rehte hain.
 // Is liye dep me array nahi, uska content-key use hota hai.
@@ -249,6 +252,28 @@ export default function HomeScreen() {
         });
     }, [unpaidCompany, unpaidCompanyAmount, unpaidCompanyLabel, navigation, pendingSignup?.selectedState, pendingSignup?.selectedCountry]);
 
+    // Selected company ka payment pending ho to Compliance/Invoice/Document tabs
+    // lock. Payment success hone par paidCompanyIdsSet refresh hota hai (focus
+    // effect) -> unpaidCompany null -> tabs automatically unlock. Agar user ne
+    // locked tab tap kiya tha to payment success par wahi tab auto-open ho jaata hai.
+    const isPaymentPending = !!unpaidCompany;
+    const lockedTabRequestRef = useRef(null);
+    const wasPaymentPendingRef = useRef(false);
+    useEffect(() => {
+        if (isPaymentPending) {
+            wasPaymentPendingRef.current = true;
+            // Deep-link/initialTab se locked tab khula ho to home par wapas.
+            setActiveTab(prev => (PAYMENT_LOCKED_TABS.includes(prev) ? 'home' : prev));
+            return;
+        }
+        if (wasPaymentPendingRef.current) {
+            wasPaymentPendingRef.current = false;
+            const requested = lockedTabRequestRef.current;
+            lockedTabRequestRef.current = null;
+            if (requested) setActiveTab(requested);
+        }
+    }, [isPaymentPending]);
+
     // ---- Naya company banane ka entry point ----
     // Do guards:
     //
@@ -276,7 +301,7 @@ export default function HomeScreen() {
     const addCompanyBlockedReason = hasUnpaidAnyCompany
         ? (unpaidCompanies.length > 1
             ? `${unpaidCompanies.length} companies ka payment pending hai. Pehle unki payment complete karein.`
-            : `Payment pending: ${unpaidCompanies[0]?.name || 'company'}. Pehle iski payment complete karein.`)
+            : `Payment pending: ${unpaidCompanies[0]?.name || 'company'}. First, complete its payment.`)
         : null;
     // Company list fetch karte waqt ka "loading" snapshot, ref me — kyun ki
     // isLoadingCompanies state se ye effect khud trigger hota hai (upar note
@@ -722,10 +747,25 @@ export default function HomeScreen() {
             onClosed?.();
         });
     }
+    // Payment pending par locked tabs / compliance cards tap karne ka common toast.
+    function showPaymentLockedToast() {
+        Toast.show({
+            type: 'error',
+            text1: 'Pay now',
+            text2: unpaidCompanyAmount > 0 ? `Pay $${unpaidCompanyAmount} to continue.` : 'Complete payment to continue.',
+        });
+    }
     function handleTabPress(tabId) {
         closeFabMenu();
         if (tabId === 'more') {
             openMoreSheet();
+            return;
+        }
+        // Payment pending company ke liye Compliance/Invoice/Document band -
+        // "Pay now" toast, taaki pehle payment complete ho.
+        if (isPaymentPending && PAYMENT_LOCKED_TABS.includes(tabId)) {
+            lockedTabRequestRef.current = tabId;
+            showPaymentLockedToast();
             return;
         }
         setActiveTab(tabId);
@@ -1044,7 +1084,7 @@ export default function HomeScreen() {
                     </Pressable>
                 </View>
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');

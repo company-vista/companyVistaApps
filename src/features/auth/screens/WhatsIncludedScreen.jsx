@@ -12,15 +12,34 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import { getStructurePrice } from '../../../utils/priceCalculator';
+import { getStateData, getPackageIncludes } from '../../../utils/jurisdictionData';
+import { getCountryPrice } from '../../../constants/countries';
+import { allCountries } from '../jurisdictionAdvisor/RegisterJurisdictionScreen';
 
 export default function WhatsIncludedScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
+  const stateData = getStateData(selectedState);
+  // Non-US flow: allCountries (RegisterJurisdictionScreen) ke packageIncludes dikhao;
+  // US flow: state ke packageIncludes
+  const countryEntry = allCountries.find((c) => c.code === selectedCountry);
+  const packageSource =
+    selectedCountry !== 'US' && countryEntry?.packageIncludes?.length
+      ? { packageIncludes: countryEntry.packageIncludes }
+      : stateData;
+  const packageItems = getPackageIncludes(packageSource);
+  const packageValue = packageItems.reduce((sum, item) => sum + (item.price || 0), 0);
+  // Country ka packageFee registry (countries.js) se — quoted countries me 0
+  const countryFee = selectedCountry !== 'US' ? getCountryPrice(selectedCountry) : 0;
+  const isQuotedCountry = selectedCountry !== 'US' && !(countryFee > 0);
+  const insets = useSafeAreaInsets();
 
   const handleContinue = () => {
-    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299), companyName, selectedEnding, selectedState, selectedCountry });
+    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? getStructurePrice(selectedStructure), companyName, selectedEnding, selectedState, selectedCountry });
   };
 
   const handleBack = () => {
@@ -58,105 +77,57 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             </View>
             <View style={styles.packageTextContainer}>
               <Text style={styles.packageTitle}>Complete formation package</Text>
-              <Text style={styles.packageSubtitle}>All 5 services · no add-ons required</Text>
+              <Text style={styles.packageSubtitle}>All {packageItems.length} services · no add-ons required</Text>
             </View>
             <View style={styles.valueContainer}>
-              <Text style={styles.valueAmount}>$740</Text>
-              <Text style={styles.valueLabel}>VALUE</Text>
+              {selectedCountry !== 'US' ? (
+                <>
+                  <Text style={[styles.valueAmount, isQuotedCountry && styles.valueAmountQuote]}>
+                    {isQuotedCountry ? 'Quote' : `$${countryFee}`}
+                  </Text>
+                  <Text style={styles.valueLabel}>{isQuotedCountry ? 'CUSTOM QUOTE' : 'PACKAGE'}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.valueAmount}>${packageValue}</Text>
+                  <Text style={styles.valueLabel}>VALUE</Text>
+                </>
+              )}
             </View>
           </View>
 
           <View style={styles.divider} />
 
-          {/* Item 1 */}
-          <View style={styles.itemRow}>
-            <View style={styles.iconContainer}>
-              <Feather name="search" size={18} color="#00E676" />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>Name availability check</Text>
-              <Text style={styles.itemDescription}>
-                Cleared with Delaware before filing — no rejected applications
-              </Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.strikethroughPrice}>$75</Text>
-              <Text style={styles.freeBadge}>FREE</Text>
-            </View>
-          </View>
-
-          {/* Item 2 */}
-          <View style={styles.itemRow}>
-            <View style={styles.iconContainer}>
-              <Feather name="home" size={18} color="#00E676" />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>Registered address - 1 year</Text>
-              <Text style={styles.itemDescription}>
-                Real US street address, not a PO box. Mail scanned to your dashboard
-              </Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.strikethroughPrice}>$180</Text>
-              <Text style={styles.freeBadge}>FREE</Text>
-            </View>
-          </View>
-
-          {/* Item 3 */}
-          <View style={styles.itemRow}>
-            <View style={styles.iconContainer}>
-              <Feather name="user" size={18} color="#00E676" />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>Registered agent - 1 year</Text>
-              <Text style={styles.itemDescription}>
-                Legally required in every state. We accept service of process on your behalf
-              </Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.strikethroughPrice}>$199</Text>
-              <Text style={styles.freeBadge}>FREE</Text>
-            </View>
-          </View>
-
-          {/* Item 4 */}
-          <View style={styles.itemRow}>
-            <View style={styles.iconContainer}>
-              <Feather name="file-text" size={18} color="#00E676" />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <View style={styles.titleBadgeRow}>
-                <Text style={styles.itemTitle}>EIN application</Text>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>NO SSN NEEDED</Text>
-                </View>
+          {packageItems.map((item, index) => (
+            <View key={item.label || index} style={styles.itemRow}>
+              <View style={styles.iconContainer}>
+                {item.iconLib === 'FontAwesome5' ? (
+                  <FontAwesome5 name={item.icon} size={16} color="#00E676" />
+                ) : (
+                  <Feather name={item.icon} size={18} color="#00E676" />
+                )}
               </View>
-              <Text style={styles.itemDescription}>
-                Federal Tax ID filed via Form SS-4. Required for banking and Stripe
-              </Text>
+              <View style={styles.itemTextContainer}>
+                <View style={styles.titleBadgeRow}>
+                  <Text style={styles.itemTitle}>{item.label}</Text>
+                  {item.badge && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{item.badge}</Text>
+                    </View>
+                  )}
+                </View>
+                {!!item.description && (
+                  <Text style={styles.itemDescription}>{item.description}</Text>
+                )}
+              </View>
+              <View style={styles.priceContainer}>
+                {item.price > 0 && (
+                  <Text style={styles.strikethroughPrice}>${item.price}</Text>
+                )}
+                <Text style={styles.freeBadge}>FREE</Text>
+              </View>
             </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.strikethroughPrice}>$149</Text>
-              <Text style={styles.freeBadge}>FREE</Text>
-            </View>
-          </View>
-
-          {/* Item 5 */}
-          <View style={styles.itemRow}>
-            <View style={styles.iconContainer}>
-              <FontAwesome5 name="university" size={16} color="#00E676" />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>Bank account assistance</Text>
-              <Text style={styles.itemDescription}>
-                Introductions to Mercury, Relay and Wise — all accept non-residents
-              </Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.strikethroughPrice}>$137</Text>
-              <Text style={styles.freeBadge}>FREE</Text>
-            </View>
-          </View>
+          ))}
 
           <View style={styles.divider} />
 
@@ -185,7 +156,7 @@ export default function WhatsIncludedScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Sticky Action Button Area */}
-      <View style={styles.footerContainer}>
+      <View style={[styles.footerContainer, { paddingBottom: s(24) + insets.bottom, paddingTop: s(14) }]}>
         <TouchableOpacity style={styles.continueButton} activeOpacity={0.8} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
           <Ionicons name="arrow-forward" size={18} color="#0A111D" />
@@ -196,24 +167,28 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             const p = route.params || {};
             if (p.advisorFlow && (p.bestStatePrice || p.bestCountryPrice || p.selectedCountryPrice)) {
               if (p.bestStatePrice) {
-                const structPrice = p.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299);
+                const structPrice = p.selectedStructurePrice ?? getStructurePrice(selectedStructure);
                 const delta = structPrice - 299;
                 const total = Number(p.bestStatePrice) + (delta > 0 ? delta : 0);
                 const stateName = p.bestState || p.selectedState || selectedState;
                 return `$${total} total · $${structPrice} structure + $${p.bestStateGovFee ?? (total - structPrice)} ${stateName} state fee`;
               } else {
-                const countryPrice = p.bestCountryPrice ?? p.selectedCountryPrice ?? 0;
-                const countryName = p.bestCountryName || p.selectedCountry || selectedCountry;
+                const countryPrice = Number(p.bestCountryPrice ?? p.selectedCountryPrice ?? 0) || countryFee;
+                const countryName = p.bestCountryName || countryEntry?.name || p.selectedCountry || selectedCountry;
+                // Quoted country (koi fee define nahi) — price zero mat dikhao
+                if (!countryPrice) return 'Custom quote · final price after our team reviews';
                 return `$${countryPrice} total · ${countryName} package`;
               }
             }
             const stateName = p.selectedState || p.bestState || selectedState;
             const stateFee = p.selectedStatePrice ?? p.bestStateGovFee ?? 160;
-            const structPrice = p.selectedStructurePrice ?? (selectedStructure === 'C-Corp' ? 399 : 299);
-            if (p.selectedCountry && p.selectedCountry !== 'US') {
-              const cPrice = p.selectedCountryPrice ?? 0;
+            const structPrice = p.selectedStructurePrice ?? getStructurePrice(selectedStructure);
+            if (selectedCountry !== 'US') {
+              // Registry packageFee fallback — param miss ho to bhi country ka sahi fee dikhe
+              const cPrice = Number(p.selectedCountryPrice ?? 0) || countryFee;
               // Custom-quote country (price '') ke liye structure/state fee add mat karo — "Custom quote" dikhao
-              return cPrice ? `$${cPrice} ${p.selectedCountry} package` : 'Custom quote · final price after our team reviews';
+              const countryName = countryEntry?.name || p.selectedCountry || selectedCountry;
+              return cPrice ? `$${cPrice} ${countryName} package` : 'Custom quote · final price after our team reviews';
             }
             return `$${structPrice} Structure package + $${stateFee} ${stateName} state fee`;
           })()}
@@ -319,6 +294,9 @@ const styles = StyleSheet.create({
     color: '#00E676',
     fontSize: 18,
     fontWeight: '700',
+  },
+  valueAmountQuote: {
+    fontSize: 13,
   },
   valueLabel: {
     color: '#00E676',

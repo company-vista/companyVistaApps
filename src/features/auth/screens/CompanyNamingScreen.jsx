@@ -12,9 +12,12 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import { getStateData, getEntityTypes, getEntityMeta } from '../../../utils/jurisdictionData';
+import { getCountryData, getCountryEntities } from '../../../constants/countries';
 
 const CompanyNamingScreen = ({ navigation, route }) => {
   const p = route.params || {};
@@ -22,10 +25,39 @@ const CompanyNamingScreen = ({ navigation, route }) => {
   const selectedCountry = p.selectedCountry || p.bestCountry || 'US';
   const isUS = selectedCountry === 'US';
   const selectedState = p.selectedState || p.bestState || (isUS ? 'Delaware' : '');
+  const stateData = getStateData(selectedState);
+  const entityTypes = getEntityTypes(stateData);
+  const countryData = getCountryData(selectedCountry);
+  const countryName = countryData?.name || selectedCountry;
+
+  // Entity options: US = state ke entityTypes, non-US = country registry entities
+  const entityOptions = isUS
+    ? entityTypes.map((type) => {
+        const meta = getEntityMeta(type);
+        return {
+          key: type,
+          chip: meta?.chip || type,
+          subtitle: meta?.subtitle || '',
+          ending: meta?.ending || '',
+        };
+      })
+    : getCountryEntities(selectedCountry).map((entity) => ({
+        key: entity.code,
+        chip: entity.code,
+        subtitle: entity.name,
+        ending: (entity.suffixes && entity.suffixes[0]) || '',
+      }));
+
   const [companyName, setCompanyName] = useState('');
-  const [selectedEnding, setSelectedEnding] = useState('');
+  // Non-US me pehla entity default selected rakho taaki legal suffix dikhe
+  const [selectedEntity, setSelectedEntity] = useState(
+    () => (isUS ? '' : getCountryEntities(selectedCountry)[0]?.code || ''),
+  );
   const [alternateName, setAlternateName] = useState('');
   const [showAvailable, setShowAvailable] = useState(false);
+  const insets = useSafeAreaInsets();
+  const selectedEntityOption = entityOptions.find((o) => o.key === selectedEntity) || null;
+  const selectedEnding = selectedEntityOption?.ending || '';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -48,10 +80,6 @@ const CompanyNamingScreen = ({ navigation, route }) => {
     }
   }, [companyName]);
 
-  const legalEndings = ['LLC', 'L.L.C.', 'Inc.', 'Corp.', 'Co.'];
-  const endingFullForm = { 'LLC': 'Limited Liability Company', 'L.L.C.': 'Limited Liability Company', 'Inc.': 'Incorporated', 'Corp.': 'Corporation', 'Co.': 'Company' };
-  const countryFullNames = { US: 'United States', AE: 'United Arab Emirates', GB: 'United Kingdom', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta', CA: 'Canada', IN: 'India', CN: 'China', AU: 'Australia', DE: 'Germany', NL: 'Netherlands', IE: 'Ireland', CH: 'Switzerland', PA: 'Panama', MY: 'Malaysia', GE: 'Georgia', IL: 'Israel', JP: 'Japan', KR: 'South Korea', PT: 'Portugal', ES: 'Spain', FR: 'France', IT: 'Italy', PL: 'Poland', CZ: 'Czech Republic', RO: 'Romania', BG: 'Bulgaria', LU: 'Luxembourg', TH: 'Thailand', ID: 'Indonesia', PH: 'Philippines', NZ: 'New Zealand', SA: 'Saudi Arabia', QA: 'Qatar', BH: 'Bahrain', MX: 'Mexico', BR: 'Brazil', PE: 'Peru', CL: 'Chile', CO: 'Colombia', UY: 'Uruguay', MU: 'Mauritius', VG: 'British Virgin Islands', KY: 'Cayman Islands', BZ: 'Belize', SC: 'Seychelles', BB: 'Barbados' };
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
@@ -69,14 +97,14 @@ const CompanyNamingScreen = ({ navigation, route }) => {
             What will you <Text style={styles.italicTitle}>call it?</Text>
           </Text>
           <Text style={styles.subtitle}>
-            {isUS ? `We'll check name availability with the ${selectedState} Division of Corporations.` : `We'll check name availability in ${countryFullNames[selectedCountry] || selectedCountry}.`}
+            {isUS ? `We'll check name availability with the ${selectedState} Division of Corporations.` : `We'll check name availability in ${countryName}.`}
           </Text>
 
           {/* Jurisdiction Card - pura naam */}
           <View style={styles.jurisdictionCard}>
             <Text style={styles.countryCodeBadge}>{selectedCountry}</Text>
             <Text style={styles.jurisdictionLabel}>Jurisdiction</Text>
-            <Text style={styles.jurisdictionValue}>{isUS ? `${selectedState}, ${countryFullNames[selectedCountry] || selectedCountry}` : (countryFullNames[selectedCountry] || selectedCountry)}</Text>
+            <Text style={styles.jurisdictionValue}>{isUS ? `${selectedState}, ${countryName}` : countryName}</Text>
           </View>
 
           {/* Company Name Input */}
@@ -96,22 +124,22 @@ const CompanyNamingScreen = ({ navigation, route }) => {
 
 
 
-          {/* Legal Endings - sirf US ke liye */}
-          {isUS && (
+          {/* Entity types - US me state ke entityTypes, warna country entities */}
+          {entityOptions.length > 0 && (
             <>
-              <Text style={styles.inputLabel}>LEGAL ENDING <Text style={styles.requiredAsterisk}>*</Text></Text>
+              <Text style={styles.inputLabel}>ENTITY TYPE <Text style={styles.requiredAsterisk}>*</Text></Text>
               <View style={styles.endingsRow}>
-                {legalEndings.map((ending) => {
-                  const isSelected = selectedEnding === ending;
+                {entityOptions.map((option) => {
+                  const isSelected = selectedEntity === option.key;
                   return (
                     <TouchableOpacity
-                      key={ending}
+                      key={option.key}
                       style={[styles.endingChip, isSelected && styles.endingChipSelected]}
                       activeOpacity={0.8}
-                      onPress={() => setSelectedEnding(ending)}
+                      onPress={() => setSelectedEntity(option.key)}
                     >
                       <Text style={[styles.endingChipText, isSelected && styles.endingChipTextSelected]}>
-                        {ending}
+                        {option.chip}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -125,11 +153,11 @@ const CompanyNamingScreen = ({ navigation, route }) => {
                 </Text>
               </Text>
               <Text style={[styles.helperText, { marginTop: 4 }]}>
-                Short: {companyName || 'Your Company'} {selectedEnding || '—'}
+                {selectedEntityOption?.subtitle || 'Choose the entity type to register'}
               </Text>
             </>
           )}
-          {!isUS && companyName.trim().length > 0 && (
+          {entityOptions.length === 0 && companyName.trim().length > 0 && (
             <Text style={styles.fullLegalPreview}>
               Full legal name: <Text style={styles.fullLegalHighlight}>{companyName}</Text>
             </Text>
@@ -165,28 +193,17 @@ const CompanyNamingScreen = ({ navigation, route }) => {
       </ScrollView>
 
       {/* Bottom Fixed Button */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom }]}>
         <TouchableOpacity
-          style={[styles.continueBtn, (!companyName.trim() || (isUS && !selectedEnding)) && styles.continueBtnDisabled]}
+          style={[styles.continueBtn, (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           onPress={() => {
-            if (!companyName.trim() || (isUS && !selectedEnding)) return;
-            const hasPrice = Number(route.params?.selectedCountryPrice || route.params?.bestCountryPrice || route.params?.bestStatePrice || route.params?.selectedStatePrice || 0) > 0;
-            const baseParams = { ...(route.params || {}), companyName: companyName.trim(), selectedEnding: isUS ? selectedEnding : '', selectedState, selectedCountry };
-            if (!hasPrice) {
-              // amount wala page nahi dikhana - direct FounderDetails, fir signup ke baad Your Order
-              navigation.navigate('FounderDetails', baseParams);
-            } else if (!isUS) {
-              // Non-US priced (AE/SG/GB/EE) -> Structure skip but pricingType fixed rakho, totalAmount country price se banega
-              // selectedStructure empty rakhne se backend quoted bana deta tha - isliye default LLC rakho
-              const fallbackStructure = route.params?.selectedStructure || 'LLC';
-              const fallbackPrice = route.params?.selectedStructurePrice ?? 299;
-              navigation.navigate('WhatsIncluded', { ...baseParams, selectedStructure: fallbackStructure, selectedStructurePrice: fallbackPrice });
-            } else {
-              navigation.navigate('StructureSelection', baseParams);
-            }
+            if (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) return;
+            const baseParams = { ...(route.params || {}), companyName: companyName.trim(), selectedEntity, selectedEnding, selectedState, selectedCountry };
+            // Sab countries structure selection se guzrenge (US = state entityTypes, non-US = country entities)
+            navigation.navigate('StructureSelection', baseParams);
           }}
-          disabled={!companyName.trim() || (isUS && !selectedEnding)}
+          disabled={!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)}
         >
           <Text style={styles.continueBtnText}>Continue →</Text>
         </TouchableOpacity>
@@ -238,7 +255,7 @@ const styles = StyleSheet.create({
   },
   availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(20), gap: s(6) },
   availabilityText: { color: '#10B981', fontSize: 11 },
-  endingsRow: { flexDirection: 'row', gap: s(8), marginBottom: s(20), marginTop: s(4) },
+  endingsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: s(8), marginBottom: s(20), marginTop: s(4) },
   endingChip: {
     paddingHorizontal: s(14), paddingVertical: s(8), borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.03)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',

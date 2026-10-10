@@ -96,6 +96,11 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     'Express EIN': 'expressEin',
     'Bank Approval Assurance': 'bankAssurance',
     'Stripe + PayPal Setup': 'stripePaypal',
+    'BOI Report Filing': 'boiFiling',
+    'Custom Operating Agreement': 'operatingAgreement',
+    'Apostilled Documents': 'apostille',
+    'ITIN Application': 'itin',
+    'US Phone Number': 'usPhone',
   };
   const handleRemoveAddOn = (title) => {
     const key = addOnKeyMap[title];
@@ -110,6 +115,11 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     addOns.expressEin ? { title: 'Express EIN', subtext: 'Tax ID in 3–5 days instead of 4–6 weeks', price: 149 } : null,
     addOns.bankAssurance ? { title: 'Bank Approval Assurance', subtext: 'Guaranteed approval', price: 349 } : null,
     addOns.stripePaypal ? { title: 'Stripe + PayPal Setup', subtext: 'Payment processors ready', price: 179 } : null,
+    addOns.boiFiling ? { title: 'BOI Report Filing', subtext: 'Beneficial Ownership filing with FinCEN', price: 99 } : null,
+    addOns.operatingAgreement ? { title: 'Custom Operating Agreement', subtext: 'Drafted to your ownership split', price: 149 } : null,
+    addOns.apostille ? { title: 'Apostilled Documents', subtext: 'Legalised for banking outside the US', price: 199 } : null,
+    addOns.itin ? { title: 'ITIN Application', subtext: 'Personal US tax ID for non-residents', price: 299 } : null,
+    addOns.usPhone ? { title: 'US Phone Number', subtext: 'US business line with voicemail-to-email', price: 99 } : null,
   ].filter(Boolean);
   // Add-ons total yahi se nikalo (UI list ka hi source) — route param stale ho
   // sakta hai aur CompletePayment dueNow is value par based hai.
@@ -139,7 +149,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   const [loadingTotal, setLoadingTotal] = useState(!reviewData);
   const pricingTypeState = route.params?.pricingType || pendingOrder?.pricingType || '';
   const [fetchedPricingType, setFetchedPricingType] = useState(pricingTypeState);
-  // Backend computeOrderTotal sirf USA ko 'fixed' maanta hai — GB/HK/CA jaise
+  // Backend computeOrderTotal sirf USA ko 'fixed' maanta hai — GB/SG/EE/AE jaise
   // priced jurisdictions ko wo 'quoted' + total 0 bhej deta hai. Isliye params
   // me koi real price hai to frontend 'fixed' resolve karta hai, warna backend.
   // Ye companyId ke bina bhi chalta hai (Add Company deferred flow).
@@ -184,7 +194,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             let fallback = fallbackPricing > 0 ? fallbackPricing : fallbackCalc > 0 ? fallbackCalc : fallbackParams;
             if (!isUS && Number(countryPriceFallback) === 0) {
               // Sach custom-quote (price define nahi) country ke liye 0 rakho.
-              // Priced non-US (GB/HK/CA) ka countryPriceFallback > 0 hota hai,
+              // Priced non-US (GB/SG/EE/AE) ka countryPriceFallback > 0 hota hai,
               // isliye wo is block se guzarta nahi aur uska price dikhta hai.
               fallback = 0;
             }

@@ -9,6 +9,6 @@ module.exports = {
         allowImportProcessEnv: true,
       },
     ],
-    'react-native-reanimated/plugin',
+    'react-native-worklets/plugin',
   ],
 };

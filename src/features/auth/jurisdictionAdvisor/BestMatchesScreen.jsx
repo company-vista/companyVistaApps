@@ -277,19 +277,21 @@ export default function BestMatchesScreen({ navigation, route }) {
     .map(key => ({ key, label: PROFILE_LABELS[key], value: Math.min(Math.max(Number(best.profile?.[key]) || 0, 0), 3) }))
     .filter(row => best.profile?.[row.key] !== undefined);
   const bestRankIndex = ranked.findIndex(j => j.name === best.name) + 1;
-  // advisor me jis country ka price define hai uska price save karo - same as RegisterJurisdictionScreen allCountries
-  const PRICED_JURISDICTIONS = ['United States', 'United Kingdom', 'Hong Kong', 'Canada'];
+  // advisor me jis country ka price define hai uska price save karo - same as RegisterJurisdictionScreen allCountries (backend FIXED_PRICE_COUNTRIES)
+  const PRICED_JURISDICTIONS = ['United States', 'United Kingdom', 'Singapore', 'Estonia', 'United Arab Emirates'];
   const PRICE_MAP = {
     'United States': '$299',
     'United Kingdom': '$595',
-    'Hong Kong': '$799',
-    'Canada': '$899',
+    'Singapore': '$899',
+    'Estonia': '$499',
+    'United Arab Emirates': '$1499',
   };
   const PRICE_NUMERIC_MAP = {
     'United States': 299,
     'United Kingdom': 595,
-    'Hong Kong': 799,
-    'Canada': 899,
+    'Singapore': 899,
+    'Estonia': 499,
+    'United Arab Emirates': 1499,
   };
   const showPrice = PRICED_JURISDICTIONS.includes(best.name);
   const isUSA = best.code === 'US' || best.name === 'United States';
@@ -441,7 +443,7 @@ export default function BestMatchesScreen({ navigation, route }) {
             </Text>
           </View>
 
-          {/* Price Footer - only US/UK/HK/CA show price (same as RegisterJurisdiction), others Custom quote */}
+          {/* Price Footer - only FIXED_PRICE_COUNTRIES (US/UK/SG/EE/AE) show price (same as RegisterJurisdiction), others Custom quote */}
           <View style={styles.cardFooter}>
             {showPrice ? (
               <View style={styles.priceContainer}>

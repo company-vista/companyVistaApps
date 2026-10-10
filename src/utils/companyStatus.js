@@ -156,7 +156,7 @@ export function isCompanyQuoted(company) {
         .trim();
     if (pricingType) {
         if (pricingType !== 'quoted') return false;
-        // Backend non-US priced jurisdiction (GB/HK/CA) ko 'quoted' bhej deta
+        // Backend non-US priced jurisdiction (GB/SG/EE/AE) ko 'quoted' bhej deta
         // hai, par company record me asli price (registrationRequestData /
         // pricing) maujood hota hai. Price hai to company fixed hai.
         return !getPricingSources(company).some(source => hasRealPrice(source));

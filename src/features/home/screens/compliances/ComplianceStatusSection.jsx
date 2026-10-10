@@ -80,7 +80,7 @@ function getDaysRemaining(value) {
     today.setHours(0, 0, 0, 0);
     return Math.round((date.getTime() - today.getTime()) / 86400000);
 }
-function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory }) {
+function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesByTitle = {}, statusesByTitle = {}, isLoadingDueDates = false, onOpenComplianceHistory, isPaymentLocked = false, onLockedPress }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     const complianceCards = useMemo(() => complianceItems.map(item => {
@@ -111,17 +111,24 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
       <View style={styles.complianceGrid}>
         {complianceCards.map(item => {
             const tone = getToneStyles(item.tone, colors);
-            return (<Pressable key={item.title} onPress={() => onOpenComplianceHistory?.({
-                id: item.id,
-                title: item.title,
-                subtitle: item.subtitle,
-                status: item.tag,
-                date: item.dueDate,
-                details: item.details ?? [],
-                companyId,
-                price: item.price,
-                years: item.years,
-            })} style={styles.tileWrapper}>
+            return (<Pressable key={item.title} onPress={() => {
+                // Payment pending ho to cards locked - tap par "Pay now" toast.
+                if (isPaymentLocked) {
+                    onLockedPress?.();
+                    return;
+                }
+                onOpenComplianceHistory?.({
+                    id: item.id,
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    status: item.tag,
+                    date: item.dueDate,
+                    details: item.details ?? [],
+                    companyId,
+                    price: item.price,
+                    years: item.years,
+                });
+            }} style={styles.tileWrapper}>
               <View style={[styles.complianceTile, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderWidth: isLight ? 0 : 1, borderColor: 'rgba(255,255,255,0.08)' }]}>
                 <View style={styles.complianceTileHeader}>
                   <View style={[styles.statusIcon, tone.icon]}>
@@ -146,6 +153,9 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                   {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
                 </Text>
               </View>
+              {isPaymentLocked ? (<View pointerEvents="none" style={[styles.lockedOverlay, { backgroundColor: isLight ? 'rgba(255,255,255,0.6)' : 'rgba(6,8,14,0.55)' }]}>
+                <FontAwesome name="lock" size={18} color={colors.text} />
+              </View>) : null}
             </Pressable>);
         })}
       </View>
@@ -183,6 +193,16 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         maxWidth: '48%',
         minWidth: '48%',
+    },
+    lockedOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     complianceTile: {
         borderRadius: 12,
