@@ -39,7 +39,14 @@ export default function WhatsIncludedScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
 
   const handleContinue = () => {
-    navigation.navigate('OptionalAddOns', { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? getStructurePrice(selectedStructure), companyName, selectedEnding, selectedState, selectedCountry });
+    const nextParams = { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? getStructurePrice(selectedStructure), companyName, selectedEnding, selectedState, selectedCountry };
+    // Optional add-ons sirf USA jurisdiction ke liye hain — RegisterJurisdictionScreen
+    // me USA select hone par hi OptionalAddOns dikhao, warna seedha FounderDetails.
+    if (selectedCountry === 'US') {
+      navigation.navigate('OptionalAddOns', nextParams);
+    } else {
+      navigation.navigate('FounderDetails', nextParams);
+    }
   };
 
   const handleBack = () => {

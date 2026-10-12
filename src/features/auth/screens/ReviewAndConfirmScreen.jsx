@@ -575,8 +575,8 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           </View>
         </View>
 
-        {/* Add-ons sirf priced (fixed) jurisdictions me dikhte hain — quoted me hidden */}
-        {!isQuotedForBtn && (
+        {/* Add-ons sirf USA jurisdiction me dikhte hain — non-US (quoted/fixed) me hidden */}
+        {!isQuotedForBtn && selectedCountry === 'US' && (
           <View style={styles.addOnsCard}>
             <View style={styles.addOnsHeader}>
               <View style={styles.addOnsTitleRow}>
