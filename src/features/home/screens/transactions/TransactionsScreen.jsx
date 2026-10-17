@@ -7,9 +7,10 @@ import { useThemeColors } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import TransactionDetailScreen from './TransactionDetailScreen';
-import { fetchSubscriptionPayments } from '../../api/subscriptionPaymentsApi';
+import { fetchCompanyTransactions } from '../../api/transactionsApi';
+import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { formatDate } from '../../../../constants/dateFormatter';
-import { collapseDuplicatePendingTransactions, matchesTransactionSearch, } from './transactionsUtils';
+import { collapseDuplicatePendingTransactions, matchesSelectedCompany, matchesTransactionSearch, } from './transactionsUtils';
 import { formatCurrency } from '../../../../constants/currencyConverter';
 import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
@@ -96,9 +97,17 @@ function normalizeApiTransaction(item, companyStatusIndex = {}, paidCompanyIds =
     const onlineAmountNumber = parseApiAmount(item.onlineAmount);
     const cashAmountNumber = parseApiAmount(item.cashAmount);
     const statusValue = getApiStatus(item.status, item.isActive);
-    const companyId = typeof item.company === 'object' && item.company !== null
-        ? String(item.company._id ?? item.company.id ?? '')
-        : String(item.company ?? '');
+    // Backend payment records me company reference kabhi `company`, kabhi `companyId`
+    // (populated object ya plain id) ke naam se aata hai. Pehle sirf `company` padha
+    // jaata tha, is liye `companyId` wale records ka company id khaali reh jaata tha
+    // aur company-filter unhe hata deta tha -> transaction list blank dikhti thi.
+    const rawCompany = item.company ?? item.companyId ?? item.company_id ?? '';
+    const companyId = typeof rawCompany === 'object' && rawCompany !== null
+        ? String(rawCompany._id ?? rawCompany.id ?? rawCompany.companyId ?? '')
+        : String(rawCompany ?? '');
+    const companyName = typeof rawCompany === 'object' && rawCompany !== null
+        ? String(rawCompany.companyName ?? rawCompany.name ?? rawCompany.businessName ?? '')
+        : String(item.companyName ?? item.company_name ?? '');
     // Company registration payment_pending hai par backend ne "success" bheja -> Pending dikhao.
     // Exception: company ki payment already SUCCESS hai (paidCompanyIds) — stale pending
     // registrationStatus ko mat maano, real success ko Success hi dikhao.
@@ -122,6 +131,8 @@ function normalizeApiTransaction(item, companyStatusIndex = {}, paidCompanyIds =
         description: String(item.description ?? item.title ?? 'Payment record'),
         notes: String(item.notes ?? ''),
         company: companyId,
+        companyId,
+        companyName,
         paymentMethod: String(item.method ?? item.paymentMethod ?? ''),
         referenceId: String(item.referenceId ?? ''),
         transactionId: String(item.transactionId ?? item.referenceId ?? item._id ?? ''),
@@ -220,9 +231,13 @@ export default function TransactionsScreen() {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
+    const userId = useAppSelector(state => state.auth.user?._id ?? state.auth.user?.id ?? null);
     const rawCompanies = useAppSelector(state => state.auth.user?.companies);
     const userCompanies = useMemo(() => rawCompanies ?? [], [rawCompanies]);
-    const hasNoCompany = userCompanies.length === 0;
+    // Company data (totalAmount ke saath) wahin se laao jahan se Home fetch karta hai
+    // (fetchClientCompanies / profile). auth.user.companies me totalAmount missing ho
+    // sakta hai, is liye ye zyada reliable hai.
+    const [profileCompanies, setProfileCompanies] = useState([]);
     const [activeFilter, setActiveFilter] = useState('All');
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const [search, setSearch] = useState('');
@@ -233,21 +248,81 @@ export default function TransactionsScreen() {
     // Company registration status ka index - payment pending wali company ka transaction
     // Success nahi dikhna chahiye, chahe backend payment record me aisa bhej de
     const companyStatusIndex = useMemo(() => buildCompanyStatusIndex(userCompanies), [userCompanies]);
+    // Company ka transaction total amount — companies fetch (userCompanies) se aata hai.
+    // TransactionDetailScreen me dena hai, is liye id -> { totalAmount, currency } map.
+    const companyTotalsById = useMemo(() => {
+        const source = profileCompanies.length > 0 ? profileCompanies : userCompanies;
+        const map = {};
+        (Array.isArray(source) ? source : []).forEach(company => {
+            const id = String(company?._id ?? company?.id ?? company?.companyId ?? '').trim();
+            const name = String(company?.companyName ?? company?.businessName ?? company?.legalName ?? company?.name ?? '').trim().toLowerCase();
+            const entry = {
+                totalAmount: Number(company?.totalAmount ?? company?.registrationRequestData?.totalAmount ?? 0) || 0,
+                currency: company?.currency ?? company?.registrationRequestData?.currency ?? undefined,
+            };
+            if (id) map[id] = entry;
+            if (name) map[`name:${name}`] = entry;
+        });
+        return map;
+    }, [profileCompanies, userCompanies]);
+    const getCompanyTotal = (details) => {
+        if (details) {
+            const id = String(details.companyId ?? details.company ?? '').trim();
+            if (id && companyTotalsById[id]) return companyTotalsById[id];
+            const name = String(details.companyName ?? '').trim().toLowerCase();
+            if (name && companyTotalsById[`name:${name}`]) return companyTotalsById[`name:${name}`];
+        }
+        // Payment record me company reference na ho to bhi selected company (route) ka
+        // total dikhao — Transactions isi company ke liye khula tha.
+        const routeId = String(companyId ?? '').trim();
+        if (routeId && companyTotalsById[routeId]) return companyTotalsById[routeId];
+        return undefined;
+    };
+    // Route me sirf companyId aata hai. Name match fallback ke liye selected company ka
+    // naam bhi resolve karte hain — kuch payment records me company id populated nahi
+    // hota, sirf naam hota hai.
+    const selectedCompanyForFilter = useMemo(() => {
+        if (!companyId) return null;
+        const match = userCompanies.find(c => String(c?._id ?? c?.id ?? c?.companyId ?? '') === String(companyId));
+        return {
+            id: String(companyId),
+            name: String(match?.companyName ?? match?.businessName ?? match?.legalName ?? match?.name ?? ''),
+        };
+    }, [companyId, userCompanies]);
+    useEffect(() => {
+        let isMounted = true;
+        if (!token) {
+            return () => {
+                isMounted = false;
+            };
+        }
+        fetchClientCompanies({ token, userId: userId ?? undefined })
+            .then(result => {
+                if (!isMounted) return;
+                if (result.isSuccess && result.companies.length > 0) {
+                    setProfileCompanies(result.companies);
+                }
+            })
+            .catch(() => { });
+        return () => {
+            isMounted = false;
+        };
+    }, [token, userId]);
     useEffect(() => {
         let isMounted = true;
         async function loadTransactions() {
             setIsLoading(true);
             setErrorMessage('');
             try {
-                const response = await fetchSubscriptionPayments(token ?? undefined);
+                const response = await fetchCompanyTransactions({ companyId, token: token ?? undefined });
                 if (!isMounted)
                     return;
                 if (response.isSuccess) {
                     // Jo companies pay kar chuki hain unhe paid maano — unki success transaction
                     // ko stale pending registrationStatus ki wajah se Pending mat dikhao. Ye set
                     // khud payments se derive hota hai, isliye backend ke stale fields se independent hai.
-                    const paidCompanyIds = getSuccessfulPaymentCompanyIds(response.payments);
-                    const normalized = response.payments.map(payment => normalizeApiTransaction(payment, companyStatusIndex, paidCompanyIds));
+                    const paidCompanyIds = getSuccessfulPaymentCompanyIds(response.transactions);
+                    const normalized = response.transactions.map(payment => normalizeApiTransaction(payment, companyStatusIndex, paidCompanyIds));
                     setTransactions(collapseDuplicatePendingTransactions(suppressStalePendingTransactions(dedupeApiTransactions(normalized))));
                 }
                 else {
@@ -267,15 +342,11 @@ export default function TransactionsScreen() {
         return () => {
             isMounted = false;
         };
-    }, [token, companyStatusIndex]);
+    }, [token, companyId, companyStatusIndex]);
     const filteredTransactions = useMemo(() => {
-        if (hasNoCompany) return [];
         return transactions.filter(item => {
-            if (companyId) {
-                const txnCompanyId = String(item.details?.company ?? '').trim();
-                if (!txnCompanyId || txnCompanyId !== String(companyId)) {
-                    return false;
-                }
+            if (companyId && !matchesSelectedCompany(item, selectedCompanyForFilter)) {
+                return false;
             }
             const matchesFilter = activeFilter === 'All' || item.status === activeFilter;
             const matchesSearch = matchesTransactionSearch(item, search);
@@ -283,7 +354,7 @@ export default function TransactionsScreen() {
         });
     }, [
         companyId,
-        hasNoCompany,
+        selectedCompanyForFilter,
         activeFilter,
         search,
         transactions,
@@ -338,7 +409,9 @@ export default function TransactionsScreen() {
         }
     };
     if (selectedTransaction && selectedTransaction.details) {
-        return (<TransactionDetailScreen transaction={selectedTransaction.details} onBackPress={() => {
+        const details = selectedTransaction.details;
+        const companyTotal = getCompanyTotal(details);
+        return (<TransactionDetailScreen transaction={details} companyTotalAmount={companyTotal?.totalAmount ?? 0} companyCurrency={companyTotal?.currency} onBackPress={() => {
             setSelectedTransaction(null);
             navigation.setOptions({ headerShown: true });
         }} />);
@@ -420,8 +493,6 @@ export default function TransactionsScreen() {
             <Text style={[styles.emptyText, { color: colors.text, marginTop: s(12) }]}>
                 Loading transactions...
             </Text>
-        </View>) : hasNoCompany ? (<View style={[styles.emptyContainer, { backgroundColor: 'transparent' }]}>
-            <DocumentNotFound subtitle="No transactions found" />
         </View>) : errorMessage ? (<View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
             <FontAwesome name="exclamation-circle" size={40} color={colors.accent} />
             <Text style={[

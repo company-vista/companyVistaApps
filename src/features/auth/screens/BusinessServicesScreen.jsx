@@ -26,6 +26,7 @@ const BusinessServicesScreen = ({ navigation }) => {
   const float2 = useRef(new Animated.Value(0)).current;
   const float3 = useRef(new Animated.Value(0)).current;
   const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   useEffect(() => {
     Animated.parallel([
@@ -56,8 +57,8 @@ const BusinessServicesScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         <View style={styles.headerRow}>
@@ -68,13 +69,13 @@ const BusinessServicesScreen = ({ navigation }) => {
         <Animated.View style={[styles.cardsContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
 
           {/* Card 1 */}
-          <Animated.View style={[styles.card, styles.goldCardBorder, { backgroundColor: 'rgba(201, 168, 76, 0.08)', transform: [{ translateY: float1 }] }]}>
+          <Animated.View style={[styles.card, styles.goldCardBorder, { backgroundColor: isDark ? 'rgba(201, 168, 76, 0.08)' : '#FFFFFF', transform: [{ translateY: float1 }] }]}>
               <View style={[styles.iconContainer, styles.goldIconBg]}>
                 <Ionicons name="business" size={20} color="#C9A84C" />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: '#C9A84C' }]}>Company Registration</Text>
-                <Text style={styles.cardSubtitle}>50+ jurisdictions · from $299</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? '#C9A84C' : '#B8942F' }]}>Company Registration</Text>
+                <Text style={[styles.cardSubtitle, { color: colors.muted }]}>50+ jurisdictions · from $299</Text>
               </View>
             <View style={styles.greenBadge}>
               <Text style={styles.greenBadgeText}>7 days</Text>
@@ -82,13 +83,13 @@ const BusinessServicesScreen = ({ navigation }) => {
           </Animated.View>
 
           {/* Card 2 */}
-          <Animated.View style={[styles.card, styles.blueCardBorder, { backgroundColor: 'rgba(59, 130, 246, 0.08)', transform: [{ translateY: float2 }] }]}>
+          <Animated.View style={[styles.card, styles.blueCardBorder, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.08)' : '#FFFFFF', transform: [{ translateY: float2 }] }]}>
               <View style={[styles.iconContainer, styles.blueIconBg]}>
                 <Ionicons name="shield-checkmark" size={20} color="#60A5FA" />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: '#60A5FA' }]}>Compliance & Filings</Text>
-                <Text style={styles.cardSubtitle}>Annual reports · registered agent</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? '#60A5FA' : '#2563EB' }]}>Compliance & Filings</Text>
+                <Text style={[styles.cardSubtitle, { color: colors.muted }]}>Annual reports · registered agent</Text>
               </View>
             <View style={styles.blueBadge}>
               <Text style={styles.blueBadgeText}>Auto</Text>
@@ -96,13 +97,13 @@ const BusinessServicesScreen = ({ navigation }) => {
           </Animated.View>
 
           {/* Card 3 */}
-          <Animated.View style={[styles.card, styles.tealCardBorder, { backgroundColor: 'rgba(20, 184, 166, 0.08)', transform: [{ translateY: float3 }] }]}>
+          <Animated.View style={[styles.card, styles.tealCardBorder, { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.08)' : '#FFFFFF', transform: [{ translateY: float3 }] }]}>
               <View style={[styles.iconContainer, styles.tealIconBg]}>
                 <Ionicons name="landmark" size={20} color="#34D399" />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: '#34D399' }]}>Business Banking</Text>
-                <Text style={styles.cardSubtitle}>Multi-currency · remote setup</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? '#34D399' : '#0D9488' }]}>Business Banking</Text>
+                <Text style={[styles.cardSubtitle, { color: colors.muted }]}>Multi-currency · remote setup</Text>
               </View>
             <View style={styles.tealBadge}>
               <Text style={styles.tealBadgeText}>USD-EUR</Text>
@@ -126,9 +127,9 @@ const BusinessServicesScreen = ({ navigation }) => {
           </View>
 
           {/* Banner */}
-          <View style={styles.banner}>
+          <View style={[styles.banner, !isDark && styles.bannerLight]}>
             <Ionicons name="checkmark-circle" size={14} color="#C9A84C" />
-            <Text style={styles.bannerText}>  One platform · One dashboard · Zero hassle</Text>
+            <Text style={[styles.bannerText, { color: isDark ? '#CBD5E1' : colors.muted }]}>  One platform · One dashboard · Zero hassle</Text>
           </View>
         </Animated.View>
 
@@ -139,28 +140,28 @@ const BusinessServicesScreen = ({ navigation }) => {
             <Text style={styles.sectionTag}>FULL-STACK BUSINESS SERVICES</Text>
           </View>
 
-          <Text style={styles.mainTitle}>
+          <Text style={[styles.mainTitle, { color: colors.text }]}>
             Everything your global business{' '}
             <Text style={styles.italicTitle}>needs to grow.</Text>
           </Text>
 
-          <Text style={styles.description}>
+          <Text style={[styles.description, { color: colors.muted }]}>
             From incorporation to banking — compliance, registered agents,
             addresses and annual filings, all handled for you.
           </Text>
 
           <View style={styles.paginationRow}>
-            <View style={styles.dotInactive} />
+            <View style={[styles.dotInactive, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border }]} />
             <View style={styles.dashActive} />
-            <View style={styles.dotInactive} />
+            <View style={[styles.dotInactive, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border }]} />
           </View>
 
           <TouchableOpacity style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
-            <Text style={styles.continueBtnText}>Continue →</Text>
+            <Text style={[styles.continueBtnText, { color: colors.buttonText }]}>Continue →</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.skipText}>Skip intro</Text>
+            <Text style={[styles.skipText, { color: colors.subtle }]}>Skip intro</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -173,7 +174,6 @@ export default BusinessServicesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#060913',
   },
   scrollContent: {
     flexGrow: 1,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(20), marginTop: s(30) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(20), marginTop: s(6) },
   cardsContainer: {
     marginBottom: s(30),
     marginTop: s(35),
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
   blueIconBg: { backgroundColor: 'rgba(59, 130, 246, 0.15)' },
   tealIconBg: { backgroundColor: 'rgba(20, 184, 166, 0.15)' },
   cardTextContent: { flex: 1 },
-  cardTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  cardSubtitle: { color: '#94A3B8', fontSize: 11, marginTop: s(3) },
+  cardTitle: { fontSize: 15, fontWeight: '600' },
+  cardSubtitle: { fontSize: 11, marginTop: s(3) },
   greenBadge: {
     backgroundColor: 'rgba(34, 197, 94, 0.2)',
     paddingHorizontal: s(10),
@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(201, 168, 76, 0.3)',
     marginTop: s(8)
   },
-  bannerText: { color: '#CBD5E1', fontSize: 12, fontWeight: '500' },
+  bannerText: { fontSize: 12, fontWeight: '500' },
+  bannerLight: { backgroundColor: 'rgba(201, 168, 76, 0.12)', borderColor: 'rgba(201, 168, 76, 0.4)' },
   contentSection: { marginTop: s(24) },
   sectionTagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   goldLine: { width: 16, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
   sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
-    color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '600',
     lineHeight: 32,
@@ -298,7 +298,6 @@ const styles = StyleSheet.create({
   },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic' },
   description: {
-    color: '#94A3B8',
     fontSize: 12,
     lineHeight: 22,
     marginBottom: s(30),

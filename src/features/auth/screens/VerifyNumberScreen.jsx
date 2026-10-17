@@ -13,9 +13,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
+import { loginVerifyOtp } from '../../../store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { useThemeColors } from '../../../theme/colors';
 
 const VerifyNumberScreen = ({ navigation, route }) => {
   const phoneParam = route?.params?.phone ?? '+91 98765 43210';
+  const apiPhone = route?.params?.apiPhone ?? String(phoneParam).replace(/[^0-9]/g, '');
+  const countryCode = route?.params?.countryCode;
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(state => state.auth.isLoading);
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef([]);
   const MAX_ATTEMPTS = 3;
@@ -45,17 +54,34 @@ const VerifyNumberScreen = ({ navigation, route }) => {
 
   const attemptsLeft = Math.max(0, MAX_ATTEMPTS - attempts);
 
-  const handleVerify = () => {
-    if (isLocked) return;
+  const handleVerify = async () => {
+    if (isLocked || isLoading) return;
     const code = otp.join('');
     if (code.length < 6 || otp.some(d => !d)) {
       Toast.show({ type: 'error', text1: 'OTP required', text2: 'Please enter 6-digit code' });
       setErrorMsg('Please enter 6-digit code');
       return;
     }
-    // Abhi ke liye coming soon
-    Toast.show({ type: 'info', text1: 'Coming soon', text2: 'OTP verification will be available soon' });
-    return;
+    setErrorMsg('');
+    const result = await dispatch(loginVerifyOtp({ countryCode, phone: apiPhone, otp: code }));
+    if (loginVerifyOtp.fulfilled.match(result)) {
+      Toast.show({ type: 'success', text1: 'Verified', text2: 'Login successful' });
+      return;
+    }
+    const message = result.payload?.message || result.payload?.errors?.otp || 'Invalid or expired code';
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
+    const left = Math.max(0, MAX_ATTEMPTS - nextAttempts);
+    if (left <= 0) {
+      const until = Date.now() + LOCK_DURATION_MS;
+      setIsLocked(true);
+      setLockUntil(until);
+      setErrorMsg('Account locked for 30 minutes');
+      Toast.show({ type: 'error', text1: 'Too many attempts', text2: 'Try again after 30 minutes' });
+      return;
+    }
+    setErrorMsg(message);
+    Toast.show({ type: 'error', text1: 'Verification failed', text2: message });
   };
 
   const formatRemaining = (sec) => {
@@ -80,23 +106,23 @@ const VerifyNumberScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0D1B" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack()}>
           <Ionicons name="chevron-back" size={22} color="#C9A84C" />
         </TouchableOpacity>
         <Image source={logoR} style={styles.headerLogo} resizeMode="contain" />
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="help-circle-outline" size={22} color="#8E93A6" />
+        <TouchableOpacity style={[styles.iconButton, { backgroundColor: isDark ? '#161928' : colors.surface }]}>
+          <Ionicons name="help-circle-outline" size={22} color={colors.subtle} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <View style={styles.logoCircleOuter}>
-            <View style={styles.phoneIconBox}>
-              <Ionicons name="phone-portrait-outline" size={20} color="#A88BFA" />
+          <View style={[styles.logoCircleOuter, { borderColor: colors.border }]}>
+            <View style={[styles.phoneIconBox, { backgroundColor: isDark ? '#17142E' : colors.accentSoft, borderColor: isDark ? '#392B68' : colors.border }]}>
+              <Ionicons name="phone-portrait-outline" size={20} color={isDark ? '#A88BFA' : colors.primary} />
             </View>
           </View>
           {/* <Text style={styles.logoText}>
@@ -104,13 +130,13 @@ const VerifyNumberScreen = ({ navigation, route }) => {
           </Text> */}
         </View>
 
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Verify your <Text style={styles.titleItalic}>number</Text>
         </Text>
-        <Text style={styles.subtitle}>Enter the 6–digit code sent via SMS.</Text>
+        <Text style={[styles.subtitle, { color: colors.muted }]}>Enter the 6–digit code sent via SMS.</Text>
 
-        <View style={styles.phonePill}>
-          <Text style={styles.countryCode}>IN</Text>
+        <View style={[styles.phonePill, { backgroundColor: isDark ? '#141629' : colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.countryCode, { color: colors.subtle }]}>IN</Text>
           <Text style={styles.phoneNumber}>{phoneParam}</Text>
         </View>
 
@@ -119,7 +145,7 @@ const VerifyNumberScreen = ({ navigation, route }) => {
             <TextInput
               key={index}
               ref={(ref) => (inputRefs.current[index] = ref)}
-              style={[styles.otpBox, isLocked && { opacity: 0.4, borderColor: '#2A202A' }]}
+              style={[styles.otpBox, { borderColor: colors.inputBorder, backgroundColor: colors.inputBackground, color: isDark ? '#D0A85C' : colors.primary }, isLocked && { opacity: 0.4, borderColor: colors.border }]}
               value={digit}
               onChangeText={(text) => handleChangeText(text, index)}
               onKeyPress={(e) => handleKeyPress(e, index)}
@@ -132,49 +158,51 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         </View>
 
         {errorMsg ? (
-          <View style={[styles.errorBadge, isLocked && { backgroundColor: '#2A1210', borderColor: '#5A1A1A' }]}>
-            <Ionicons name={isLocked ? 'lock-closed' : 'close'} size={14} color="#FF5252" style={{ marginRight: s(4) }} />
-            <Text style={styles.errorText}>{errorMsg}</Text>
+          <View style={[styles.errorBadge, { backgroundColor: isDark ? '#271318' : 'rgba(220, 38, 38, 0.08)', borderColor: isDark ? '#4A1922' : 'rgba(220, 38, 38, 0.25)' }, isLocked && { backgroundColor: isDark ? '#2A1210' : 'rgba(220, 38, 38, 0.12)', borderColor: isDark ? '#5A1A1A' : 'rgba(220, 38, 38, 0.3)' }]}>
+            <Ionicons name={isLocked ? 'lock-closed' : 'close'} size={14} color={colors.danger} style={{ marginRight: s(4) }} />
+            <Text style={[styles.errorText, { color: colors.danger }]}>{errorMsg}</Text>
           </View>
         ) : null}
         {isLocked ? (
-          <View style={[styles.warningCard, { borderColor: '#4A1922', backgroundColor: '#271318' }]}>
-            <Ionicons name="time-outline" size={18} color="#FF5252" style={{ marginRight: s(10) }} />
-            <Text style={[styles.warningText, { color: '#FF9A9A' }]}>Locked for {formatRemaining(remainingSec)} — please try after 30 minutes.</Text>
+          <View style={[styles.warningCard, { borderColor: isDark ? '#4A1922' : 'rgba(220, 38, 38, 0.3)', backgroundColor: isDark ? '#271318' : 'rgba(220, 38, 38, 0.08)' }]}>
+            <Ionicons name="time-outline" size={18} color={colors.danger} style={{ marginRight: s(10) }} />
+            <Text style={[styles.warningText, { color: isDark ? '#FF9A9A' : colors.danger }]}>Locked for {formatRemaining(remainingSec)} — please try after 30 minutes.</Text>
           </View>
         ) : null}
 
         <View style={styles.resendContainer}>
-          <Text style={styles.didnotReceiveText}>Didn't receive it? </Text>
+          <Text style={[styles.didnotReceiveText, { color: colors.muted }]}>Didn't receive it? </Text>
           <TouchableOpacity>
-            <Text style={styles.resendText}>Resend SMS</Text>
+            <Text style={styles.resendText}>Resend code</Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.callButton}>
-          <Ionicons name="call-outline" size={16} color="#7B8CB2" style={{ marginRight: s(8) }} />
-          <Text style={styles.callButtonText}>Get code via call instead</Text>
+        <TouchableOpacity style={[styles.callButton, { backgroundColor: isDark ? '#131728' : colors.surface, borderColor: colors.border }]}>
+          <Ionicons name="call-outline" size={16} color={colors.subtle} style={{ marginRight: s(8) }} />
+          <Text style={[styles.callButtonText, { color: colors.muted }]}>Get code via call instead</Text>
         </TouchableOpacity>
 
-        <View style={styles.warningCard}>
+        <View style={[styles.warningCard, { backgroundColor: isDark ? '#131522' : colors.surface, borderColor: colors.border }]}>
           <Ionicons name="warning-outline" size={18} color="#D8A23B" style={{ marginRight: s(10) }} />
-          <Text style={styles.warningText}>
+          <Text style={[styles.warningText, { color: colors.muted }]}>
             After 3 failed attempts your account will be locked for 30 minutes.
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.changePhoneButton} onPress={() => navigation?.goBack()}>
-          <Ionicons name="create-outline" size={16} color="#7B8CB2" style={{ marginRight: s(8) }} />
-          <Text style={styles.changePhoneText}>Change phone number</Text>
+        <TouchableOpacity style={[styles.changePhoneButton, { backgroundColor: isDark ? '#101322' : colors.surface, borderColor: colors.border }]} onPress={() => navigation?.goBack()}>
+          <Ionicons name="create-outline" size={16} color={colors.subtle} style={{ marginRight: s(8) }} />
+          <Text style={[styles.changePhoneText, { color: colors.muted }]}>Change phone number</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.verifyButtonInline, isLocked && { backgroundColor: '#2A1A1A', opacity: 0.6 }]}
-          activeOpacity={0.8}
+          style={[styles.verifyButtonInline, { backgroundColor: colors.buttonBackground }, (isLocked || isLoading) && styles.verifyButtonDisabled]}
+          activeOpacity={0.85}
           onPress={handleVerify}
-          disabled={isLocked}
+          disabled={isLocked || isLoading}
         >
-          <Text style={[styles.verifyButtonText, isLocked && { color: '#8A6A6A' }]}>{isLocked ? `Locked ${formatRemaining(remainingSec)}` : 'Verify & Continue'}</Text>
+          <Text style={[styles.verifyButtonText, { color: colors.buttonText }]}>
+            {isLocked ? `Locked ${formatRemaining(remainingSec)}` : isLoading ? 'Verifying...' : 'Verify & Continue'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -212,10 +240,11 @@ const styles = StyleSheet.create({
   warningText: { color: '#9FAECB', fontSize: 11, flex: 1, lineHeight: 16 },
   changePhoneButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#101322', borderRadius: 12, paddingVertical: s(12), borderWidth: 1, borderColor: '#1D2338', width: '100%' },
   changePhoneText: { color: '#9FAECB', fontSize: 13, fontWeight: '500' },
-  verifyButtonInline: { backgroundColor: '#1E2333', borderRadius: 12, paddingVertical: s(14), alignItems: 'center', width: '100%', marginTop: s(28) },
+  verifyButtonInline: { borderRadius: 24, paddingVertical: s(14), alignItems: 'center', width: '100%', marginTop: s(28) },
+  verifyButtonDisabled: { opacity: 0.4 },
   footer: { paddingHorizontal: s(20), paddingBottom: s(20) },
-  verifyButton: { backgroundColor: '#1E2333', borderRadius: 12, paddingVertical: s(14), alignItems: 'center' },
-  verifyButtonText: { color: '#656F8A', fontSize: 15, fontWeight: '600' },
+  verifyButton: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
+  verifyButtonText: { color: '#060913', fontSize: 15, fontWeight: 'bold' },
 });
 
 export default VerifyNumberScreen;

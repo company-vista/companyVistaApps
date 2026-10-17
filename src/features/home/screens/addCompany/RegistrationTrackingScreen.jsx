@@ -10,7 +10,7 @@ import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
-import { getCompanyTotalAmount, isRegistrationUnpaid, normalizeRegistrationStatus } from '../../../../utils/companyStatus';
+import { normalizeRegistrationStatus } from '../../../../utils/companyStatus';
 import { getStateData } from '../../../../utils/jurisdictionData';
 const STATUS_STEPS = {
     standard: [
@@ -121,7 +121,7 @@ const PACKAGE_TIMES = {
     express: ['• Priority Filing (12-24 hrs)', '• Express EIN (5-15 days)'],
     premium: ['• Premium Filing (6-12 hrs)', '• Premium EIN (3-7 days)'],
 };
-export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, onEditPress, onContactSupport, onPayPress, companyId, onRefreshCompanies }) {
+export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, onEditPress, onContactSupport, companyId, onRefreshCompanies }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const token = useAppSelector(s => s.auth.token);
@@ -174,8 +174,6 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
         onRefreshCompanies?.();
     }, [fetchCompany, onRefreshCompanies]);
     const status = company?.registrationStatus || 'pending';
-    const isPaymentPending = isRegistrationUnpaid(company);
-    const pendingAmount = getCompanyTotalAmount(company);
     const selectedPkg = company?.selectedPackage || 'standard';
     const steps = STATUS_STEPS[selectedPkg] || STATUS_STEPS.standard;
     const statusIdx = company ? getStatusIndex(status) : 0;
@@ -227,18 +225,6 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
             </TouchableOpacity>)}
         </View>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingBottom: safeAreaInsets.bottom + 24 }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
-            {isPaymentPending ? (<View style={[styles.paymentAlert, { backgroundColor: 'rgba(234, 179, 8, 0.12)', borderColor: '#eab308' }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <FontAwesome name="credit-card" color="#eab308" size={16} style={{ marginRight: 8 }}/>
-                    <Text style={[styles.paymentAlertTitle, { color: colors.text }]}>Payment pending</Text>
-                </View>
-                <Text style={[styles.paymentAlertText, { color: colors.muted }]}>
-                    {`Registration is on hold until payment is completed${pendingAmount > 0 ? ` · $${pendingAmount} due` : ''}.`}
-                </Text>
-                {onPayPress ? (<TouchableOpacity style={[styles.payButton, { backgroundColor: '#eab308' }]} onPress={onPayPress}>
-                    <Text style={styles.payButtonText}>Pay now</Text>
-                </TouchableOpacity>) : null}
-            </View>) : null}
             <View style={[styles.card, { backgroundColor: colors.cardElevated, borderColor: colors.border }]}>
                 <View style={styles.headerRow}>
                     <View style={[styles.iconContainer, { backgroundColor: colors.surfaceAlt }]}>
@@ -518,32 +504,6 @@ const styles = StyleSheet.create({
         fontSize: font.lg,
         fontWeight: '500',
         marginTop: 2,
-    },
-    paymentAlert: {
-        borderRadius: 14,
-        borderWidth: 1,
-        padding: 16,
-        marginBottom: 16,
-    },
-    paymentAlertTitle: {
-        fontSize: font.lg,
-        fontWeight: '700',
-    },
-    paymentAlertText: {
-        fontSize: font.md,
-        lineHeight: 20,
-    },
-    payButton: {
-        marginTop: 12,
-        height: 44,
-        borderRadius: 22,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    payButtonText: {
-        fontSize: font.lg,
-        fontWeight: '700',
-        color: '#0f172a',
     },
     stepContainer: {
         flexDirection: 'row',

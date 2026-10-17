@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -43,6 +44,7 @@ const PRIORITY_OPTIONS = [
 
 export default function USStatePriorityScreen({ navigation, route }) {
   const [selectedId, setSelectedId] = useState(null);
+  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,7 +108,7 @@ export default function USStatePriorityScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Sticky Bottom Next Button */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity
           style={[styles.nextButton, !selectedId && styles.nextButtonDisabled]}
           activeOpacity={0.8}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -18,10 +18,14 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { getStructurePrice } from '../../../utils/priceCalculator';
+import { useThemeColors } from '../../../theme/colors';
 
 export default function OptionalAddOnsScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
+  const styles = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
 
   const ADD_ON_KEYS = ['expeditedFiling', 'expressEin', 'bankAssurance', 'stripePaypal', 'boiFiling', 'operatingAgreement', 'apostille', 'itin', 'usPhone'];
   const [selectedAddOns, setSelectedAddOns] = useState(() => {
@@ -102,7 +106,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#080e18" />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
@@ -408,7 +412,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
       <View style={[styles.footerContainer, { paddingBottom: 24 + insets.bottom, paddingTop: 12 }]}>
         <TouchableOpacity style={styles.continueButton} activeOpacity={0.8} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color="#0A111D" />
+          <Ionicons name="arrow-forward" size={18} color={colors.buttonText} />
         </TouchableOpacity>
         <Text style={styles.footerSubtext}>${addOnsTotal} add-ons · {selectedCount} selected</Text>
       </View>
@@ -416,53 +420,53 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080E18' },
+const makeStyles = (colors, isDark) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
   header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 34, marginBottom: 16, paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: 20 },
   titleContainer: { marginVertical: 15 },
-  mainTitle: { fontSize: s(24), fontWeight: '700', color: '#FFFFFF', marginBottom: s(8) },
+  mainTitle: { fontSize: s(24), fontWeight: '700', color: colors.text, marginBottom: s(8) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: 14, lineHeight: 20 },
-  totalBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(212,175,55,0.2)', padding: 16, marginTop: 10, marginBottom: 16 },
-  runningTotalLabel: { color: '#8E9BAE', fontSize: 11, letterSpacing: 0.5, textTransform: 'uppercase' },
+  subtitle: { color: colors.muted, fontSize: 14, lineHeight: 20 },
+  totalBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: isDark ? 'rgba(212,175,55,0.2)' : 'rgba(212,175,55,0.4)', padding: 16, marginTop: 10, marginBottom: 16 },
+  runningTotalLabel: { color: colors.muted, fontSize: 11, letterSpacing: 0.5, textTransform: 'uppercase' },
   runningTotalAmount: { color: '#D4AF37', fontSize: 22, fontWeight: '700', marginTop: 2 },
   runningTotalRight: { alignItems: 'flex-end' },
-  basePriceText: { color: '#8E9BAE', fontSize: 12 },
+  basePriceText: { color: colors.muted, fontSize: 12 },
   addOnsCountText: { color: '#00E676', fontSize: 12, fontWeight: '600', marginTop: 2 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 10 },
-  sectionTitle: { color: '#6C7A8E', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-  card: { width: '100%', backgroundColor: '#0C1622', borderRadius: s(12), borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', padding: s(14), marginBottom: s(12) },
-  selectedCard: { borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.06)' },
+  sectionTitle: { color: colors.subtle, fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  sectionLine: { flex: 1, height: 1, backgroundColor: colors.border },
+  card: { width: '100%', backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: s(12), borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
+  selectedCard: { borderColor: '#D4AF37', backgroundColor: isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.12)' },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  iconContainer: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.05)', justifyContent: 'center', alignItems: 'center', marginTop: 2 },
+  iconContainer: { width: 36, height: 36, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.surfaceAlt, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
   cardTextContainer: { flex: 1, marginLeft: 12, marginRight: 8 },
   titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  cardTitle: { color: '#FFFFFF', fontSize: s(13), fontWeight: '600' },
+  cardTitle: { color: colors.text, fontSize: s(13), fontWeight: '600' },
   popularBadge: { backgroundColor: 'rgba(212,175,55,0.15)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
   popularBadgeText: { color: '#D4AF37', fontSize: 8, fontWeight: '700' },
   purpleBadge: { backgroundColor: 'rgba(100,80,255,0.15)', borderWidth: 1, borderColor: 'rgba(100,80,255,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
   purpleBadgeText: { color: '#A78BFA', fontSize: 8, fontWeight: '700' },
   guaranteeBadge: { backgroundColor: 'rgba(0,230,118,0.12)', borderWidth: 1, borderColor: 'rgba(0,230,118,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 4 },
   guaranteeBadgeText: { color: '#00E676', fontSize: 8, fontWeight: '700' },
-  cardDescription: { color: '#7C8BA1', fontSize: 12, marginTop: 4, lineHeight: 16 },
-  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.04)', justifyContent: 'center', alignItems: 'center', marginTop: 2 },
+  cardDescription: { color: colors.muted, fontSize: 12, marginTop: 4, lineHeight: 16 },
+  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.2)' : colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.surface, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
   checkboxSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 12 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1, marginRight: 10 },
   tagGreen: { backgroundColor: 'rgba(0,230,118,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(0,230,118,0.2)' },
   tagGreenText: { color: '#00E676', fontSize: 10, fontWeight: '500' },
-  tagGray: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
-  tagGrayText: { color: '#8E9BAE', fontSize: 10 },
+  tagGray: { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.surfaceAlt, borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border },
+  tagGrayText: { color: colors.muted, fontSize: 10 },
   tagBlue: { backgroundColor: 'rgba(100,149,237,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(100,149,237,0.2)' },
   tagBlueText: { color: '#64B5F6', fontSize: 10 },
   priceContainer: { alignItems: 'flex-end' },
   priceText: { color: '#D4AF37', fontSize: 14, fontWeight: '700' },
-  priceSubtext: { color: '#6C7A8E', fontSize: 10 },
-  footerContainer: { paddingHorizontal: s(16), paddingTop: 10, paddingBottom: 16, backgroundColor: '#080E18', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
-  continueButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  continueButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700', marginRight: 8 },
-  footerSubtext: { color: '#5B6B7C', fontSize: 12, textAlign: 'center', marginTop: 10 },
+  priceSubtext: { color: colors.subtle, fontSize: 10 },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: 10, paddingBottom: 16, backgroundColor: colors.background, borderTopWidth: 1, borderTopColor: colors.border },
+  continueButton: { backgroundColor: colors.buttonBackground, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  continueButtonText: { color: colors.buttonText, fontSize: 16, fontWeight: '700', marginRight: 8 },
+  footerSubtext: { color: colors.subtle, fontSize: 12, textAlign: 'center', marginTop: 10 },
 });

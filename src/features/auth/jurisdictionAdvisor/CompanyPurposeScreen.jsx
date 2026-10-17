@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -245,6 +246,7 @@ export const PURPOSES = [
 
 export default function CompanyPurposeScreen({ navigation, route }) {
   const [selectedId, setSelectedId] = useState(null);
+  const insets = useSafeAreaInsets();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -317,7 +319,7 @@ export default function CompanyPurposeScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Sticky Action Area */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity
           style={[styles.nextButton, !selectedId && styles.nextButtonDisabled]}
           activeOpacity={0.8}

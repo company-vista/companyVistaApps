@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -59,6 +60,7 @@ const PLANNED_NEEDS = [
 export default function DayOneNeedsScreen({ navigation, route }) {
   // Checkbox Selection State
   const [selectedIds, setSelectedIds] = useState([]);
+  const insets = useSafeAreaInsets();
 
   const toggleSelection = (id) => {
     if (selectedIds.includes(id)) {
@@ -189,7 +191,7 @@ export default function DayOneNeedsScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Sticky Action Button */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity
           style={[styles.submitButton, selectedIds.length === 0 && styles.submitButtonDisabled]}
           activeOpacity={0.8}

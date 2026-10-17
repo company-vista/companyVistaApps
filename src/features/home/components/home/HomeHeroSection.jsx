@@ -34,8 +34,8 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
   const isActive = String(heroCompanyStatus).trim().toLowerCase() === 'active';
   const cardStyle = {
     backgroundColor: isLight ? colors.cardHighlight : colors.cardElevated,
-    borderWidth: isLight ? 0 : 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: colors.border,
     shadowColor: isLight ? '#0D2137' : '#000000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: isLight ? 0.08 : 0.2,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   heroMetaLabel: {
-    fontSize: 9,
+    fontSize: font.xs,
     fontWeight: '600',
     letterSpacing: 0.6,
     textTransform: 'uppercase',

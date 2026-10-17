@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -21,11 +21,16 @@ import { setPendingOrderData, setAuthSession, setPendingOpenOrderDetails, setPen
 import { fetchReviewApi, confirmSignupApi } from '../api/orderApi';
 import { fetchClientCompanyDetails } from '../../../features/home/api/clientProfileApi';
 import { resolvePricingType, hasRealPrice } from '../../../utils/priceCalculator';
+import { getCountryData } from '../../../constants/countries';
 import { s } from '../../../theme/responsive';
+import { useThemeColors } from '../../../theme/colors';
 
 export default function ReviewAndConfirmScreen({ navigation, route }) {
   const dispatch = useAppDispatch();
   const token = useAppSelector(s => s.auth.token);
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
+  const styles = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
   React.useEffect(() => {
     console.log('=== REVIEW & SUBMIT SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
   }, []);
@@ -48,23 +53,42 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     });
     return unsub;
   }, [navigation, route.params]);
+  // Backend GET /review/:companyId se company aata hai. Ye state derived values
+  // (companyName / selectedCountry) se PEHLE declare karna zaroori hai — neeche
+  // wale const isi ko padhte hain. Pehle ye neeche declare tha, is liye render
+  // par TDZ crash aata tha ("Cannot access 'reviewData' before initialization").
+  const [reviewData, setReviewData] = useState(null);
   // Signup ke baad sab data backend me save — Review sirf GET /review/:companyId se dikhayega (portal payload ke baad backend hi source of truth)
   const {
     selectedStructure: paramStructure = '',
     companyName: paramCompanyName = '',
     selectedEnding: paramEnding = '',
     selectedState: paramState = 'Delaware',
-    selectedCountry: paramCountry = 'US',
+    selectedCountry: paramCountry = '',
     selectedAddOns: paramAddOns = {},
+    bestCountry: paramBestCountry = '',
+    bestCountryName: paramBestCountryName = '',
   } = route.params || {};
 
   // Backend se company + pricing aane ke baad wahi display — fallback me route.params
   const companyName = reviewData?.company?.companyName || paramCompanyName || '';
   const selectedStructure = reviewData?.company?.companyType || paramStructure || '';
   const selectedState = reviewData?.company?.stateOfRegistration || paramState || '';
-  const selectedCountry = reviewData?.company?.countryOfIncorporation || paramCountry || '';
+  // Country code ('US','GB','SG') ya poora naam ('United Kingdom') — dono handle.
+  const selectedCountry = reviewData?.company?.countryOfIncorporation || paramCountry || paramBestCountry || paramBestCountryName || 'US';
   const selectedEnding = paramEnding || '';
   const selectedAddOns = reviewData?.pricing?.addOns || paramAddOns || {};
+  // ── Jurisdiction display ──────────────────────────────────────────────
+  // Pehle reviewData null hone par (Add-Company deferred flow) hardcoded
+  // "US ..., USA" dikhta tha — non-US country select karne par bhi USA.
+  const resolvedCountryName = (() => {
+    const raw = String(reviewData?.company?.countryOfIncorporation || paramCountry || paramBestCountry || '').trim();
+    if (!raw) return paramBestCountryName || '';
+    return getCountryData(raw)?.name || raw;
+  })();
+  const isUSJurisdiction = String(selectedCountry || '').toUpperCase() === 'US'
+    || String(selectedCountry || '').toUpperCase() === 'USA'
+    || resolvedCountryName.toLowerCase() === 'united states';
 
   // dedup LLC: "Acme LLC LLC" / "Acme L.L.C." + LLC -> single suffix
   const getLegalName = () => {
@@ -127,7 +151,6 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
   // Backend GET /review/:companyId -> {company:{companyName,countryOfIncorporation,stateOfRegistration,companyType}, founder, pricing:{structurePrice,statePrice,addOns,addOnsTotal,totalAmount}, pricingType} — frontend calculate nahi
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
-  const [reviewData, setReviewData] = useState(null);
   // Deferred Add-Company flow: company abhi backend me bani hi nahi => backend me
   // se total nahi aayega. Params se compute karke dikhao (fixed) ya 0 (quoted).
   const [backendTotal, setBackendTotal] = useState(() => {
@@ -434,7 +457,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#080E18" />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <View style={styles.header}>
         <BackButton onPress={() => {
@@ -458,7 +481,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
      
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.titleContainer}>
           <Text style={styles.mainTitle}>
             Review & <Text style={styles.italicTitle}>confirm</Text>
@@ -470,7 +493,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         {loadingTotal && !reviewData ? (
           <View style={[styles.companyCard, { alignItems: 'center', paddingVertical: 20 }]}>
             <ActivityIndicator size="small" color="#D4AF37" />
-            <Text style={{ color: '#94A3B8', fontSize: 12, marginTop: 8 }}>Loading review from backend...</Text>
+            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>Loading review from backend...</Text>
           </View>
         ) : null}
         {/* Company + Founder Summary — reviewData.company + reviewData.founder + reviewData.pricing se */}
@@ -497,11 +520,11 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             <View style={styles.summaryRowSmall}>
               <Text style={styles.summaryLabel}>Jurisdiction</Text>
               <Text style={styles.summaryValue}>
-                {reviewData?.company
-                  ? (selectedCountry === 'US'
-                    ? `${reviewData.company.countryOfIncorporation || 'US'} ${reviewData.company.stateOfRegistration || selectedState}, ${reviewData.company.countryOfIncorporation || 'USA'}`
-                    : String(selectedCountry || reviewData.company.countryOfIncorporation || '—'))
-                  : `US ${selectedState}, USA`}
+                {isUSJurisdiction
+                  ? (reviewData?.company
+                    ? `US ${reviewData.company.stateOfRegistration || selectedState}, USA`
+                    : `US ${selectedState || 'Delaware'}, USA`)
+                  : (resolvedCountryName || paramBestCountryName || '—')}
               </Text>
             </View>
             {/* Structure sirf USA jurisdiction me dikhao — quoted/non-US me LLC galat dikhta hai */}
@@ -670,10 +693,10 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             </>
           )}
           {pricingType === 'quoted' && (
-            <Text style={{ color: '#94A3B8', fontSize: 12, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
+            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
           )}
           {reviewData && (
-            <Text style={{ color: '#64748B', fontSize: 11, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
+            <Text style={{ color: colors.subtle, fontSize: 11, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
           )}
         </View>
 
@@ -696,7 +719,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         <TouchableOpacity style={[styles.confirmButton, (confirming || !isChecked) && { opacity: 0.5 }]} activeOpacity={0.8} onPress={handleConfirm} disabled={confirming || !isChecked}>
           {/* quoted -> "Your Order" (OrderDetails pe le jata hai), fixed -> "Continue" (payment ke liye) */}
           <Text style={styles.confirmButtonText}>{confirming ? 'Creating…' : loadingTotal ? 'Confirm & Continue' : isQuotedForBtn ? 'Your Order' : 'Continue'}</Text>
-          <Ionicons name="arrow-forward" size={18} color="#0A111D" />
+          <Ionicons name="arrow-forward" size={18} color={colors.buttonText} />
         </TouchableOpacity>
 
         <Text style={styles.footerSubtext}>
@@ -707,67 +730,68 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080E18' },
+const makeStyles = (colors, isDark) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
   header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(34), marginBottom: s(8), paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   progressContainer: { flexDirection: 'row', paddingHorizontal: s(20), marginTop: s(6), marginBottom: s(10), gap: 8 },
   progressStepActive: { flex: 1, height: 3, backgroundColor: '#D4AF37', borderRadius: 2 },
+  scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   summarySection: { gap: 12, marginBottom: s(12) },
-  companyCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: s(14), borderTopWidth: 1, borderTopColor: 'rgba(212,175,55,0.15)' },
+  companyCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: s(14), borderTopWidth: 1, borderTopColor: 'rgba(212,175,55,0.15)' },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   summaryIconBox: { width: 26, height: 26, borderRadius: 7, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.25)', justifyContent: 'center', alignItems: 'center' },
-  summaryHeaderTitle: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+  summaryHeaderTitle: { color: colors.muted, fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   editText: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
   summaryRowSmall: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
-  summaryLabel: { color: '#6C7A8E', fontSize: 13 },
-  summaryValue: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
+  summaryLabel: { color: colors.subtle, fontSize: 13 },
+  summaryValue: { color: colors.text, fontSize: 13, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
   summaryValueGold: { color: '#D4AF37', fontSize: 13, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
-  summaryValueSmall: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.06)', paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
+  summaryValueSmall: { color: colors.muted, fontSize: 11, fontWeight: '700', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surfaceAlt, paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
   residenceValue: { flexDirection: 'row', alignItems: 'center' },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
+  mainTitle: { fontSize: 28, fontWeight: '700', color: colors.text, marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: 15 },
-  includedCard: { backgroundColor: '#0C1622', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
+  subtitle: { color: colors.muted, fontSize: 15 },
+  includedCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
   checkGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 8, columnGap: 16 },
   checkItem: { flexDirection: 'row', alignItems: 'center' },
-  checkItemText: { color: '#8E9BAE', fontSize: 13, marginLeft: s(6) },
-  addOnsCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(12) },
+  checkItemText: { color: colors.muted, fontSize: 13, marginLeft: s(6) },
+  addOnsCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 14, borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
   addOnsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   addOnsTitleRow: { flexDirection: 'row', alignItems: 'center' },
-  addOnsHeaderText: { color: '#8E9BAE', fontSize: 12, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
+  addOnsHeaderText: { color: colors.muted, fontSize: 12, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
   changeButton: { flexDirection: 'row', alignItems: 'center' },
   changeText: { color: '#D4AF37', fontSize: 13, fontWeight: '600', marginLeft: s(4) },
   addOnItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
   addOnTextGroup: { flex: 1, paddingRight: s(10) },
-  addOnTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  addOnSubtext: { color: '#6C7A8E', fontSize: 12, marginTop: s(2) },
-  addOnPrice: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  itemSeparator: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)', marginVertical: s(10) },
-  summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginBottom: s(12) },
+  addOnTitle: { color: colors.text, fontSize: 15, fontWeight: '600' },
+  addOnSubtext: { color: colors.subtle, fontSize: 12, marginTop: s(2) },
+  addOnPrice: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  itemSeparator: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
+  summaryCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginBottom: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
-  summaryTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  summarySubtext: { color: '#6C7A8E', fontSize: 12, marginTop: s(2) },
-  summaryPrice: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: s(10) },
+  summaryTitle: { color: colors.text, fontSize: 14, fontWeight: '600' },
+  summarySubtext: { color: colors.subtle, fontSize: 12, marginTop: s(2) },
+  summaryPrice: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  summaryDivider: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(4) },
-  totalLabel: { color: '#8E9BAE', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  totalLabel: { color: colors.muted, fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
   timelineBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: s(12), flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
   timelineIcon: { marginRight: s(10) },
-  timelineText: { color: '#8E9BAE', fontSize: 13, flex: 1 },
+  timelineText: { color: colors.muted, fontSize: 13, flex: 1 },
   timelineBold: { color: '#00E676', fontWeight: '700' },
   checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
-  checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: '#4A5768', backgroundColor: '#0C1622', justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
+  checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: colors.border, backgroundColor: isDark ? '#0C1622' : colors.surface, justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
   checkboxActive: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
-  checkboxLabel: { color: '#8E9BAE', fontSize: 13, flex: 1, lineHeight: 18 },
-  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
-  confirmButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  confirmButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700', marginRight: s(8) },
-  footerSubtext: { color: '#5B6B7C', fontSize: 12, textAlign: 'center', marginTop: s(10) },
+  checkboxLabel: { color: colors.muted, fontSize: 13, flex: 1, lineHeight: 18 },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: colors.background },
+  confirmButton: { backgroundColor: colors.buttonBackground, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  confirmButtonText: { color: colors.buttonText, fontSize: 16, fontWeight: '700', marginRight: s(8) },
+  footerSubtext: { color: colors.subtle, fontSize: 12, textAlign: 'center', marginTop: s(10) },
   footerSubtextBold: { color: '#D4AF37', fontWeight: '600' },
 });

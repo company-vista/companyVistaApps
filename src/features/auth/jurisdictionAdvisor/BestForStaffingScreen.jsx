@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -41,6 +42,7 @@ const FEATURES = [
 ];
 
 export default function BestForStaffingScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
@@ -135,7 +137,7 @@ export default function BestForStaffingScreen({ navigation }) {
       </ScrollView>
 
       {/* Bottom Sticky Action Bar */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(16) + insets.bottom }]}>
         <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
           <Text style={styles.actionButtonText}>
             Continue with us United States  →

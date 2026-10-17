@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, BackHandler, Easing, Pressable, StyleSheet, Text, View, } from 'react-native';
+import { Animated, BackHandler, Easing, View, } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from './HomeScreen.styles';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { logoutUser, setPendingAddCompany, setPendingOpenOrderDetails, setPendingOpenRegistrationProgress, setPendingOpenRegistrationTracking, setPendingCloseAddCompany, setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useThemeColors } from '../../../theme/colors';
 // Import subcomponents
-import { HomeHeader } from './homeScreenComponent/HomeHeader';
 import { BottomNavBar } from './homeScreenComponent/BottomNavBar';
 import { QuickActionFab } from './homeScreenComponent/QuickActionFab';
 import { CompanySwitcherModal } from './homeScreenComponent/CompanySwitcherModal';
+import { HomeOverlayScreens } from './homeScreenComponent/HomeOverlayScreens';
+import { PendingPaymentBanner } from './homeScreenComponent/PendingPaymentBanner';
+import { DashboardOverlay } from './homeScreenComponent/DashboardOverlay';
+import { FixedHomeHeader } from './homeScreenComponent/FixedHomeHeader';
+import { MoreTabSheet } from './homeScreenComponent/MoreTabSheet';
+import { PAYMENT_LOCKED_TABS, companyIdsKey } from './homeScreen/constants';
 import { notifications } from '../../notifications/data/notifications';
 import { fetchNotifications } from '../../notifications/api/notificationsApi';
 import { fetchClientCompanies, fetchClientCompanyDetails, } from '../api/clientProfileApi';
@@ -22,36 +26,11 @@ import { mapCompanyToListItem } from './quickAccess/companyListItem';
 import PullToRefresh from './homeScreenComponent/PullToRefresh';
 import BillingTabContent from './invoices/InvoicesTabContent';
 import CompanyTabContent from '../components/CompanyTabContent';
-import CompanyDetailScreen from '../components/CompanyDetailScreen';
 import DocumentsTabContent from './documents/DocumentsTabContent';
-import DocumentViewScreen from './documents/DocumentViewScreen';
-import ManageCompanyScreen from './manageCompany/ManageCompanyScreen';
-import ManageOptionsScreen from './manageCompany/ManageOptionsScreen';
-import ServicesScreen from './subscription&services/ServicesScreen';
-import SubscriptionScreen from './subscription&services/SubscriptionScreen';
-import ExploreServicesScreen from './subscription&services/ExploreServicesScreen';
-import ServicesHistoryScreen from './subscription&services/ServicesHistoryScreen';
-import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
-import RegistrationProgressScreen from '../../auth/screens/RegistrationProgressScreen';
-import ContactSupport from '../../support/screens/SupportScreen';
 import HomeTabContent from '../components/HomeTabContent';
-import OrderDetailsScreen from '../components/companyInformationSection/yourOrder/OrderDetailsScreen';
-import QuoteScreen from '../components/companyInformationSection/yourOrder/QuoteScreen';
-import QuoteBreakdownScreen from '../components/companyInformationSection/yourOrder/QuoteBreakdownScreen';
-import PaymentMethodScreen from '../components/companyInformationSection/yourOrder/PaymentMethodScreen';
-import ShareholdersScreen from '../components/companyInformationSection/yourOrder/ShareholdersScreen';
-import VerifyIdentityScreen from '../components/companyInformationSection/yourOrder/VerifyIdentityScreen';
-import MoreTabContent from '../components/MoreTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
 const emptyCompanies = [];
-// Payment pending hone par ye bottom-tab tabs lock rehte hain - tap par
-// "Pay now" toast dikhta hai. Payment success par ye automatically unlock ho jaate hain.
-const PAYMENT_LOCKED_TABS = ['reports', 'billing', 'documents'];
-// userCompanies ki array identity har profile update par nayi ho jaati hai
-// (updateProfileUser naya object banata hai), jabki contents same rehte hain.
-// Is liye dep me array nahi, uska content-key use hota hai.
-const companyIdsKey = list => (list || []).map(c => String(c?.id ?? c?._id ?? '')).join('|');
 export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
@@ -929,138 +908,83 @@ export default function HomeScreen() {
         } else if (!isQuotedAuto && isOrderDetailsOpen) {
             setIsOrderDetailsOpen(false);
         }
+        // selectedCompany?.id hi dep hai: poora selectedCompany object har detail
+        // merge par nayi identity banta hai, jo is effect ko bekaar dobara
+        // chala kar user ko Your Order par force kar deta. `isOrderDetailsOpen`
+        // bhi jaan-boojh kar bahar hai — ise dep banane se ye effect apne hi
+        // setIsOrderDetailsOpen se trigger ho kar loop banata.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCompany?.id]);
-    if (isVerifyIdentityOpen) {
-        return <VerifyIdentityScreen onBackPress={() => { setIsVerifyIdentityOpen(false); setIsShareholdersOpen(true); }} />;
-    }
-    if (isShareholdersOpen) {
-        return <ShareholdersScreen onBackPress={() => setIsShareholdersOpen(false)} onContinue={() => { setIsShareholdersOpen(false); setIsVerifyIdentityOpen(true); }} />;
-    }
-    if (isPaymentMethodOpen) {
-        const payAmount = currentQuote?.total ?? 3090;
-        const payCurrency = currentQuote?.currency || 'EUR';
-        return <PaymentMethodScreen companyId={selectedCompany?.id} amount={payAmount} invoice={{ id: currentQuote?.quoteId || 'Q-2026-0412', companyId: selectedCompany?.id, amount: payAmount, currency: payCurrency }} onBackPress={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(true); }} onPaymentSuccess={() => { setIsPaymentMethodOpen(false); setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(false); setIsShareholdersOpen(false); setIsVerifyIdentityOpen(false); Toast.show({ type: 'success', text1: 'Payment successful!', text2: 'Your order is confirmed - redirecting to Home' }); }} onSelectPayment={(method) => { const label = method === 'stripe' ? 'Stripe' : method === 'razorpay' ? 'Razorpay' : 'UPI'; Toast.show({ type: 'info', text1: `${label} selected` }); }} />;
-    }
-    if (isQuoteBreakdownOpen) {
-        return <QuoteBreakdownScreen quote={currentQuote} onBackPress={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(true); }} onDecline={() => { setIsQuoteBreakdownOpen(false); setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onAccept={() => { setIsQuoteBreakdownOpen(false); setIsPaymentMethodOpen(true); }} />;
-    }
-    if (isQuoteOpen) {
-        const quoteAmount = selectedCompany?.amount ?? selectedCompany?.quoteAmount ?? 0;
-        return <QuoteScreen amount={quoteAmount} selectedCompany={selectedCompany} quote={currentQuote} onBackPress={() => { setIsQuoteOpen(false); setIsOrderDetailsOpen(true); }} onViewBreakdown={(q) => { if(q) setCurrentQuote(q); setIsQuoteOpen(false); setIsQuoteBreakdownOpen(true); }} />;
-    }
-    if (isOrderDetailsOpen) {
-        const handleOrderBack = () => {
-            setIsOrderDetailsOpen(false);
-        };
-        return <OrderDetailsScreen selectedCompany={selectedCompany} onBackPress={handleOrderBack} onNextPress={(q) => { if(q) setCurrentQuote(q); setIsOrderDetailsOpen(false); setIsQuoteOpen(true); }} onMessagePress={() => { setIsOrderDetailsOpen(false); setIsSupportOpen(true); }} />;
-    }
-    if (activeCompanySection) {
-        return (<CompanyDetailScreen activeSection={activeCompanySection === 'menu' ? undefined : activeCompanySection} selectedCompany={selectedCompany} isLoading={isLoadingCompanies} onBackPress={() => setActiveCompanySection(null)} />);
-    }
-    if (isManageOptionsOpen) {
-        return (<ManageOptionsScreen onBackPress={() => setIsManageOptionsOpen(false)} onRequestChangePress={() => {
-            setIsManageOptionsOpen(false);
-            setIsManageScreenOpen(true);
-        }} />);
-    }
-    if (isManageScreenOpen) {
-        return (<ManageCompanyScreen selectedCompany={selectedCompany} onBackPress={() => {
-            setIsManageScreenOpen(false);
-            setIsManageOptionsOpen(true);
-        }} />);
-    }
-    if (selectedDocumentForView) {
-        return (<DocumentViewScreen documentItem={selectedDocumentForView} onBackPress={() => setSelectedDocumentForView(null)} />);
-    }
-    if (isServicesOpen) {
-        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} onExploreServicesPress={openExploreServicesScreen} onServicesHistoryPress={openServicesHistoryScreen} />);
-    }
-    if (isExploreServicesOpen) {
-        return (<ExploreServicesScreen onBackPress={closeExploreServicesScreen} selectedCompany={selectedCompany} />);
-    }
-    if (isServicesHistoryOpen) {
-        return (<ServicesHistoryScreen onBackPress={closeServicesHistoryScreen} selectedCompany={selectedCompany} />);
-    }
-    if (isSubscriptionOpen) {
-        return (<SubscriptionScreen onBackPress={closeSubscriptionScreen} selectedCompany={selectedCompany} />);
-    }
-    if (isRegistrationProgressOpen) {
-        return (<RegistrationProgressScreen navigation={{ goBack: () => setIsRegistrationProgressOpen(false) }} route={{ params: {} }} onActive={() => setIsRegistrationProgressOpen(false)} />);
-    }
-    if (isRegistrationTrackingOpen) {
-        return (<RegistrationTrackingScreen onBackPress={closeRegistrationTrackingScreen} companyId={trackingCompanyId ?? selectedCompany?.id} onPayPress={() => {
-            const payTarget = companyOptions.find(c => String(c.id) === String(trackingCompanyId ?? selectedCompany?.id)) ?? selectedCompany;
-            if (!isRegistrationUnpaid(payTarget)) {
-                handleResumePaymentPress();
-                return;
-            }
-            const amount = getCompanyTotalAmount(payTarget);
-            navigation.navigate('ResumePayment', {
-                companyId: String(payTarget?.id ?? ''),
-                companyName: payTarget?.name ?? 'your company',
-                totalAmount: amount,
-                registrationStatus: payTarget?.registrationStatus ?? '',
-                state: payTarget?.raw?.state ?? payTarget?.state ?? null,
-                country: payTarget?.raw?.countryOfIncorporation ?? null,
-            });
-        }} onRefreshCompanies={() => refreshCompanies(trackingCompanyId ?? selectedCompany?.id)} onEditPress={() => {
-            setIsRegistrationTrackingOpen(false);
-            // Pehle ye 'add company' wizard kholta tha — jo company EDIT karne
-            // ke bajaye ek NAYI company bana deta tha. Wizard me koi edit mode
-            // nahi hai, is liye ab user ko usi company ke detail screen par
-            // bheja ja raha hai.
-            setActiveCompanySection('menu');
-        }} onContactSupport={() => {
-            setIsRegistrationTrackingOpen(false);
-            setSupportFromRegistrationTracking(true);
-            setIsSupportOpen(true);
-        }} />);
-    }
-    if (isSupportOpen) {
-        return (<ContactSupport onBackPress={() => {
-            setIsSupportOpen(false);
-            if (supportFromRegistrationTracking) {
-                setSupportFromRegistrationTracking(false);
-                setIsRegistrationTrackingOpen(true);
-            }
-        }} />);
+    // Full-screen overlay screens (order/quote/payment/manage/services/
+    // registration/support) ab HomeOverlayScreens component handle karta hai.
+    // Yahan sirf ye decide hota hai ki koi overlay active hai ya nahi — agar
+    // hai to wahi render hota hai, warna neeche wala dashboard.
+    const isAnyOverlayOpen = !!(
+        isVerifyIdentityOpen || isShareholdersOpen || isPaymentMethodOpen || isQuoteBreakdownOpen ||
+        isQuoteOpen || isOrderDetailsOpen || activeCompanySection || isManageOptionsOpen ||
+        isManageScreenOpen || selectedDocumentForView || isServicesOpen || isExploreServicesOpen ||
+        isServicesHistoryOpen || isSubscriptionOpen || isRegistrationProgressOpen ||
+        isRegistrationTrackingOpen || isSupportOpen
+    );
+    if (isAnyOverlayOpen) {
+        return <HomeOverlayScreens
+            isVerifyIdentityOpen={isVerifyIdentityOpen}
+            isShareholdersOpen={isShareholdersOpen}
+            isPaymentMethodOpen={isPaymentMethodOpen}
+            isQuoteBreakdownOpen={isQuoteBreakdownOpen}
+            isQuoteOpen={isQuoteOpen}
+            isOrderDetailsOpen={isOrderDetailsOpen}
+            currentQuote={currentQuote}
+            selectedCompany={selectedCompany}
+            activeCompanySection={activeCompanySection}
+            isManageOptionsOpen={isManageOptionsOpen}
+            isManageScreenOpen={isManageScreenOpen}
+            selectedDocumentForView={selectedDocumentForView}
+            isServicesOpen={isServicesOpen}
+            isExploreServicesOpen={isExploreServicesOpen}
+            isServicesHistoryOpen={isServicesHistoryOpen}
+            isSubscriptionOpen={isSubscriptionOpen}
+            isRegistrationProgressOpen={isRegistrationProgressOpen}
+            isRegistrationTrackingOpen={isRegistrationTrackingOpen}
+            isSupportOpen={isSupportOpen}
+            isLoadingCompanies={isLoadingCompanies}
+            companyOptions={companyOptions}
+            trackingCompanyId={trackingCompanyId}
+            supportFromRegistrationTracking={supportFromRegistrationTracking}
+            setIsVerifyIdentityOpen={setIsVerifyIdentityOpen}
+            setIsShareholdersOpen={setIsShareholdersOpen}
+            setIsPaymentMethodOpen={setIsPaymentMethodOpen}
+            setIsQuoteBreakdownOpen={setIsQuoteBreakdownOpen}
+            setIsQuoteOpen={setIsQuoteOpen}
+            setIsOrderDetailsOpen={setIsOrderDetailsOpen}
+            setCurrentQuote={setCurrentQuote}
+            setActiveCompanySection={setActiveCompanySection}
+            setIsManageOptionsOpen={setIsManageOptionsOpen}
+            setIsManageScreenOpen={setIsManageScreenOpen}
+            setSelectedDocumentForView={setSelectedDocumentForView}
+            setIsRegistrationProgressOpen={setIsRegistrationProgressOpen}
+            setIsRegistrationTrackingOpen={setIsRegistrationTrackingOpen}
+            setIsSupportOpen={setIsSupportOpen}
+            setSupportFromRegistrationTracking={setSupportFromRegistrationTracking}
+            closeServicesScreen={closeServicesScreen}
+            openSubscriptionScreen={openSubscriptionScreen}
+            openExploreServicesScreen={openExploreServicesScreen}
+            openServicesHistoryScreen={openServicesHistoryScreen}
+            closeExploreServicesScreen={closeExploreServicesScreen}
+            closeServicesHistoryScreen={closeServicesHistoryScreen}
+            closeSubscriptionScreen={closeSubscriptionScreen}
+            closeRegistrationTrackingScreen={closeRegistrationTrackingScreen}
+            handleResumePaymentPress={handleResumePaymentPress}
+            refreshCompanies={refreshCompanies}
+        />;
     }
     const HEADER_CONTENT_HEIGHT = 72;
     return (<View style={styles.screen}>
         {/* Full-screen skeleton overlay (covers fixed header too) */}
-        {isLoadingCompanies ? (<View style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 40,
-            paddingTop: safeAreaInsets.top,
-            backgroundColor: colors.surface,
-        }}>
-            <DashboardSkeleton />
-        </View>) : null}
+        {isLoadingCompanies ? <DashboardOverlay insets={safeAreaInsets} colors={colors} /> : null}
 
         {/* Fixed header wrapper */}
-        <View style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: safeAreaInsets.top + HEADER_CONTENT_HEIGHT,
-            zIndex: 30,
-            justifyContent: 'center',
-            paddingTop: safeAreaInsets.top,
-            backgroundColor: colors.surface,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.03,
-            shadowRadius: 12,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-        }}>
-            <HomeHeader displayName={displayName} notificationCount={notificationCount} bellRotation={bellRotation} onSearchPress={() => navigation.navigate('Search', { companyId: selectedCompany?.id })} onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })} colors={colors} />
-        </View>
+        <FixedHomeHeader insets={safeAreaInsets} colors={colors} contentHeight={HEADER_CONTENT_HEIGHT} displayName={displayName} notificationCount={notificationCount} bellRotation={bellRotation} onSearchPress={() => navigation.navigate('Search', { companyId: selectedCompany?.id })} onNotificationPress={() => navigation.navigate('Notifications', { companyId: selectedCompany?.id })} />
 
         <PullToRefresh token={token} selectedCompanyId={selectedCompany?.id} colors={colors} onNotificationCountChange={setNotificationCount} progressViewOffset={safeAreaInsets.top + HEADER_CONTENT_HEIGHT + 16} contentContainerStyle={[
             styles.content,
@@ -1071,18 +995,7 @@ export default function HomeScreen() {
             },
         ]} showsVerticalScrollIndicator={false}>
             {activeTab === 'home' && unpaidCompany ? (
-                <View style={styles.pendingPaymentBanner}>
-                    <Text style={styles.pendingPaymentTitle}>Payment pending</Text>
-                    <Text style={styles.pendingPaymentText}>
-                        Payment is still pending for {unpaidCompanyLabel}{unpaidCompanyAmount > 0 ? ` · $${unpaidCompanyAmount} due` : ''}
-                    </Text>
-                    <Pressable style={styles.pendingPaymentButton} onPress={handleResumePaymentPress}>
-                        <FontAwesome name="credit-card" size={15} color="#0A111D" />
-                        <Text style={styles.pendingPaymentButtonText}>
-                            {unpaidCompanyAmount > 0 ? `Pay $${unpaidCompanyAmount} now` : 'Pay now'}
-                        </Text>
-                    </Pressable>
-                </View>
+                <PendingPaymentBanner colors={colors} companyLabel={unpaidCompanyLabel} amount={unpaidCompanyAmount} onPayPress={handleResumePaymentPress} />
             ) : null}
             {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
@@ -1117,31 +1030,7 @@ export default function HomeScreen() {
 
         <BottomNavBar activeTab={activeTab} isMoreOpen={isMoreOpen} onTabPress={handleTabPress} colors={colors} safeAreaInsets={safeAreaInsets} />
 
-        {isMoreOpen ? (<View style={styles.moreOverlay}>
-            <Pressable onPress={() => closeMoreSheet()} style={[styles.moreBackdrop, { backgroundColor: colors.backdrop }]} />
-            <Animated.View style={[
-                styles.moreSheet,
-                {
-                    backgroundColor: colors.sheet,
-                    paddingBottom: safeAreaInsets.bottom + 24,
-                    transform: [{ translateY: moreSlideAnim }],
-                },
-            ]}>
-                <View style={[styles.sheetHandle, { backgroundColor: colors.border }]} />
-                <View style={styles.sheetHeader}>
-                    <Text style={[styles.sheetTitle, { color: colors.text }]}>
-                        More
-                    </Text>
-                    <Pressable onPress={() => closeMoreSheet()} style={[
-                        styles.sheetCloseButton,
-                        { backgroundColor: colors.surface },
-                    ]}>
-                        <FontAwesome name="close" size={18} color={colors.text} />
-                    </Pressable>
-                </View>
-                <MoreTabContent onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} />
-            </Animated.View>
-        </View>) : null}
+        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} onAddCompany={openAddCompanyFlow} addCompanyBlocked={addCompanyBlocked} addCompanyBlockedReason={addCompanyBlockedReason} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);

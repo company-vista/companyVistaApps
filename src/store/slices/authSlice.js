@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { handleLoginApi, handleGoogleLoginApi, } from '../../features/auth/api/loginApi';
+import { handleLoginApi, handleGoogleLoginApi, handleLoginSendOtpApi, handleLoginVerifyOtpApi, } from '../../features/auth/api/loginApi';
 import { handleSignupApi, handleResendVerificationApi, } from '../../features/auth/api/signupApi';
 import { deactivateAccount as deactivateAccountApi } from '../../features/auth/api/deactivateApi';
 import { deleteAccount as deleteAccountApi } from '../../features/auth/api/deleteAccountApi';
@@ -124,6 +124,43 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (payload, { re
         console.warn('Unable to persist auth session after login', error);
     });
     return session;
+});
+export const loginSendOtp = createAsyncThunk('auth/loginSendOtp', async (payload, { rejectWithValue }) => {
+    const result = await handleLoginSendOtpApi(payload);
+    if (!result.isSuccess) {
+        return rejectWithValue({
+            errors: result.errors,
+            phone: result.phone,
+            message: result.message,
+        });
+    }
+    return {
+        phone: result.phone,
+        message: result.message,
+        rawResponse: result.rawResponse,
+    };
+});
+export const loginVerifyOtp = createAsyncThunk('auth/loginVerifyOtp', async (payload, { rejectWithValue }) => {
+    const result = await handleLoginVerifyOtpApi(payload);
+    if (!result.isSuccess) {
+        return rejectWithValue({
+            errors: result.errors,
+            phone: result.phone,
+            message: result.message,
+        });
+    }
+    const session = {
+        user: result.user ?? {
+            phone: result.phone,
+        },
+        token: result.token ?? '',
+    };
+    if (session.token) {
+        saveAuthSession(session).catch(error => {
+            console.warn('Unable to persist auth session after OTP login', error);
+        });
+    }
+    return { ...session, phone: result.phone, message: result.message };
 });
 export const googleLoginUser = createAsyncThunk('auth/googleLoginUser', async (payload, { rejectWithValue }) => {
     const result = await handleGoogleLoginApi(payload);
@@ -320,6 +357,37 @@ const authSlice = createSlice({
             saveAuthSession({ user: action.payload.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         })
             .addCase(loginUser.rejected, (state, action) => {
+            state.isLoading = false;
+            state.loginErrors = action.payload?.errors ?? {};
+        })
+            .addCase(loginSendOtp.pending, state => {
+            state.isLoading = true;
+            state.loginErrors = {};
+        })
+            .addCase(loginSendOtp.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.loginErrors = {};
+        })
+            .addCase(loginSendOtp.rejected, (state, action) => {
+            state.isLoading = false;
+            state.loginErrors = action.payload?.errors ?? {};
+        })
+            .addCase(loginVerifyOtp.pending, state => {
+            state.isLoading = true;
+            state.loginErrors = {};
+        })
+            .addCase(loginVerifyOtp.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.loginErrors = {};
+            // Token aaya to user authenticated maano; warna OTP verify ho gaya
+            // par session establish nahi hua — screen route.params par decide karega.
+            if (action.payload?.token) {
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.isAuthenticated = true;
+            }
+        })
+            .addCase(loginVerifyOtp.rejected, (state, action) => {
             state.isLoading = false;
             state.loginErrors = action.payload?.errors ?? {};
         })

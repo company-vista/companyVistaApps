@@ -5,6 +5,8 @@ import { getNetworkErrorMessage } from '../../../utils/errorMessages';
 import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 const CLIENT_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/login`;
 const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google/login`;
+const LOGIN_SEND_OTP_ROUTE = `${API_BASE_URL}/api/company-signup/login-send-otp`;
+const LOGIN_VERIFY_OTP_ROUTE = `${API_BASE_URL}/api/company-signup/login-verify-otp`;
 const API_REQUEST_TIMEOUT_MS = 8000;
 function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -312,5 +314,152 @@ export async function handleGoogleLoginApi({ idToken, }) {
         errors: { general: message },
         isSuccess: false,
         email: '',
+    };
+}
+export async function handleLoginSendOtpApi({ countryCode, phone, password, }) {
+    const errors = {};
+    const trimmedPhone = String(phone ?? '').trim();
+    if (!trimmedPhone) {
+        errors.phone = 'Phone number is required';
+    }
+    if (!password) {
+        errors.password = 'Password is required';
+    }
+    else if (password.length < 6) {
+        errors.password = 'Password must be at least 6 characters';
+    }
+    if (Object.keys(errors).length > 0) {
+        Toast.show({
+            type: 'error',
+            text1: 'Login failed',
+            text2: 'Please check your phone number and password.',
+        });
+        return {
+            errors,
+            isSuccess: false,
+            phone: trimmedPhone,
+        };
+    }
+    let lastError;
+    let phoneToSend = trimmedPhone.replace(/\D/g, '');
+    const cc = String(countryCode ?? '').replace(/\D/g, '');
+    if (cc && phoneToSend.startsWith(cc) && phoneToSend.length > cc.length) {
+        phoneToSend = phoneToSend.slice(cc.length);
+    }
+    try {
+        const response = await axios.post(LOGIN_SEND_OTP_ROUTE, {
+            countryCode,
+            phone: phoneToSend,
+            password,
+        }, {
+            timeout: API_REQUEST_TIMEOUT_MS,
+        });
+        return {
+            errors: {},
+            isSuccess: true,
+            phone: trimmedPhone,
+            message: response.data?.message ?? 'Verification code sent',
+            rawResponse: response.data,
+        };
+    }
+    catch (error) {
+        lastError = error;
+    }
+    const message = getErrorMessage(lastError);
+    Toast.show({
+        type: 'error',
+        text1: 'Login failed',
+        text2: message,
+    });
+    return {
+        errors: { general: message },
+        isSuccess: false,
+        phone: trimmedPhone,
+    };
+}
+export async function handleLoginVerifyOtpApi({ countryCode, phone, otp }) {
+    const errors = {};
+    const trimmedPhone = String(phone ?? '').trim();
+    const trimmedOtp = String(otp ?? '').trim();
+    if (!trimmedPhone) {
+        errors.phone = 'Phone number is required';
+    }
+    if (!trimmedOtp) {
+        errors.otp = 'OTP is required';
+    }
+    else if (trimmedOtp.length < 6) {
+        errors.otp = 'Enter the 6-digit code';
+    }
+    if (Object.keys(errors).length > 0) {
+        return {
+            errors,
+            isSuccess: false,
+            phone: trimmedPhone,
+        };
+    }
+    let lastError;
+    try {
+        const response = await axios.post(LOGIN_VERIFY_OTP_ROUTE, {
+            countryCode,
+            phone: trimmedPhone,
+            otp: trimmedOtp,
+        }, {
+            timeout: API_REQUEST_TIMEOUT_MS,
+        });
+        const user = getResponseUser(response.data);
+        const token = getResponseToken(response.data) || getHeaderToken(response.headers);
+        const loginUser = {
+            _id: user?._id,
+            address: user?.address,
+            addressLine1: user?.addressLine1,
+            avatar: getImageUrl(user?.avatar),
+            businessName: user?.businessName,
+            companies: user?.companies,
+            company: getUserCompany(user),
+            companyName: user?.companyName,
+            countryCode: user?.countryCode,
+            country: user?.country,
+            dateOfBirth: user?.dateOfBirth,
+            dob: user?.dob,
+            email: user?.email ?? '',
+            id: user?.id,
+            firstName: user?.firstName ? capitalizeCompanyName(user.firstName) : user?.firstName,
+            image: getImageUrl(user?.image),
+            lastName: user?.lastName ? capitalizeCompanyName(user.lastName) : user?.lastName,
+            legalName: user?.legalName,
+            mobile: user?.mobile,
+            name: getUserName(user),
+            passportNo: user?.passportNo,
+            passportNumber: user?.passportNumber,
+            phone: getUserPhone(user) ?? trimmedPhone,
+            phoneNumber: user?.phoneNumber,
+            photo: getImageUrl(user?.photo),
+            postalCode: user?.postalCode,
+            profileImage: getImageUrl(user?.profileImage),
+            profilePicture: getImageUrl(user?.profilePicture),
+            role: user?.role,
+            state: user?.state,
+            street: user?.street,
+            isCompleteRegistration: user?.isCompleteRegistration,
+        };
+        return {
+            errors: {},
+            isSuccess: true,
+            phone: trimmedPhone,
+            token,
+            user: loginUser,
+            message: response.data?.message ?? 'Verified successfully',
+            rawResponse: response.data,
+        };
+    }
+    catch (error) {
+        lastError = error;
+    }
+    const message = getErrorMessage(lastError);
+    return {
+        errors: { otp: message },
+        isSuccess: false,
+        phone: trimmedPhone,
+        message,
     };
 }

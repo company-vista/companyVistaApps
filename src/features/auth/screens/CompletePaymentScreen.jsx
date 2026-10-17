@@ -63,17 +63,19 @@ export default function CompletePaymentScreen({ navigation, route }) {
   const countryPrice = route.params?.selectedCountryPrice ?? 0;
   let packagePrice;
   let stateFee;
+  const isUSPayment = (route.params?.selectedCountry || selectedCountry) === 'US';
   if (isAdvisorFlow) {
     packagePrice = advisorPrice;
     stateFee = 0;
-  } else if ((route.params?.selectedCountry || selectedCountry) === 'US') {
+  } else if (isUSPayment) {
     packagePrice = structurePrice;
     stateFee = directStateFee;
   } else {
-    packagePrice = 0;
+    // Non-US fixed-price jurisdiction (Canada/UK/Hong Kong) — country package hi price hai,
+    // state fee nahi. Pehle yahan 0 tha jisse summary me "Package $0" dikhta tha.
+    packagePrice = Number(countryPrice) || 0;
     stateFee = 0;
   }
-  const isUSPayment = (route.params?.selectedCountry || selectedCountry) === 'US';
   const additiveBase = isAdvisorFlow ? advisorPrice : isUSPayment ? (Number(countryPrice) || 0) + (Number(directStateFee) || 0) + (Number(structurePrice) || 0) : (Number(countryPrice) || 0);
   const hasPrice = Number(route.params?.selectedCountryPrice || route.params?.bestStatePrice || route.params?.selectedStatePrice || route.params?.selectedStructurePrice || 0) > 0;
   const computedAddOnsTotal = addOnsTotal || 0;
@@ -287,10 +289,12 @@ export default function CompletePaymentScreen({ navigation, route }) {
             <Text style={styles.summaryTitle}>Package</Text>
             <Text style={styles.summaryPrice}>${packagePrice}</Text>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryTitle}>{selectedState} state fee</Text>
-            <Text style={styles.summaryPrice}>${stateFee}</Text>
-          </View>
+          {isUSPayment && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryTitle}>{selectedState} state fee</Text>
+              <Text style={styles.summaryPrice}>${stateFee}</Text>
+            </View>
+          )}
           {computedAddOnsTotal > 0 && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryTitle}>Add-ons</Text>

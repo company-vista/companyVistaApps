@@ -20,6 +20,7 @@ import { getStructurePrice } from '../../../utils/priceCalculator';
 import { getStateData, getPackageIncludes } from '../../../utils/jurisdictionData';
 import { getCountryPrice } from '../../../constants/countries';
 import { allCountries } from '../jurisdictionAdvisor/RegisterJurisdictionScreen';
+import { useThemeColors } from '../../../theme/colors';
 
 export default function WhatsIncludedScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -37,6 +38,8 @@ export default function WhatsIncludedScreen({ navigation, route }) {
   const countryFee = selectedCountry !== 'US' ? getCountryPrice(selectedCountry) : 0;
   const isQuotedCountry = selectedCountry !== 'US' && !(countryFee > 0);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   const handleContinue = () => {
     const nextParams = { ...(route.params || {}), selectedStructure, selectedStructurePrice: route.params?.selectedStructurePrice ?? getStructurePrice(selectedStructure), companyName, selectedEnding, selectedState, selectedCountry };
@@ -54,10 +57,10 @@ export default function WhatsIncludedScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#080e18" />
-      
-      {/* Header - same style as StructureSelectionScreen to avoid overlap */}
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+
+      {/* Header */}
       <View style={styles.header}>
         <BackButton onPress={handleBack} />
         <Image source={logoR} style={styles.topLogo} />
@@ -67,24 +70,24 @@ export default function WhatsIncludedScreen({ navigation, route }) {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Title Section */}
         <View style={styles.titleContainer}>
-          <Text style={styles.mainTitle}>
+          <Text style={[styles.mainTitle, { color: colors.text }]}>
             What's <Text style={styles.italicTitle}>included</Text>
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
             Everything needed to trade legally — nothing held back for an upsell.
           </Text>
         </View>
 
         {/* Package Card */}
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(0, 230, 118, 0.2)' : 'rgba(0, 230, 118, 0.35)' }]}>
           {/* Main Package Header */}
           <View style={styles.packageHeader}>
             <View style={styles.iconContainerGreen}>
               <Feather name="shield" size={22} color="#00E676" />
             </View>
             <View style={styles.packageTextContainer}>
-              <Text style={styles.packageTitle}>Complete formation package</Text>
-              <Text style={styles.packageSubtitle}>All {packageItems.length} services · no add-ons required</Text>
+              <Text style={[styles.packageTitle, { color: colors.text }]}>Complete formation package</Text>
+              <Text style={[styles.packageSubtitle, { color: colors.muted }]}>All {packageItems.length} services · no add-ons required</Text>
             </View>
             <View style={styles.valueContainer}>
               {selectedCountry !== 'US' ? (
@@ -103,11 +106,11 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]} />
 
           {packageItems.map((item, index) => (
             <View key={item.label || index} style={styles.itemRow}>
-              <View style={styles.iconContainer}>
+              <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.surfaceAlt }]}>
                 {item.iconLib === 'FontAwesome5' ? (
                   <FontAwesome5 name={item.icon} size={16} color="#00E676" />
                 ) : (
@@ -116,7 +119,7 @@ export default function WhatsIncludedScreen({ navigation, route }) {
               </View>
               <View style={styles.itemTextContainer}>
                 <View style={styles.titleBadgeRow}>
-                  <Text style={styles.itemTitle}>{item.label}</Text>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{item.label}</Text>
                   {item.badge && (
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>{item.badge}</Text>
@@ -124,26 +127,26 @@ export default function WhatsIncludedScreen({ navigation, route }) {
                   )}
                 </View>
                 {!!item.description && (
-                  <Text style={styles.itemDescription}>{item.description}</Text>
+                  <Text style={[styles.itemDescription, { color: colors.muted }]}>{item.description}</Text>
                 )}
               </View>
               <View style={styles.priceContainer}>
                 {item.price > 0 && (
-                  <Text style={styles.strikethroughPrice}>${item.price}</Text>
+                  <Text style={[styles.strikethroughPrice, { color: colors.subtle }]}>${item.price}</Text>
                 )}
                 <Text style={styles.freeBadge}>FREE</Text>
               </View>
             </View>
           ))}
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]} />
 
           {/* Guarantee Footer inside card */}
           <View style={styles.guaranteeRow}>
             <View style={styles.checkIconContainer}>
               <Ionicons name="checkmark-circle" size={24} color="#00E676" />
             </View>
-            <Text style={styles.guaranteeText}>
+            <Text style={[styles.guaranteeText, { color: colors.muted }]}>
               <Text style={styles.guaranteeBold}>100% refund guarantee</Text> — if we cannot form your company, you pay nothing.
             </Text>
           </View>
@@ -151,25 +154,25 @@ export default function WhatsIncludedScreen({ navigation, route }) {
 
         {/* Stats Row */}
         <View style={styles.statsContainer}>
-          <View style={styles.statBox}>
+          <View style={[styles.statBox, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
             <Text style={styles.statNumber}>2,400+</Text>
-            <Text style={styles.statLabel}>COMPANIES FORMED</Text>
+            <Text style={[styles.statLabel, { color: colors.muted }]}>COMPANIES FORMED</Text>
           </View>
-          <View style={styles.statBox}>
+          <View style={[styles.statBox, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
             <Text style={styles.statNumber}>98%</Text>
-            <Text style={styles.statLabel}>FIRST-TIME APPROVAL</Text>
+            <Text style={[styles.statLabel, { color: colors.muted }]}>FIRST-TIME APPROVAL</Text>
           </View>
         </View>
       </ScrollView>
 
       {/* Bottom Sticky Action Button Area */}
-      <View style={[styles.footerContainer, { paddingBottom: s(24) + insets.bottom, paddingTop: s(14) }]}>
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.8} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color="#0A111D" />
+      <View style={[styles.footerContainer, { paddingBottom: s(24) + insets.bottom, paddingTop: s(14), backgroundColor: colors.background }]}>
+        <TouchableOpacity style={[styles.continueButton, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={handleContinue}>
+          <Text style={[styles.continueButtonText, { color: colors.buttonText }]}>Continue</Text>
+          <Ionicons name="arrow-forward" size={18} color={colors.buttonText} />
         </TouchableOpacity>
 
-        <Text style={styles.footerSubtext}>
+        <Text style={[styles.footerSubtext, { color: colors.subtle }]}>
           {(() => {
             const p = route.params || {};
             if (p.advisorFlow && (p.bestStatePrice || p.bestCountryPrice || p.selectedCountryPrice)) {
@@ -182,7 +185,6 @@ export default function WhatsIncludedScreen({ navigation, route }) {
               } else {
                 const countryPrice = Number(p.bestCountryPrice ?? p.selectedCountryPrice ?? 0) || countryFee;
                 const countryName = p.bestCountryName || countryEntry?.name || p.selectedCountry || selectedCountry;
-                // Quoted country (koi fee define nahi) — price zero mat dikhao
                 if (!countryPrice) return 'Custom quote · final price after our team reviews';
                 return `$${countryPrice} total · ${countryName} package`;
               }
@@ -191,9 +193,7 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             const stateFee = p.selectedStatePrice ?? p.bestStateGovFee ?? 160;
             const structPrice = p.selectedStructurePrice ?? getStructurePrice(selectedStructure);
             if (selectedCountry !== 'US') {
-              // Registry packageFee fallback — param miss ho to bhi country ka sahi fee dikhe
               const cPrice = Number(p.selectedCountryPrice ?? 0) || countryFee;
-              // Custom-quote country (price '') ke liye structure/state fee add mat karo — "Custom quote" dikhao
               const countryName = countryEntry?.name || p.selectedCountry || selectedCountry;
               return cPrice ? `$${cPrice} ${countryName} package` : 'Custom quote · final price after our team reviews';
             }
@@ -208,7 +208,6 @@ export default function WhatsIncludedScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#080E18',
   },
   header: {
     flexDirection: 'row',
@@ -219,24 +218,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(16),
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  logoText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  logoHighlight: {
-    color: '#D4AF37',
-  },
   scrollContent: {
     paddingHorizontal: s(16),
     paddingBottom: s(20),
@@ -247,7 +228,6 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: s(26),
     fontWeight: '400',
-    color: '#FFFFFF',
     marginBottom: s(8),
   },
   italicTitle: {
@@ -256,15 +236,12 @@ const styles = StyleSheet.create({
     color: '#D4AF37',
   },
   subtitle: {
-    color: '#8E9BAE',
     fontSize: 14,
     lineHeight: 20,
   },
   card: {
-    backgroundColor: '#0C1622',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
     padding: s(16),
     marginTop: s(10),
   },
@@ -285,12 +262,10 @@ const styles = StyleSheet.create({
     marginLeft: s(12),
   },
   packageTitle: {
-    color: '#FFFFFF',
     fontSize: s(15),
     fontWeight: '700',
   },
   packageSubtitle: {
-    color: '#8E9BAE',
     fontSize: 12,
     marginTop: s(2),
   },
@@ -312,7 +287,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     marginVertical: s(14),
   },
   itemRow: {
@@ -324,7 +298,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: s(2),
@@ -340,7 +313,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   itemTitle: {
-    color: '#FFFFFF',
     fontSize: s(13),
     fontWeight: '600',
   },
@@ -359,7 +331,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   itemDescription: {
-    color: '#7C8BA1',
     fontSize: 12,
     marginTop: s(3),
     lineHeight: 16,
@@ -368,7 +339,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   strikethroughPrice: {
-    color: '#5B6B7C',
     fontSize: 11,
     textDecorationLine: 'line-through',
   },
@@ -386,7 +356,6 @@ const styles = StyleSheet.create({
     marginRight: s(10),
   },
   guaranteeText: {
-    color: '#8E9BAE',
     fontSize: 12,
     flex: 1,
     lineHeight: 17,
@@ -402,12 +371,10 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 0.48,
-    backgroundColor: '#0C1622',
     borderRadius: 12,
     paddingVertical: s(14),
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   statNumber: {
     color: '#D4AF37',
@@ -415,7 +382,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statLabel: {
-    color: '#6C7A8E',
     fontSize: 9,
     fontWeight: '700',
     marginTop: s(4),
@@ -425,10 +391,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(16),
     paddingTop: s(10),
     paddingBottom: s(16),
-    backgroundColor: '#080E18',
   },
   continueButton: {
-    backgroundColor: '#D4AF37',
     paddingVertical: s(14),
     borderRadius: 26,
     flexDirection: 'row',
@@ -436,13 +400,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    color: '#0A111D',
     fontSize: s(15),
     fontWeight: '700',
     marginRight: s(8),
   },
   footerSubtext: {
-    color: '#5B6B7C',
     fontSize: 12,
     textAlign: 'center',
     marginTop: s(10),

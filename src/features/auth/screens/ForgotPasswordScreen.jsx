@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(14),
     paddingBottom: s(20),
     justifyContent: 'space-between',
   },
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginBottom: s(16),
-    marginTop: s(10),
+    marginTop: s(1),
   },
   topLogo: {
     width: 150,

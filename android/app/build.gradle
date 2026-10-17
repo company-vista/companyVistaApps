@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
-def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystorePropertiesFile = file("keystore.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
@@ -94,8 +94,8 @@ android {
         applicationId "com.vistaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "1.5.3"
+        versionCode 12
+        versionName "1.5.7"
         manifestPlaceholders = [usesCleartextTraffic: "true"]
     }
     compileOptions {
@@ -150,15 +150,23 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
+    // React Native
     implementation("com.facebook.react:react-android")
-     implementation 'com.github.tiktok:tiktok-business-android-sdk:1.5.0' // replace the version with the one which suits your need
-    //to listen for app life cycle
+
+    // TikTok Business SDK
+    implementation 'com.github.tiktok:tiktok-business-android-sdk:1.5.0'
+
+    // Google Play Billing - fixes missing BillingClient classes
+    implementation 'com.android.billingclient:billing:6.0.0'
+
+    // App lifecycle
     implementation 'androidx.lifecycle:lifecycle-process:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.3.1'
-    //to get Google install referrer
+
+    // Google Install Referrer
     implementation 'com.android.installreferrer:installreferrer:2.2'
 
+    // JavaScript engine
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

@@ -82,32 +82,30 @@ const ComplianceHistoryScreen = () => {
                 return [selectedAction.title.toLowerCase()];
         }
     }, [selectedAction.id, selectedAction.title]);
+    const getActionSegmentKeys = () => {
+        switch (selectedAction.id) {
+            case 'agent_address':
+                return ['Address', 'resident'];
+            case 'address':
+                return ['Address'];
+            case 'resident':
+                return ['resident'];
+            case 'itin':
+                return ['itin'];
+            case 'annual_filing':
+                return ['annualFiling'];
+            case 'federal_filing':
+                return ['federalTaxFiling'];
+            default:
+                return [];
+        }
+    };
     const getHistorySegment = (record) => {
-        if (selectedAction.id === 'agent_address') {
-            const segment = record.Address ?? record.resident;
-            if (segment && typeof segment === 'object' && !Array.isArray(segment)) {
-                return segment;
-            }
-            return record;
-        }
-        const segmentKey = selectedAction.id === 'address'
-            ? 'Address'
-            : selectedAction.id === 'resident'
-                ? 'resident'
-                : selectedAction.id === 'itin'
-                    ? 'itin'
-                    : selectedAction.id === 'annual_filing'
-                        ? 'annualFiling'
-                        : selectedAction.id === 'federal_filing'
-                            ? 'federalTaxFiling'
-                            : undefined;
-        const segment = segmentKey && record[segmentKey];
-        if (segment && typeof segment === 'object' && !Array.isArray(segment)) {
-            return segment;
-        }
-        return record;
+        const segmentKey = getActionSegmentKeys().find(key => record[key] && typeof record[key] === 'object' && !Array.isArray(record[key]));
+        return segmentKey ? record[segmentKey] : record;
     };
     const matchesSelectedAction = (record) => {
+        const hasSegment = getActionSegmentKeys().some(key => record[key] && typeof record[key] === 'object' && !Array.isArray(record[key]));
         const target = getHistorySegment(record);
         const candidate = [
             target.title,
@@ -123,7 +121,7 @@ const ComplianceHistoryScreen = () => {
             .filter(Boolean)
             .map(value => String(value).toLowerCase())
             .join(' ');
-        return actionMatchTerms.some(term => candidate.includes(term));
+        return hasSegment || actionMatchTerms.some(term => candidate.includes(term));
     };
     const getHistoryDueDate = (record) => {
         const segment = getHistorySegment(record);
@@ -178,10 +176,15 @@ const ComplianceHistoryScreen = () => {
         return String(value);
     };
     const getHistoryYear = (record) => {
-        if (record.year) {
-            return String(record.year);
+        const segment = getHistorySegment(record);
+        const explicitYear = record.year ??
+            segment.year ??
+            segment.applicableYear ??
+            record.yearLabel;
+        if (explicitYear) {
+            return String(explicitYear);
         }
-        const dueDate = String(record.dueDate ?? record.date ?? selectedAction.date ?? '');
+        const dueDate = String(segment.dueDate ?? record.dueDate ?? record.date ?? selectedAction.date ?? '');
         const parsed = new Date(dueDate);
         if (!Number.isNaN(parsed.getTime())) {
             return String(parsed.getFullYear());

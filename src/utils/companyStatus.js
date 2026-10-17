@@ -103,9 +103,10 @@ export function getSuccessfulPaymentCompanyIds(payments = []) {
             status === 'active' ||
             status.includes('active');
         if (!isSuccess) return;
-        const companyId = typeof payment.company === 'object' && payment.company !== null
-            ? String(payment.company._id ?? payment.company.id ?? payment.company.companyId ?? '')
-            : String(payment.company ?? '');
+        const rawCompany = payment.company ?? payment.companyId ?? payment.company_id ?? '';
+        const companyId = typeof rawCompany === 'object' && rawCompany !== null
+            ? String(rawCompany._id ?? rawCompany.id ?? rawCompany.companyId ?? '')
+            : String(rawCompany ?? '');
         if (companyId.trim()) paidIds.add(companyId.trim());
     });
     return paidIds;

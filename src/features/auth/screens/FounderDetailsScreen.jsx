@@ -23,6 +23,8 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { signupUser, setPendingOrderData } from '../../../store/slices/authSlice';
 import { fetchClientProfile } from '../../profile/api/clientProfileDetailsApi';
 import { s } from '../../../theme/responsive';
+import { getCountryData } from '../../../constants/countries';
+import { useThemeColors } from '../../../theme/colors';
 
 const COUNTRIES = [
   { code: '+91', iso: 'IN', name: 'India' },
@@ -48,10 +50,26 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   const isAuthenticated = useAppSelector(s => s?.auth?.isAuthenticated);
   const sessionToken = useAppSelector(s => s?.auth?.token);
   const authUser = useAppSelector(s => s?.auth?.user);
-  const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '', selectedCountry: jurisdictionCountry, bestState, advisorFlow } = route.params || {};
-  const isUSFounder = (route.params?.selectedCountry || jurisdictionCountry) === 'US' || (!jurisdictionCountry && !route.params?.selectedCountry);
-  const jurisdictionCountryName = jurisdictionCountry ? ({ US: 'USA', GB: 'UK', AE: 'UAE', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta' }[jurisdictionCountry] || jurisdictionCountry) : (bestState ? 'USA' : null);
-  const displayJurisdictionCountry = advisorFlow ? (bestState ? 'USA' : jurisdictionCountryName || 'USA') : (jurisdictionCountryName || 'USA');
+  const { selectedStructure = 'LLC', selectedState = 'Delaware', companyName = '', selectedEnding = '', selectedCountry: jurisdictionCountry, bestState } = route.params || {};
+  // Jurisdiction ka asli country — yahi US vs non-US decide karta hai.
+  // NOTE: bestState advisor US flow me aata hai, par StructureSelection ne
+  // non-US flow me bhi bestState='Delaware' forward kar diya tha, isliye
+  // bestState ko akela US ka signal nahi maan sakte. Advisor flow me country
+  // sirf bestCountry/bestCountryName me bhi aa sakta hai.
+  const rawCountry = jurisdictionCountry || route.params?.selectedCountry || route.params?.bestCountry || '';
+  const jurisdictionCode = String(rawCountry || '').toUpperCase();
+  const bestCountryName = route.params?.bestCountryName || '';
+  const isUSFounder = jurisdictionCode === 'US'
+    || (!jurisdictionCode && (!bestCountryName || bestCountryName === 'United States'));
+  const jurisdictionCountryName = jurisdictionCode
+    ? (getCountryData(jurisdictionCode)?.name
+      || { US: 'USA', GB: 'UK', AE: 'UAE', SG: 'Singapore', EE: 'Estonia', HK: 'Hong Kong', CY: 'Cyprus', MT: 'Malta' }[jurisdictionCode]
+      || bestCountryName
+      || rawCountry)
+    : (bestCountryName || null);
+  const displayJurisdictionCountry = isUSFounder
+    ? 'USA'
+    : (jurisdictionCountryName || bestCountryName || rawCountry || 'USA');
   // ownership note dynamic: US me state name (advisor me bestState), non-US me country name
   const ownershipJurisdiction = isUSFounder
     ? (bestState || selectedState || 'a US')
@@ -83,14 +101,21 @@ const FounderDetailsScreen = ({ navigation, route }) => {
   const [isAutoContinuing, setIsAutoContinuing] = useState(false);
   const autoContinueRef = useRef(false);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
+    // NOTE: useNativeDriver MUST stay false here. On Android + New Architecture
+    // a native-driver `translateY` transform is applied directly to the native
+    // view and never committed to the shadow tree, so touch hit-testing uses a
+    // stale position and children's onPress never fires (react-native#36504).
+    // That made the country-code / country-of-residence pickers unresponsive.
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: false }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: false }),
     ]).start();
   }, []);
 
@@ -200,10 +225,10 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       const trimmedPhone = effPhone;
       const countryCodeObj = { code: effCountryCode || '+91', iso: effCountryIso || '' };
       const residence = effResidence || '';
-      const isUSA = (route.params?.selectedCountry === 'US' || route.params?.selectedCountry === 'USA' || !!route.params?.bestState || isUSFounder);
+      const isUSA = isUSFounder;
       const legalEnding = selectedEnding || selectedStructure || '';
       const usState = { name: route.params?.bestState || selectedState || '', timeframe: route.params?.bestStateTimeframe || '' };
-      const country = { name: route.params?.selectedCountry || '' };
+      const country = { name: route.params?.selectedCountry || route.params?.bestCountry || route.params?.bestCountryName || '' };
       const structure = { id: selectedStructure || route.params?.selectedStructure || '' };
       const statePrice = route.params?.bestStatePrice ?? route.params?.selectedStatePrice ?? 0;
       // LLC structure price sirf USA me add hota hai. Quoted/custom country ho ya
@@ -365,23 +390,24 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
   if (isAutoContinuing) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <ActivityIndicator size="large" color="#D4AF37" />
-          <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>Using your saved profile — setting up your company…</Text>
+          <Text style={{ color: colors.muted, marginTop: 12, fontSize: 14 }}>Using your saved profile — setting up your company…</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
 
       <ScrollView
         style={styles.scrollArea}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: s(32) + insets.bottom }]}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
 
@@ -392,28 +418,28 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
 
-          <Text style={styles.mainTitle}>
+          <Text style={[styles.mainTitle, { color: colors.text }]}>
             Tell us about <Text style={styles.italicTitle}>you</Text>
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
             Details of the principal founder / member.
           </Text>
 
           {/* Summary Card */}
-          <View style={styles.summaryCard}>
+          <View style={[styles.summaryCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
             <View style={styles.summaryField}>
-              <Text style={styles.summaryFieldLabel}>COMPANY NAME</Text>
+              <Text style={[styles.summaryFieldLabel, { color: colors.muted }]}>COMPANY NAME</Text>
               <Text style={styles.companyNameText} numberOfLines={1}>{displayCompanyName}</Text>
             </View>
-            <View style={styles.summaryDivider} />
+            <View style={[styles.summaryDivider, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]} />
             <View style={styles.summaryRowBottom}>
               <View style={styles.summaryFieldHalf}>
-                <Text style={styles.summaryFieldLabel}>JURISDICTION</Text>
-                <Text style={styles.stateSubtitle}>{isUSFounder ? `${bestState || selectedState} · ${selectedStructure}` : (displayJurisdictionCountry || jurisdictionCountry || route.params?.selectedCountry || '—')}</Text>
+                <Text style={[styles.summaryFieldLabel, { color: colors.muted }]}>JURISDICTION</Text>
+                <Text style={[styles.stateSubtitle, { color: colors.muted }]}>{isUSFounder ? `${bestState || selectedState} · ${selectedStructure}` : (displayJurisdictionCountry || jurisdictionCountry || route.params?.selectedCountry || '—')}</Text>
               </View>
               <View style={styles.summaryFieldHalf}>
-                <Text style={styles.summaryFieldLabel}>COUNTRY</Text>
-                <Text style={styles.stateSubtitle}>{displayJurisdictionCountry}</Text>
+                <Text style={[styles.summaryFieldLabel, { color: colors.muted }]}>COUNTRY</Text>
+                <Text style={[styles.stateSubtitle, { color: colors.muted }]}>{displayJurisdictionCountry}</Text>
               </View>
               {/* TOTAL frontend me calculate nahi karna — backend se aayega */}
             </View>
@@ -421,19 +447,19 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
           {/* Full Name */}
           <View style={styles.labelRow}>
-            <Text style={styles.inputLabel}>
+            <Text style={[styles.inputLabel, { color: colors.muted }]}>
               FULL NAME <Text style={styles.requiredAsterisk}>*</Text>
             </Text>
-            <Text style={styles.passportHint}>as per passport</Text>
+            <Text style={[styles.passportHint, { color: colors.muted }]}>as per passport</Text>
           </View>
-          <View style={styles.inputContainerActive}>
-            <Ionicons name="person" size={16} color="#94A3B8" />
+          <View style={[styles.inputContainerActive, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : colors.inputBackground }]}>
+            <Ionicons name="person" size={16} color={colors.muted} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { color: colors.text }]}
               value={fullName}
               onChangeText={setFullName}
               placeholder="Enter full name"
-              placeholderTextColor="#475569"
+              placeholderTextColor={colors.subtle}
             />
           </View>
           <View style={styles.warningRow}>
@@ -444,24 +470,24 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           </View>
 
           {/* Email */}
-          <Text style={styles.inputLabel}>
+          <Text style={[styles.inputLabel, { color: colors.muted }]}>
             EMAIL ADDRESS <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
-          <View style={emailVerified ? styles.successInputContainer : styles.inputContainerDefault}>
-            <Ionicons name="mail" size={16} color={emailVerified ? '#10B981' : '#94A3B8'} />
+          <View style={emailVerified ? styles.successInputContainer : [styles.inputContainerDefault, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]}>
+            <Ionicons name="mail" size={16} color={emailVerified ? '#10B981' : colors.muted} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { color: colors.text }]}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
               placeholder="Enter email address"
-              placeholderTextColor="#475569"
+              placeholderTextColor={colors.subtle}
             />
             {emailVerified && <Ionicons name="checkmark-circle" size={16} color="#10B981" />}
           </View>
 
-          {/* Verified status - Verify button hata diya gaya, ab Register Company button hi verification handle karega */}
+          {/* Verified status */}
           {emailVerified && (
             <View style={styles.verifiedRow}>
               <Ionicons name="checkmark-circle" size={12} color="#10B981" />
@@ -473,38 +499,38 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           )}
 
           {/* Phone */}
-          <Text style={styles.inputLabel}>
+          <Text style={[styles.inputLabel, { color: colors.muted }]}>
             PHONE NUMBER <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
           <View style={styles.phoneRow}>
-            <TouchableOpacity style={styles.countryCodePicker} activeOpacity={0.8} onPress={() => setShowCodePicker(true)}>
-              {countryIso ? <Text style={styles.flagText}>{countryIso}</Text> : null}
-              <Text style={[styles.codeText, !countryCode && styles.placeholderText]}>{countryCode || 'Select'}</Text>
-              <Ionicons name="chevron-down" size={12} color="#64748B" />
+            <TouchableOpacity style={[styles.countryCodePicker, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowCodePicker(true)}>
+              {countryIso ? <Text style={[styles.flagText, { color: colors.subtle }]}>{countryIso}</Text> : null}
+              <Text style={[styles.codeText, { color: colors.text }, !countryCode && { color: colors.subtle }]}>{countryCode || 'Select'}</Text>
+              <Ionicons name="chevron-down" size={12} color={colors.subtle} />
             </TouchableOpacity>
-            <View style={styles.phoneInputContainer}>
+            <View style={[styles.phoneInputContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]}>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={phone}
                 onChangeText={setPhone}
                 keyboardType="phone-pad"
                 placeholder="Phone number"
-                placeholderTextColor="#475569"
+                placeholderTextColor={colors.subtle}
               />
             </View>
           </View>
-          <Text style={styles.helperText}>
+          <Text style={[styles.helperText, { color: colors.subtle }]}>
             We'll send a verification code to this number
           </Text>
 
           {/* Country of Residence */}
-          <Text style={styles.inputLabel}>
+          <Text style={[styles.inputLabel, { color: colors.muted }]}>
             COUNTRY OF RESIDENCE <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
-          <TouchableOpacity style={styles.dropdownInputContainer} activeOpacity={0.8} onPress={() => setShowResidencePicker(true)}>
-            {residenceIso ? <Text style={styles.flagText}>{residenceIso}</Text> : null}
-            <Text style={[styles.dropdownValueText, !countryOfResidence && styles.placeholderText]}>{countryOfResidence || 'Select'}</Text>
-            <Ionicons name="chevron-down" size={12} color="#64748B" />
+          <TouchableOpacity style={[styles.dropdownInputContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowResidencePicker(true)}>
+            {residenceIso ? <Text style={[styles.flagText, { color: colors.subtle }]}>{residenceIso}</Text> : null}
+            <Text style={[styles.dropdownValueText, { color: colors.text }, !countryOfResidence && { color: colors.subtle }]}>{countryOfResidence || 'Select'}</Text>
+            <Ionicons name="chevron-down" size={12} color={colors.subtle} />
           </TouchableOpacity>
           <View style={styles.successRow}>
             <Ionicons name="checkmark-circle" size={12} color="#10B981" />
@@ -519,10 +545,10 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             activeOpacity={0.8}
             onPress={() => setIsChecked(!isChecked)}
           >
-            <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-              {isChecked && <Ionicons name="checkmark" size={11} color="#060913" />}
+            <View style={[styles.checkbox, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255,255,255,0.2)' : colors.border }, isChecked && styles.checkboxChecked]}>
+              {isChecked && <Ionicons name="checkmark" size={11} color={isDark ? '#060913' : '#FFFFFF'} />}
             </View>
-            <Text style={styles.checkboxText}>
+            <Text style={[styles.checkboxText, { color: colors.muted }]}>
               I agree to the <Text style={styles.linkText}>Terms of Service</Text> and{' '}
               <Text style={styles.linkText}>Privacy Policy</Text>, and confirm the
               above details are accurate.
@@ -534,6 +560,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[
             styles.primaryBtn,
+            { backgroundColor: colors.buttonBackground },
             !(fullName.trim() && isEmailValid && phone.trim() && countryCode && countryOfResidence && isChecked) && styles.primaryBtnDisabled,
             verifyingEmail && styles.primaryBtnDisabled,
           ]}
@@ -542,16 +569,16 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           onPress={handleRegisterCompany}
         >
           {verifyingEmail ? (
-            <ActivityIndicator size="small" color="#060913" />
+            <ActivityIndicator size="small" color={colors.buttonText} />
           ) : (
-            <Text style={styles.primaryBtnText}>{emailVerified ? '+  Register Company' : 'Submit->'}</Text>
+            <Text style={[styles.primaryBtnText, { color: colors.buttonText }]}>{emailVerified ? '+  Register Company' : 'Submit->'}</Text>
           )}
         </TouchableOpacity>
         {!emailVerified && email.length > 0 && !isEmailValid && (
           <Text style={styles.verifyWarning}>Enter a valid email to continue</Text>
         )}
 
-        <Text style={styles.footerSubtext}>
+        <Text style={[styles.footerSubtext, { color: colors.subtle }]}>
           No payment required now · <Text style={styles.goldText}>Invoice auto-generated</Text>
         </Text>
 
@@ -560,7 +587,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             registered bhi nahi hai. */}
         {!isAuthenticated && (
           <View style={styles.loginRow}>
-            <Text style={styles.loginHint}>Already have an account? </Text>
+            <Text style={[styles.loginHint, { color: colors.muted }]}>Already have an account? </Text>
             <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Login')}>
               <Text style={styles.loginLink}>Log in</Text>
             </TouchableOpacity>
@@ -570,12 +597,13 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
       {/* Country Code Picker Modal */}
       <Modal visible={showCodePicker} transparent animationType="fade" onRequestClose={() => setShowCodePicker(false)}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowCodePicker(false)}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Country Code</Text>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setShowCodePicker(false)} />
+          <View style={[styles.modalContent, { backgroundColor: isDark ? '#111827' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Select Country Code</Text>
               <TouchableOpacity onPress={() => setShowCodePicker(false)}>
-                <Ionicons name="close" size={20} color="#94A3B8" />
+                <Ionicons name="close" size={20} color={colors.muted} />
               </TouchableOpacity>
             </View>
             <FlatList
@@ -583,32 +611,33 @@ const FounderDetailsScreen = ({ navigation, route }) => {
               keyExtractor={(item) => item.iso}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.countryOption, countryCode === item.code && styles.countryOptionSelected]}
+                  style={[styles.countryOption, { borderBottomColor: isDark ? 'rgba(255,255,255,0.04)' : colors.border }, countryCode === item.code && styles.countryOptionSelected]}
                   onPress={() => {
                     setCountryCode(item.code);
                     setCountryIso(item.iso);
                     setShowCodePicker(false);
                   }}
                 >
-                  <Text style={styles.flagText}>{item.iso}</Text>
-                  <Text style={styles.countryOptionName}>{item.name}</Text>
-                  <Text style={styles.countryOptionCode}>{item.code}</Text>
+                  <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
+                  <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
+                  <Text style={[styles.countryOptionCode, { color: colors.muted }]}>{item.code}</Text>
                   {countryCode === item.code && <Ionicons name="checkmark" size={16} color="#C9A84C" />}
                 </TouchableOpacity>
               )}
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       {/* Country of Residence Picker Modal */}
       <Modal visible={showResidencePicker} transparent animationType="fade" onRequestClose={() => setShowResidencePicker(false)}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowResidencePicker(false)}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Country of Residence</Text>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setShowResidencePicker(false)} />
+          <View style={[styles.modalContent, { backgroundColor: isDark ? '#111827' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Select Country of Residence</Text>
               <TouchableOpacity onPress={() => setShowResidencePicker(false)}>
-                <Ionicons name="close" size={20} color="#94A3B8" />
+                <Ionicons name="close" size={20} color={colors.muted} />
               </TouchableOpacity>
             </View>
             <FlatList
@@ -616,21 +645,21 @@ const FounderDetailsScreen = ({ navigation, route }) => {
               keyExtractor={(item) => item.iso}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.countryOption, countryOfResidence === item.name && styles.countryOptionSelected]}
+                  style={[styles.countryOption, { borderBottomColor: isDark ? 'rgba(255,255,255,0.04)' : colors.border }, countryOfResidence === item.name && styles.countryOptionSelected]}
                   onPress={() => {
                     setCountryOfResidence(item.name);
                     setResidenceIso(item.iso);
                     setShowResidencePicker(false);
                   }}
                 >
-                  <Text style={styles.flagText}>{item.iso}</Text>
-                  <Text style={styles.countryOptionName}>{item.name}</Text>
+                  <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
+                  <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
                   {countryOfResidence === item.name && <Ionicons name="checkmark" size={16} color="#C9A84C" />}
                 </TouchableOpacity>
               )}
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -639,122 +668,104 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 export default FounderDetailsScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#060913' },
+  container: { flex: 1 },
   scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
+  mainTitle: { fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(16) },
+  subtitle: { fontSize: 12, lineHeight: 18, marginBottom: s(16) },
   summaryCard: {
     width: '100%',
     alignSelf: 'stretch',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(16),
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(18), marginBottom: s(20), minHeight: 105,
+    borderRadius: s(16),
+    borderWidth: 1, padding: s(18), marginBottom: s(20), minHeight: 105,
   },
   summaryField: { marginBottom: s(8) },
-  summaryFieldLabel: { color: '#64748B', fontSize: 10, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
-  summaryDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: s(8) },
+  summaryFieldLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
+  summaryDivider: { height: 1, marginVertical: s(8) },
   summaryFieldHalf: { flex: 1 },
-  summaryFieldHalfRight: { flex: 1, alignItems: 'flex-end' },
-  summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
-  usBadgeRow: { flexDirection: 'row', alignItems: 'center' },
-  countryCodeBadge: { color: '#64748B', fontSize: s(12), fontWeight: 'bold', marginRight: s(6) },
-  summaryLabel: { color: '#64748B', fontSize: 11 },
   companyNameText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
   summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: s(12) },
-  stateSubtitle: { color: '#94A3B8', fontSize: s(15), fontWeight: '600' },
-  priceSummaryText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
+  stateSubtitle: { fontSize: s(15), fontWeight: '600' },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(14), marginBottom: s(8) },
-  inputLabel: { color: '#64748B', fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
+  inputLabel: { fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
   requiredAsterisk: { color: '#EF4444' },
-  passportHint: { color: '#64748B', fontSize: 10 },
+  passportHint: { fontSize: 10 },
   inputContainerActive: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 12,
+    borderRadius: 12,
     borderWidth: 1, borderColor: '#C9A84C', paddingHorizontal: s(14), height: 48,
   },
   inputContainerDefault: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', paddingHorizontal: s(14), height: 48,
+    borderRadius: 12,
+    borderWidth: 1, paddingHorizontal: s(14), height: 48,
   },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: 12,
     borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
   },
-  verifyRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginTop: s(8), marginBottom: s(12),
-  },
-  verifyHint: { color: '#64748B', fontSize: 10, flex: 1, marginRight: s(10) },
-  verifyBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#C9A84C', paddingHorizontal: s(14), paddingVertical: s(7),
-    borderRadius: 20, borderWidth: 1, borderColor: '#C9A84C',
-  },
-  verifyBtnDisabled: { backgroundColor: 'rgba(201,168,76,0.35)', borderColor: 'rgba(201,168,76,0.35)', opacity: 0.7 },
-  verifyBtnText: { color: '#060913', fontSize: 12, fontWeight: '700' },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(8), marginBottom: s(12) },
   verifiedText: { color: '#10B981', fontSize: 10, fontWeight: '600', flex: 1 },
   changeEmailText: { color: '#C9A84C', fontSize: 10, fontWeight: '700', textDecorationLine: 'underline' },
   verifyWarning: { color: '#D97706', fontSize: 10, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
   dropdownInputContainer: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    borderWidth: 1,
     paddingHorizontal: s(14), height: 48,
   },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500', marginLeft: s(10) },
+  textInput: { flex: 1, fontSize: 13, fontWeight: '500', marginLeft: s(10) },
   warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(16), gap: s(6) },
   warningText: { color: '#D97706', fontSize: 10 },
-  helperText: { color: '#64748B', fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
+  helperText: { fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
   successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(18), gap: s(6) },
   successText: { color: '#10B981', fontSize: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10 },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    borderWidth: 1,
     paddingHorizontal: s(12), height: 48, gap: 6,
   },
-  flagText: { color: '#64748B', fontSize: 10, fontWeight: 'bold' },
-  codeText: { color: '#FFFFFF', fontSize: 13, fontWeight: 'bold' },
+  flagText: { fontSize: 10, fontWeight: 'bold' },
+  codeText: { fontSize: 13, fontWeight: 'bold' },
   phoneInputContainer: {
-    flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    flex: 1, borderRadius: 12,
+    borderWidth: 1,
     paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
-  dropdownValueText: { flex: 1, color: '#FFFFFF', fontSize: 13, fontWeight: '500' },
-  placeholderText: { color: '#475569' },
+  dropdownValueText: { flex: 1, fontSize: 13, fontWeight: '500' },
   checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: s(4), marginBottom: s(20) },
   checkbox: {
-    width: 18, height: 18, borderRadius: 5, backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 18, height: 18, borderRadius: 5,
     alignItems: 'center', justifyContent: 'center', marginRight: s(10), marginTop: s(2),
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
   },
   checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  checkboxText: { flex: 1, color: '#64748B', fontSize: 10, lineHeight: 15 },
+  checkboxText: { flex: 1, fontSize: 10, lineHeight: 15 },
   linkText: { color: '#C9A84C', fontWeight: 'bold' },
   primaryBtn: {
-    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
+    borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(12),
   },
-  primaryBtnDisabled: { backgroundColor: 'rgba(212, 175, 55, 0.3)' },
-  primaryBtnText: { color: '#060913', fontSize: 15, fontWeight: 'bold' },
-  footerSubtext: { color: '#64748B', fontSize: 10, textAlign: 'center' },
+  primaryBtnDisabled: { opacity: 0.4 },
+  primaryBtnText: { fontSize: 15, fontWeight: 'bold' },
+  footerSubtext: { fontSize: 11, textAlign: 'center' },
   goldText: { color: '#C9A84C' },
   loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: s(16), marginBottom: s(4) },
-  loginHint: { color: '#94A3B8', fontSize: 12 },
-  loginLink: { color: '#C9A84C', fontSize: 12, fontWeight: '700', textDecorationLine: 'underline' },
+  loginHint: { fontSize: 14 },
+  loginLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700', textDecorationLine: 'underline' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#111827', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
-  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
+  modalBackdrop: { ...StyleSheet.absoluteFillObject },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1 },
+  modalTitle: { fontSize: 14, fontWeight: 'bold' },
+  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1 },
   countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
-  countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: 13 },
-  countryOptionCode: { color: '#94A3B8', fontSize: 12, marginRight: s(6) },
+  countryOptionName: { flex: 1, fontSize: 13 },
+  countryOptionCode: { fontSize: 12, marginRight: s(6) },
 });

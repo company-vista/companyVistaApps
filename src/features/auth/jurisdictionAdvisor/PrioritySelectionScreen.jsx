@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -29,6 +30,7 @@ const ALL_OPTIONS = [
 export default function PrioritySelectionScreen({ navigation, route }) {
   // Store selected IDs in array to preserve selection order (Max 3)
   const [selectedPriorities, setSelectedPriorities] = useState([]);
+  const insets = useSafeAreaInsets();
 
   const handleToggleOption = (id) => {
     if (selectedPriorities.includes(id)) {
@@ -144,7 +146,7 @@ export default function PrioritySelectionScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Sticky Action Button */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity
           style={[styles.nextButton, selectedPriorities.length === 0 && styles.nextButtonDisabled]}
           activeOpacity={0.8}

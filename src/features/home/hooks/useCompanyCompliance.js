@@ -13,16 +13,6 @@ export const complianceItems = [
         tone: 'amber',
     },
     {
-        id: 'itin',
-        title: 'ITIN',
-        subtitle: 'Tax identification',
-        dueDate: 'Jul 15',
-        tag: 'Due',
-        icon: 'id-card',
-        matchTerms: ['itin', 'tax id', 'taxpayer id', 'tax identification number'],
-        tone: 'amber',
-    },
-    {
         id: 'annual_filing',
         title: 'State Filing',
         subtitle: 'State compliance',

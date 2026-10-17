@@ -37,11 +37,15 @@ export function matchesSelectedCompany(transaction, selectedCompany) {
         '').toLowerCase();
     const selectedCompanyId = normalizeCompanyValue(selectedCompany.id).toLowerCase();
     const selectedCompanyName = normalizeCompanyValue(selectedCompany.name).toLowerCase();
-    const transactionCompanyName = normalizeCompanyValue(transaction.details?.company && typeof transaction.details.company === 'object'
-        ? transaction.details.company.name
-        : transaction.company && typeof transaction.company === 'object'
-            ? transaction.company.name
-            : '').toLowerCase();
+    const transactionCompanyName = normalizeCompanyValue(
+        transaction.details?.companyName ??
+        transaction.companyName ??
+        (transaction.details?.company && typeof transaction.details.company === 'object'
+            ? transaction.details.company.name
+            : transaction.company && typeof transaction.company === 'object'
+                ? transaction.company.name
+                : '')
+    ).toLowerCase();
     return companyId === selectedCompanyId || transactionCompanyName === selectedCompanyName;
 }
 function toTimestamp(value) {

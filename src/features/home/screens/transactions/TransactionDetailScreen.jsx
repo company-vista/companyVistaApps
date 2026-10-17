@@ -46,15 +46,24 @@ function getStatusTagStyle(status) {
         default: return { color: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.1)' };
     }
 }
-export default function TransactionDetailScreen({ transaction, onBackPress, }) {
+export default function TransactionDetailScreen({ transaction, companyTotalAmount = 0, companyCurrency, onBackPress, }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
-    console.log(transaction);
     const displayStatus = getDisplayStatus(transaction);
+    // Transaction ki company ka total amount (companies fetch se aata hai) yahan dikhana hai.
+    // Company total available ho to wahi "Total Amount" dikhao (pending hone par bhi),
+    // warna purana behaviour: pending par 0, success/failed par transaction.amount.
+    const resolvedCompanyTotal = Number(companyTotalAmount) || 0;
+    const hasCompanyTotal = resolvedCompanyTotal > 0;
+    const displayCurrency = hasCompanyTotal
+        ? (companyCurrency || transaction.currency || 'USD')
+        : (transaction.currency || 'USD');
     // Pending transaction par amount "Pending (USD)" label ke saath dikhana hai —
     // Success/Failed par normal "Total Amount" hi rahega.
-    const pendingAmountLabel = displayStatus === 'Pending' ? `Pending (${transaction.currency || 'USD'})` : 'Total Amount';
-    const displayAmount = displayStatus === 'Pending' ? 0 : transaction.amount;
+    const pendingAmountLabel = displayStatus === 'Pending' && !hasCompanyTotal ? `Pending (${displayCurrency})` : 'Total Amount';
+    const displayAmount = hasCompanyTotal
+        ? resolvedCompanyTotal
+        : (displayStatus === 'Pending' ? 0 : transaction.amount);
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
@@ -135,18 +144,18 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
 
     <div class="amount-section">
       <div class="amount-label">Total Amount</div>
-      <div class="amount-value">${formatCurrency(displayAmount, transaction.currency)}</div>
+      <div class="amount-value">${formatCurrency(displayAmount, displayCurrency)}</div>
       <div class="breakdown">
         ${(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') ? `
         <div class="breakdown-item">
           <div class="breakdown-label">Online</div>
           <div class="breakdown-label" style="font-size:8px; letter-spacing:0.5px;">${transaction.paymentMethod.charAt(0).toUpperCase() + transaction.paymentMethod.slice(1)}</div>
-          <div class="breakdown-value" style="color:#2563eb;">${formatCurrency(displayAmount, transaction.currency)}</div>
+          <div class="breakdown-value" style="color:#2563eb;">${formatCurrency(displayAmount, displayCurrency)}</div>
         </div>` : ''}
         ${transaction.paymentMethod === 'cash' ? `
         <div class="breakdown-item">
           <div class="breakdown-label">Cash</div>
-          <div class="breakdown-value" style="color:#059669;">${formatCurrency(displayAmount, transaction.currency)}</div>
+          <div class="breakdown-value" style="color:#059669;">${formatCurrency(displayAmount, displayCurrency)}</div>
         </div>` : ''}
       </div>
     </div>
@@ -251,7 +260,7 @@ export default function TransactionDetailScreen({ transaction, onBackPress, }) {
           <Text style={[styles.amountLabel, { color: colors.muted }]}>{pendingAmountLabel}</Text>
           <View style={styles.amountRow}>
             <Text style={[styles.amountValue, { color: colors.text }]}>
-              {formatCurrency(displayAmount, transaction.currency)}
+              {formatCurrency(displayAmount, displayCurrency)}
             </Text>
             {(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') && (<Text style={[styles.amountBracket, { color: '#2563eb' }]}>
                 (Online)

@@ -10,10 +10,13 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
+import { getCountryPrice, getCountryPriceLabel } from '../../../constants/countries';
 import { PURPOSES } from './CompanyPurposeScreen';
+import { scoreJurisdictions } from './advisor';
 
 export const US_STATES = [
   { code: 'WY', name: 'Wyoming', popularityRank: 1, tag: 'Best value', tagline: 'Best value, strong privacy', snippet: 'Lowest running costs in the US with no income tax and members kept off public record.', bestFor: 'Solo founders, e-commerce, holding companies, cost-conscious setups', keyPoints: ['$100 state fee — excellent value', 'No state income, franchise or gross receipts tax', 'Members not disclosed on public filings', 'Lifetime proxy permitted for added anonymity'], govtFees: { formation: 100, annual: 60, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report licence tax, $60 minimum, based on assets located in Wyoming.', verified: true, source: 'CompanyVista official rate card' }, timeline: '3–5 days', serviceFee: 299, stateIncomeTax: 'None', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 399, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false } },
@@ -114,6 +117,7 @@ const ALSO_POSSIBLE = [
 export default function BestMatchesScreen({ navigation, route }) {
   const params = route?.params || {};
   const { purpose, customerLocation, priorities = [], dayOneNeeds = [] } = params;
+  const insets = useSafeAreaInsets();
 
   // Dynamic filter tags based on user selections
   const purposeLabelMap = {
@@ -163,93 +167,74 @@ export default function BestMatchesScreen({ navigation, route }) {
 
   // Dynamic ranking based on selections - enriched with PURPOSES recommended/caution + advisorWeights
   const allJurisdictions = [
-    { code: 'US', flag: '🇺🇸', name: 'United States', subtitle: 'Wyoming or Delaware LLC', base: 70, match: '96%', purposes: ['STAFFING','ECOM','CONSULT','SAAS','staffing','ecommerce','consulting','software'], customers: ['us','global'], priorities: ['banking','fast','investor','reputation'], dayOne: ['payments','workers','investment'], profile: { banking: 3, credibility: 3, lowTax: 1, speed: 3, cost: 2, privacy: 0, compliance: 2 } },
-    { code: 'GB', flag: '🇬🇧', name: 'United Kingdom', subtitle: 'Stripe-ready · 24hr setup', desc: 'Stripe-ready · 24hr setup · no agency licence', base: 68, match: '87%', purposes: ['CONSULT','SAAS','ECOM','MARKETING','EDU','consulting','software','ecommerce'], customers: ['eu','global','home'], priorities: ['reputation','banking','fast'], dayOne: ['payments','multicurrency'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 3, cost: 2, privacy: 1, compliance: 2 } },
-    { code: 'AE', flag: '🇦🇪', name: 'United Arab Emirates', subtitle: '0% tax & visa route', desc: '0% tax & visa route · MOHRE licence needed', base: 65, match: '78%', purposes: ['HOLDING','CONSULT','ECOM','TRADING','MARKETING','LOGISTICS','HEALTH','FINSERV','REALESTATE','EDU','STAFFING'], customers: ['asia_me','global'], priorities: ['tax','privacy','visa'], dayOne: ['residence_visa','physical_office'], profile: { banking: 2, credibility: 2, lowTax: 3, speed: 2, cost: 1, privacy: 2, compliance: 1 } },
-    { code: 'SG', flag: '🇸🇬', name: 'Singapore', subtitle: 'Best Asian banking', desc: 'Best Asian banking · resident director required', base: 64, match: '74%', purposes: ['HOLDING','SAAS','TRADING','CRYPTO','STARTUP','LOGISTICS','FINSERV','STAFFING'], customers: ['asia_me','global'], priorities: ['banking','reputation','tax'], dayOne: ['multicurrency','investment'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 2, cost: 1, privacy: 1, compliance: 2 } },
-    { code: 'IE', flag: '🇮🇪', name: 'Ireland', subtitle: '12.5% tax · EU access', desc: '12.5% tax · EU access · EEA director needed', base: 62, match: '69%', purposes: ['SAAS','CONSULT','STARTUP'], customers: ['eu'], priorities: ['tax','reputation'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 2, cost: 2, privacy: 1, compliance: 2 } },
-    { code: 'EE', flag: '🇪🇪', name: 'Estonia', subtitle: '0% retained tax', desc: '0% retained tax · EU banking harder', base: 60, match: '66%', purposes: ['SAAS','HOLDING','ECOM','CONSULT','MARKETING','EDU'], customers: ['eu','global'], priorities: ['tax','cost','maintenance'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 3, speed: 3, cost: 3, privacy: 2, compliance: 1 } },
-    { code: 'HK', flag: '🇭🇰', name: 'Hong Kong', subtitle: 'Territorial tax', desc: 'Territorial tax · Asia focused', base: 59, match: '63%', purposes: ['HOLDING','ECOM','TRADING','LOGISTICS'], customers: ['asia_me'], priorities: ['tax','privacy'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 2, lowTax: 3, speed: 2, cost: 2, privacy: 1, compliance: 1 } },
-    { code: 'CA', flag: '🇨🇦', name: 'Canada', subtitle: 'USMCA access', desc: 'USMCA access · BC has no residency rule', base: 58, match: '61%', purposes: ['CONSULT','ECOM'], customers: ['us','global'], priorities: ['reputation','cost'], dayOne: ['workers'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 2, privacy: 1, compliance: 3 } },
-    { code: 'NL', flag: '🇳🇱', name: 'Netherlands', subtitle: 'Treaty network', desc: 'Treaty network · slower setup', base: 55, match: '57%', purposes: ['HOLDING','CONSULT','LOGISTICS'], customers: ['eu'], priorities: ['reputation','tax'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 1, cost: 1, privacy: 1, compliance: 3 } },
-    { code: 'GE', flag: '🇬🇪', name: 'Georgia', subtitle: '0% retained', desc: '0% retained · weak for US clients', base: 52, match: '52%', purposes: ['HOLDING','CONSULT','MARKETING','CRYPTO'], customers: ['asia_me','home'], priorities: ['cost','tax','privacy'], dayOne: ['residence_visa'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 3, cost: 3, privacy: 2, compliance: 1 } },
-    { code: 'CY', flag: '🇨🇾', name: 'Cyprus', subtitle: 'EU holding · 12.5% tax', desc: 'EU member with treaty network', base: 54, match: '55%', purposes: ['HOLDING'], customers: ['eu'], priorities: ['tax','privacy'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 2, compliance: 2 } },
-    { code: 'MT', flag: '🇲🇹', name: 'Malta', subtitle: 'EU gaming & finance', desc: 'EU compliant with incentives', base: 53, match: '54%', purposes: ['HOLDING','FINSERV'], customers: ['eu'], priorities: ['tax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 2 } },
-    { code: 'IN', flag: '🇮🇳', name: 'India', subtitle: 'Large domestic market', desc: 'Complex but huge market', base: 50, match: '50%', purposes: ['MANUFACTURING','CONSULT'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['workers'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
-    { code: 'CN', flag: '🇨🇳', name: 'China', subtitle: 'Manufacturing hub', desc: 'WFOE required', base: 48, match: '48%', purposes: ['MANUFACTURING','TRADING'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
-    { code: 'AU', flag: '🇦🇺', name: 'Australia', subtitle: 'Stable · high credibility', desc: 'High compliance market', base: 55, match: '56%', purposes: ['CONSULT','REALESTATE'], customers: ['global'], priorities: ['credibility','banking'], dayOne: ['payments'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 1, privacy: 0, compliance: 3 } },
-    { code: 'DE', flag: '🇩🇪', name: 'Germany', subtitle: 'EU powerhouse', desc: 'Strong but heavy compliance', base: 54, match: '55%', purposes: ['MANUFACTURING','CONSULT'], customers: ['eu'], priorities: ['credibility','compliance'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 3 } },
-    { code: 'CH', flag: '🇨🇭', name: 'Switzerland', subtitle: 'Private banking · premium', desc: 'Top privacy & banking', base: 60, match: '62%', purposes: ['HOLDING','FINSERV','CRYPTO'], customers: ['eu','global'], priorities: ['privacy','banking','credibility'], dayOne: ['multicurrency','investment'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 1, cost: 0, privacy: 3, compliance: 2 } },
-    { code: 'PA', flag: '🇵🇦', name: 'Panama', subtitle: 'Territorial tax', desc: 'Classic offshore', base: 48, match: '49%', purposes: ['HOLDING','TRADING'], customers: ['global'], priorities: ['privacy','lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
-    { code: 'MY', flag: '🇲🇾', name: 'Malaysia', subtitle: 'Labuan option', desc: 'Asia hub with incentives', base: 51, match: '53%', purposes: ['MANUFACTURING','HOLDING'], customers: ['asia_me'], priorities: ['tax','cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 1 } },
-    { code: 'IL', flag: '🇮🇱', name: 'Israel', subtitle: 'Startup nation', desc: 'Tech ecosystem', base: 53, match: '54%', purposes: ['SAAS','STARTUP'], customers: ['global'], priorities: ['banking','credibility'], dayOne: ['investment'], profile: { banking: 2, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
-    { code: 'JP', flag: '🇯🇵', name: 'Japan', subtitle: 'High credibility', desc: 'Complex incorporation', base: 52, match: '53%', purposes: ['MANUFACTURING','TRADING'], customers: ['asia_me'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 0, privacy: 0, compliance: 3 } },
+    { code: 'US', flag: '🇺🇸', name: 'United States', subtitle: 'Wyoming or Delaware LLC', base: 70, match: '96%', purposes: ['STAFFING', 'ECOM', 'CONSULT', 'SAAS', 'staffing', 'ecommerce', 'consulting', 'software'], customers: ['us', 'global'], priorities: ['banking', 'fast', 'investor', 'reputation'], dayOne: ['payments', 'workers', 'investment'], profile: { banking: 3, credibility: 3, lowTax: 1, speed: 3, cost: 2, privacy: 0, compliance: 2 } },
+    { code: 'GB', flag: '🇬🇧', name: 'United Kingdom', subtitle: 'Stripe-ready · 24hr setup', desc: 'Stripe-ready · 24hr setup · no agency licence', base: 68, match: '87%', purposes: ['CONSULT', 'SAAS', 'ECOM', 'MARKETING', 'EDU', 'consulting', 'software', 'ecommerce'], customers: ['eu', 'global', 'home'], priorities: ['reputation', 'banking', 'fast'], dayOne: ['payments', 'multicurrency'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 3, cost: 2, privacy: 1, compliance: 2 } },
+    { code: 'AE', flag: '🇦🇪', name: 'United Arab Emirates', subtitle: '0% tax & visa route', desc: '0% tax & visa route · MOHRE licence needed', base: 65, match: '78%', purposes: ['HOLDING', 'CONSULT', 'ECOM', 'TRADING', 'MARKETING', 'LOGISTICS', 'HEALTH', 'FINSERV', 'REALESTATE', 'EDU', 'STAFFING'], customers: ['asia_me', 'global'], priorities: ['tax', 'privacy', 'visa'], dayOne: ['residence_visa', 'physical_office'], profile: { banking: 2, credibility: 2, lowTax: 3, speed: 2, cost: 1, privacy: 2, compliance: 1 } },
+    { code: 'SG', flag: '🇸🇬', name: 'Singapore', subtitle: 'Best Asian banking', desc: 'Best Asian banking · resident director required', base: 64, match: '74%', purposes: ['HOLDING', 'SAAS', 'TRADING', 'CRYPTO', 'STARTUP', 'LOGISTICS', 'FINSERV', 'STAFFING'], customers: ['asia_me', 'global'], priorities: ['banking', 'reputation', 'tax'], dayOne: ['multicurrency', 'investment'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 2, cost: 1, privacy: 1, compliance: 2 } },
+    { code: 'IE', flag: '🇮🇪', name: 'Ireland', subtitle: '12.5% tax · EU access', desc: '12.5% tax · EU access · EEA director needed', base: 62, match: '69%', purposes: ['SAAS', 'CONSULT', 'STARTUP'], customers: ['eu'], priorities: ['tax', 'reputation'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 2, cost: 2, privacy: 1, compliance: 2 } },
+    { code: 'EE', flag: '🇪🇪', name: 'Estonia', subtitle: '0% retained tax', desc: '0% retained tax · EU banking harder', base: 60, match: '66%', purposes: ['SAAS', 'HOLDING', 'ECOM', 'CONSULT', 'MARKETING', 'EDU'], customers: ['eu', 'global'], priorities: ['tax', 'cost', 'maintenance'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 3, speed: 3, cost: 3, privacy: 2, compliance: 1 } },
+    { code: 'HK', flag: '🇭🇰', name: 'Hong Kong', subtitle: 'Territorial tax', desc: 'Territorial tax · Asia focused', base: 59, match: '63%', purposes: ['HOLDING', 'ECOM', 'TRADING', 'LOGISTICS'], customers: ['asia_me'], priorities: ['tax', 'privacy'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 2, lowTax: 3, speed: 2, cost: 2, privacy: 1, compliance: 1 } },
+    { code: 'CA', flag: '🇨🇦', name: 'Canada', subtitle: 'USMCA access', desc: 'USMCA access · BC has no residency rule', base: 58, match: '61%', purposes: ['CONSULT', 'ECOM'], customers: ['us', 'global'], priorities: ['reputation', 'cost'], dayOne: ['workers'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 2, privacy: 1, compliance: 3 } },
+    { code: 'NL', flag: '🇳🇱', name: 'Netherlands', subtitle: 'Treaty network', desc: 'Treaty network · slower setup', base: 55, match: '57%', purposes: ['HOLDING', 'CONSULT', 'LOGISTICS'], customers: ['eu'], priorities: ['reputation', 'tax'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 1, cost: 1, privacy: 1, compliance: 3 } },
+    { code: 'GE', flag: '🇬🇪', name: 'Georgia', subtitle: '0% retained', desc: '0% retained · weak for US clients', base: 52, match: '52%', purposes: ['HOLDING', 'CONSULT', 'MARKETING', 'CRYPTO'], customers: ['asia_me', 'home'], priorities: ['cost', 'tax', 'privacy'], dayOne: ['residence_visa'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 3, cost: 3, privacy: 2, compliance: 1 } },
+    { code: 'CY', flag: '🇨🇾', name: 'Cyprus', subtitle: 'EU holding · 12.5% tax', desc: 'EU member with treaty network', base: 54, match: '55%', purposes: ['HOLDING'], customers: ['eu'], priorities: ['tax', 'privacy'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 2, compliance: 2 } },
+    { code: 'MT', flag: '🇲🇹', name: 'Malta', subtitle: 'EU gaming & finance', desc: 'EU compliant with incentives', base: 53, match: '54%', purposes: ['HOLDING', 'FINSERV'], customers: ['eu'], priorities: ['tax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 2 } },
+    { code: 'IN', flag: '🇮🇳', name: 'India', subtitle: 'Large domestic market', desc: 'Complex but huge market', base: 50, match: '50%', purposes: ['MANUFACTURING', 'CONSULT'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['workers'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
+    { code: 'CN', flag: '🇨🇳', name: 'China', subtitle: 'Manufacturing hub', desc: 'WFOE required', base: 48, match: '48%', purposes: ['MANUFACTURING', 'TRADING'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
+    { code: 'AU', flag: '🇦🇺', name: 'Australia', subtitle: 'Stable · high credibility', desc: 'High compliance market', base: 55, match: '56%', purposes: ['CONSULT', 'REALESTATE'], customers: ['global'], priorities: ['credibility', 'banking'], dayOne: ['payments'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 1, privacy: 0, compliance: 3 } },
+    { code: 'DE', flag: '🇩🇪', name: 'Germany', subtitle: 'EU powerhouse', desc: 'Strong but heavy compliance', base: 54, match: '55%', purposes: ['MANUFACTURING', 'CONSULT'], customers: ['eu'], priorities: ['credibility', 'compliance'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 3 } },
+    { code: 'CH', flag: '🇨🇭', name: 'Switzerland', subtitle: 'Private banking · premium', desc: 'Top privacy & banking', base: 60, match: '62%', purposes: ['HOLDING', 'FINSERV', 'CRYPTO'], customers: ['eu', 'global'], priorities: ['privacy', 'banking', 'credibility'], dayOne: ['multicurrency', 'investment'], profile: { banking: 3, credibility: 3, lowTax: 2, speed: 1, cost: 0, privacy: 3, compliance: 2 } },
+    { code: 'PA', flag: '🇵🇦', name: 'Panama', subtitle: 'Territorial tax', desc: 'Classic offshore', base: 48, match: '49%', purposes: ['HOLDING', 'TRADING'], customers: ['global'], priorities: ['privacy', 'lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
+    { code: 'MY', flag: '🇲🇾', name: 'Malaysia', subtitle: 'Labuan option', desc: 'Asia hub with incentives', base: 51, match: '53%', purposes: ['MANUFACTURING', 'HOLDING'], customers: ['asia_me'], priorities: ['tax', 'cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 1 } },
+    { code: 'IL', flag: '🇮🇱', name: 'Israel', subtitle: 'Startup nation', desc: 'Tech ecosystem', base: 53, match: '54%', purposes: ['SAAS', 'STARTUP'], customers: ['global'], priorities: ['banking', 'credibility'], dayOne: ['investment'], profile: { banking: 2, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
+    { code: 'JP', flag: '🇯🇵', name: 'Japan', subtitle: 'High credibility', desc: 'Complex incorporation', base: 52, match: '53%', purposes: ['MANUFACTURING', 'TRADING'], customers: ['asia_me'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 0, privacy: 0, compliance: 3 } },
     { code: 'KR', flag: '🇰🇷', name: 'South Korea', subtitle: 'Tech & manufacturing', desc: 'Advanced market', base: 51, match: '52%', purposes: ['MANUFACTURING'], customers: ['asia_me'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 0, compliance: 2 } },
-    { code: 'PT', flag: '🇵🇹', name: 'Portugal', subtitle: 'EU residency route', desc: 'NHR & visa options', base: 54, match: '55%', purposes: ['REALESTATE','CONSULT'], customers: ['eu'], priorities: ['visa','lowTax'], dayOne: ['residence_visa'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 1 } },
-    { code: 'ES', flag: '🇪🇸', name: 'Spain', subtitle: 'EU market', desc: 'Large EU economy', base: 52, match: '53%', purposes: ['CONSULT','REALESTATE'], customers: ['eu'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
-    { code: 'FR', flag: '🇫🇷', name: 'France', subtitle: 'EU leader', desc: 'Strong regulation', base: 52, match: '53%', purposes: ['CONSULT','MANUFACTURING'], customers: ['eu'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
+    { code: 'PT', flag: '🇵🇹', name: 'Portugal', subtitle: 'EU residency route', desc: 'NHR & visa options', base: 54, match: '55%', purposes: ['REALESTATE', 'CONSULT'], customers: ['eu'], priorities: ['visa', 'lowTax'], dayOne: ['residence_visa'], profile: { banking: 1, credibility: 2, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 1 } },
+    { code: 'ES', flag: '🇪🇸', name: 'Spain', subtitle: 'EU market', desc: 'Large EU economy', base: 52, match: '53%', purposes: ['CONSULT', 'REALESTATE'], customers: ['eu'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
+    { code: 'FR', flag: '🇫🇷', name: 'France', subtitle: 'EU leader', desc: 'Strong regulation', base: 52, match: '53%', purposes: ['CONSULT', 'MANUFACTURING'], customers: ['eu'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
     { code: 'IT', flag: '🇮🇹', name: 'Italy', subtitle: 'EU market', desc: 'Traditional economy', base: 51, match: '52%', purposes: ['CONSULT'], customers: ['eu'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 1, compliance: 2 } },
-    { code: 'PL', flag: '🇵🇱', name: 'Poland', subtitle: 'Growing EU', desc: 'Cost effective EU', base: 53, match: '54%', purposes: ['CONSULT','MANUFACTURING'], customers: ['eu'], priorities: ['cost','lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
+    { code: 'PL', flag: '🇵🇱', name: 'Poland', subtitle: 'Growing EU', desc: 'Cost effective EU', base: 53, match: '54%', purposes: ['CONSULT', 'MANUFACTURING'], customers: ['eu'], priorities: ['cost', 'lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
     { code: 'CZ', flag: '🇨🇿', name: 'Czech Republic', subtitle: 'Central EU', desc: 'EU access', base: 52, match: '53%', purposes: ['CONSULT'], customers: ['eu'], priorities: ['cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 2, privacy: 1, compliance: 1 } },
-    { code: 'RO', flag: '🇷🇴', name: 'Romania', subtitle: 'Low cost EU', desc: 'Budget EU option', base: 51, match: '52%', purposes: ['CONSULT'], customers: ['eu'], priorities: ['cost','lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
-    { code: 'BG', flag: '🇧🇬', name: 'Bulgaria', subtitle: '10% flat tax', desc: 'Lowest EU tax', base: 52, match: '53%', purposes: ['HOLDING'], customers: ['eu'], priorities: ['lowTax','cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
-    { code: 'LU', flag: '🇱🇺', name: 'Luxembourg', subtitle: 'Holding & funds', desc: 'Premium holding', base: 58, match: '60%', purposes: ['HOLDING','FINSERV'], customers: ['eu'], priorities: ['credibility','lowTax'], dayOne: ['investment'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 1, cost: 0, privacy: 2, compliance: 3 } },
-    { code: 'TH', flag: '🇹🇭', name: 'Thailand', subtitle: 'Southeast Asia', desc: 'BOI incentives', base: 50, match: '51%', purposes: ['MANUFACTURING','TRADING'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
+    { code: 'RO', flag: '🇷🇴', name: 'Romania', subtitle: 'Low cost EU', desc: 'Budget EU option', base: 51, match: '52%', purposes: ['CONSULT'], customers: ['eu'], priorities: ['cost', 'lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
+    { code: 'BG', flag: '🇧🇬', name: 'Bulgaria', subtitle: '10% flat tax', desc: 'Lowest EU tax', base: 52, match: '53%', purposes: ['HOLDING'], customers: ['eu'], priorities: ['lowTax', 'cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 3, privacy: 1, compliance: 1 } },
+    { code: 'LU', flag: '🇱🇺', name: 'Luxembourg', subtitle: 'Holding & funds', desc: 'Premium holding', base: 58, match: '60%', purposes: ['HOLDING', 'FINSERV'], customers: ['eu'], priorities: ['credibility', 'lowTax'], dayOne: ['investment'], profile: { banking: 2, credibility: 3, lowTax: 2, speed: 1, cost: 0, privacy: 2, compliance: 3 } },
+    { code: 'TH', flag: '🇹🇭', name: 'Thailand', subtitle: 'Southeast Asia', desc: 'BOI incentives', base: 50, match: '51%', purposes: ['MANUFACTURING', 'TRADING'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'ID', flag: '🇮🇩', name: 'Indonesia', subtitle: 'Large market', desc: 'PT PMA structure', base: 49, match: '50%', purposes: ['MANUFACTURING'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'PH', flag: '🇵🇭', name: 'Philippines', subtitle: 'BPO hub', desc: 'Service market', base: 49, match: '50%', purposes: ['CONSULT'], customers: ['asia_me'], priorities: ['cost'], dayOne: ['workers'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'NZ', flag: '🇳🇿', name: 'New Zealand', subtitle: 'High trust', desc: 'Stable jurisdiction', base: 54, match: '55%', purposes: ['CONSULT'], customers: ['global'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 2, credibility: 3, lowTax: 1, speed: 1, cost: 1, privacy: 0, compliance: 2 } },
-    { code: 'SA', flag: '🇸🇦', name: 'Saudi Arabia', subtitle: 'Vision 2030', desc: 'Growing market', base: 50, match: '51%', purposes: ['TRADING','MANUFACTURING'], customers: ['asia_me'], priorities: ['visa'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 1, privacy: 0, compliance: 1 } },
+    { code: 'SA', flag: '🇸🇦', name: 'Saudi Arabia', subtitle: 'Vision 2030', desc: 'Growing market', base: 50, match: '51%', purposes: ['TRADING', 'MANUFACTURING'], customers: ['asia_me'], priorities: ['visa'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 1, privacy: 0, compliance: 1 } },
     { code: 'QA', flag: '🇶🇦', name: 'Qatar', subtitle: 'Gulf hub', desc: 'Free zone options', base: 51, match: '52%', purposes: ['TRADING'], customers: ['asia_me'], priorities: ['lowTax'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 1, privacy: 1, compliance: 1 } },
-    { code: 'BH', flag: '🇧🇭', name: 'Bahrain', subtitle: 'Gulf finance', desc: 'Fintech friendly', base: 52, match: '53%', purposes: ['FINSERV'], customers: ['asia_me'], priorities: ['lowTax','banking'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 1, privacy: 1, compliance: 1 } },
-    { code: 'MX', flag: '🇲🇽', name: 'Mexico', subtitle: 'USMCA access', desc: 'Nearshoring', base: 52, match: '53%', purposes: ['MANUFACTURING','TRADING'], customers: ['global'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
+    { code: 'BH', flag: '🇧🇭', name: 'Bahrain', subtitle: 'Gulf finance', desc: 'Fintech friendly', base: 52, match: '53%', purposes: ['FINSERV'], customers: ['asia_me'], priorities: ['lowTax', 'banking'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 3, speed: 1, cost: 1, privacy: 1, compliance: 1 } },
+    { code: 'MX', flag: '🇲🇽', name: 'Mexico', subtitle: 'USMCA access', desc: 'Nearshoring', base: 52, match: '53%', purposes: ['MANUFACTURING', 'TRADING'], customers: ['global'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'BR', flag: '🇧🇷', name: 'Brazil', subtitle: 'Largest LatAm', desc: 'Complex tax', base: 48, match: '49%', purposes: ['MANUFACTURING'], customers: ['global'], priorities: ['cost'], dayOne: ['physical_office'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 0, cost: 1, privacy: 0, compliance: 1 } },
     { code: 'PE', flag: '🇵🇪', name: 'Peru', subtitle: 'Mining & trade', desc: 'Resource market', base: 47, match: '48%', purposes: ['TRADING'], customers: ['global'], priorities: ['cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'CL', flag: '🇨🇱', name: 'Chile', subtitle: 'Stable LatAm', desc: 'Market economy', base: 50, match: '51%', purposes: ['TRADING'], customers: ['global'], priorities: ['credibility'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 2, lowTax: 1, speed: 1, cost: 1, privacy: 0, compliance: 2 } },
     { code: 'CO', flag: '🇨🇴', name: 'Colombia', subtitle: 'Growing market', desc: 'Emerging economy', base: 48, match: '49%', purposes: ['TRADING'], customers: ['global'], priorities: ['cost'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 1, speed: 1, cost: 2, privacy: 0, compliance: 1 } },
     { code: 'UY', flag: '🇺🇾', name: 'Uruguay', subtitle: 'Stable & private', desc: 'LatAm hub', base: 50, match: '51%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 1, privacy: 2, compliance: 1 } },
     { code: 'MU', flag: '🇲🇺', name: 'Mauritius', subtitle: 'Africa-Asia hub', desc: 'Treaty network', base: 55, match: '56%', purposes: ['HOLDING'], customers: ['global'], priorities: ['lowTax'], dayOne: ['investment'], profile: { banking: 1, credibility: 2, lowTax: 3, speed: 1, cost: 1, privacy: 2, compliance: 1 } },
-    { code: 'VG', flag: '🇻🇬', name: 'British Virgin Islands', subtitle: 'Classic offshore', desc: 'IBC structure', base: 45, match: '46%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy','lowTax'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 1, lowTax: 3, speed: 1, cost: 1, privacy: 3, compliance: 0 } },
-    { code: 'KY', flag: '🇰🇾', name: 'Cayman Islands', subtitle: 'Funds hub', desc: 'Premier offshore', base: 48, match: '49%', purposes: ['HOLDING','FINSERV','CRYPTO'], customers: ['global'], priorities: ['privacy','lowTax'], dayOne: ['investment'], profile: { banking: 1, credibility: 2, lowTax: 3, speed: 1, cost: 0, privacy: 3, compliance: 1 } },
-    { code: 'BZ', flag: '🇧🇿', name: 'Belize', subtitle: 'IBC jurisdiction', desc: 'Low cost offshore', base: 44, match: '45%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy','lowTax','cost'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 0, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
-    { code: 'SC', flag: '🇸🇨', name: 'Seychelles', subtitle: 'IBC offshore', desc: 'Fast & cheap', base: 44, match: '45%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy','lowTax','cost'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 0, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
+    { code: 'VG', flag: '🇻🇬', name: 'British Virgin Islands', subtitle: 'Classic offshore', desc: 'IBC structure', base: 45, match: '46%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy', 'lowTax'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 1, lowTax: 3, speed: 1, cost: 1, privacy: 3, compliance: 0 } },
+    { code: 'KY', flag: '🇰🇾', name: 'Cayman Islands', subtitle: 'Funds hub', desc: 'Premier offshore', base: 48, match: '49%', purposes: ['HOLDING', 'FINSERV', 'CRYPTO'], customers: ['global'], priorities: ['privacy', 'lowTax'], dayOne: ['investment'], profile: { banking: 1, credibility: 2, lowTax: 3, speed: 1, cost: 0, privacy: 3, compliance: 1 } },
+    { code: 'BZ', flag: '🇧🇿', name: 'Belize', subtitle: 'IBC jurisdiction', desc: 'Low cost offshore', base: 44, match: '45%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy', 'lowTax', 'cost'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 0, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
+    { code: 'SC', flag: '🇸🇨', name: 'Seychelles', subtitle: 'IBC offshore', desc: 'Fast & cheap', base: 44, match: '45%', purposes: ['HOLDING'], customers: ['global'], priorities: ['privacy', 'lowTax', 'cost'], dayOne: ['multicurrency'], profile: { banking: 0, credibility: 0, lowTax: 3, speed: 1, cost: 2, privacy: 3, compliance: 0 } },
     { code: 'BB', flag: '🇧🇧', name: 'Barbados', subtitle: 'Treaty network', desc: 'Caribbean hub', base: 50, match: '51%', purposes: ['HOLDING'], customers: ['global'], priorities: ['lowTax'], dayOne: ['multicurrency'], profile: { banking: 1, credibility: 1, lowTax: 2, speed: 1, cost: 1, privacy: 1, compliance: 1 } },
   ];
 
-  // Purpose ke recommended/caution + advisorWeights se scoring
+  // Purpose recommended/caution flags (card ke reasons ke liye)
   const normalizedPurpose = purpose ? String(purpose).toUpperCase() : null;
   const selectedPurpose = normalizedPurpose ? PURPOSES.find(p => p.code === normalizedPurpose) : null;
 
-  const scored = allJurisdictions.map(j => {
-    let score = j.base;
-    if (purpose && j.purposes.includes(purpose)) score += 12;
-    if (normalizedPurpose && j.purposes.includes(normalizedPurpose)) score += 12;
-    if (customerLocation && j.customers.includes(customerLocation)) score += 10;
-    priorities.forEach(p => { if (j.priorities.includes(p)) score += 6; });
-    dayOneNeeds.forEach(d => { if (j.dayOne.includes(d)) score += 5; });
-
-    if (selectedPurpose) {
-      if (selectedPurpose.recommendedJurisdictions?.includes(j.code)) score += 25;
-      if (selectedPurpose.cautionJurisdictions?.includes(j.code)) score -= 40;
-      // advisorWeights * jurisdiction profile
-      const w = selectedPurpose.advisorWeights || {};
-      let wScore = 0;
-      Object.keys(w).forEach(k => {
-        const weight = w[k] || 0;
-        const prof = j.profile?.[k] ?? 0;
-        wScore += weight * prof;
-      });
-      score += wScore * 1.1;
-    }
-    return { ...j, score };
-  }).sort((a, b) => b.score - a.score);
-
-  const ranked = scored;
+  // Portal wali scoring — absolute match % (score / maxScore), taaki app aur portal ek jaise dikhein
+  const ranked = scoreJurisdictions(allJurisdictions, { purpose, customerLocation, priorities, dayOneNeeds });
   const [selectedBest, setSelectedBest] = useState(ranked[0]);
+
+  const priorityKey = priorities.join(',');
+  const dayOneNeedsKey = dayOneNeeds.join(',');
 
   // jab ranking change ho (purpose/customer change pe) toh selected ko reset karo
   useEffect(() => {
     setSelectedBest(ranked[0]);
-  }, [purpose, customerLocation, priorities.join(','), dayOneNeeds.join(',')]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [purpose, customerLocation, priorityKey, dayOneNeedsKey]);
 
   const best = selectedBest;
 
@@ -277,29 +262,16 @@ export default function BestMatchesScreen({ navigation, route }) {
     .map(key => ({ key, label: PROFILE_LABELS[key], value: Math.min(Math.max(Number(best.profile?.[key]) || 0, 0), 3) }))
     .filter(row => best.profile?.[row.key] !== undefined);
   const bestRankIndex = ranked.findIndex(j => j.name === best.name) + 1;
-  // advisor me jis country ka price define hai uska price save karo - same as RegisterJurisdictionScreen allCountries (backend FIXED_PRICE_COUNTRIES)
-  const PRICED_JURISDICTIONS = ['United States', 'United Kingdom', 'Singapore', 'Estonia', 'United Arab Emirates'];
-  const PRICE_MAP = {
-    'United States': '$299',
-    'United Kingdom': '$595',
-    'Singapore': '$899',
-    'Estonia': '$499',
-    'United Arab Emirates': '$1499',
-  };
-  const PRICE_NUMERIC_MAP = {
-    'United States': 299,
-    'United Kingdom': 595,
-    'Singapore': 899,
-    'Estonia': 499,
-    'United Arab Emirates': 1499,
-  };
-  const showPrice = PRICED_JURISDICTIONS.includes(best.name);
+  // Fixed-price jurisdictions registry (src/constants/countries.js) se — single source
+  // of truth. Sirf US, Canada, UK, Hong Kong ka packageFee define hai; baaki custom quote.
+  // (Pehle yahan hardcoded US/UK/SG/EE/AE list thi — wahi galat price/custom-quote dikhati thi.)
+  const numericPrice = getCountryPrice(best.code);
+  const priceLabel = getCountryPriceLabel(best.code);
+  const showPrice = numericPrice > 0;
   const isUSA = best.code === 'US' || best.name === 'United States';
-  const getPriceNumeric = (name) => PRICE_NUMERIC_MAP[name] ?? 0;
   const handleContinue = () => {
     const baseParams = { ...params, bestCountry: best.code, bestCountryName: best.name, advisorFlow: true };
     // country price yahan se aage ke screens (StructureSelection) me dikhane ke liye bhej do
-    const numericPrice = getPriceNumeric(best.name);
     if (isUSA) {
       // US: country price + state fee (state fee BestStatesForYou me add hota hai)
       navigation.navigate('USStatePhysicalPresence', { ...baseParams, selectedCountry: best.code, selectedCountryPrice: numericPrice, bestCountryPrice: numericPrice });
@@ -370,7 +342,7 @@ export default function BestMatchesScreen({ navigation, route }) {
             </View>
 
             <View style={styles.matchPercentageContainer}>
-              <Text style={styles.matchPercentage}>{best.match}</Text>
+              <Text style={styles.matchPercentage}>{best.match}%</Text>
               <Text style={styles.matchLabel}>MATCH</Text>
             </View>
           </View>
@@ -443,11 +415,11 @@ export default function BestMatchesScreen({ navigation, route }) {
             </Text>
           </View>
 
-          {/* Price Footer - only FIXED_PRICE_COUNTRIES (US/UK/SG/EE/AE) show price (same as RegisterJurisdiction), others Custom quote */}
+          {/* Price Footer - sirf fixed-price jurisdictions (US/Canada/UK/Hong Kong) show price (registry se), others Custom quote */}
           <View style={styles.cardFooter}>
             {showPrice ? (
               <View style={styles.priceContainer}>
-                <Text style={styles.priceAmount}>{PRICE_MAP[best.name] || '$299'}</Text>
+                <Text style={styles.priceAmount}>{priceLabel}</Text>
                 <Text style={styles.priceNote}>incl. service package</Text>
               </View>
             ) : (
@@ -475,7 +447,7 @@ export default function BestMatchesScreen({ navigation, route }) {
               </View>
             </View>
             <View style={styles.altMatchWrap}>
-              <Text style={styles.altMatch}>{item.match}</Text>
+              <Text style={styles.altMatch}>{item.match}%</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
           </TouchableOpacity>
@@ -496,7 +468,7 @@ export default function BestMatchesScreen({ navigation, route }) {
               </View>
             </View>
             <View style={styles.altMatchWrap}>
-              <Text style={[styles.altMatch, { fontSize: 16 }]}>{item.match}</Text>
+              <Text style={[styles.altMatch, { fontSize: 16 }]}>{item.match}%</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
           </TouchableOpacity>
@@ -509,7 +481,7 @@ export default function BestMatchesScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Action Area */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={handleContinue}>
           <Text style={styles.actionButtonText}>
             Continue with {best.name}  →

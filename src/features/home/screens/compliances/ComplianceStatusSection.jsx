@@ -1,59 +1,9 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { StyleSheet, Text, View } from 'react-native';
 import { useThemeColors } from '../../../../theme/colors';
-import { useResponsive } from '../../../../hooks/useResponsive';
-import { s } from '../../../../theme/responsive';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 import { font } from '../../../../theme/typography';
-function getToneStyles(tone, colors) {
-    const isDark = colors.mode === 'dark';
-    const toneStyles = {
-        amber: {
-            icon: {
-                backgroundColor: isDark ? '#2F2411' : '#FEF3C7',
-            },
-            iconText: {
-                color: isDark ? '#F9C56A' : '#B45309',
-            },
-            tag: {
-                backgroundColor: isDark ? '#3A2A15' : '#FEF3C7',
-            },
-            tagText: {
-                color: isDark ? '#F7DCA7' : '#B45309',
-            },
-        },
-        green: {
-            icon: {
-                backgroundColor: isDark ? '#15352A' : '#D1FAE5',
-            },
-            iconText: {
-                color: isDark ? '#7DD3A8' : '#047857',
-            },
-            tag: {
-                backgroundColor: isDark ? '#1C4334' : '#D1FAE5',
-            },
-            tagText: {
-                color: isDark ? '#A7F3D0' : '#047857',
-            },
-        },
-        red: {
-            icon: {
-                backgroundColor: isDark ? '#3D1717' : '#FEE2E2',
-            },
-            iconText: {
-                color: isDark ? '#F8A5A5' : '#DC2626',
-            },
-            tag: {
-                backgroundColor: isDark ? '#4C1D1D' : '#FEE2E2',
-            },
-            tagText: {
-                color: isDark ? '#F6C1C1' : '#DC2626',
-            },
-        },
-    };
-    return toneStyles[tone];
-}
+import ComplianceCard from './ComplianceCard';
 function formatStatus(value) {
     const status = normalizeText(value);
     if (!status) {
@@ -103,62 +53,25 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
         };
     }), [dueDatesByTitle, rawDueDatesByTitle, isLoadingDueDates, statusesByTitle]);
     return (<View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Compliance Status
-        </Text>
-      </View>
-      <View style={styles.complianceGrid}>
-        {complianceCards.map(item => {
-            const tone = getToneStyles(item.tone, colors);
-            return (<Pressable key={item.title} onPress={() => {
-                // Payment pending ho to cards locked - tap par "Pay now" toast.
-                if (isPaymentLocked) {
-                    onLockedPress?.();
-                    return;
-                }
-                onOpenComplianceHistory?.({
-                    id: item.id,
-                    title: item.title,
-                    subtitle: item.subtitle,
-                    status: item.tag,
-                    date: item.dueDate,
-                    details: item.details ?? [],
-                    companyId,
-                    price: item.price,
-                    years: item.years,
-                });
-            }} style={styles.tileWrapper}>
-              <View style={[styles.complianceTile, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderWidth: isLight ? 0 : 1, borderColor: 'rgba(255,255,255,0.08)' }]}>
-                <View style={styles.complianceTileHeader}>
-                  <View style={[styles.statusIcon, tone.icon]}>
-                    <FontAwesome name={item.icon} size={18} style={tone.iconText}/>
-                  </View>
-                  <View style={styles.headerBadges}>
-                    <View style={styles.tag}>
-                      <Text style={[
-                      styles.tagText,
-                      item.daysTone === 'ok' ? styles.daysBadgeOkText : styles.daysBadgeSoonText,
-                  ]}>
-                        {item.daysBadge}
-                      </Text>
-                    </View>
-                    <View style={styles.statusPill}>
-                      <Text style={[styles.statusPillText, tone.tagText]}>{item.tag}</Text>
-                    </View>
-                  </View>
-                </View>
-                <Text style={[styles.tileName, { color: colors.text }]}>{item.title}</Text>
-                <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                  {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
-                </Text>
-              </View>
-              {isPaymentLocked ? (<View pointerEvents="none" style={[styles.lockedOverlay, { backgroundColor: isLight ? 'rgba(255,255,255,0.6)' : 'rgba(6,8,14,0.55)' }]}>
-                <FontAwesome name="lock" size={18} color={colors.text} />
-              </View>) : null}
-            </Pressable>);
-        })}
-      </View>
+        <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Compliance Status
+            </Text>
+        </View>
+        <View style={styles.complianceGrid}>
+            {complianceCards.map(item => (
+                <ComplianceCard
+                    key={item.title}
+                    item={item}
+                    companyId={companyId}
+                    colors={colors}
+                    isLight={isLight}
+                    isPaymentLocked={isPaymentLocked}
+                    onLockedPress={onLockedPress}
+                    onOpenComplianceHistory={onOpenComplianceHistory}
+                />
+            ))}
+        </View>
     </View>);
 }
 const styles = StyleSheet.create({
@@ -186,130 +99,6 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         gap: 8,
         justifyContent: 'space-between',
-    },
-    tileWrapper: {
-        position: 'relative',
-        flexBasis: '48%',
-        flexGrow: 1,
-        maxWidth: '48%',
-        minWidth: '48%',
-    },
-    lockedOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    complianceTile: {
-        borderRadius: 12,
-        paddingHorizontal: s(10),
-        paddingVertical: 11,
-    },
-    complianceTileDark: {
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-    },
-    complianceTileHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 6,
-    },
-    statusIcon: {
-        width: 42,
-        height: 42,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-    },
-    iconAmber: {
-        backgroundColor: '#FEF3C7',
-    },
-    iconGreen: {
-        backgroundColor: '#D1FAE5',
-    },
-    iconRed: {
-        backgroundColor: '#FEE2E2',
-    },
-    iconTextAmber: {
-        color: '#B45309',
-    },
-    iconTextGreen: {
-        color: '#047857',
-    },
-    iconTextRed: {
-        color: '#DC2626',
-    },
-    tag: {
-        borderRadius: 20,
-        paddingHorizontal: s(8),
-        paddingVertical: 3,
-    },
-    tagText: {
-        fontSize: 11,
-        fontWeight: '600',
-    },
-    daysBadgeOk: {
-        backgroundColor: '#D1FAE5',
-    },
-    daysBadgeOkText: {
-        color: '#047857',
-    },
-    daysBadgeSoon: {
-        backgroundColor: '#FEF3C7',
-    },
-    daysBadgeSoonText: {
-        color: '#B45309',
-    },
-    headerBadges: {
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 5,
-    },
-    statusPill: {
-        borderRadius: 20,
-        paddingHorizontal: s(8),
-        paddingVertical: 3,
-    },
-    statusPillText: {
-        fontSize: 11,
-        fontWeight: '600',
-    },
-    tagAmber: {
-        backgroundColor: '#FEF3C7',
-    },
-    tagGreen: {
-        backgroundColor: '#D1FAE5',
-    },
-    tagRed: {
-        backgroundColor: '#FEE2E2',
-    },
-    tagTextAmber: {
-        color: '#B45309',
-    },
-    tagTextGreen: {
-        color: '#047857',
-    },
-    tagTextRed: {
-        color: '#DC2626',
-    },
-    tileName: {
-        fontSize: 14,
-        fontWeight: '500',
-        lineHeight: 16,
-    },
-    tileDueDateText: {
-        fontSize: 12,
-        marginTop: 5,
-    },
-    tileDueDateValue: {
-        fontSize: 12,
-        fontWeight: '600',
     },
 });
 export default ComplianceStatusSection;

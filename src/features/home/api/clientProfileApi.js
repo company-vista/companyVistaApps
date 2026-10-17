@@ -168,10 +168,6 @@ function findCurrentComplianceMap(value, depth = 0) {
     return findCurrentComplianceMap(record.data, depth + 1);
 }
 function getResponseComplianceHistory(data) {
-    const fromCurrent = mapCurrentComplianceHistory(findCurrentCompliance(data));
-    if (fromCurrent.length > 0) {
-        return fromCurrent;
-    }
     const dataObj = data.data && typeof data.data === 'object' && !Array.isArray(data.data)
         ? data.data
         : undefined;
@@ -183,10 +179,10 @@ function getResponseComplianceHistory(data) {
         dataObj?.complianceHistory,
         dataObj?.records,
     ];
-    for (const candidate of historyCandidates) {
-        if (Array.isArray(candidate) && candidate.length > 0) {
-            return candidate;
-        }
+    const historyRecords = historyCandidates.find(candidate => Array.isArray(candidate) && candidate.length > 0) ?? [];
+    const fromCurrent = mapCurrentComplianceHistory(findCurrentCompliance(data));
+    if (fromCurrent.length > 0 || historyRecords.length > 0) {
+        return [...fromCurrent, ...historyRecords];
     }
     const directMap = findCurrentComplianceMap(data) ?? findCurrentComplianceMap(dataObj);
     if (directMap) {

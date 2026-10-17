@@ -2,34 +2,50 @@ import { useAppSelector } from '../store/hooks';
 export const appThemes = {
     light: {
         mode: 'light',
-        background: '#F3F4E5', // f8fafc
-        backgroundGradient: ['#ccfbf1', '#f1f5f9'],
-        authBackground: '#0f172a',
-        surface: '#ffffff',
-        surfaceAlt: '#ecfeff',
-        cardHighlight: '#ffffff83',
-        cardElevated: '#ffffff83',
-        sheet: '#f1f5f9',
-        text: '#0F172A',
-        textOnDark: '#f8fafc',
-        muted: '#576375',
-        subtle: '#5d646d',
-        border: '#e5e7ebe5',
-        inputBorder: '#e5e7eb',
-        inputBackground: '#ffffff',
-        inputText: '#0f172a',
-        inputPlaceholder: '#868e9b',
-        primary: '#14b8a6',
-        primaryText: '#042f2e',
-        buttonBackground: '#e8c96a', // 276897
-        buttonText: '#1a1204',
-        accent: '#0f766dbb',
-        accentSoft: '#ccfbf1',
-        activeNav: '#fff3eb',
-        danger: '#dc2626',
-        skeleton: '#e5e7eb',
-        shadow: '#000000',
-        backdrop: 'rgba(15, 23, 42, 0.28)',
+        // Backgrounds
+        background: '#F8F9FA',
+        backgroundGradient: ['#CCFBF1', '#F1F5F9'],
+        authBackground: '#0F172A',
+
+        // Surfaces & Cards
+        surface: '#FFFFFF',
+        surfaceAlt: '#ECFEFF',
+        cardHighlight: '#FFFFFF',
+        cardElevated: '#FFFFFF', // Translucency remove karke solid rakha hai cleaner look ke liye
+        sheet: '#F1F5F9',
+
+        // Text Hierarchy
+        text: '#0F172A',          // Primary Text
+        textOnDark: '#F8FAFC',    // Text on Dark Backgrounds
+        muted: '#475569',         // Secondary Text (slate-600)
+        subtle: '#94A3B8',        // Tertiary / Captions / Disabled Text (slate-400)
+
+        // Borders & Inputs
+        border: '#E2E8F0',
+        inputBorder: '#CBD5E1',
+        inputBackground: '#FFFFFF',
+        inputText: '#0F172A',
+        inputPlaceholder: '#94A3B8',
+
+        // Brand & Primary Actions (Teal Theme)
+        primary: '#14B8A6',       // Main Brand / Action Color (teal-500)
+        primaryText: '#042F2E',   // Text on soft primary surfaces
+        accent: '#0F766E',        // Solid Deep Accent (teal-700)
+        accentSoft: '#CCFBF1',    // Light Teal Background (teal-100)
+
+        // Buttons (Aligned with Teal Primary Palette)
+        buttonBackground: '#0D9488', // Primary Teal Action Button (teal-600)
+        buttonText: '#FFFFFF',       // Clean White Text on Teal Button
+        // Agar Gold/Yellow button intentionally rakhna tha, to ye try karein:
+        // buttonBackground: '#EAB308',
+        // buttonText: '#0F172A',
+
+        // Navigation & States
+        activeNav: '#E0F2FE',
+        danger: '#DC2626',
+        skeleton: '#E2E8F0',
+        shadow: '#0F172A',
+        backdrop: 'rgba(15, 23, 42, 0.4)',
     },
     dark: {
         mode: 'dark',
@@ -37,7 +53,7 @@ export const appThemes = {
         authBackground: '#020617',
         surface: '#06080ecb',
         surfaceAlt: '#164e63',
-        cardHighlight: '#1E293B',
+        cardHighlight: '#1E1E1E',
         cardElevated: '#0D1B2A',
         sheet: '#111827',
         text: '#f8fafcf1',

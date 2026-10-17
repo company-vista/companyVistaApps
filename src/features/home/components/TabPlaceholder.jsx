@@ -58,6 +58,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                         'x-auth-token': token,
                     },
                 });
+                console.log('Compliance API data:', JSON.stringify(response?.data, null, 2));
                 setApiData(response?.data);
             }
             catch (error) {
@@ -92,7 +93,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         const lower = apiStatus.toLowerCase().trim();
         if (lower === 'active' || lower === 'done' || lower === 'completed')
             return 'Active';
-        if (lower === 'expired' || lower === 'expired_soon' || lower === 'overdue')
+        if (lower === 'expired' || lower === 'expired_soon' || lower === 'expiring_soon' || lower === 'overdue')
             return 'Expired';
         if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed')
             return 'Client Managed';
@@ -105,7 +106,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         const lower = apiStatus.toLowerCase().trim();
         if (lower === 'completed' || lower === 'active' || lower === 'done')
             return 'Completed';
-        if (lower === 'expired' || lower === 'expired_soon')
+        if (lower === 'expired' || lower === 'expired_soon' || lower === 'expiring_soon' || lower === 'overdue')
             return 'Expired';
         if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed')
             return 'Client Managed';
@@ -115,7 +116,6 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const residentData = apiData?.data?.resident || {};
     const addressData = apiData?.data?.Address || {};
     const annualFilingData = apiData?.data?.annualFiling || {};
-    const itinData = apiData?.data?.itin || {};
     const derivedActions = [];
     const shouldShowRenewButton = (action) => {
         return action.status === 'Pending' || action.status === 'Expired';
@@ -166,22 +166,6 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
             { label: 'Country', value: addressData.country || 'N/A', icon: 'globe' },
             { label: 'Due Date', value: formatDate(addressData.dueDate || residentData.dueDate), icon: 'calendar' },
             { label: 'Last Filed', value: formatDate(addressData.lastDate || residentData.lastDate), icon: 'history' },
-        ],
-        price: 99,
-        years: 1,
-    });
-    // ITIN
-    derivedActions.push({
-        id: 'itin',
-        title: 'ITIN',
-        subtitle: 'Tax identification',
-        status: mapFederalAnnualStatus(itinData.status),
-        date: formatDate(itinData.dueDate),
-        icon: 'id-card',
-        details: [
-            { label: 'ITIN Number', value: itinData.itin || itinData.number || 'N/A', icon: 'id-card' },
-            { label: 'Due Date', value: formatDate(itinData.dueDate), icon: 'calendar' },
-            { label: 'Last Filed', value: formatDate(itinData.lastDate), icon: 'history' },
         ],
         price: 99,
         years: 1,

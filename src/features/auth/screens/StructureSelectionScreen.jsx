@@ -18,6 +18,7 @@ import { s } from '../../../theme/responsive';
 import { STRUCTURE_PRICE_MAP } from '../../../utils/priceCalculator';
 import { getStateData, getEntityTypes, getEntityMeta, getEntityByStructureId } from '../../../utils/jurisdictionData';
 import { getCountryData, getCountryEntities } from '../../../constants/countries';
+import { useThemeColors } from '../../../theme/colors';
 
 const StructureSelectionScreen = ({ navigation, route }) => {
   const p = route.params || {};
@@ -30,6 +31,8 @@ const StructureSelectionScreen = ({ navigation, route }) => {
   const isUS = selectedCountry === 'US';
   const [selectedStructure, setSelectedStructure] = useState(null);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   // US: state ke usStates.entityTypes se; non-US: country registry ke entities se
   const stateData = getStateData(selectedState);
@@ -106,7 +109,6 @@ const StructureSelectionScreen = ({ navigation, route }) => {
   }, [selectedEntityKey]);
 
   const getStructurePrice = (id) => STRUCTURE_PRICE_MAP[id] ?? 299;
-  const selectedItem = structures.find((struct) => struct.id === selectedStructure);
   // country price: direct flow selectedCountryPrice, advisor flow BestMatches se aata hai
   const countryPrice = Number(p.selectedCountryPrice ?? p.bestCountryPrice ?? 0);
   // state ka govt fee: direct flow me selectedStatePrice, advisor flow me bestStateGovFee
@@ -130,8 +132,8 @@ const StructureSelectionScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" transparent backgroundColor="transparent" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
 
       <ScrollView
         style={styles.scrollArea}
@@ -146,10 +148,10 @@ const StructureSelectionScreen = ({ navigation, route }) => {
 
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
 
-          <Text style={styles.mainTitle}>
+          <Text style={[styles.mainTitle, { color: colors.text }]}>
             Choose your <Text style={styles.italicTitle}>structure</Text>
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
             Entity types available in {isUS ? selectedState : countryName}.
           </Text>
 
@@ -159,34 +161,34 @@ const StructureSelectionScreen = ({ navigation, route }) => {
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.card, isSelected && styles.cardSelected]}
+                  style={[styles.card, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: '#C9A84C', backgroundColor: isDark ? 'rgba(201, 168, 76, 0.02)' : 'rgba(201, 168, 76, 0.06)' }]}
                   activeOpacity={0.85}
                   onPress={() => setSelectedStructure(item.id)}
                 >
                   <View style={styles.cardHeaderRow}>
-                    <View style={[styles.iconBox, isSelected && styles.iconBoxSelected]}>
-                      <Ionicons name={item.icon} size={18} color={isSelected ? '#C9A84C' : '#94A3B8'} />
+                    <View style={[styles.iconBox, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: 'rgba(201, 168, 76, 0.3)', backgroundColor: 'rgba(201, 168, 76, 0.08)' }]}>
+                      <Ionicons name={item.icon} size={18} color={isSelected ? '#C9A84C' : (isDark ? '#94A3B8' : colors.muted)} />
                     </View>
                     <View style={styles.titleContainer}>
-                      <Text style={[styles.cardTitle, isSelected && styles.goldText]}>{item.title}</Text>
-                      <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+                      <Text style={[styles.cardTitle, { color: colors.text }, isSelected && styles.goldText]}>{item.title}</Text>
+                      <Text style={[styles.cardSubtitle, { color: colors.muted }]}>{item.subtitle}</Text>
                     </View>
                     <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
                       {isSelected && <Ionicons name="checkmark" size={11} color="#060913" />}
                     </View>
                   </View>
 
-                  <Text style={styles.cardDescription}>{item.description}</Text>
+                  <Text style={[styles.cardDescription, { color: colors.muted }]}>{item.description}</Text>
 
                   <View style={styles.tagsRow}>
                     {item.tags.map((tag, idx) => (
-                      <View key={idx} style={[styles.tagChip, tag.startsWith('⚠') && styles.tagWarn]}>
-                        <Text style={[styles.tagText, tag.startsWith('⚠') && styles.tagWarnText]}>{tag}</Text>
+                      <View key={idx} style={[styles.tagChip, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border }, tag.startsWith('⚠') && styles.tagWarn]}>
+                        <Text style={[styles.tagText, { color: colors.muted }, tag.startsWith('⚠') && styles.tagWarnText]}>{tag}</Text>
                       </View>
                     ))}
                   </View>
 
-                  <View style={styles.cardDivider} />
+                  <View style={[styles.cardDivider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border }]} />
 
                   <View style={styles.cardFooterRow}>
                     {(() => {
@@ -194,9 +196,9 @@ const StructureSelectionScreen = ({ navigation, route }) => {
                       return (
                         <View>
                           <Text style={styles.priceText}>
-                            {total > 0 ? `$${total}` : 'Custom quote'} <Text style={styles.stateFeeText}>total</Text>
+                            {total > 0 ? `$${total}` : 'Custom quote'} <Text style={[styles.stateFeeText, { color: colors.muted }]}>total</Text>
                           </Text>
-                          <Text style={styles.stateFeeText}>
+                          <Text style={[styles.stateFeeText, { color: colors.muted }]}>
                             {getBreakdownForStructure(item.id)}
                           </Text>
                         </View>
@@ -218,9 +220,9 @@ const StructureSelectionScreen = ({ navigation, route }) => {
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom }]}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
         <TouchableOpacity
-          style={[styles.continueBtn, !selectedStructure && styles.continueBtnDisabled]}
+          style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }, !selectedStructure && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           disabled={!selectedStructure}
           onPress={() => {
@@ -229,8 +231,6 @@ const StructureSelectionScreen = ({ navigation, route }) => {
             const combinedTotal = getTotalForStructure(selectedStructure);
             const structureMeta = getEntityByStructureId(selectedStructure);
             const matchedStructure = structures.find((item) => item.id === selectedStructure);
-            // Custom-quote wale country (non-USA, koi price define nahi) me LLC structure price add MAT karo:
-            // $299 leke jaane par backend ki review me bhi total $299 ban jata tha quoted country ke liye.
             const isQuotedCountry = !isUS && !(countryPrice > 0);
             navigation.navigate('WhatsIncluded', {
               ...restParams,
@@ -251,8 +251,8 @@ const StructureSelectionScreen = ({ navigation, route }) => {
             });
           }}
         >
-          <Text style={[styles.continueBtnText, !selectedStructure && styles.continueBtnTextDisabled]}>
-            {selectedStructure ? `Continue with ${selectedItem.title}  →` : 'Select a structure to continue'}
+          <Text style={[styles.continueBtnText, { color: colors.buttonText }, !selectedStructure && styles.continueBtnTextDisabled]}>
+            {selectedStructure ? 'Continue  →' : 'Select a structure to continue'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -263,60 +263,57 @@ const StructureSelectionScreen = ({ navigation, route }) => {
 export default StructureSelectionScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#060913' },
+  container: { flex: 1 },
   scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { color: '#FFFFFF', fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(8) },
+  mainTitle: { fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(8) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
   goldText: { color: '#C9A84C' },
-  subtitle: { color: '#94A3B8', fontSize: s(14), lineHeight: s(21), marginBottom: s(20) },
+  subtitle: { fontSize: s(14), lineHeight: s(21), marginBottom: s(20) },
   listContainer: { gap: 14 },
   card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 16,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(16),
+    borderRadius: 16,
+    borderWidth: 1, padding: s(16),
   },
-  cardSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.02)' },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   iconBox: {
     width: 40, height: 40, borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)', borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)', alignItems: 'center', justifyContent: 'center', marginRight: s(12),
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginRight: s(12),
   },
-  iconBoxSelected: { borderColor: 'rgba(201, 168, 76, 0.3)', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
   titleContainer: { flex: 1 },
-  cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
-  cardSubtitle: { color: '#64748B', fontSize: 11, marginTop: s(2) },
+  cardTitle: { fontSize: 16, fontWeight: 'bold' },
+  cardSubtitle: { fontSize: 11, marginTop: s(2) },
   radioCircle: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)', alignItems: 'center', justifyContent: 'center',
   },
   radioCircleSelected: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  cardDescription: { color: '#94A3B8', fontSize: 11.5, lineHeight: 17, marginBottom: s(12) },
+  cardDescription: { fontSize: 12.5, lineHeight: 17, marginBottom: s(12) },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: s(14) },
   tagChip: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)', borderRadius: 12,
-    paddingHorizontal: s(10), paddingVertical: s(5), borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 12,
+    paddingHorizontal: s(10), paddingVertical: s(5), borderWidth: 1,
   },
   tagWarn: { borderColor: 'rgba(234, 179, 8, 0.2)', backgroundColor: 'rgba(234, 179, 8, 0.05)' },
-  tagText: { color: '#94A3B8', fontSize: 10, fontWeight: '500' },
+  tagText: { fontSize: 11.3, fontWeight: '500' },
   tagWarnText: { color: '#EAB308' },
-  cardDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.06)', marginBottom: s(12) },
+  cardDivider: { height: 1, marginBottom: s(12) },
   cardFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   priceText: { color: '#C9A84C', fontSize: 18, fontWeight: 'bold' },
-  stateFeeText: { color: '#64748B', fontSize: 10, fontWeight: 'normal' },
+  stateFeeText: { fontSize: 10, fontWeight: 'normal' },
   badge: { paddingHorizontal: s(10), paddingVertical: s(4), borderRadius: 12 },
   badgeGreen: { backgroundColor: 'rgba(16, 185, 129, 0.12)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' },
   badgeTextGreen: { color: '#10B981', fontSize: 10, fontWeight: 'bold' },
   badgeBlue: { backgroundColor: 'rgba(59, 130, 246, 0.12)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.3)' },
   badgeTextBlue: { color: '#60A5FA', fontSize: 10, fontWeight: 'bold' },
   bottomBar: {
-    backgroundColor: '#060913', paddingHorizontal: s(16), paddingTop: s(12),
-    borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: s(16), paddingTop: s(12),
+    borderTopWidth: 1,
   },
-  continueBtn: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
-  continueBtnDisabled: { backgroundColor: 'rgba(212,175,55,0.35)' },
-  continueBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
-  continueBtnTextDisabled: { color: 'rgba(6,9,19,0.5)' },
+  continueBtn: { borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
+  continueBtnDisabled: { opacity: 0.4 },
+  continueBtnText: { fontSize: 14, fontWeight: 'bold' },
+  continueBtnTextDisabled: { opacity: 0.5 },
 });

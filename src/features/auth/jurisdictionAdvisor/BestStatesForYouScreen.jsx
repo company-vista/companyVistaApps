@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
@@ -102,6 +103,7 @@ export const STATES_DATA = [
 
 export default function BestStatesForYouScreen({ navigation, route }) {
   const [selected, setSelected] = useState(STATES_DATA[0]);
+  const insets = useSafeAreaInsets();
   const alternatives = STATES_DATA.filter(s => s.name !== selected.name);
   const stateFee = selected.govtFees?.formation ?? 0;
   const stateFeeLabel = `$${stateFee}`;
@@ -230,7 +232,7 @@ export default function BestStatesForYouScreen({ navigation, route }) {
       </ScrollView>
 
       {/* Bottom Action Area */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
         <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={() => {
           const priceNum = Number(selected.totalFirstYear) || Number(String(selected.price).replace(/[^0-9]/g, '')) || 399;
           const govFee = selected.govtFees?.formation ?? 0;
