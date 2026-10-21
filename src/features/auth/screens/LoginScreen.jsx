@@ -312,21 +312,26 @@ const LoginScreen = ({ navigation }) => {
             <FlatList
               data={COUNTRIES}
               keyExtractor={(item) => item.iso}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.countryOption, { borderBottomColor: colors.border }, countryCode === item.code && styles.countryOptionSelected]}
-                  onPress={() => {
-                    setCountryCode(item.code);
-                    setCountryIso(item.iso);
-                    setShowCodePicker(false);
-                  }}
-                >
-                  <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
-                  <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
-                  <Text style={[styles.countryOptionCode, { color: colors.subtle }]}>{item.code}</Text>
-                  {countryCode === item.code && <Ionicons name="checkmark" size={16} color="#C9A84C" />}
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                const selected = countryCode === item.code;
+                return (
+                  <TouchableOpacity
+                    style={[styles.countryOption, { borderBottomColor: colors.border }, selected && styles.countryOptionSelected]}
+                    onPress={() => {
+                      setCountryCode(item.code);
+                      setCountryIso(item.iso);
+                      setShowCodePicker(false);
+                    }}
+                  >
+                    <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
+                    <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
+                    <Text style={[styles.countryOptionCode, { color: colors.subtle }]}>{item.code}</Text>
+                    <View style={[styles.checkCircle, { borderColor: selected ? '#C9A84C' : colors.border }, selected && styles.checkCircleSelected]}>
+                      {selected && <Ionicons name="checkmark" size={12} color="#060913" />}
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
             />
           </View>
         </View>
@@ -424,4 +429,9 @@ const styles = StyleSheet.create({
   countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
   countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: 13 },
   countryOptionCode: { color: '#94A3B8', fontSize: 12, marginRight: s(6) },
+  checkCircle: {
+    width: 20, height: 20, borderRadius: 10, borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  checkCircleSelected: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
 });

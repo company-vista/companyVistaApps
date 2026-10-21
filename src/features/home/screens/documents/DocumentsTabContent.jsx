@@ -164,12 +164,17 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
         };
     }, [selectedCompany?.id, token]);
     const filteredDocuments = documents.filter(doc => {
-        if (activeTab === 'registered' && isMailDoc(doc))
-            return false;
         if (activeTab === 'locked' || activeTab === 'unlocked')
             return false;
-        if (sortOption === 'mails&letter' && !isMailDoc(doc))
-            return false;
+        if (activeTab === 'registered') {
+            if (sortOption === 'mails&letter') {
+                if (!isMailDoc(doc))
+                    return false;
+            }
+            else if (isMailDoc(doc)) {
+                return false;
+            }
+        }
         if (sortOption === 'docs' && isMailDoc(doc))
             return false;
         if (sortOption === 'locked' || sortOption === 'free')

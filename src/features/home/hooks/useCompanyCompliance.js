@@ -127,10 +127,12 @@ function isExpiringWithinOneMonth(value) {
 }
 function getYearlyFilingStatus(record) {
     const backendStatus = normalizeText(record.status);
+    if (backendStatus) {
+        return backendStatus;
+    }
     const lastDate = new Date(getRecordLastDate(record));
     const isCompletedThisYear = !Number.isNaN(lastDate.getTime()) &&
-        lastDate.getFullYear() === new Date().getFullYear() &&
-        backendStatus === 'active';
+        lastDate.getFullYear() === new Date().getFullYear();
     return isCompletedThisYear ? 'completed' : 'pending';
 }
 function getMatchedTitle(record) {

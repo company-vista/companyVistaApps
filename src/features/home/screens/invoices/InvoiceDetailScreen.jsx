@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { generatePDF } from 'react-native-html-to-pdf';
@@ -99,15 +99,6 @@ function InvoiceDetailScreen() {
     const route = useRoute();
     const { invoice } = route.params;
     const insets = useSafeAreaInsets();
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <Pressable onPress={handleDownload} style={[styles.topDownloadBtn, { backgroundColor: '#eef2ff' }]}>
-                    <FontAwesome name="download" size={14} color="#4f46e5"/>
-                </Pressable>
-            ),
-        });
-    }, [navigation]);
     // डेटा पार्सिंग
     const paymentStatus = getStringValue(invoice.paymentStatus).toLowerCase();
     const isPaid = paymentStatus === 'paid';
@@ -127,21 +118,33 @@ function InvoiceDetailScreen() {
     const currency = getStringValue(invoice.currency, invoice.currencyCode) || 'USD';
     const subtotal = getNumberValue(invoice.subtotal, invoice.subTotal) ||
         getNumberValue(invoice.totalAmount, invoice.total, invoice.grandTotal, invoice.amount);
-    const gstAmount = currency === 'INR' ? subtotal * 0.18 : 0;
-    const totalAmount = subtotal + gstAmount;
+    const discountAmount = getNumberValue(invoice.discount, invoice.discountAmount);
+    const discountType = getStringValue(invoice.discountType).toLowerCase();
+    const discountValue = getNumberValue(invoice.discountValue);
+    const discountLabel = discountType === 'percentage' && discountValue > 0
+        ? `Discount (${discountValue}%)`
+        : 'Discount';
+    const gstAmount = getNumberValue(invoice.tax, invoice.taxAmount);
+    const taxRate = getNumberValue(invoice.taxRate);
+    const taxLabel = taxRate > 0 ? `Tax (${taxRate}%)` : 'Tax';
+    const computedTotal = subtotal - discountAmount + gstAmount;
+    const totalAmount = getNumberValue(invoice.total) || computedTotal;
     const rawPaidAmount = getNumberValue(invoice.paidAmount, invoice.amountPaid);
     const paidAmount = isPaid ? totalAmount : rawPaidAmount;
     const balanceDue = isPaid ? 0 : totalAmount - rawPaidAmount;
     const bankName = getStringValue(invoice.bankName, 'Column N.A.');
     const accountNo = getStringValue(invoice.accountNo, '939612679843912');
     const routing = getStringValue(invoice.routing, '121145433');
-    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const items = useMemo(
+        () => (Array.isArray(invoice.items) ? invoice.items : []),
+        [invoice.items],
+    );
     const invoiceNumber = getStringValue(invoice.invoiceNumber, invoice.invoiceNo, invoice.number) ||
         'INV-202606-0001';
     const invDate = formatDate(getStringValue(invoice.invoiceDate, invoice.createdAt) || undefined, currency);
     const dueDate = formatDate(getStringValue(invoice.dueDate, invoice.due) || undefined, currency);
     // PDF डाउनलोड करने का फ़ंक्शन (इमेज के डिज़ाइन जैसा ही HTML आउटपुट)
-    async function handleDownload() {
+    const handleDownload = useCallback(async () => {
         const itemsHtml = items
             .map((item, i) => {
             const itemName = getStringValue(item.itemName, item.name, item.title) ||
@@ -150,6 +153,8 @@ function InvoiceDetailScreen() {
                 'Provides your company with a professional business presence...';
             const itemAmount = getNumberValue(item.amount) || 145.0;
             const itemQty = getNumberValue(item.quantity, 1);
+            const itemDiscount = getNumberValue(item.discount, item.discountAmount);
+            const itemNetAmount = itemAmount - itemDiscount;
             const itemType = getStringValue(item.itemType) || 'ONE-TIME';
             return `
         <tr style="vertical-align: top;">
@@ -163,7 +168,8 @@ function InvoiceDetailScreen() {
           </td>
           <td style="padding: 15px 10px; text-align: center; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${itemQty}</td>
           <td style="padding: 15px 10px; text-align: right; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemAmount / itemQty, currency)}</td>
-          <td style="padding: 15px 10px; text-align: right; font-weight: bold; color: #1e1b4b; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemAmount, currency)}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: 500; color: #dc2626; border-bottom: 1px solid #f1f5f9;">${itemDiscount > 0 ? '-' + formatAmount(itemDiscount, currency) : '—'}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: bold; color: #1e1b4b; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemNetAmount, currency)}</td>
         </tr>`;
         })
             .join('');
@@ -183,6 +189,9 @@ function InvoiceDetailScreen() {
             itemsHtml,
             subtotal,
             gstAmount,
+            taxLabel,
+            discountAmount,
+            discountLabel,
             totalAmount,
             paidAmount,
             balanceDue,
@@ -222,7 +231,41 @@ function InvoiceDetailScreen() {
                 text2: err?.message || 'Could not save PDF file.',
             });
         }
-    }
+    }, [
+        items,
+        invoiceNumber,
+        isPaid,
+        isPartial,
+        companyName,
+        fromAddress,
+        companyEmail,
+        clientName,
+        clientAddress,
+        clientCountry,
+        invDate,
+        dueDate,
+        currency,
+        subtotal,
+        gstAmount,
+        taxLabel,
+        discountAmount,
+        discountLabel,
+        totalAmount,
+        paidAmount,
+        balanceDue,
+        bankName,
+        accountNo,
+        routing,
+    ]);
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <Pressable onPress={handleDownload} style={[styles.topDownloadBtn, { backgroundColor: '#eef2ff' }]}>
+                    <FontAwesome name="download" size={14} color="#4f46e5"/>
+                </Pressable>
+            ),
+        });
+    }, [navigation, handleDownload]);
     return (<View style={styles.screen}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
         {/* कॉर्पोरेट डार्क बैनर स्टाइल हेडर */}
@@ -289,54 +332,55 @@ function InvoiceDetailScreen() {
           </View>
         </View>
 
-        {/* टेबल हेडर */}
-        <View style={styles.tableHeaderRow}>
-          <Text style={[styles.tableHeaderText, { width: s(28), textAlign: 'center' }]}>
-            #
-          </Text>
-          <Text style={[styles.tableHeaderText, { flex: 1, paddingLeft: s(8) }]}>
-            SERVICE / DESCRIPTION
-          </Text>
-          <Text style={[styles.tableHeaderText, { width: s(36), textAlign: 'center' }]}>
-            QTY
-          </Text>
-          <Text style={[styles.tableHeaderText, { width: s(72), textAlign: 'right' }]}>
-            PRICE
-          </Text>
-          <Text style={[styles.tableHeaderText, { width: s(78), textAlign: 'right' }]}>
-            AMOUNT
-          </Text>
-        </View>
+        {/* टेबल (horizontal scroll) */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tableInner}>
+            {/* टेबल हेडर */}
+            <View style={styles.tableHeaderRow}>
+              <Text style={[styles.tableHeaderText, styles.colIndex]} numberOfLines={1}>#</Text>
+              <Text style={[styles.tableHeaderText, styles.colService]} numberOfLines={1} adjustsFontSizeToFit>SERVICE / DESCRIPTION</Text>
+              <Text style={[styles.tableHeaderText, styles.colQty]} numberOfLines={1}>QTY</Text>
+              <Text style={[styles.tableHeaderText, styles.colPrice]} numberOfLines={1}>PRICE</Text>
+              <Text style={[styles.tableHeaderText, styles.colDiscount]} numberOfLines={1}>DISCOUNT</Text>
+              <Text style={[styles.tableHeaderText, styles.colAmount]} numberOfLines={1}>AMOUNT</Text>
+            </View>
 
-        {/* टेबल लिस्ट आइटम्स */}
-        {items.map((item, index) => {
-            const itemAmount = getNumberValue(item.amount) || 145.0;
-            const itemQty = getNumberValue(item.quantity, 1);
-            const itemName = getStringValue(item.itemName, item.name, item.title) ||
-                'AGENT & ADDRESS';
-            const itemDesc = getStringValue(item.description) ||
-                'Provides your company with a professional business presence...';
-            const itemType = getStringValue(item.itemType) || 'ONE-TIME';
-            return (<View key={index} style={styles.tableBodyRow}>
-              <Text style={styles.tableRowIndex}>{index + 1}</Text>
-              <View style={styles.serviceDescCol}>
-                <View style={styles.itemNameRow}>
-                  <View style={styles.itemTypeTag}>
-                    <Text style={styles.itemTypeTagText} numberOfLines={1}>{itemType}</Text>
+            {/* टेबल लिस्ट आइटम्स */}
+            {items.map((item, index) => {
+                const itemAmount = getNumberValue(item.amount) || 145.0;
+                const itemQty = getNumberValue(item.quantity, 1);
+                const itemDiscount = getNumberValue(item.discount, item.discountAmount);
+                const itemNetAmount = itemAmount - itemDiscount;
+                const itemName = getStringValue(item.itemName, item.name, item.title) ||
+                    'AGENT & ADDRESS';
+                const itemDesc = getStringValue(item.description) ||
+                    'Provides your company with a professional business presence...';
+                const itemType = getStringValue(item.itemType) || 'ONE-TIME';
+                return (<View key={index} style={styles.tableBodyRow}>
+                  <Text style={styles.tableRowIndex}>{index + 1}</Text>
+                  <View style={styles.serviceDescCol}>
+                    <View style={styles.itemNameRow}>
+                      <View style={styles.itemTypeTag}>
+                        <Text style={styles.itemTypeTagText} numberOfLines={1}>{itemType}</Text>
+                      </View>
+                      <Text style={styles.itemNameText} numberOfLines={2} ellipsizeMode="tail">{itemName}</Text>
+                    </View>
+                    <Text style={styles.itemDescText} numberOfLines={2} ellipsizeMode="tail">{itemDesc}</Text>
                   </View>
-                  <Text style={styles.itemNameText} numberOfLines={2} ellipsizeMode="tail">{itemName}</Text>
-                </View>
-                <Text style={styles.itemDescText} numberOfLines={2} ellipsizeMode="tail">{itemDesc}</Text>
-              </View>
-              <Text style={styles.tableRowQty}>{itemQty}</Text>
-              <Text style={styles.tableRowPrice} numberOfLines={1} adjustsFontSizeToFit>
-                {formatAmount(itemAmount / itemQty, currency)}
-              </Text>
-              <Text style={styles.tableRowAmount} numberOfLines={1} adjustsFontSizeToFit>
-                {formatAmount(itemAmount, currency)}
-              </Text>
-            </View>);
-        })}
+                  <Text style={styles.tableRowQty}>{itemQty}</Text>
+                  <Text style={styles.tableRowPrice} numberOfLines={1} adjustsFontSizeToFit>
+                    {formatAmount(itemAmount / itemQty, currency)}
+                  </Text>
+                  <Text style={styles.tableRowDiscount} numberOfLines={1} adjustsFontSizeToFit>
+                    {itemDiscount > 0 ? `-${formatAmount(itemDiscount, currency)}` : '—'}
+                  </Text>
+                  <Text style={styles.tableRowAmount} numberOfLines={1} adjustsFontSizeToFit>
+                    {formatAmount(itemNetAmount, currency)}
+                  </Text>
+                </View>);
+            })}
+          </View>
+        </ScrollView>
 
         <View style={styles.splitBox}>
           <View style={styles.splitLeft}>
@@ -383,6 +427,12 @@ function InvoiceDetailScreen() {
                 {formatAmount(subtotal, currency)}
               </Text>
             </View>
+            {discountAmount > 0 && (<View style={styles.summaryRow}>
+              <Text style={styles.summaryLabelText}>{discountLabel}</Text>
+              <Text style={[styles.summaryValueText, { color: '#dc2626' }]}>
+                -{formatAmount(discountAmount, currency)}
+              </Text>
+            </View>)}
             {currency === 'INR' && (<View style={styles.summaryRow}>
               <Text style={styles.summaryLabelText}>GST (18.0%)</Text>
               <Text style={styles.summaryValueText}>
@@ -521,6 +571,9 @@ const styles = StyleSheet.create({
     },
     metaLabel: { fontSize: font.base, color: '#212325' },
     metaValue: { fontSize: font.base, fontWeight: '400', color: '#1e1b4b' },
+    tableInner: {
+        minWidth: s(24 + 28 + 150 + 36 + 72 + 60 + 78),
+    },
     tableHeaderRow: {
         backgroundColor: '#231f4f',
         paddingVertical: s(10),
@@ -538,6 +591,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         alignItems: 'flex-start',
     },
+    colIndex: { width: s(28), flexShrink: 0, textAlign: 'center' },
+    colService: { width: s(150), flexShrink: 0, textAlign: 'left', paddingLeft: s(8) },
+    colQty: { width: s(36), flexShrink: 0, textAlign: 'center' },
+    colPrice: { width: s(72), flexShrink: 0, textAlign: 'right', paddingRight: s(10) },
+    colDiscount: { width: s(60), flexShrink: 0, textAlign: 'right', paddingRight: s(10) },
+    colAmount: { width: s(78), flexShrink: 0, textAlign: 'right' },
     tableRowIndex: {
         width: s(28),
         textAlign: 'center',
@@ -545,7 +604,7 @@ const styles = StyleSheet.create({
         fontSize: font.base,
     },
     serviceDescCol: {
-        flex: 1,
+        width: s(150),
         paddingHorizontal: s(8),
         minWidth: 0,
     },
@@ -583,8 +642,17 @@ const styles = StyleSheet.create({
     tableRowPrice: {
         width: s(72),
         textAlign: 'right',
+        paddingRight: s(10),
         fontSize: font.base,
         color: '#1e1b4b',
+        fontWeight: '500',
+    },
+    tableRowDiscount: {
+        width: s(60),
+        textAlign: 'right',
+        paddingRight: s(10),
+        fontSize: font.base,
+        color: '#dc2626',
         fontWeight: '500',
     },
     tableRowAmount: {

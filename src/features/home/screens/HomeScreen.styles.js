@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         flex: 1,
         color: '#111827',
         fontSize: 19,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     headerIcon: {
         width: 40,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     notificationBadgeText: {
         color: '#ffffff',
         fontSize: 10,
-        fontWeight: '900',
+        fontWeight: '600',
     },
     profileButton: {
         width: 36,

@@ -30,6 +30,8 @@ import DocumentsTabContent from './documents/DocumentsTabContent';
 import HomeTabContent from '../components/HomeTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
+import FloatingPlusButton from '../../../components/floatingPlusButton/FloatingPlusButton';
+import FloatingPlusButtonCard from '../../../components/floatingPlusButton/FloatingPlusButtonCard';
 const emptyCompanies = [];
 export default function HomeScreen() {
     const navigation = useNavigation();
@@ -51,6 +53,7 @@ export default function HomeScreen() {
     const [activeTab, setActiveTab] = useState(initialTab ?? 'home');
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
+    const [isPlusCardOpen, setIsPlusCardOpen] = useState(false);
     const [notificationCount, setNotificationCount] = useState(0);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [activeCompanySection, setActiveCompanySection] = useState(null);
@@ -1029,6 +1032,10 @@ export default function HomeScreen() {
         }} onRegistrationTrackingPress={openRegistrationTrackingScreen} /> : null}
 
         <BottomNavBar activeTab={activeTab} isMoreOpen={isMoreOpen} onTabPress={handleTabPress} colors={colors} safeAreaInsets={safeAreaInsets} />
+
+        {activeTab === 'home' ? <FloatingPlusButton bottomOffset={safeAreaInsets.bottom + 85} onPress={() => setIsPlusCardOpen(v => !v)} /> : null}
+
+        <FloatingPlusButtonCard visible={isPlusCardOpen} onClose={() => setIsPlusCardOpen(false)} bottomOffset={safeAreaInsets.bottom + 85} onChatSupportPress={() => { setIsPlusCardOpen(false); navigation.navigate('ChatSupport'); }} />
 
         {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
 

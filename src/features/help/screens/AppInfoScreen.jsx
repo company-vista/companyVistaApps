@@ -9,7 +9,7 @@ import logoImage from '../../../assets/images/company-vista-icon-gold-512.png';
 
 const appInfoItems = [
     { label: 'App name', value: 'Company Vista' },
-    { label: 'Version', value: '1.4.1' },
+    { label: 'Version', value: '1.5.8' },
     { label: 'Platform', value: Platform.OS === 'ios' ? 'iOS' : 'Android' },
     { label: 'React Native', value: '0.85.3' },
     { label: 'Support', value: 'support@companyvista.com' },

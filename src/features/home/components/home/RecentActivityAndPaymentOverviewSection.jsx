@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-import { s } from '../../../../theme/responsive';
 function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, onRegistrationTrackingPress, selectedCompany, }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
@@ -16,12 +15,16 @@ function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, onR
     return (<View style={styles.wrapper}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Links</Text>
       <View style={styles.grid}>
-        {recentActivities.map(item => (<Pressable key={item.title} style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderColor: isLight ? item.borderColor : 'rgba(255,255,255,0.08)', borderWidth: isLight ? 1 : 1 }]} onPress={item.onItemPress}>
-            <View style={[styles.iconContainer]}>
-              <FontAwesome name={item.icon} size={16} color={item.iconColor}/>
-            </View>
-            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-          </Pressable>))}
+        {recentActivities.map(item => (
+          <View key={item.title} style={styles.item}>
+            <Pressable style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderColor: isLight ? item.borderColor : 'rgba(255,255,255,0.08)', borderWidth: isLight ? 1 : 1 }]} onPress={item.onItemPress}>
+              <View style={styles.iconContainer}>
+                <FontAwesome name={item.icon} size={24} color={item.iconColor}/>
+              </View>
+            </Pressable>
+            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">{item.title}</Text>
+          </View>
+        ))}
       </View>
     </View>);
 }
@@ -38,36 +41,39 @@ const styles = StyleSheet.create({
     },
     grid: {
         flexDirection: 'row',
-        alignItems: 'stretch',
+        alignItems: 'flex-start',
         columnGap: 8,
         justifyContent: 'flex-start',
     },
+    item: {
+        width: '20%',
+        alignItems: 'center',
+    },
     card: {
-        width: '23%',
+        width: '100%',
         aspectRatio: 1,
         borderWidth: 1,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: s(3),
+        paddingVertical: 4,
+        paddingHorizontal: 2,
         overflow: 'hidden',
     },
     iconContainer: {
-        width: 30,
-        height: 30,
-        borderRadius: 8,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 4,
         backgroundColor: 'transparent',
     },
     cardTitle: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '500',
         textAlign: 'center',
-        lineHeight: 12,
-        minHeight: 24,
+        lineHeight: 15,
+        marginTop: 6,
     },
 });
 export default RecentActivityAndPaymentOverviewSection;

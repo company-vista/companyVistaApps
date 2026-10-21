@@ -15,6 +15,7 @@ const NotificationDetailScreen = lazy(() => import('../features/notifications/sc
 const SearchScreen = lazy(() => import('../features/home/screens/SearchScreen'));
 const HelpFeedbackScreen = lazy(() => import('../features/help/screens/HelpFeedbackScreen'));
 const SupportScreen = lazy(() => import('../features/support/screens/SupportScreen'));
+const ChatSupportScreen = lazy(() => import('../features/support/screens/ChatSupportScreen'));
 const FollowUsScreen = lazy(() => import('../features/home/screens/FollowUsScreen'));
 const SettingsScreen = lazy(() => import('../features/settings/screens/SettingsScreen'));
 const QuickAccessScreen = lazy(() => import('../features/home/screens/QuickAccessScreen'));
@@ -90,6 +91,7 @@ export default function MainStack() {
       <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search' }}/>
       <Stack.Screen name="HelpFeedback" component={HelpFeedbackScreen} options={{ title: 'Help and feedback', headerTitleStyle: { fontSize: font.hero, color: colors.text } }}/>
       <Stack.Screen name="Support" component={SupportScreen} options={{ title: 'Support' }}/>
+      <Stack.Screen name="ChatSupport" component={ChatSupportScreen} options={{ title: 'Chat & Support' }}/>
       <Stack.Screen name="FollowUs" component={FollowUsScreen} options={{ title: 'Follow Us' }}/>
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }}/>
       <Stack.Screen name="QuickAccess" component={QuickAccessScreen} options={{ title: 'Quick Access' }}/>

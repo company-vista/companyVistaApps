@@ -116,9 +116,14 @@ export function buildInvoiceHtml(p) {
             <span style="color:#94a3b8;">Sub Total</span>
             <span style="font-weight: 600; color:#1e1b4b;">${formatAmount(p.subtotal, p.currency)}</span>
           </div>
-          ${p.currency === 'INR' ? `
+          ${p.discountAmount > 0 ? `
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color:#94a3b8;">GST (18.0%)</span>
+            <span style="color:#94a3b8;">${p.discountLabel || 'Discount'}</span>
+            <span style="font-weight: 600; color:#dc2626;">-${formatAmount(p.discountAmount, p.currency)}</span>
+          </div>` : ''}
+          ${p.gstAmount > 0 ? `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color:#94a3b8;">${p.taxLabel || 'Tax'}</span>
             <span style="font-weight: 600; color:#1e1b4b;">${formatAmount(p.gstAmount, p.currency)}</span>
           </div>` : ''}
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; color: #1e1b4b;">

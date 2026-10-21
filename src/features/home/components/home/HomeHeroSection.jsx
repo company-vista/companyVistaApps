@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#ffffff',
     fontSize: font.heading,
-    fontWeight: '600',
-    lineHeight: 23,
+    fontWeight: '400',
+    lineHeight: 20,
   },
   heroCompanySwitcher: {
     width: '100%',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   heroMetaValue: {
     color: '#FAC775',
     fontSize: font.sm,
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: 3,
   },
   heroStats: {

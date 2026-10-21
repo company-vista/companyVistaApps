@@ -94,8 +94,8 @@ android {
         applicationId "com.vistaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "1.5.7"
+        versionCode 13
+        versionName "1.5.8"
         manifestPlaceholders = [usesCleartextTraffic: "true"]
     }
     compileOptions {
@@ -153,11 +153,11 @@ dependencies {
     // React Native
     implementation("com.facebook.react:react-android")
 
+    // Play Billing Library updated to 8.0.0 (fixes Play Console error)
+    implementation 'com.android.billingclient:billing:8.0.0'
+
     // TikTok Business SDK
     implementation 'com.github.tiktok:tiktok-business-android-sdk:1.5.0'
-
-    // Google Play Billing - fixes missing BillingClient classes
-    implementation 'com.android.billingclient:billing:6.0.0'
 
     // App lifecycle
     implementation 'androidx.lifecycle:lifecycle-process:2.3.1'
@@ -173,4 +173,3 @@ dependencies {
         implementation jscFlavor
     }
 }
-

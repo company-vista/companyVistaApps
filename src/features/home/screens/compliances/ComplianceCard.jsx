@@ -78,7 +78,7 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
             <View style={[styles.complianceTile, { backgroundColor: isLight ? colors.cardHighlight : colors.cardElevated, borderWidth: 1, borderColor: colors.border }]}>
                 <View style={styles.complianceTileHeader}>
                     <View style={[styles.statusIcon, tone.icon]}>
-                        <FontAwesome name={item.icon} size={18} style={tone.iconText} />
+                        <FontAwesome name={item.icon} size={20} style={tone.iconText} />
                     </View>
                     <View style={styles.headerBadges}>
                         {isPaymentLocked ? (
@@ -111,10 +111,7 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
 const styles = StyleSheet.create({
     tileWrapper: {
         position: 'relative',
-        flexBasis: '48%',
-        flexGrow: 1,
-        maxWidth: '48%',
-        minWidth: '48%',
+        width: s(215),
     },
     lockBadge: {
         alignItems: 'center',
@@ -125,18 +122,18 @@ const styles = StyleSheet.create({
     },
     complianceTile: {
         borderRadius: 12,
-        paddingHorizontal: s(10),
-        paddingVertical: 11,
+        paddingHorizontal: s(14),
+        paddingVertical: 18,
     },
     complianceTileHeader: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
-        marginBottom: 6,
+        marginBottom: 8,
     },
     statusIcon: {
-        width: 30,
-        height: 30,
+        width: 38,
+        height: 38,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
@@ -164,7 +161,7 @@ const styles = StyleSheet.create({
         marginLeft: s(8),
     },
     tileNameTop: {
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: '600',
         textAlign: 'right',
     },
@@ -179,11 +176,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     tileDueDateText: {
-        fontSize: 12,
-        marginTop: 5,
+        fontSize: 14,
+        marginTop: 7,
     },
     tileDueDateValue: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '600',
     },
 });

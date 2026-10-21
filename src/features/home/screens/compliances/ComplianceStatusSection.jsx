@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { useThemeColors } from '../../../../theme/colors';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 import { font } from '../../../../theme/typography';
@@ -7,7 +7,7 @@ import ComplianceCard from './ComplianceCard';
 function formatStatus(value) {
     const status = normalizeText(value);
     if (!status) {
-        return 'Not available';
+        return 'N/A';
     }
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
@@ -35,21 +35,25 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
     const isLight = colors.mode === 'light';
     const complianceCards = useMemo(() => complianceItems.map(item => {
         const days = getDaysRemaining(rawDueDatesByTitle[item.title]);
+        const status = normalizeText(statusesByTitle[item.title]);
+        const isCompleted = status === 'completed';
         return {
             ...item,
-            dueDate: dueDatesByTitle[item.title] ?? (isLoadingDueDates ? 'Loading...' : 'Not available'),
+            dueDate: dueDatesByTitle[item.title] ?? (isLoadingDueDates ? 'Loading...' : 'N/A'),
             tag: isLoadingDueDates
                 ? 'Loading...'
                 : formatStatus(statusesByTitle[item.title]),
             tone: getStatusTone(statusesByTitle[item.title]),
             daysBadge: isLoadingDueDates
                 ? 'Loading...'
-                : days === null
-                    ? 'N/A'
-                    : days < 0
-                        ? 'Overdue'
-                        : `${days} days`,
-            daysTone: days !== null && days > 30 ? 'ok' : 'soon',
+                : isCompleted
+                    ? 'Completed'
+                    : days === null
+                        ? 'N/A'
+                        : days < 0
+                            ? 'Overdue'
+                            : `${days} days`,
+            daysTone: isCompleted || (days !== null && days > 30) ? 'ok' : 'soon',
         };
     }), [dueDatesByTitle, rawDueDatesByTitle, isLoadingDueDates, statusesByTitle]);
     return (<View style={styles.section}>
@@ -58,7 +62,11 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                 Compliance Status
             </Text>
         </View>
-        <View style={styles.complianceGrid}>
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.complianceRow}
+        >
             {complianceCards.map(item => (
                 <ComplianceCard
                     key={item.title}
@@ -71,7 +79,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                     onOpenComplianceHistory={onOpenComplianceHistory}
                 />
             ))}
-        </View>
+        </ScrollView>
     </View>);
 }
 const styles = StyleSheet.create({
@@ -94,11 +102,10 @@ const styles = StyleSheet.create({
         fontSize: font.sm,
         fontWeight: '500',
     },
-    complianceGrid: {
+    complianceRow: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
         gap: 8,
-        justifyContent: 'space-between',
+        paddingRight: 16,
     },
 });
 export default ComplianceStatusSection;

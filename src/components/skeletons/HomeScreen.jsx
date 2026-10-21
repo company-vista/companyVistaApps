@@ -87,7 +87,7 @@ export default function DashboardSkeleton() {
       {/* Section Title */}
       <SkeletonItem colors={colors} style={{ width: rs(150), height: rvs(22), marginBottom: rvs(16), borderRadius: rs(6) }} />
 
-      {/* 4. Compliance Grid Skeleton (2x2 Cards) - horizontal responsive */}
+      {/* 4. Compliance Cards Skeleton - horizontal scroll */}
       <View style={styles.gridContainer}>
         {[1, 2, 3, 4].map((item) => (
           <View key={item} style={[styles.gridCard, { backgroundColor: colors.surface, borderWidth: colors.mode === 'dark' ? 1 : 0, borderColor: colors.border }]}>
@@ -173,18 +173,17 @@ function createStyles({ rs, rvs, width, height }) {
   },
   gridContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: rs(14),
-    // horizontal: 3-4 columns on tablet/landscape
+    gap: rs(8),
+    paddingRight: rs(16),
+    // horizontal scroll - fixed width cards
   },
   gridCard: {
-    width: isTablet ? '31.5%' : isLargeLandscape ? '48%' : '48%',
+    width: rs(215),
     backgroundColor: '#FFFFFF',
     borderRadius: rs(14),
     paddingHorizontal: rs(12), // dynamic horizontal padding
     paddingVertical: rvs(12),
-    height: rvs(110),
+    height: rvs(145),
   },
   });
 }

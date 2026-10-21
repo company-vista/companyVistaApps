@@ -9,7 +9,15 @@ import { useAppSelector } from '../../../store/hooks';
 import styles from './TabPlaceholder.styles';
 import { formatDate } from '../../../constants/dateFormatter';
 import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
+import { useCompanyCompliance, normalizeText } from '../hooks/useCompanyCompliance';
 const STATUS_ORDER = ['Expired', 'Pending', 'Client Managed', 'Active', 'Completed'];
+function formatStatusLabel(value) {
+    const status = normalizeText(value);
+    if (!status) {
+        return 'N/A';
+    }
+    return status.charAt(0).toUpperCase() + status.slice(1);
+}
 function getWorstStatus(...statuses) {
     let worst = statuses[0];
     for (const status of statuses) {
@@ -29,6 +37,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const [apiData, setApiData] = useState(null);
     const [loading, setLoading] = useState(true);
     const effectiveCompanyId = companyId ?? null;
+    const { statusesByTitle } = useCompanyCompliance(effectiveCompanyId);
 
     const avatarPlaceholder = {
         backgroundColor: colors.surface,
@@ -72,19 +81,20 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     }, [effectiveCompanyId, token]);
     const getStatusTheme = (status) => {
         const isDark = colors.mode === 'dark';
-        switch (status) {
-            case 'Expired':
-                return { text: isDark ? '#FCA5A5' : '#DE3730', bg: isDark ? '#3D1717' : '#FCE8E6' };
-            case 'Pending':
-                return { text: isDark ? '#FCD34D' : '#E28704', bg: isDark ? '#3A2A15' : '#FEF3D6' };
-            case 'Active':
-            case 'Completed':
-                return { text: isDark ? '#6EE7B7' : '#256F46', bg: isDark ? '#15352A' : '#E6F4EA' };
-            case 'Client Managed':
-                return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
-            default:
-                return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
+        const key = String(status ?? '').toLowerCase().trim();
+        if (key === 'expired' || key === 'overdue') {
+            return { text: isDark ? '#FCA5A5' : '#DE3730', bg: isDark ? '#3D1717' : '#FCE8E6' };
         }
+        if (key === 'pending' || key === 'due' || key === 'expiring soon' || key === 'expiring_soon') {
+            return { text: isDark ? '#FCD34D' : '#E28704', bg: isDark ? '#3A2A15' : '#FEF3D6' };
+        }
+        if (key === 'active' || key === 'completed') {
+            return { text: isDark ? '#6EE7B7' : '#256F46', bg: isDark ? '#15352A' : '#E6F4EA' };
+        }
+        if (key === 'client managed') {
+            return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
+        }
+        return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
     };
     // 1. Agent aur Address ke liye status mapping
     const mapAgentAddressStatus = (apiStatus, defaultStatus = 'Pending') => {
@@ -153,7 +163,9 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         id: 'agent_address',
         title: 'Agent & Address',
         subtitle: 'Registered agent & address',
-        status: getWorstStatus(residentStatus, addressStatus),
+        status: statusesByTitle['Agent & Address']
+            ? formatStatusLabel(statusesByTitle['Agent & Address'])
+            : getWorstStatus(residentStatus, addressStatus),
         date: formatDate(addressData.dueDate || residentData.dueDate),
         icon: 'building',
         details: [
@@ -175,7 +187,9 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         id: 'federal_filing',
         title: 'Federal Filing Services',
         subtitle: 'Annual federal tax',
-        status: mapFederalAnnualStatus(federalTaxFilingData.status),
+        status: statusesByTitle['Federal Filing']
+            ? formatStatusLabel(statusesByTitle['Federal Filing'])
+            : mapFederalAnnualStatus(federalTaxFilingData.status),
         date: formatDate(federalTaxFilingData.dueDate),
         icon: 'exclamation-circle',
         details: [
@@ -188,7 +202,9 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         id: 'annual_filing',
         title: 'State Filing',
         subtitle: 'State compliance',
-        status: mapFederalAnnualStatus(annualFilingData.status),
+        status: statusesByTitle['State Filing']
+            ? formatStatusLabel(statusesByTitle['State Filing'])
+            : mapFederalAnnualStatus(annualFilingData.status),
         date: formatDate(annualFilingData.dueDate),
         icon: 'check-circle',
         details: [
@@ -218,9 +234,6 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                 <View style={styles.userInfo}>
                     <Text style={[styles.userName, { color: colors.text }]}>
                         {capitalizeCompanyName(selectedCompanyName) ?? residentData?.name ?? 'Loading...'}
-                    </Text>
-                    <Text style={[styles.userEmail, { color: colors.muted }]}>
-                        {residentData?.email || 'Email not added'}
                     </Text>
                 </View>
             </View>
