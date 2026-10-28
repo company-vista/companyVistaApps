@@ -12,6 +12,8 @@ const initialState = {
     user: null,
     token: null,
     isAuthenticated: false,
+    isAdmin: false,
+    role: null,
     isLoading: false,
     isRestoring: true,
     loginErrors: {},
@@ -26,6 +28,23 @@ const initialState = {
     hasCompletedPayment: false,
     pendingSignup: null,
 };
+function deriveAdmin(user) {
+    if (!user) return false;
+    if (user.isAdmin === true) return true;
+    if (String(user.accountType).toLowerCase() === 'admin') return true;
+    const role = String(user.role || user.userRole || '').toLowerCase();
+    return ['owner', 'admin', 'superadmin', 'super-admin'].includes(role);
+}
+function normalizeAuthUser(user) {
+    if (!user || typeof user !== 'object') return user;
+    const isAdmin = deriveAdmin(user);
+    return {
+        ...user,
+        role: user.role ?? user.userRole ?? null,
+        accountType: isAdmin ? 'admin' : (user.accountType ?? 'client'),
+        isAdmin,
+    };
+}
 async function saveAuthSession(session) {
     try {
         await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
@@ -101,6 +120,9 @@ export const restoreAuth = createAsyncThunk('auth/restoreAuth', async () => {
     catch (error) {
         console.warn('Unable to restore pending signup', error);
     }
+    if (session?.user) {
+        session.user = normalizeAuthUser(session.user);
+    }
     return { session, pendingSignup };
 });
 export const loginUser = createAsyncThunk('auth/loginUser', async (payload, { rejectWithValue }) => {
@@ -115,9 +137,11 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (payload, { re
         });
     }
     const session = {
-        user: result.user ?? {
+        user: normalizeAuthUser(result.user ?? {
             email: result.email,
-        },
+            role: result.user?.role,
+            isAdmin: result.isAdmin,
+        }),
         token: result.token ?? '',
     };
     saveAuthSession(session).catch(error => {
@@ -249,17 +273,21 @@ const authSlice = createSlice({
             state.signupErrors = {};
         },
         updateProfileUser(state, action) {
-            state.user = {
+            state.user = normalizeAuthUser({
                 ...state.user,
                 ...action.payload,
-            };
+            });
+            state.isAdmin = deriveAdmin(state.user);
+            state.role = state.user?.role ?? state.user?.userRole ?? null;
         },
         setAuthSession(state, action) {
-            state.user = action.payload.user;
+            state.user = normalizeAuthUser(action.payload.user);
             state.token = action.payload.token;
             state.isAuthenticated = true;
+            state.isAdmin = deriveAdmin(state.user);
+            state.role = state.user?.role ?? state.user?.userRole ?? null;
             state.isRestoring = false;
-            saveAuthSession({ user: action.payload.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
+            saveAuthSession({ user: state.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         },
         setOnboardingComplete(state, action) {
             if (state.user) state.user.hasCompletedOnboarding = true;
@@ -325,9 +353,11 @@ const authSlice = createSlice({
             state.isRestoring = false;
             const session = action.payload?.session ?? null;
             const storedPending = action.payload?.pendingSignup ?? null;
-            state.user = session?.user ?? null;
+            state.user = normalizeAuthUser(session?.user) ?? null;
             state.token = session?.token ?? null;
             state.isAuthenticated = Boolean(session?.token);
+            state.isAdmin = deriveAdmin(state.user);
+            state.role = state.user?.role ?? state.user?.userRole ?? null;
             state.hasCompletedPayment = Boolean(session?.hasCompletedPayment);
             // payment pehle ho chuka hai to stale pending record ignore karo
             state.pendingSignup = state.hasCompletedPayment ? null : storedPending;
@@ -342,6 +372,8 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.isAdmin = false;
+            state.role = null;
         })
             .addCase(loginUser.pending, state => {
             state.isLoading = true;
@@ -349,12 +381,14 @@ const authSlice = createSlice({
         })
             .addCase(loginUser.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.user = action.payload.user;
+            state.user = normalizeAuthUser(action.payload.user);
             state.token = action.payload.token;
             state.isAuthenticated = true;
+            state.isAdmin = deriveAdmin(state.user);
+            state.role = state.user?.role ?? state.user?.userRole ?? null;
             state.loginErrors = {};
             // hasCompletedPayment ko preserve rakho (login ke baad bhi), save session with flag
-            saveAuthSession({ user: action.payload.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
+            saveAuthSession({ user: state.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         })
             .addCase(loginUser.rejected, (state, action) => {
             state.isLoading = false;
@@ -397,10 +431,13 @@ const authSlice = createSlice({
         })
             .addCase(googleLoginUser.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.user = action.payload.user;
+            state.user = normalizeAuthUser(action.payload.user);
             state.token = action.payload.token;
             state.isAuthenticated = true;
+            state.isAdmin = deriveAdmin(state.user);
+            state.role = state.user?.role ?? state.user?.userRole ?? null;
             state.loginErrors = {};
+            saveAuthSession({ user: state.user, token: action.payload.token, hasCompletedPayment: state.hasCompletedPayment });
         })
             .addCase(googleLoginUser.rejected, (state, action) => {
             state.isLoading = false;
@@ -466,6 +503,8 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.isAdmin = false;
+            state.role = null;
             state.loginErrors = {};
             state.signupErrors = {};
             state.pendingAddCompany = false;
@@ -482,6 +521,8 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.isAdmin = false;
+            state.role = null;
             state.loginErrors = {};
             state.signupErrors = {};
             state.pendingAddCompany = false;
@@ -492,6 +533,8 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.isAdmin = false;
+            state.role = null;
             state.loginErrors = {};
             state.signupErrors = {};
             state.pendingAddCompany = false;

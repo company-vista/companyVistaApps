@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../../../config/api';
 import { getNetworkErrorMessage } from '../../../utils/errorMessages';
 import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 const CLIENT_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/login`;
+const ADMIN_LOGIN_ROUTE = `${API_BASE_URL}/api/auth/login`;
 const GOOGLE_LOGIN_ROUTE = `${API_BASE_URL}/api/client/auth/google/login`;
 const LOGIN_SEND_OTP_ROUTE = `${API_BASE_URL}/api/company-signup/login-send-otp`;
 const LOGIN_VERIFY_OTP_ROUTE = `${API_BASE_URL}/api/company-signup/login-verify-otp`;
@@ -111,6 +112,77 @@ function getErrorMessage(error) {
         axiosError.message ??
         'Unable to login. Please try again.');
 }
+const ADMIN_ROLES = ['owner', 'admin', 'superadmin', 'super-admin'];
+function isAdminRole(role) {
+    return ADMIN_ROLES.includes(String(role ?? '').toLowerCase());
+}
+function buildSessionUser(user, fallbackEmail) {
+    const role = user?.role;
+    const isAdmin = isAdminRole(role);
+    const phone = user?.phone ?? user?.phoneNumber ?? user?.mobile ?? user?.contactNumber ?? user?.mobileNumber;
+    return {
+        _id: user?._id,
+        address: user?.address,
+        addressLine1: user?.addressLine1,
+        avatar: getImageUrl(user?.avatar),
+        businessName: user?.businessName,
+        companies: user?.companies,
+        company: getUserCompany(user),
+        companyName: user?.companyName,
+        countryCode: user?.countryCode,
+        country: user?.country,
+        dateOfBirth: user?.dateOfBirth,
+        dob: user?.dob,
+        email: user?.email ?? fallbackEmail,
+        id: user?.id,
+        firstName: user?.firstName ? capitalizeCompanyName(user.firstName) : user?.firstName,
+        image: getImageUrl(user?.image),
+        lastName: user?.lastName ? capitalizeCompanyName(user.lastName) : user?.lastName,
+        legalName: user?.legalName,
+        mobile: user?.mobile,
+        name: getUserName(user) || user?.name,
+        passportNo: user?.passportNo,
+        passportNumber: user?.passportNumber,
+        phone,
+        phoneNumber: phone,
+        contactNumber: phone,
+        photo: getImageUrl(user?.photo),
+        postalCode: user?.postalCode,
+        profileImage: getImageUrl(user?.profileImage),
+        profilePicture: getImageUrl(user?.profilePicture),
+        role,
+        accountType: isAdmin ? 'admin' : 'client',
+        isAdmin,
+        state: user?.state,
+        street: user?.street,
+        isCompleteRegistration: user?.isCompleteRegistration,
+    };
+}
+function buildLoginResult(session, email) {
+    const loginUser = buildSessionUser(session.user, email);
+    return {
+        errors: {},
+        isSuccess: true,
+        email: loginUser.email,
+        token: session.token,
+        user: loginUser,
+        isAdmin: loginUser.isAdmin,
+        isRegistrationIncomplete: loginUser.isCompleteRegistration === false,
+    };
+}
+async function requestLogin(route, email, password) {
+    const response = await axios.post(route, { email, password }, {
+        timeout: API_REQUEST_TIMEOUT_MS,
+    });
+    const user = getResponseUser(response.data);
+    const token = getResponseToken(response.data) || getHeaderToken(response.headers);
+    if (!token) {
+        const tokenError = new Error('Login response did not include an auth token.');
+        tokenError.code = 'NO_TOKEN';
+        throw tokenError;
+    }
+    return { user, token };
+}
 export async function handleLoginApi({ email, password, }) {
     const errors = {};
     const trimmedEmail = email.trim();
@@ -140,76 +212,38 @@ export async function handleLoginApi({ email, password, }) {
     }
     let lastError;
     try {
-        const response = await axios.post(CLIENT_LOGIN_ROUTE, {
-            email: trimmedEmail,
-            password,
-        }, {
-            timeout: API_REQUEST_TIMEOUT_MS,
-        });
-        const user = getResponseUser(response.data);
-        const token = getResponseToken(response.data) || getHeaderToken(response.headers);
-        if (!token) {
-            Toast.show({
-                type: 'error',
-                text1: 'Login failed',
-                text2: 'Login response did not include an auth token.',
-            });
-            return {
-                errors: {
-                    email: 'Check your email',
-                    password: 'Check your password',
-                },
-                isSuccess: false,
-                email: trimmedEmail,
-            };
-        }
-        const loginUser = {
-            _id: user?._id,
-            address: user?.address,
-            addressLine1: user?.addressLine1,
-            avatar: getImageUrl(user?.avatar),
-            businessName: user?.businessName,
-            companies: user?.companies,
-            company: getUserCompany(user),
-            companyName: user?.companyName,
-            countryCode: user?.countryCode,
-            country: user?.country,
-            dateOfBirth: user?.dateOfBirth,
-            dob: user?.dob,
-            email: user?.email ?? trimmedEmail,
-            id: user?.id,
-            firstName: user?.firstName ? capitalizeCompanyName(user.firstName) : user?.firstName,
-            image: getImageUrl(user?.image),
-            lastName: user?.lastName ? capitalizeCompanyName(user.lastName) : user?.lastName,
-            legalName: user?.legalName,
-            mobile: user?.mobile,
-            name: getUserName(user),
-            passportNo: user?.passportNo,
-            passportNumber: user?.passportNumber,
-            phone: getUserPhone(user),
-            phoneNumber: user?.phoneNumber,
-            photo: getImageUrl(user?.photo),
-            postalCode: user?.postalCode,
-            profileImage: getImageUrl(user?.profileImage),
-            profilePicture: getImageUrl(user?.profilePicture),
-            role: user?.role,
-            state: user?.state,
-            street: user?.street,
-            isCompleteRegistration: user?.isCompleteRegistration,
-        };
-        // Login success even if incomplete - dashboard will be blocked via RootStack
-        // isCompleteRegistration === false => login ho jayega but dashboard nahi dikhega
-        return {
-            errors,
-            isSuccess: true,
-            email: loginUser.email,
-            token,
-            user: loginUser,
-            isRegistrationIncomplete: loginUser.isCompleteRegistration === false,
-        };
+        const session = await requestLogin(CLIENT_LOGIN_ROUTE, trimmedEmail, password);
+        return buildLoginResult(session, trimmedEmail);
     }
     catch (error) {
         lastError = error;
+    }
+    // Client route 401/404 deta hai jab email client collection me nahi hota.
+    // Usi case me admin route try karo - is tarah user ko account type choose nahi karna padta.
+    const status = lastError?.response?.status;
+    if (status === 401 || status === 404) {
+        try {
+            const session = await requestLogin(ADMIN_LOGIN_ROUTE, trimmedEmail, password);
+            return buildLoginResult(session, trimmedEmail);
+        }
+        catch (adminError) {
+            lastError = adminError;
+        }
+    }
+    if (lastError?.code === 'NO_TOKEN') {
+        Toast.show({
+            type: 'error',
+            text1: 'Login failed',
+            text2: 'Login response did not include an auth token.',
+        });
+        return {
+            errors: {
+                email: 'Check your email',
+                password: 'Check your password',
+            },
+            isSuccess: false,
+            email: trimmedEmail,
+        };
     }
     const message = getErrorMessage(lastError);
     Toast.show({

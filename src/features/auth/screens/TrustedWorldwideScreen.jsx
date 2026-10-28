@@ -34,7 +34,7 @@ const TrustedWorldwideScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: s(30) + insets.bottom }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: s(16) }]} showsVerticalScrollIndicator={false}>
 
         <View style={styles.headerRow}>
           <BackButton onPress={() => navigation.goBack()} />
@@ -117,14 +117,15 @@ const TrustedWorldwideScreen = ({ navigation }) => {
             <View style={styles.dashActive} />
           </View>
 
-          <TouchableOpacity style={[styles.getStartedBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
-            <Text style={[styles.btnText, { color: colors.buttonText }]}>Get Started →</Text>
-          </TouchableOpacity>
-
-
         </View>
 
       </ScrollView>
+
+      <View style={[styles.footerBar, { paddingBottom: s(12) + insets.bottom }]}>
+        <TouchableOpacity style={[styles.getStartedBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
+          <Text style={[styles.btnText, { color: colors.buttonText }]}>Get Started →</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -138,7 +139,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: s(16),
     paddingTop: s(30),
-    paddingBottom: s(30),
+    paddingBottom: s(16),
+  },
+  footerBar: {
+    paddingHorizontal: s(16),
+    paddingTop: s(8),
+    backgroundColor: 'transparent',
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(16) },
   topLogo: { width: 150, height: 38, marginTop: s(10), resizeMode: 'contain' },
@@ -248,7 +254,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingVertical: s(14),
     alignItems: 'center',
-    marginBottom: s(16),
   },
   btnText: { fontSize: 16, fontWeight: 'bold' },
 });

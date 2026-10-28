@@ -20,6 +20,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast, { type ToastConfig } from 'react-native-toast-message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
+
+// Meta SDK Event Logger Import
+import { AppEventsLogger } from 'react-native-fbsdk-next';
+
 import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
@@ -90,6 +94,11 @@ function AppContent() {
   useEffect(() => {
     dispatch(restoreAuth());
   }, [dispatch]);
+
+  // Meta SDK App Open / Install Event Logging
+  useEffect(() => {
+    AppEventsLogger.logEvent('fb_mobile_activate_app');
+  }, []);
 
   useEffect(() => {
     const splashTimer = setTimeout(() => {
@@ -219,24 +228,11 @@ function SplashScreen() {
           style={styles.globeImage}
           resizeMode={FastImage.resizeMode.contain}
         />
-        {/* <Animated.Image
-          source={logoR}
-          style={{
-            position: 'absolute',
-            bottom: -116,
-            width: 120,
-            height: 42,
-            resizeMode: 'contain',
-            transform: [{ translateY: logoTranslateY }],
-            opacity: logoRise,
-          }}
-        /> */}
         <Animated.Text style={{ position: 'absolute', bottom: -106, color: 'rgba(250, 234, 189, 0.64)', fontSize: 20, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>Company Vista Inc</Animated.Text>
         <Animated.Text style={{ position: 'absolute', bottom: -138, color: 'rgba(250, 234, 189, 0.64)', fontSize: 12, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>--a Koshika company--</Animated.Text>
       </View>
     </View>
   );
 }
-
 
 export default App;

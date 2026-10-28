@@ -1,0 +1,41 @@
+﻿    fontWeight: '600',
+    color: '#1E293B',
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#DC2626',
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1E293B',
+  },
+  countText: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+});
+

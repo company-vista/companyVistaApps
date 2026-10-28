@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, Animated, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import logoR from '../../../assets/images/logoR.png';
@@ -106,48 +106,55 @@ const OnboardingSlide = ({ navigation }) => {
 
       <LinearGradient
         colors={isDark ? ['#0a0f1e', '#070b16'] : ['#FFFFFF', '#F3F4F6']}
-        style={[styles.contentSection, { paddingBottom: s(24) + insets.bottom }]}
+        style={[styles.contentSection, { paddingBottom: s(4) + insets.bottom }]}
       >
         <View style={styles.goldLine} />
 
-        <View style={styles.eyebrowContainer}>
-          <View style={styles.eyebrowDash} />
-          <Text style={styles.eyebrowText}>{slide.eyebrow}</Text>
-        </View>
+        <ScrollView
+          style={styles.scrollBody}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={styles.eyebrowContainer}>
+            <View style={styles.eyebrowDash} />
+            <Text style={styles.eyebrowText}>{slide.eyebrow}</Text>
+          </View>
 
-        <Text style={[styles.title, { color: colors.text }]}>
-          {slide.title}
-          <Text style={styles.titleItalic}>{slide.titleItalic}</Text>
-        </Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {slide.title}
+            <Text style={styles.titleItalic}>{slide.titleItalic}</Text>
+          </Text>
 
-        <Text style={[styles.body, { color: colors.muted }]}>{slide.body}</Text>
+          <Text style={[styles.body, { color: colors.muted }]}>{slide.body}</Text>
 
-        {slide.showStepper && (
-          <View style={styles.stepperContainer}>
-            <View style={styles.stepperRow}>
-              <View style={styles.stepperStep}>
-                <View style={[styles.stepperCircle, { borderColor: '#c9a84c', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                  <Text style={[styles.stepperNumber, { color: '#c9a84c' }]}>1</Text>
+          {slide.showStepper && (
+            <View style={styles.stepperContainer}>
+              <View style={styles.stepperRow}>
+                <View style={styles.stepperStep}>
+                  <View style={[styles.stepperCircle, { borderColor: '#c9a84c', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: '#c9a84c' }]}>1</Text>
+                  </View>
+                  <Text style={[styles.stepperLabel, { color: colors.muted }]}>Choose</Text>
                 </View>
-                <Text style={[styles.stepperLabel, { color: colors.muted }]}>Choose</Text>
-              </View>
-              <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
-              <View style={styles.stepperStep}>
-                <View style={[styles.stepperCircle, { borderColor: '#3b82f6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                  <Text style={[styles.stepperNumber, { color: '#3b82f6' }]}>2</Text>
+                <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
+                <View style={styles.stepperStep}>
+                  <View style={[styles.stepperCircle, { borderColor: '#3b82f6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: '#3b82f6' }]}>2</Text>
+                  </View>
+                  <Text style={[styles.stepperLabel, { color: colors.muted }]}>Submit</Text>
                 </View>
-                <Text style={[styles.stepperLabel, { color: colors.muted }]}>Submit</Text>
-              </View>
-              <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
-              <View style={styles.stepperStep}>
-                <View style={[styles.stepperCircle, { borderColor: '#14b8a6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                  <Text style={[styles.stepperNumber, { color: '#14b8a6' }]}>3</Text>
+                <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
+                <View style={styles.stepperStep}>
+                  <View style={[styles.stepperCircle, { borderColor: '#14b8a6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: '#14b8a6' }]}>3</Text>
+                  </View>
+                  <Text style={[styles.stepperLabel, { color: colors.muted }]}>Incorporated</Text>
                 </View>
-                <Text style={[styles.stepperLabel, { color: colors.muted }]}>Incorporated</Text>
               </View>
             </View>
-          </View>
-        )}
+          )}
+        </ScrollView>
 
         <View style={styles.dotsContainer}>
           {SLIDES_DATA.map((_, idx) => (
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
   topLogo: { position: 'absolute', top: 50, left: 12, width: 180, height: 38, resizeMode: 'contain', zIndex: 10 },
   remoteButton: { position: 'absolute', top: 98, left: 20, backgroundColor: 'rgba(201, 168, 76, 0.15)', borderWidth: 1, borderColor: 'rgba(201, 168, 76, 0.3)', borderRadius: 20, paddingHorizontal: s(14), paddingVertical: s(6), zIndex: 10 },
   remoteButtonText: { fontSize: 12, fontWeight: '600', color: '#c9a84c', letterSpacing: 0.5 },
-  artSection: { height: '56%', alignItems: 'center', justifyContent: 'center' },
+  artSection: { height: '50%', alignItems: 'center', justifyContent: 'center' },
   artBadge: {
     width: 120,
     height: 120,
@@ -268,7 +275,7 @@ const styles = StyleSheet.create({
   contentSection: {
     flex: 1,
     paddingHorizontal: s(16),
-    paddingTop: s(26),
+    paddingTop: s(20),
     paddingBottom: s(24),
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
@@ -279,7 +286,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 1,
     backgroundColor: 'rgba(201, 168, 76, 0.35)',
-    marginBottom: s(20),
+    marginBottom: s(16),
   },
   eyebrowContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
   eyebrowDash: { width: 18, height: 1, backgroundColor: '#c9a84c', marginRight: s(8) },
@@ -287,14 +294,16 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '300', lineHeight: 30, marginBottom: s(12) },
   titleItalic: { fontStyle: 'italic', color: '#c9a84c' },
   body: { fontSize: 14, lineHeight: 20, marginBottom: 4 },
-  dotsContainer: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: s(20) },
+  dotsContainer: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: s(16) },
   dot: { width: 6, height: 6, borderRadius: 3 },
   activeDot: { width: 22, backgroundColor: '#c9a84c', borderRadius: 4 },
-  nextButton: { borderRadius: 24, overflow: 'hidden', marginBottom: s(10) },
+  nextButton: { borderRadius: 24, overflow: 'hidden', marginBottom: s(8) },
   gradientButton: { height: 50, alignItems: 'center', justifyContent: 'center' },
   nextButtonText: { fontSize: 16, fontWeight: '700', color: '#0a0f1e' },
-  skipButton: { height: 38, alignItems: 'center', justifyContent: 'center' },
+  skipButton: { height: 34, alignItems: 'center', justifyContent: 'center', marginBottom: s(4) },
   skipText: { fontSize: 12, fontWeight: '500' },
+  scrollBody: { flex: 1 },
+  scrollContent: { paddingBottom: s(8) },
 });
 
 export default OnboardingSlide;
