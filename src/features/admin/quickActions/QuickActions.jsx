@@ -4,7 +4,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export const QUICK_ACTIONS = [
   { key: 'create-invoice', title: 'Create Invoice', icon: '📄' },
   { key: 'add-client', title: 'Add Client', icon: '👤' },
-  { key: 'record-payment', title: 'Payment Record', icon: '💳' },
+  { key: 'vista-leads', title: 'Vista Leads', icon: '🎯' },
+  { key: 'record-payment', title: 'Payment record', icon: '💳' },
   { key: 'add-expense', title: 'Add Expense', icon: '💸' },
 ];
 
@@ -47,16 +48,17 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     justifyContent: 'flex-start',
     paddingTop: 10,
-    gap: 20,
+    columnGap: 20,
+    rowGap: 8,
   },
   card: {
     width: 64,
     backgroundColor: 'transparent',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 6,
   },
   cardIconWrap: {
     width: 64,
