@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getInvoiceStatusType } from '../dashboard/utils/dashboardFormat';
@@ -96,12 +97,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
   },
   viewAllText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#2563EB',
   },
   invoiceRowHeader: {
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   invCol: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     color: '#94A3B8',
   },
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   invoiceText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#0F172A',
   },
   statusBadge: {
@@ -133,11 +134,11 @@ const styles = StyleSheet.create({
     maxWidth: 90,
   },
   statusText: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '600',
   },
   emptyText: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
     textAlign: 'center',
     paddingVertical: 16,

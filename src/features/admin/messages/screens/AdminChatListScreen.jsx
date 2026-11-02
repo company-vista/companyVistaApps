@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -66,7 +67,7 @@ const AdminChatListScreen = () => {
         activeOpacity={0.7}
         onPress={() => navigation.navigate('AdminMessageScreen', { conversation: item })}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}</Text>
+          <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}{name.charAt(1).toUpperCase()}</Text>
         </View>
         <View style={styles.info}>
           <View style={styles.row}>
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
     color: '#1E293B',
   },
@@ -246,8 +247,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   avatarText: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: font.lg,
+    fontWeight: '500',
     color: '#1E3A8A',
   },
   info: {
@@ -263,19 +264,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   name: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
     color: '#1E293B',
     flex: 1,
     marginRight: 8,
   },
   time: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#94A3B8',
   },
   lastMsg: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
     marginTop: 2,
   },
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   unreadText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     color: '#FFFFFF',
   },
@@ -302,18 +303,18 @@ const styles = StyleSheet.create({
   },
   stateText: {
     marginTop: 10,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
   },
   errorText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#B91C1C',
     textAlign: 'center',
   },
   retryText: {
     marginTop: 12,
     color: '#1E3A8A',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
   emptyList: {
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#64748B',
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   modalBackdrop: {
     flex: 1,
@@ -340,14 +341,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalTitle: {
-    fontSize: 17,
+    fontSize: font.xl,
     fontWeight: '700',
     color: '#1E293B',
   },
   modalDescription: {
     marginTop: 6,
     marginBottom: 16,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
   },
   phoneInput: {
@@ -356,13 +357,13 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1',
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: font.base,
     color: '#1E293B',
   },
   phoneError: {
     marginTop: 7,
     color: '#B91C1C',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   modalActions: {
     flexDirection: 'row',
@@ -378,7 +379,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#334155',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
   startButton: {
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
 });

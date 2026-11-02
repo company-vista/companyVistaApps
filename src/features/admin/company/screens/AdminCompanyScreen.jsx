@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -425,7 +426,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     marginLeft: 6,
   },
@@ -444,12 +445,12 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginBottom: 4,
   },
   statValue: {
     color: '#0F172A',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
   tabsContainer: {
@@ -471,7 +472,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   activeTabText: {
@@ -497,7 +498,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: '#0F172A',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginLeft: 8,
   },
   filterIconButton: {
@@ -513,7 +514,7 @@ const styles = StyleSheet.create({
   },
   resultsCount: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginBottom: 12,
   },
   companyCard: {
@@ -548,7 +549,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#4F46E5',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   companyInfo: {
@@ -556,12 +557,12 @@ const styles = StyleSheet.create({
   },
   companyName: {
     color: '#0F172A',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: 'bold',
   },
   companyType: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 2,
   },
   statusBadge: {
@@ -571,7 +572,7 @@ const styles = StyleSheet.create({
     maxWidth: 130,
   },
   statusText: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: 'bold',
   },
   cardDetailsSection: {
@@ -588,7 +589,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginLeft: 4,
   },
   cardActionsFooter: {
@@ -606,7 +607,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   actionText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     marginLeft: 4,
   },
@@ -618,12 +619,12 @@ const styles = StyleSheet.create({
   },
   stateText: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: 10,
   },
   errorText: {
     color: '#DC2626',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     textAlign: 'center',
   },
   retryButton: {
@@ -635,7 +636,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
 });

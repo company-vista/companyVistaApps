@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '600',
     color: '#1E293B',
   },
@@ -208,11 +209,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: 14,
+    fontSize: font.base,
     color: '#64748B',
   },
   errorText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#DC2626',
     textAlign: 'center',
     paddingHorizontal: 16,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   actionBtnText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#334155',
   },
@@ -260,11 +261,11 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   activeFilterText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#475569',
   },
   clearFilterText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#1E3A8A',
     fontWeight: '600',
   },
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#1E293B',
     paddingVertical: 0,
   },
@@ -309,12 +310,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
     color: '#1E293B',
   },
   countText: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
   },
 });

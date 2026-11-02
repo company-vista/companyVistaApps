@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -77,14 +78,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
     flex: 1,
     marginRight: 8,
   },
   viewAllText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#2563EB',
   },
   tableRowHeader: {
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tableCol: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     color: '#94A3B8',
   },
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F8FAFC',
   },
   companyName: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#0F172A',
   },
@@ -123,22 +124,22 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '600',
   },
   stateText: {
-    fontSize: 9,
+    fontSize: font.caption,
     color: '#94A3B8',
     marginLeft: 6,
     flex: 1,
   },
   dateText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#64748B',
     textAlign: 'right',
   },
   emptyText: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
     textAlign: 'center',
     paddingVertical: 16,

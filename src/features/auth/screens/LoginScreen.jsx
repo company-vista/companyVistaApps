@@ -47,6 +47,7 @@ const COUNTRIES = [
 
 const LoginScreen = ({ navigation }) => {
   const [loginMethod, setLoginMethod] = useState('email');
+  const [accountType, setAccountType] = useState('client');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -69,7 +70,7 @@ const LoginScreen = ({ navigation }) => {
         Toast.show({ type: 'error', text1: 'Missing fields', text2: 'Please fill all fields' });
         return;
       }
-      const result = await dispatch(loginUser({ email: email.trim(), password }));
+      const result = await dispatch(loginUser({ email: email.trim(), password, loginType: accountType, forceAdmin: accountType === 'admin' }));
       if (loginUser.fulfilled.match(result)) {
         const user = result.payload?.user;
         if (user?.isCompleteRegistration === false) {
@@ -151,26 +152,26 @@ const LoginScreen = ({ navigation }) => {
           Log in to manage your companies, compliance and invoices.
         </Text>
 
-        {/* Login Method Toggle */}
-        <View style={[styles.tabContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : colors.surface, borderColor: colors.border }]}>
+        {/* Account Type Toggle */}
+        <View style={[styles.tabContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : colors.surface, borderColor: colors.border, marginBottom: s(12) }]}>
           <TouchableOpacity
-            style={[styles.tabButton, loginMethod === 'email' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
-            onPress={() => setLoginMethod('email')}
+            style={[styles.tabButton, accountType === 'client' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
+            onPress={() => setAccountType('client')}
             activeOpacity={0.8}
           >
-            <Ionicons name="mail" size={14} color={loginMethod === 'email' ? '#C9A84C' : colors.subtle} />
-            <Text style={[styles.tabText, { color: colors.muted }, loginMethod === 'email' && styles.activeTabText]}>
-              Email
+            <Ionicons name="person-outline" size={14} color={accountType === 'client' ? '#C9A84C' : colors.subtle} />
+            <Text style={[styles.tabText, { color: colors.muted }, accountType === 'client' && styles.activeTabText]}>
+              Client
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tabButton, loginMethod === 'mobile' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
-            onPress={() => setLoginMethod('mobile')}
+            style={[styles.tabButton, accountType === 'admin' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
+            onPress={() => setAccountType('admin')}
             activeOpacity={0.8}
           >
-            <Ionicons name="call" size={14} color={loginMethod === 'mobile' ? '#C9A84C' : colors.subtle} />
-            <Text style={[styles.tabText, { color: colors.muted }, loginMethod === 'mobile' && styles.activeTabText]}>
-              Mobile
+            <Ionicons name="shield-checkmark-outline" size={14} color={accountType === 'admin' ? '#C9A84C' : colors.subtle} />
+            <Text style={[styles.tabText, { color: colors.muted }, accountType === 'admin' && styles.activeTabText]}>
+              Admin
             </Text>
           </TouchableOpacity>
         </View>
@@ -258,6 +259,16 @@ const LoginScreen = ({ navigation }) => {
         >
           <Text style={[styles.loginBtnText, { color: colors.buttonText }]}>
             {isLoading ? 'Logging in...' : 'Log In →'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.loginMethodLink}
+          activeOpacity={0.8}
+          onPress={() => setLoginMethod(loginMethod === 'email' ? 'mobile' : 'email')}
+        >
+          <Text style={styles.createAccountLink}>
+            {loginMethod === 'email' ? 'Login with mobile number?' : 'Login with email?'}
           </Text>
         </TouchableOpacity>
 
@@ -396,10 +407,11 @@ const styles = StyleSheet.create({
   forgotText: { color: '#C9A84C', fontSize: 11, fontWeight: '500' },
   loginBtn: {
     backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
-    alignItems: 'center', marginBottom: s(24),
+    alignItems: 'center', marginBottom: s(10),
   },
   loginBtnDisabled: { opacity: 0.4 },
   loginBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
+  loginMethodLink: { alignItems: 'center', marginBottom: s(20) },
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(20) },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
   dividerText: { color: '#475569', fontSize: 10, paddingHorizontal: s(12) },

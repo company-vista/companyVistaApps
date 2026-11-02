@@ -1,15 +1,22 @@
 import { s } from './responsive';
 export const font = {
+    micro: s(7),
+    tiny: s(8),
+    caption: s(9),
     xs: s(10),
-    sm: s(14),
-    base: s(12),
+    small: s(11),
+    sm: s(12),
+    bodySmall: s(13),
+    base: s(14),
     md: s(15),
-    lg: s(14),
-    xl: s(16), // 15
-    xxl: s(16), // 16
-    title: s(17), // 17
-    heading: s(17), // 17
+    lg: s(16),
+    xl: s(17),
+    xxl: s(18),
+    heading: s(18),
+    title: s(19),
     hero: s(20),
-    display: s(20),
-    large: s(22),
+    large: s(21),
+    display: s(22),
+    displayLarge: s(26),
+    displayXL: s(28),
 };

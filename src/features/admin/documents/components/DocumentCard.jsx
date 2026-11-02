@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React from 'react';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -127,12 +128,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#1E293B',
   },
   subText: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
     marginTop: 2,
     fontWeight: '400',
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   uploadedAtText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#94A3B8',
   },
 });

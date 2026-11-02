@@ -1,11 +1,41 @@
-import React from 'react';
+import { font } from '../../../theme/typography';
+import React, { useCallback, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../store/hooks';
+import { fetchAdminNotifications } from '../notifications/api/adminNotificationsApi';
 
 const AdminHeader = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const navigation = useNavigation();
+  const { user, token } = useAppSelector((state) => state.auth);
   const insets = useSafeAreaInsets();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      const loadUnreadCount = async () => {
+        if (!token) return;
+        try {
+          const notifications = await fetchAdminNotifications({ token });
+          if (!active) return;
+          setUnreadCount(
+            notifications.filter(
+              notification => !(notification.isRead ?? notification.read),
+            ).length,
+          );
+        } catch (error) {
+          if (active) setUnreadCount(0);
+        }
+      };
+      loadUnreadCount();
+      return () => {
+        active = false;
+      };
+    }, [token]),
+  );
 
   return (
     <View style={styles.headerWrapper}>
@@ -20,18 +50,28 @@ const AdminHeader = () => {
           />
           <View>
             <Text style={styles.userName}>{user?.name || 'shivam chauhan'}</Text>
-            <Text style={styles.userRole}>@ {user?.role || 'Admin'}</Text>
+            {/* <Text style={styles.userRole}>@ {user?.role || 'Admin'}</Text> */}
           </View>
         </View>
 
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Text style={styles.iconText}>🔔</Text>
-            <View style={styles.badge} />
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('AdminNotifications')}
+            accessibilityRole="button"
+            accessibilityLabel="Open notifications">
+            <Ionicons name="notifications-outline" size={22} color="#1E293B" />
+            {unreadCount > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            ) : null}
           </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        {/* <TouchableOpacity style={styles.iconButton}>
           <Text style={styles.iconText}>☰</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         </View>
       </View>
     </View>
@@ -68,12 +108,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   userName: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
   },
   userRole: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#64748B',
   },
   headerActions: {
@@ -86,15 +126,23 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   iconText: {
-    fontSize: 18,
+    fontSize: font.xxl,
   },
   badge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    top: 2,
+    right: 2,
+    minWidth: 15,
+    height: 15,
+    paddingHorizontal: 3,
+    borderRadius: 8,
     backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: font.tiny,
+    fontWeight: '800',
   },
 });

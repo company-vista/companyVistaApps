@@ -94,8 +94,8 @@ android {
         applicationId "com.vistaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.6.1"
+        versionCode 16
+        versionName "1.7.0"
         manifestPlaceholders = [usesCleartextTraffic: "true"]
     }
     compileOptions {

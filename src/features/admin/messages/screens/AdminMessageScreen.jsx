@@ -1,13 +1,110 @@
+import { font } from '../../../../theme/typography';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, Image, Keyboard, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, FlatList, Image, Keyboard, Linking, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { pick, types } from '@react-native-documents/picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
 import {
   fetchAdminConversationThread,
+  getAdminMessageMediaUrl,
   getAdminMessagesError,
+  sendAdminMediaMessage,
   sendAdminMessage,
 } from '../api/messagesApi';
+
+const MIME_TYPES_BY_EXTENSION = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  mp4: 'video/mp4',
+  '3gp': 'video/3gpp',
+  aac: 'audio/aac',
+  m4a: 'audio/mp4',
+  mp3: 'audio/mpeg',
+  amr: 'audio/amr',
+  ogg: 'audio/ogg',
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt: 'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  txt: 'text/plain',
+};
+
+const getAttachmentMimeType = file => {
+  if (file.type) return file.type;
+  const extension = file.name?.split('.').pop()?.toLowerCase();
+  return MIME_TYPES_BY_EXTENSION[extension] || 'application/octet-stream';
+};
+
+const MessageImage = ({ item, conversationId, token }) => {
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const isLocalImage =
+    typeof item.mediaUrl === 'string' &&
+    /^(file|content):\/\//i.test(item.mediaUrl);
+  const imageSource = isLocalImage
+    ? { uri: item.mediaUrl }
+    : {
+        uri: getAdminMessageMediaUrl({
+          id: conversationId,
+          messageId: item._id || item.id,
+        }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-auth-token': token,
+        },
+      };
+  const [hasLoadError, setHasLoadError] = useState(false);
+
+  if (hasLoadError) {
+    return (
+      <View style={styles.messageImageFallback}>
+        <Ionicons name="image-outline" size={22} color="#BFDBFE" />
+        <Text style={styles.messageImageFallbackText}>
+          Image unavailable
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <TouchableOpacity onPress={() => setViewerVisible(true)} activeOpacity={0.9}>
+        <Image
+          source={imageSource}
+          style={styles.messageImage}
+          resizeMode="cover"
+          onError={() => setHasLoadError(true)}
+        />
+      </TouchableOpacity>
+      <Modal
+        visible={viewerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setViewerVisible(false)}>
+        <Pressable
+          style={styles.imageViewer}
+          onPress={() => setViewerVisible(false)}>
+          <Image
+            source={imageSource}
+            style={styles.imageViewerImage}
+            resizeMode="contain"
+          />
+          <Ionicons
+            name="close-circle"
+            size={34}
+            color="#FFFFFF"
+            style={styles.imageViewerClose}
+          />
+        </Pressable>
+      </Modal>
+    </>
+  );
+};
 
 const formatTime = date => {
   if (!date) return '';
@@ -112,14 +209,10 @@ const AdminMessageScreen = () => {
 
     setSending(true);
     try {
-      const response = await sendAdminMessage({ id: conversationId, text, token });
-      if (response?.data) {
-        setMessages(prev => [...prev, response.data]);
-        setMessage('');
-        setError('');
-      } else {
-        throw new Error(response?.message || 'Message was not sent.');
-      }
+      const sentMessage = await sendAdminMessage({ id: conversationId, text, token });
+      setMessages(prev => [...prev, sentMessage]);
+      setMessage('');
+      setError('');
     } catch (sendError) {
       const failedMessage = sendError?.response?.data?.data;
       if (failedMessage) {
@@ -133,15 +226,80 @@ const AdminMessageScreen = () => {
     }
   };
 
+  const sendAttachment = async () => {
+    if (sending || !conversationId) return;
+
+    setSending(true);
+    try {
+      const selectedFiles = await pick({
+        type: [
+          types.images,
+          types.video,
+          types.audio,
+          types.pdf,
+          types.doc,
+          types.docx,
+          types.xls,
+          types.xlsx,
+          types.ppt,
+          types.pptx,
+          types.plainText,
+        ],
+        allowMultiSelection: false,
+      });
+      const selectedFile = selectedFiles?.[0];
+      if (!selectedFile?.uri) return;
+
+      const sentMessage = await sendAdminMediaMessage({
+        id: conversationId,
+        file: {
+          uri: selectedFile.uri,
+          name: selectedFile.name,
+          type: getAttachmentMimeType(selectedFile),
+        },
+        caption: message,
+        token,
+      });
+      setMessages(prev => [
+        ...prev,
+        {
+          ...sentMessage,
+          mediaUrl: selectedFile.uri,
+          remoteMediaUrl: sentMessage.mediaUrl,
+        },
+      ]);
+      setMessage('');
+      setError('');
+    } catch (sendError) {
+      if (
+        sendError?.code === 'DOCUMENT_PICKER_CANCELED' ||
+        sendError?.code === 'user_cancelled'
+      ) {
+        return;
+      }
+      const failedMessage = sendError?.response?.data?.data;
+      if (failedMessage) {
+        setMessages(prev => [...prev, failedMessage]);
+      }
+      const errorMessage = getAdminMessagesError(sendError);
+      setError(errorMessage);
+      Alert.alert('Attachment not sent', errorMessage);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const renderItem = ({ item }) => {
     const isAdmin = item.direction === 'outbound';
     return (
       <View style={[styles.msgRow, isAdmin ? styles.msgRowRight : styles.msgRowLeft]}>
         <View style={[styles.bubble, isAdmin ? styles.bubbleAdmin : styles.bubbleUser]}>
-          {item.mediaType === 'image' && item.mediaUrl ? (
-            <TouchableOpacity onPress={() => openMedia(item.mediaUrl)}>
-              <Image source={{ uri: item.mediaUrl }} style={styles.messageImage} resizeMode="cover" />
-            </TouchableOpacity>
+          {item.mediaType === 'image' ? (
+            <MessageImage
+              item={item}
+              conversationId={conversationId}
+              token={token}
+            />
           ) : null}
           {item.mediaType && item.mediaType !== 'image' && item.mediaUrl ? (
             <TouchableOpacity onPress={() => openMedia(item.mediaUrl)}>
@@ -210,7 +368,15 @@ const AdminMessageScreen = () => {
             styles.inputRow,
             { paddingBottom: Math.max(insets.bottom, 8), marginBottom: keyboardOffset },
           ]}>
-          <TextInput
+            <TouchableOpacity
+              style={[styles.attachBtn, sending && styles.sendBtnDisabled]}
+              onPress={sendAttachment}
+              disabled={sending || !conversationId}
+              accessibilityRole="button"
+              accessibilityLabel="Attach and send a file">
+              <Ionicons name="attach" size={22} color="#1E3A8A" />
+            </TouchableOpacity>
+            <TextInput
             style={styles.input}
             placeholder="Type a message..."
             placeholderTextColor="#94A3B8"
@@ -251,24 +417,24 @@ const styles = StyleSheet.create({
   },
   stateText: {
     marginTop: 10,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
   },
   errorText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#B91C1C',
     textAlign: 'center',
   },
   retryText: {
     marginTop: 12,
     color: '#1E3A8A',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
   emptyText: {
     color: '#64748B',
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: 16,
   },
   header: {
@@ -285,7 +451,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   backText: {
-    fontSize: 18,
+    fontSize: font.xxl,
     color: '#1E293B',
   },
   headerInfo: {
@@ -303,12 +469,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   avatarSmallText: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#1E3A8A',
   },
   headerName: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
     color: '#1E293B',
     flex: 1,
@@ -349,6 +515,37 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 8,
     marginBottom: 4,
+    backgroundColor: '#1E3A8A',
+  },
+  messageImageFallback: {
+    width: 200,
+    minHeight: 80,
+    borderRadius: 8,
+    marginBottom: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  messageImageFallbackText: {
+    color: '#BFDBFE',
+    fontSize: font.caption,
+    textAlign: 'center',
+  },
+  imageViewer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.94)',
+  },
+  imageViewerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageViewerClose: {
+    position: 'absolute',
+    top: 48,
+    right: 20,
   },
   mediaLink: {
     color: '#1D4ED8',
@@ -356,7 +553,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   msgText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   msgTextUser: {
     color: '#1E293B',
@@ -365,7 +562,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   msgTime: {
-    fontSize: 9,
+    fontSize: font.caption,
     marginTop: 4,
     alignSelf: 'flex-end',
   },
@@ -393,8 +590,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
     paddingHorizontal: 14,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#1E293B',
+  },
+  attachBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F1F5F9',
   },
   sendBtn: {
     backgroundColor: '#1E3A8A',
@@ -407,7 +612,7 @@ const styles = StyleSheet.create({
   },
   sendText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
 });

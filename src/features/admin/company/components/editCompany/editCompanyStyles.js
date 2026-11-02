@@ -1,3 +1,4 @@
+import { font } from '../../../../../theme/typography';
 import { StyleSheet } from 'react-native';
 
 export const editColors = {
@@ -51,13 +52,13 @@ export const sharedStyles = StyleSheet.create({
     flex: 1,
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: editColors.text,
     letterSpacing: 0.1,
   },
   sectionSubtitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -72,7 +73,7 @@ export const sharedStyles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: editColors.text,
     marginBottom: 6,
@@ -87,7 +88,7 @@ export const sharedStyles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 14,
+    fontSize: font.base,
     color: editColors.text,
     backgroundColor: '#fbfbfd',
   },
@@ -103,14 +104,14 @@ export const sharedStyles = StyleSheet.create({
     opacity: 0.6,
   },
   inputText: {
-    fontSize: 14,
+    fontSize: font.base,
     color: editColors.text,
   },
   placeholder: {
     color: editColors.textSoft,
   },
   helper: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 5,
   },
@@ -130,7 +131,7 @@ export const sharedStyles = StyleSheet.create({
   },
   selectValue: {
     flex: 1,
-    fontSize: 14,
+    fontSize: font.base,
     color: editColors.text,
     marginRight: 8,
   },
@@ -159,7 +160,7 @@ export const sharedStyles = StyleSheet.create({
     marginBottom: 8,
   },
   modalTitle: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: editColors.text,
     textAlign: 'center',
@@ -178,7 +179,7 @@ export const sharedStyles = StyleSheet.create({
     backgroundColor: editColors.primarySoft,
   },
   modalOptionText: {
-    fontSize: 14,
+    fontSize: font.base,
     color: editColors.text,
     flex: 1,
     marginRight: 12,
@@ -200,7 +201,7 @@ export const sharedStyles = StyleSheet.create({
     backgroundColor: editColors.primarySoft,
   },
   addButtonText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: editColors.primary,
   },
@@ -237,12 +238,12 @@ export const sharedStyles = StyleSheet.create({
     marginRight: 10,
   },
   memberName: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: editColors.text,
   },
   memberMeta: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -271,12 +272,12 @@ export const sharedStyles = StyleSheet.create({
     borderColor: '#fcd34d',
   },
   totalLabel: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: editColors.textMuted,
   },
   totalValue: {
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '800',
     color: editColors.primary,
   },
@@ -284,7 +285,7 @@ export const sharedStyles = StyleSheet.create({
     color: editColors.warning,
   },
   totalHint: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -294,13 +295,13 @@ export const sharedStyles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   emptyTitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: editColors.text,
     marginTop: 8,
   },
   emptyText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     textAlign: 'center',
     marginTop: 3,
@@ -368,7 +369,7 @@ export const screenStyles = StyleSheet.create({
     backgroundColor: editColors.accent,
   },
   stepNumber: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: editColors.textSoft,
   },
@@ -376,7 +377,7 @@ export const screenStyles = StyleSheet.create({
     color: '#ffffff',
   },
   stepLabel: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.textMuted,
     marginTop: 6,
@@ -388,7 +389,7 @@ export const screenStyles = StyleSheet.create({
     color: editColors.accent,
   },
   stepSubtitle: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     textAlign: 'center',
     marginTop: 10,
@@ -419,7 +420,7 @@ export const screenStyles = StyleSheet.create({
     backgroundColor: editColors.surface,
   },
   backButtonText: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
     color: editColors.text,
   },
@@ -450,12 +451,12 @@ export const screenStyles = StyleSheet.create({
     opacity: 0.55,
   },
   primaryButtonText: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#ffffff',
   },
   bottomHint: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     textAlign: 'center',
     marginTop: 8,
@@ -479,12 +480,12 @@ export const screenStyles = StyleSheet.create({
   },
   warningText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.warning,
     lineHeight: 16,
   },
   loadingText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: editColors.textMuted,
     marginTop: 10,
   },
@@ -497,13 +498,13 @@ export const screenStyles = StyleSheet.create({
     alignItems: 'center',
   },
   errorTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: editColors.danger,
     marginBottom: 4,
   },
   errorText: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#b91c1c',
     textAlign: 'center',
     marginBottom: 12,
@@ -515,7 +516,7 @@ export const screenStyles = StyleSheet.create({
     backgroundColor: editColors.danger,
   },
   retryButtonText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#ffffff',
   },

@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -862,20 +863,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   companyLabel: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   companyName: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: editColors.text,
     marginTop: 2,
   },
   companyHint: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 3,
     lineHeight: 16,
@@ -888,7 +889,7 @@ const styles = StyleSheet.create({
     backgroundColor: editColors.surface,
   },
   changeButtonText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: editColors.danger,
   },
@@ -904,7 +905,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: font.base,
     color: editColors.text,
     paddingHorizontal: 8,
     paddingVertical: 10,
@@ -926,23 +927,23 @@ const styles = StyleSheet.create({
     borderTopColor: '#f3f4f6',
   },
   companyResultName: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: editColors.text,
   },
   companyResultMeta: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
   selectLabel: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     color: editColors.primary,
     marginLeft: 10,
   },
   searchHint: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 6,
   },
@@ -981,7 +982,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   tagText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.primary,
     marginRight: 6,
@@ -1013,12 +1014,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   optionTitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: editColors.text,
   },
   optionSubtitle: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -1046,7 +1047,7 @@ const styles = StyleSheet.create({
     backgroundColor: editColors.primarySoft,
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: editColors.textMuted,
   },
@@ -1067,7 +1068,7 @@ const styles = StyleSheet.create({
     backgroundColor: editColors.primary,
   },
   tabBadgeText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     color: editColors.textMuted,
   },
@@ -1096,13 +1097,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pickerTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: editColors.primary,
     textAlign: 'center',
   },
   pickerHint: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 3,
     textAlign: 'center',
@@ -1131,12 +1132,12 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   fileName: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: editColors.text,
   },
   fileMeta: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -1165,22 +1166,22 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   summaryText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.primary,
   },
   fileCount: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.success,
     marginTop: 2,
   },
   emptyFiles: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
   },
   errorText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.danger,
     textAlign: 'center',

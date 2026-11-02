@@ -1,3 +1,4 @@
+import { font } from '../../../../../theme/typography';
 ﻿import { StyleSheet } from 'react-native';
 import { editColors } from '../editCompany/editCompanyStyles';
 
@@ -29,12 +30,12 @@ export const styles = StyleSheet.create({
     borderBottomColor: editColors.border,
   },
   pickerTitle: {
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     color: editColors.text,
   },
   pickerSubtitle: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -74,12 +75,12 @@ export const styles = StyleSheet.create({
     marginRight: 8,
   },
   pickerItemTitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: editColors.text,
   },
   pickerItemDesc: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
     lineHeight: 16,
@@ -100,12 +101,12 @@ export const styles = StyleSheet.create({
     backgroundColor: editColors.surface,
   },
   modalTitle: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: editColors.text,
   },
   modalSubtitle: {
-    fontSize: 11,
+    fontSize: font.small,
     color: editColors.textMuted,
     marginTop: 2,
   },
@@ -118,7 +119,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: editColors.text,
     marginBottom: 8,
@@ -138,7 +139,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: editColors.textMuted,
     marginBottom: 4,
@@ -151,7 +152,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: editColors.surface,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: editColors.text,
   },
   textarea: {
@@ -165,7 +166,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   addBtnText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     color: '#4F46E5',
     marginLeft: 4,
@@ -203,7 +204,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
   },
   ghostBtnText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: editColors.textMuted,
   },
@@ -219,7 +220,7 @@ export const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryBtnText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: '#FFFFFF',
     marginRight: 6,

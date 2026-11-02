@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardTitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#475569',
     flex: 1,
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mainNumber: {
-    fontSize: 26,
+    fontSize: font.displayLarge,
     fontWeight: '800',
     color: '#0F172A',
     marginBottom: 6,
@@ -151,21 +152,21 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   currencyLabel: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#94A3B8',
   },
   amountText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: '#0F172A',
   },
   subAmountText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#334155',
   },
   noteText: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#94A3B8',
     marginTop: 10,
   },

@@ -1,15 +1,27 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export const QUICK_ACTIONS = [
   { key: 'create-invoice', title: 'Create Invoice', icon: '📄' },
   { key: 'add-client', title: 'Add Client', icon: '👤' },
-  { key: 'record-payment', title: 'Payment Record', icon: '💳' },
+  // { key: 'record-payment', title: 'Payment Record', icon: '💳' },
   { key: 'add-expense', title: 'Add Expense', icon: '💸' },
+  { key: 'vista-leads', title: 'Vista Leads', icon: '👥' },
 ];
 
 const QuickActions = () => {
-  const handlePress = () => {};
+  const navigation = useNavigation();
+  const handlePress = action => {
+    if (action.key === 'create-invoice') {
+      navigation.navigate('AdminCreateInvoice');
+    } else if (action.key === 'add-expense') {
+      navigation.navigate('AdminAddExpense');
+    } else if (action.key === 'vista-leads') {
+      navigation.navigate('CompanyVistaLeads');
+    }
+  };
 
   return (
     <View style={styles.quickActionsSection}>
@@ -20,7 +32,7 @@ const QuickActions = () => {
             key={action.key}
             style={styles.card}
             activeOpacity={0.7}
-            onPress={handlePress}>
+            onPress={() => handlePress(action)}>
             <View style={styles.cardIconWrap}>
               <Text style={styles.cardIcon}>{action.icon}</Text>
             </View>
@@ -38,7 +50,7 @@ export default QuickActions;
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
   },
@@ -47,7 +59,7 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     justifyContent: 'flex-start',
     paddingTop: 10,
     gap: 20,
@@ -74,10 +86,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
   },
   cardIcon: {
-    fontSize: 22,
+    fontSize: font.display,
   },
   cardTitle: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '600',
     color: '#1E293B',
     textAlign: 'center',

@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -68,14 +69,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navIcon: {
-    fontSize: 16,
+    fontSize: font.lg,
     opacity: 0.5,
   },
   activeNavIcon: {
     opacity: 1,
   },
   navText: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#64748B',
     marginTop: 2,
   },

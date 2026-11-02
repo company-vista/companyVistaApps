@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -254,9 +255,6 @@ const AdminDashboard = () => {
             <Text style={styles.outlinedButtonText}>↑ Upload Document</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>+ Create Invoice</Text>
-          </TouchableOpacity>
         </View>
 
         <AdminStatsCards
@@ -270,7 +268,10 @@ const AdminDashboard = () => {
         />
 
         <View style={{ marginTop: 16 }}>
-          <AdminRecentInvoices invoices={recentInvoices} />
+          <AdminRecentInvoices
+            invoices={recentInvoices}
+            onViewAll={() => navigation.navigate('AdminInvoices')}
+          />
         </View>
 
         <QuickActions />
@@ -304,12 +305,12 @@ const styles = StyleSheet.create({
   },
   stateText: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
   },
   errorText: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#DC2626',
     textAlign: 'center',
   },
@@ -322,7 +323,7 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
 
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   outlinedButtonText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#334155',
   },
@@ -350,12 +351,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#FFFFFF',
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
   },

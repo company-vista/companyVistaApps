@@ -23,7 +23,7 @@ import FastImage from 'react-native-fast-image';
 
 // Meta SDK Event Logger Import
 import { AppEventsLogger } from 'react-native-fbsdk-next';
-
+import { Settings } from 'react-native-fbsdk-next';
 import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
@@ -97,6 +97,8 @@ function AppContent() {
 
   // Meta SDK App Open / Install Event Logging
   useEffect(() => {
+    Settings.initializeSDK();
+    Settings.setAdvertiserTrackingEnabled(true);
     AppEventsLogger.logEvent('fb_mobile_activate_app');
   }, []);
 

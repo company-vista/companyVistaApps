@@ -183,7 +183,7 @@ async function requestLogin(route, email, password) {
     }
     return { user, token };
 }
-export async function handleLoginApi({ email, password, }) {
+export async function handleLoginApi({ email, password, loginType = 'client', forceAdmin = false, }) {
     const errors = {};
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
@@ -211,23 +211,34 @@ export async function handleLoginApi({ email, password, }) {
         };
     }
     let lastError;
-    try {
-        const session = await requestLogin(CLIENT_LOGIN_ROUTE, trimmedEmail, password);
-        return buildLoginResult(session, trimmedEmail);
-    }
-    catch (error) {
-        lastError = error;
-    }
-    // Client route 401/404 deta hai jab email client collection me nahi hota.
-    // Usi case me admin route try karo - is tarah user ko account type choose nahi karna padta.
-    const status = lastError?.response?.status;
-    if (status === 401 || status === 404) {
+    const useAdminRoute = forceAdmin || loginType === 'admin';
+    if (useAdminRoute) {
         try {
             const session = await requestLogin(ADMIN_LOGIN_ROUTE, trimmedEmail, password);
             return buildLoginResult(session, trimmedEmail);
         }
-        catch (adminError) {
-            lastError = adminError;
+        catch (error) {
+            lastError = error;
+        }
+    } else {
+        try {
+            const session = await requestLogin(CLIENT_LOGIN_ROUTE, trimmedEmail, password);
+            return buildLoginResult(session, trimmedEmail);
+        }
+        catch (error) {
+            lastError = error;
+        }
+        // Client route 401/404 deta hai jab email client collection me nahi hota.
+        // Usi case me admin route try karo - is tarah user ko account type choose nahi karna padta.
+        const status = lastError?.response?.status;
+        if (status === 401 || status === 404) {
+            try {
+                const session = await requestLogin(ADMIN_LOGIN_ROUTE, trimmedEmail, password);
+                return buildLoginResult(session, trimmedEmail);
+            }
+            catch (adminError) {
+                lastError = adminError;
+            }
         }
     }
     if (lastError?.code === 'NO_TOKEN') {

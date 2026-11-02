@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   RefreshControl,
@@ -401,7 +402,7 @@ export function AdminCompanyRecordsScreen() {
               onPress={handleUpload}
             >
               <Text
-                style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}
+                style={{ color: '#FFFFFF', fontSize: font.sm, fontWeight: '600' }}
               >
                 Go to Upload
               </Text>

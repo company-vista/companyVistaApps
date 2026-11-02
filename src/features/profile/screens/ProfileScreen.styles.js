@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(8),
         borderWidth: 1,
-        borderRadius: 19,
+        borderRadius: 29,
         backgroundColor: '#ccfbf1',
         paddingHorizontal: s(14),
     },
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     },
     profileCard: {
         alignItems: 'center',
-        borderRadius: 18,
+        borderRadius: 29,
         backgroundColor: '#ffffff',
         marginTop: s(24),
         paddingHorizontal: 0,

@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -5,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const cards = [
   { key: 'invoices', title: 'Invoices', icon: '📄' },
   { key: 'estimates', title: 'Estimates', icon: '🧾' },
-  // { key: 'payments', title: 'Payment records', icon: '💳' },
+  { key: 'payments', title: 'Payment records', icon: '💳' },
   // { key: 'expenses', title: 'Expenses', icon: '💸' },
 ];
 
@@ -13,8 +14,11 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
   const navigation = useNavigation();
 
   const handlePress = (item) => {
-    // Placeholder navigation - can be updated when screens exist
-    // navigation.navigate(item.key);
+    if (item.key === 'invoices') {
+      navigation.navigate('AdminInvoices');
+    } else if (item.key === 'payments') {
+      navigation.navigate('AdminTransactions');
+    }
   };
 
   return (
@@ -31,7 +35,7 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() => handlePress(item)}>
-            <View style={[styles.cardIconWrap, item.key === 'payments' && { paddingTop: 2 }]}>
+            <View style={[styles.cardIconWrap, item.key === 'payments' && styles.paymentIconWrap]}>
               <Text style={styles.cardIcon}>{item.icon}</Text>
             </View>
             <Text style={styles.cardTitle} numberOfLines={2}>
@@ -50,23 +54,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1E293B',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
   gridCompact: {
     paddingHorizontal: 0,
     paddingTop: 6,
@@ -77,7 +64,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '600',
     color: '#1E293B',
   },
@@ -111,11 +98,14 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
   },
+  paymentIconWrap: {
+    paddingTop: 2,
+  },
   cardIcon: {
-    fontSize: 28,
+    fontSize: font.displayXL,
   },
   cardTitle: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '500',
     color: '#1E293B',
     textAlign: 'center',

@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -28,7 +29,7 @@ export const styles = StyleSheet.create({
   topNavTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: '#0F172A',
     marginHorizontal: 8,
@@ -41,12 +42,12 @@ export const styles = StyleSheet.create({
   },
   stateText: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
   },
   errorText: {
     marginTop: 12,
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#DC2626',
     textAlign: 'center',
   },
@@ -59,12 +60,12 @@ export const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
   inlineError: {
     marginBottom: 12,
-    fontSize: 11,
+    fontSize: font.small,
     color: '#DC2626',
   },
   headerCard: {
@@ -88,7 +89,7 @@ export const styles = StyleSheet.create({
     marginRight: 12,
   },
   companyAvatarText: {
-    fontSize: 19,
+    fontSize: font.title,
     fontWeight: '700',
     color: '#4F46E5',
   },
@@ -97,7 +98,7 @@ export const styles = StyleSheet.create({
     marginRight: 8,
   },
   companyName: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: '#0F172A',
   },
@@ -107,7 +108,7 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   locationText: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#64748B',
     marginLeft: 4,
     flex: 1,
@@ -119,7 +120,7 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusPillText: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
@@ -141,7 +142,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   headerActionText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '600',
     color: '#334155',
   },
@@ -153,7 +154,7 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     color: '#0F172A',
   },
@@ -164,7 +165,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   criticalPillText: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     color: '#DC2626',
     textTransform: 'uppercase',
@@ -202,7 +203,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   complianceTitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#0F172A',
     marginTop: 8,
@@ -216,7 +217,7 @@ export const styles = StyleSheet.create({
   },
   complianceSubtitle: {
     flex: 1,
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#64748B',
     marginRight: 4,
   },
@@ -232,7 +233,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   timelineSectionHeading: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
     color: '#111827',
   },
@@ -273,12 +274,12 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   timelineCardTitle: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
     color: '#111827',
   },
   timelineCardSubtitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#6B7280',
     marginTop: 2,
   },
@@ -301,7 +302,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   timelineStatusPillText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: '#475569',
   },
@@ -328,11 +329,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   timelineInfoLabel: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#6B7280',
   },
   timelineInfoValue: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '500',
     color: '#111827',
   },
@@ -356,12 +357,12 @@ export const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   timelineActionBtnTextPrimary: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#4338CA',
   },
   timelineActionBtnTextSecondary: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#475569',
   },
@@ -412,12 +413,12 @@ export const styles = StyleSheet.create({
     marginRight: 8,
   },
   bannerTitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#1E3A8A',
   },
   bannerSubtitle: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#475569',
     marginTop: 3,
   },
@@ -425,7 +426,7 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
   linkText: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#1D4ED8',
   },
@@ -447,12 +448,12 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
     color: '#0F172A',
   },
   cardSubtitle: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#94A3B8',
     marginTop: 3,
   },
@@ -472,12 +473,12 @@ export const styles = StyleSheet.create({
   },
   infoLabel: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
   },
   infoValue: {
     flex: 1.2,
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#0F172A',
     textAlign: 'right',
@@ -491,12 +492,12 @@ export const styles = StyleSheet.create({
     marginBottom: 14,
   },
   recordsCompanyName: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: '#0F172A',
   },
   recordsLocation: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#64748B',
     marginTop: 4,
   },
@@ -518,7 +519,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   recordsEditText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: '#334155',
   },
@@ -543,7 +544,7 @@ export const styles = StyleSheet.create({
     borderColor: '#1E3A8A',
   },
   tabText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: '#475569',
   },
@@ -561,7 +562,7 @@ export const styles = StyleSheet.create({
   },
   emptyText: {
     marginTop: 8,
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#64748B',
   },
   shareholderCard: {
@@ -586,7 +587,7 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   shareholderAvatarText: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
     color: '#3730A3',
   },
@@ -595,12 +596,12 @@ export const styles = StyleSheet.create({
     marginRight: 8,
   },
   shareholderName: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#0F172A',
   },
   shareholderMeta: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#64748B',
     marginTop: 2,
   },
@@ -611,7 +612,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   sharePillText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     color: '#059669',
   },
@@ -624,7 +625,7 @@ export const styles = StyleSheet.create({
     borderTopColor: '#F1F5F9',
   },
   shareholderDesignation: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#64748B',
     marginLeft: 4,
   },
@@ -638,7 +639,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   docSectionTitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#334155',
   },
@@ -649,7 +650,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   docCountText: {
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     color: '#475569',
   },
@@ -678,17 +679,17 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   docName: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     color: '#0F172A',
   },
   docMeta: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#94A3B8',
     marginTop: 2,
   },
   docEmptyText: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#94A3B8',
     marginBottom: 10,
   },
@@ -735,22 +736,22 @@ export const styles = StyleSheet.create({
   },
   timelineStatus: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     color: '#0F172A',
   },
   timelineDate: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#94A3B8',
   },
   timelineNote: {
-    fontSize: 11,
+    fontSize: font.small,
     color: '#64748B',
     marginTop: 4,
     lineHeight: 16,
   },
   timelineActor: {
-    fontSize: 10,
+    fontSize: font.xs,
     color: '#94A3B8',
     marginTop: 4,
   },
@@ -794,12 +795,12 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   webCardTitle: {
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
     color: '#111827',
   },
   webCardSubtitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#6B7280',
     marginTop: 2,
   },
@@ -821,7 +822,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   webPillText: {
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
   },
   webPillTextGreen: {
@@ -847,11 +848,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   webInfoLabel: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#6B7280',
   },
   webInfoValue: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '500',
     color: '#111827',
   },
@@ -878,12 +879,12 @@ export const styles = StyleSheet.create({
     borderLeftColor: '#F1F5F9',
   },
   webActionPrimaryText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#4338CA',
   },
   webActionSecondaryText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     color: '#475569',
   },
@@ -926,12 +927,12 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   recentActivityTitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '500',
     color: '#111827',
   },
   recentActivityDate: {
-    fontSize: 12,
+    fontSize: font.sm,
     color: '#6B7280',
     marginTop: 2,
   },
