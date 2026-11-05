@@ -17,6 +17,11 @@ export const font = {
     hero: s(20),
     large: s(21),
     display: s(22),
+    displayMedium: s(24),
     displayLarge: s(26),
     displayXL: s(28),
+    displayXXL: s(32),
+    display3XL: s(40),
+    display4XL: s(48),
+    display5XL: s(54),
 };

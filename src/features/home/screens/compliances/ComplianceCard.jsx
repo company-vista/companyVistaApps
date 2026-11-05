@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { s } from '../../../../theme/responsive';
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
     },
     tagText: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
     },
     daysBadgeOkText: {
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
         marginLeft: s(8),
     },
     tileNameTop: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '600',
         textAlign: 'right',
     },
@@ -172,15 +173,15 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     statusPillText: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
     },
     tileDueDateText: {
-        fontSize: 14,
+        fontSize: font.base,
         marginTop: 7,
     },
     tileDueDateValue: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '600',
     },
 });

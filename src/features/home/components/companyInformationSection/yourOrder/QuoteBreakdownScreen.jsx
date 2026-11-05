@@ -253,12 +253,12 @@ const QuoteBreakdownScreen = ({ onBackPress, onAccept, onDecline, quote }) => {
           </View>
           <View style={[styles.itemRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.itemTitle, { color: '#9CA3AF', fontWeight: '500' }]}>VAT</Text>
-            <Text style={[styles.itemPrice, { color: '#10B981', fontSize: 13 }]}>{selectedCurrency === 'INR' ? '₹0 · reverse charge' : selectedCurrency === 'USD' ? '$0 · reverse charge' : '€0 · reverse charge'}</Text>
+            <Text style={[styles.itemPrice, { color: '#10B981', fontSize: font.bodySmall }]}>{selectedCurrency === 'INR' ? '₹0 · reverse charge' : selectedCurrency === 'USD' ? '$0 · reverse charge' : '€0 · reverse charge'}</Text>
           </View>
           <View style={[styles.itemRow, { borderBottomWidth: 0, paddingTop: s(8) }]}>
-            <Text style={[styles.itemTitle, { color: '#FFFFFF', fontSize: 13, letterSpacing: 0.5 }]}>TOTAL</Text>
+            <Text style={[styles.itemTitle, { color: '#FFFFFF', fontSize: font.bodySmall, letterSpacing: 0.5 }]}>TOTAL</Text>
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={[styles.itemPrice, { color: '#EAB308', fontSize: 22 }]}>{price(qTotal)}</Text>
+              <Text style={[styles.itemPrice, { color: '#EAB308', fontSize: font.display }]}>{price(qTotal)}</Text>
               <Text style={styles.convertedInline}>{selectedCurrency === 'INR' ? `≈ ${fmt(qTotal, 'EUR')} · ${fmt(qTotal, 'USD')}` : selectedCurrency === 'USD' ? `≈ ${fmt(qTotal, 'EUR')} · ${fmt(qTotal, 'INR')}` : `≈ ${fmt(qTotal, 'USD')} · ${fmt(qTotal, 'INR')}`}</Text>
             </View>
           </View>
@@ -311,7 +311,7 @@ const QuoteBreakdownScreen = ({ onBackPress, onAccept, onDecline, quote }) => {
           style={{ marginTop: s(8), alignSelf: 'center', opacity: declining || !isReady ? 0.6 : 1 }}
           onPress={() => setShowDeclineModal(true)}
         >
-          <Text style={{ color: '#EF4444', fontSize: 13, fontWeight: '600' }}>
+          <Text style={{ color: '#EF4444', fontSize: font.bodySmall, fontWeight: '600' }}>
             {declining ? 'Declining...' : 'Decline quote'}
           </Text>
         </TouchableOpacity>
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#9CA3AF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: s(4),
   },
   currencyContainer: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   currencyText: {
     color: '#9CA3AF',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   currencyTextActive: {
     color: '#EAB308',
@@ -457,14 +457,14 @@ const styles = StyleSheet.create({
   },
   sectionHeaderText: {
     color: '#9CA3AF',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
   sectionHeaderAmount: {
     color: '#EAB308',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
   },
   itemRow: {
     flexDirection: 'row',
@@ -481,23 +481,23 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   itemDescription: {
     color: '#6B7280',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   itemPrice: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
   },
   includedText: {
     color: '#10B981',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   footerContainer: {
     position: 'absolute',
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   declineButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
   },
   acceptButton: {
     width: '60%',
@@ -541,17 +541,17 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: '#000000',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
   },
   footerSubText: {
     color: '#6B7280',
-    fontSize: 11,
+    fontSize: font.small,
     textAlign: 'center',
     marginTop: s(8),
   },
   convertedInline: {
     color: '#6B7280',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: s(2),
   },
   infoBanner: {
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   },
   infoBannerText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 16,
   },
   modalOverlay: {
@@ -584,12 +584,12 @@ const styles = StyleSheet.create({
     padding: s(16),
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
     marginBottom: s(4),
   },
   modalSubtitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     marginBottom: s(12),
   },
   reasonInput: {
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     padding: s(12),
     minHeight: 80,
     textAlignVertical: 'top',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginBottom: s(16),
   },
   modalRow: {
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   },
   modalCancelText: {
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   modalDecline: {
     backgroundColor: '#EF4444',
@@ -628,6 +628,6 @@ const styles = StyleSheet.create({
   modalDeclineText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
 });

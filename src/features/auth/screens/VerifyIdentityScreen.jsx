@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import {
   Alert,
@@ -360,8 +361,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
         >
           <Text style={[styles.continueButtonText, { color: '#EAB308' }]}>{uploading ? 'Uploading...' : kycStatus === 'complete' ? 'KYC Complete — Re-upload?' : 'Upload KYC Documents'}</Text>
         </TouchableOpacity>
-        {kycStatus ? <Text style={{ color: kycStatus === 'complete' ? '#10B981' : '#EAB308', fontSize: 11, textAlign: 'center', marginTop: 6 }}>KYC Status: {kycStatus}{fetchingKyc ? ' (refreshing...)' : ''}</Text> : null}
-        {!companyId || !clientId ? <Text style={{ color: '#EF4444', fontSize: 11, textAlign: 'center', marginTop: 6 }}>Missing companyId/clientId — upload will fail</Text> : null}
+        {kycStatus ? <Text style={{ color: kycStatus === 'complete' ? '#10B981' : '#EAB308', fontSize: font.small, textAlign: 'center', marginTop: 6 }}>KYC Status: {kycStatus}{fetchingKyc ? ' (refreshing...)' : ''}</Text> : null}
+        {!companyId || !clientId ? <Text style={{ color: '#EF4444', fontSize: font.small, textAlign: 'center', marginTop: 6 }}>Missing companyId/clientId — upload will fail</Text> : null}
 
         {/* Bottom Button - KYC complete -> direct RegistrationTracking */}
         <TouchableOpacity style={[styles.continueButton, kycStatus !== 'complete' && { opacity: 0.7 }]} activeOpacity={0.85} onPress={handleContinue}>
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mainTitle: {
-    fontSize: 26,
+    fontSize: font.displayLarge,
     color: '#FFFFFF',
     fontWeight: '400',
   },
@@ -413,7 +414,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: 6,
     lineHeight: 18,
   },
@@ -445,21 +446,21 @@ const styles = StyleSheet.create({
   avatarGoldText: {
     color: '#D97706',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   userName: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
   },
   userRole: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 2,
   },
   progressText: {
     color: '#EAB308',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
   },
   documentsContainer: {
@@ -507,17 +508,17 @@ const styles = StyleSheet.create({
   },
   docTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   docSub: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 2,
   },
   docSubYellow: {
     color: '#EAB308',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 2,
   },
   uploadBtn: {
@@ -538,7 +539,7 @@ const styles = StyleSheet.create({
   },
   uploadBtnText: {
     color: '#EAB308',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
   },
   uploadBtnTextFilled: {
@@ -562,7 +563,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     color: '#475569',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
     marginRight: 10,
@@ -599,7 +600,7 @@ const styles = StyleSheet.create({
   avatarBlueText: {
     color: '#38BDF8',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   avatarRed: {
     width: 36,
@@ -613,21 +614,21 @@ const styles = StyleSheet.create({
   avatarRedText: {
     color: '#F87171',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   otherUserName: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   otherUserSub: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 2,
   },
   errorText: {
     color: '#F87171',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 2,
   },
   resendBtn: {
@@ -640,7 +641,7 @@ const styles = StyleSheet.create({
   },
   resendBtnText: {
     color: '#EAB308',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   notifyBtn: {
@@ -653,7 +654,7 @@ const styles = StyleSheet.create({
   },
   notifyBtnText: {
     color: '#F87171',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   securityBanner: {
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
   },
   securityText: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginLeft: 10,
     flex: 1,
     lineHeight: 16,
@@ -683,7 +684,7 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: '#64748B',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   continueButton: {
@@ -696,12 +697,12 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#070C15',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   footerNote: {
     color: '#475569',
-    fontSize: 11,
+    fontSize: font.small,
     textAlign: 'center',
     marginTop: 12,
     marginBottom: 20,

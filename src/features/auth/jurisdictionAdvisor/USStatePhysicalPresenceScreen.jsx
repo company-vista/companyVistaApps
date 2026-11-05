@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: '#94A3B8',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   brandContainer: {
@@ -167,12 +167,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1A253',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
     color: '#64748B',
-    fontSize: 7,
+    fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
   },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   questionStepText: {
     color: '#8B5CF6',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1.5,
     marginBottom: s(8),
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
     marginTop: s(8),
     marginBottom: s(20),
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     marginRight: s(14),
   },
   optionIcon: {
-    fontSize: 18,
+    fontSize: font.xxl,
   },
   textContainer: {
     flex: 1,
@@ -254,13 +254,13 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
     marginBottom: s(4),
   },
   optionDescription: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 16,
   },
   radioOuter: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#0B0E17',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: 'bold',
   },
   infoBox: {
@@ -297,14 +297,14 @@ const styles = StyleSheet.create({
   },
   infoIcon: {
     color: '#60A5FA',
-    fontSize: 15,
+    fontSize: font.md,
     marginRight: s(10),
     marginTop: s(1),
   },
   infoText: {
     flex: 1,
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 18,
   },
   infoBold: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#0B0E17',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   nextButtonDisabled: {

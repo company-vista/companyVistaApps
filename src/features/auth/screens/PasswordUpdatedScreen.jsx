@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import {
   StyleSheet,
@@ -16,12 +17,13 @@ const PasswordUpdatedScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
-  const email = route.params?.email || 'rajesh@meridianglobal.com';
+  const email = route.params?.email;
+  const accountType = route.params?.accountType === 'admin' ? 'admin' : 'client';
 
   const handleContinue = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Login' }],
+      routes: [{ name: 'Login', params: { accountType } }],
     });
   };
 
@@ -72,16 +74,17 @@ const PasswordUpdatedScreen = () => {
             </View>
           </View>
 
-          {/* Card 2: Confirmation email sent */}
-          <View style={styles.infoCard}>
-            <View style={styles.badgeIconContainer}>
-              <Text style={styles.mailIcon}>✉</Text>
+          {email ? (
+            <View style={styles.infoCard}>
+              <View style={styles.badgeIconContainer}>
+                <Text style={styles.mailIcon}>✉</Text>
+              </View>
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.infoTitle}>Confirmation email sent</Text>
+                <Text style={styles.infoSubtext}>{email}</Text>
+              </View>
             </View>
-            <View style={styles.infoTextContainer}>
-              <Text style={styles.infoTitle}>Confirmation email sent</Text>
-              <Text style={styles.infoSubtext}>{email}</Text>
-            </View>
-          </View>
+          ) : null}
         </View>
 
         {/* Action Button */}
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: '#E2E8F0',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '700',
   },
   logoAccent: {
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#10B981',
-    fontSize: 40,
+    fontSize: font.display3XL,
     fontWeight: '300',
   },
   textSection: {
@@ -163,7 +166,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: '400',
     textAlign: 'center',
   },
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: 6,
-    fontSize: 14,
+    fontSize: font.base,
     lineHeight: 20,
   },
   infoSection: {
@@ -206,24 +209,24 @@ const styles = StyleSheet.create({
   },
   greenCheckIcon: {
     color: '#10B981',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   mailIcon: {
     color: '#38BDF8',
-    fontSize: 16,
+    fontSize: font.lg,
   },
   infoTextContainer: {
     flex: 1,
   },
   infoTitle: {
     color: '#E2E8F0',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   infoSubtext: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 2,
   },
   footer: {
@@ -240,13 +243,13 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: '#070A12',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
   arrowIcon: {
     color: '#070A12',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
 });

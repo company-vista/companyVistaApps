@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
         marginBottom: 0,
     },
     requiredText: {
-        fontSize: 11,
+        fontSize: font.small,
     },
     selectField: {
         flexDirection: 'row',
@@ -513,10 +513,10 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     selectFieldText: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     hintText: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     choiceRow: {
         flexDirection: 'row',
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(59,130,246,0.12)',
     },
     choiceButtonText: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     choiceButtonTextActive: {
         fontWeight: '600',
@@ -547,11 +547,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     uploadTitle: {
-        fontSize: 14,
+        fontSize: font.base,
         marginTop: 8,
     },
     uploadHint: {
-        fontSize: 11,
+        fontSize: font.small,
         marginTop: 2,
     },
     notesInput: {
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         minHeight: 60,
-        fontSize: 10,
+        fontSize: font.xs,
         textAlignVertical: 'top',
         marginBottom: 6,
         marginTop: 8,
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     selectedFileText: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     removeFileButton: {
         paddingVertical: 6,
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     removeFileButtonText: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '600',
     },
     stepRow: {
@@ -605,10 +605,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     stepBulletNumber: {
-        fontSize: 11,
+        fontSize: font.small,
     },
     stepBulletNumberActive: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
     },
     stepConnector: {
@@ -617,11 +617,11 @@ const styles = StyleSheet.create({
         minHeight: 22,
     },
     stepTitle: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '600',
     },
     stepSubtitle: {
-        fontSize: 11,
+        fontSize: font.small,
         marginTop: 1,
     },
     supportCard: {
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
         marginBottom: 14,
     },
     supportText: {
-        fontSize: 12,
+        fontSize: font.sm,
         lineHeight: 18,
         marginTop: 8,
         marginBottom: 12,
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     supportButtonText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '600',
     },
     dropdownList: {
@@ -655,12 +655,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: s(12),
     },
     dropdownItemText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
     },
     dropdownEmptyText: {
         paddingVertical: 12,
         paddingHorizontal: s(12),
-        fontSize: 13,
+        fontSize: font.bodySmall,
     },
     submitButtonWrapper: {
         paddingTop: 16,
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     submitButtonText: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '600',
     },
     sendIcon: {

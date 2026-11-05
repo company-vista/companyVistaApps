@@ -447,7 +447,7 @@ const getStyles = (colors) => {
             borderColor: colors.mode === 'dark' ? '#334155' : '#FFFFFF',
         },
         tabText: {
-            fontSize: 12,
+            fontSize: font.sm,
             fontWeight: '600',
             color: colors.mode === 'dark' ? '#94A3B8' : '#475569',
             letterSpacing: -0.1,
@@ -471,7 +471,7 @@ const getStyles = (colors) => {
             backgroundColor: colors.mode === 'dark' ? 'rgba(250,199,117,0.18)' : '#0F172A',
         },
         tabCountText: {
-            fontSize: 10,
+            fontSize: font.xs,
             fontWeight: '700',
             color: colors.muted,
         },
@@ -533,7 +533,7 @@ const getStyles = (colors) => {
         cardSubtitle: {
             fontSize: font.sm,
             color: palette.accentText,
-            fontWeight: '500',
+            fontWeight: '400',
         },
         documentTypeText: {
             color: palette.documentTypeText,
@@ -574,7 +574,7 @@ const getStyles = (colors) => {
         },
         cardLink: {
             fontSize: font.base,
-            fontWeight: '700',
+            fontWeight: '400',
             color: palette.link,
         },
         lockedCard: {

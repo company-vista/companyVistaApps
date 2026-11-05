@@ -35,6 +35,18 @@ const MIME_TYPES_BY_EXTENSION = {
   txt: 'text/plain',
 };
 
+const MIN_INPUT_HEIGHT = 40;
+const MAX_INPUT_HEIGHT = 120;
+const INPUT_LINE_HEIGHT = 22;
+
+const getInputHeightForText = text => {
+  const lineBreaks = (text.match(/\n/g) || []).length;
+  return Math.min(
+    MAX_INPUT_HEIGHT,
+    MIN_INPUT_HEIGHT + lineBreaks * INPUT_LINE_HEIGHT,
+  );
+};
+
 const getAttachmentMimeType = file => {
   if (file.type) return file.type;
   const extension = file.name?.split('.').pop()?.toLowerCase();
@@ -130,6 +142,27 @@ const getMessageText = item => {
   return mediaLabels[item.mediaType] || '';
 };
 
+const renderFormattedMessage = text => {
+  const parts = String(text).split(/(\*[^*\n]+\*|_[^_\n]+_)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return (
+        <Text key={index} style={styles.msgTextBold}>
+          {part.slice(1, -1)}
+        </Text>
+      );
+    }
+    if (part.startsWith('_') && part.endsWith('_')) {
+      return (
+        <Text key={index} style={styles.msgTextItalic}>
+          {part.slice(1, -1)}
+        </Text>
+      );
+    }
+    return <Text key={index}>{part}</Text>;
+  });
+};
+
 const AdminMessageScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -140,6 +173,7 @@ const AdminMessageScreen = () => {
     conversation.clientName || conversation.name || conversation.clientPhone || 'Unknown';
   const token = useAppSelector(state => state.auth.token);
   const [message, setMessage] = useState('');
+  const [inputHeight, setInputHeight] = useState(MIN_INPUT_HEIGHT);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -212,6 +246,7 @@ const AdminMessageScreen = () => {
       const sentMessage = await sendAdminMessage({ id: conversationId, text, token });
       setMessages(prev => [...prev, sentMessage]);
       setMessage('');
+      setInputHeight(MIN_INPUT_HEIGHT);
       setError('');
     } catch (sendError) {
       const failedMessage = sendError?.response?.data?.data;
@@ -310,7 +345,7 @@ const AdminMessageScreen = () => {
           ) : null}
           {getMessageText(item) ? (
             <Text style={[styles.msgText, isAdmin ? styles.msgTextAdmin : styles.msgTextUser]}>
-              {getMessageText(item)}
+              {renderFormattedMessage(getMessageText(item))}
             </Text>
           ) : null}
           <Text style={[styles.msgTime, isAdmin ? styles.msgTimeAdmin : styles.msgTimeUser]}>
@@ -365,9 +400,16 @@ const AdminMessageScreen = () => {
         )}
         <Animated.View
           style={[
-            styles.inputRow,
-            { paddingBottom: Math.max(insets.bottom, 8), marginBottom: keyboardOffset },
+            styles.inputPanel,
+            {
+              paddingBottom: Math.max(insets.bottom, 8),
+              marginBottom: keyboardOffset,
+            },
           ]}>
+          <Text style={styles.formatHint}>
+            Use *text* for bold, _text_ for italic
+          </Text>
+          <View style={styles.inputRow}>
             <TouchableOpacity
               style={[styles.attachBtn, sending && styles.sendBtnDisabled]}
               onPress={sendAttachment}
@@ -377,19 +419,42 @@ const AdminMessageScreen = () => {
               <Ionicons name="attach" size={22} color="#1E3A8A" />
             </TouchableOpacity>
             <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            placeholderTextColor="#94A3B8"
-            value={message}
-            onChangeText={setMessage}
-            editable={!sending}
-          />
-          <TouchableOpacity
-            style={[styles.sendBtn, sending && styles.sendBtnDisabled]}
-            onPress={sendMessage}
-            disabled={sending || !conversationId || !message.trim()}>
-            <Text style={styles.sendText}>Send</Text>
-          </TouchableOpacity>
+              placeholder="Type a message..."
+              placeholderTextColor="#94A3B8"
+              value={message}
+              onChangeText={value => {
+                if (sending) return;
+                setMessage(value);
+                setInputHeight(getInputHeightForText(value));
+              }}
+              onContentSizeChange={event => {
+                const contentHeight = event.nativeEvent.contentSize.height;
+                setInputHeight(
+                  Math.max(
+                    getInputHeightForText(message),
+                    Math.min(MAX_INPUT_HEIGHT, contentHeight),
+                  ),
+                );
+              }}
+              multiline
+              submitBehavior="newline"
+              returnKeyType="default"
+              textAlignVertical="top"
+              scrollEnabled={inputHeight >= MAX_INPUT_HEIGHT}
+              style={[styles.input, { height: inputHeight }]}
+            />
+            <TouchableOpacity
+              style={[
+                styles.sendBtn,
+                sending && styles.sendBtnDisabled,
+              ]}
+              onPress={sendMessage}
+              disabled={sending || !conversationId || !message.trim()}
+              accessibilityRole="button"
+              accessibilityLabel="Send message">
+              <Ionicons name="send" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       </View>
     </View>
@@ -572,26 +637,41 @@ const styles = StyleSheet.create({
   msgTimeAdmin: {
     color: '#BFDBFE',
   },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  inputPanel: {
     paddingHorizontal: 12,
-    paddingTop: 8,
+    paddingTop: 6,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   input: {
     flex: 1,
-    height: 40,
+    width: '100%',
     backgroundColor: '#F8FAFC',
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
     paddingHorizontal: 14,
+    paddingVertical: 10,
     fontSize: font.bodySmall,
     color: '#1E293B',
+  },
+  formatHint: {
+    marginBottom: 4,
+    marginLeft: 48,
+    fontSize: font.caption,
+    color: '#64748B',
+  },
+  msgTextBold: {
+    fontWeight: '700',
+  },
+  msgTextItalic: {
+    fontStyle: 'italic',
   },
   attachBtn: {
     width: 40,
@@ -602,10 +682,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   sendBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#1E3A8A',
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
   },
   sendBtnDisabled: {
     opacity: 0.5,

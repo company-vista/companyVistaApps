@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -248,24 +249,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: s(14), height: 48,
   },
-  textInput: { flex: 1, fontSize: 13, fontWeight: '500', marginLeft: s(10) },
+  textInput: { flex: 1, fontSize: font.bodySmall, fontWeight: '500', marginLeft: s(10) },
   greenCheckBadge: {
     width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981',
     alignItems: 'center', justifyContent: 'center',
   },
   availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(20), gap: s(6) },
-  availabilityText: { color: '#10B981', fontSize: 11 },
+  availabilityText: { color: '#10B981', fontSize: font.small },
   endingsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: s(8), marginBottom: s(20), marginTop: s(4) },
   endingChip: {
     paddingHorizontal: s(14), paddingVertical: s(8), borderRadius: 16,
     borderWidth: 1,
   },
   endingChipSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
-  endingChipText: { fontSize: 11, fontWeight: '600' },
+  endingChipText: { fontSize: font.small, fontWeight: '600' },
   endingChipTextSelected: { color: '#C9A84C', fontWeight: 'bold' },
   fullLegalPreview: { fontSize: s(13), fontWeight: '500', marginBottom: s(12), marginTop: s(4) },
   fullLegalHighlight: { color: '#C9A84C', fontWeight: 400, fontSize: s(14) },
-  helperText: { fontSize: 10, marginTop: s(6), marginBottom: s(10) },
+  helperText: { fontSize: font.xs, marginTop: s(6), marginBottom: s(10) },
   infoBox: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
     width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#60A5FA',
     alignItems: 'center', justifyContent: 'center', marginRight: s(10),
   },
-  infoBoxText: { flex: 1, fontSize: 10.5, lineHeight: 15 },
+  infoBoxText: { flex: 1, fontSize: font.small, lineHeight: 15 },
   boldText: { fontWeight: 'bold' },
   bottomBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
@@ -285,5 +286,5 @@ const styles = StyleSheet.create({
   },
   continueBtn: { borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
   continueBtnDisabled: { opacity: 0.4 },
-  continueBtnText: { fontSize: 14, fontWeight: 'bold' },
+  continueBtnText: { fontSize: font.base, fontWeight: 'bold' },
 });

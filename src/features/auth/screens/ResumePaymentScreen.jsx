@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
@@ -271,20 +272,20 @@ const styles = StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
+  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: 13 },
+  subtitle: { color: '#8E9BAE', fontSize: font.bodySmall },
   infoCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: s(14), marginTop: s(12) },
   infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(8) },
-  infoText: { color: '#8E9BAE', fontSize: 12, marginLeft: s(8), flex: 1 },
+  infoText: { color: '#8E9BAE', fontSize: font.sm, marginLeft: s(8), flex: 1 },
   summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', padding: s(16), marginVertical: s(12) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  totalLabel: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
+  totalLabel: { color: '#8E9BAE', fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
+  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center' },
-  cancelBtnText: { color: '#8E9BAE', fontSize: 14, fontWeight: '600' },
+  cancelBtnText: { color: '#8E9BAE', fontSize: font.base, fontWeight: '600' },
   lockIcon: { marginRight: s(8) },
-  payButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700' },
+  payButtonText: { color: '#0A111D', fontSize: font.lg, fontWeight: '700' },
 });

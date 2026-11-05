@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     priceText: {
-        fontSize: 32,
+        fontSize: font.displayXXL,
         fontWeight: '800',
     },
     periodText: {

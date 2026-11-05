@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
@@ -493,7 +494,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         {loadingTotal && !reviewData ? (
           <View style={[styles.companyCard, { alignItems: 'center', paddingVertical: 20 }]}>
             <ActivityIndicator size="small" color="#D4AF37" />
-            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>Loading review from backend...</Text>
+            <Text style={{ color: colors.muted, fontSize: font.sm, marginTop: 8 }}>Loading review from backend...</Text>
           </View>
         ) : null}
         {/* Company + Founder Summary — reviewData.company + reviewData.founder + reviewData.pricing se */}
@@ -645,7 +646,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
               </View>
               <Text style={styles.summaryPrice}>${route.params.bestStatePrice}</Text>
             </View>
-            <Text style={{ color: '#10B981', fontSize: 12, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
+            <Text style={{ color: '#10B981', fontSize: font.sm, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
           </View>
         ) : null}
 
@@ -693,10 +694,10 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             </>
           )}
           {pricingType === 'quoted' && (
-            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
+            <Text style={{ color: colors.muted, fontSize: font.sm, marginTop: 6 }}>Quoted jurisdiction — final quote backend se aayega</Text>
           )}
           {reviewData && (
-            <Text style={{ color: colors.subtle, fontSize: 11, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
+            <Text style={{ color: colors.subtle, fontSize: font.small, marginTop: 6 }}>Company ID: {String(reviewData.companyId).slice(-8)} · {reviewData.registrationStatus}</Text>
           )}
         </View>
 
@@ -743,55 +744,55 @@ const makeStyles = (colors, isDark) => StyleSheet.create({
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   summaryIconBox: { width: 26, height: 26, borderRadius: 7, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.25)', justifyContent: 'center', alignItems: 'center' },
-  summaryHeaderTitle: { color: colors.muted, fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+  summaryHeaderTitle: { color: colors.muted, fontSize: font.small, fontWeight: '700', letterSpacing: 0.8 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  editText: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
+  editText: { color: '#D4AF37', fontSize: font.sm, fontWeight: '600' },
   summaryRowSmall: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
-  summaryLabel: { color: colors.subtle, fontSize: 13 },
-  summaryValue: { color: colors.text, fontSize: 13, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
-  summaryValueGold: { color: '#D4AF37', fontSize: 13, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
-  summaryValueSmall: { color: colors.muted, fontSize: 11, fontWeight: '700', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surfaceAlt, paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
+  summaryLabel: { color: colors.subtle, fontSize: font.bodySmall },
+  summaryValue: { color: colors.text, fontSize: font.bodySmall, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
+  summaryValueGold: { color: '#D4AF37', fontSize: font.bodySmall, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
+  summaryValueSmall: { color: colors.muted, fontSize: font.small, fontWeight: '700', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surfaceAlt, paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
   residenceValue: { flexDirection: 'row', alignItems: 'center' },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: colors.text, marginBottom: s(4) },
+  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: colors.text, marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: colors.muted, fontSize: 15 },
+  subtitle: { color: colors.muted, fontSize: font.md },
   includedCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
   checkGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 8, columnGap: 16 },
   checkItem: { flexDirection: 'row', alignItems: 'center' },
-  checkItemText: { color: colors.muted, fontSize: 13, marginLeft: s(6) },
+  checkItemText: { color: colors.muted, fontSize: font.bodySmall, marginLeft: s(6) },
   addOnsCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 14, borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
   addOnsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   addOnsTitleRow: { flexDirection: 'row', alignItems: 'center' },
-  addOnsHeaderText: { color: colors.muted, fontSize: 12, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
+  addOnsHeaderText: { color: colors.muted, fontSize: font.sm, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
   changeButton: { flexDirection: 'row', alignItems: 'center' },
-  changeText: { color: '#D4AF37', fontSize: 13, fontWeight: '600', marginLeft: s(4) },
+  changeText: { color: '#D4AF37', fontSize: font.bodySmall, fontWeight: '600', marginLeft: s(4) },
   addOnItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
   addOnTextGroup: { flex: 1, paddingRight: s(10) },
-  addOnTitle: { color: colors.text, fontSize: 15, fontWeight: '600' },
-  addOnSubtext: { color: colors.subtle, fontSize: 12, marginTop: s(2) },
-  addOnPrice: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  addOnTitle: { color: colors.text, fontSize: font.md, fontWeight: '600' },
+  addOnSubtext: { color: colors.subtle, fontSize: font.sm, marginTop: s(2) },
+  addOnPrice: { color: colors.text, fontSize: font.md, fontWeight: '700' },
   itemSeparator: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
   summaryCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginBottom: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
-  summaryTitle: { color: colors.text, fontSize: 14, fontWeight: '600' },
-  summarySubtext: { color: colors.subtle, fontSize: 12, marginTop: s(2) },
-  summaryPrice: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  summaryTitle: { color: colors.text, fontSize: font.base, fontWeight: '600' },
+  summarySubtext: { color: colors.subtle, fontSize: font.sm, marginTop: s(2) },
+  summaryPrice: { color: colors.text, fontSize: font.md, fontWeight: '700' },
   summaryDivider: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(4) },
-  totalLabel: { color: colors.muted, fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
+  totalLabel: { color: colors.muted, fontSize: font.bodySmall, fontWeight: '700', letterSpacing: 1 },
+  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
   timelineBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: s(12), flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
   timelineIcon: { marginRight: s(10) },
-  timelineText: { color: colors.muted, fontSize: 13, flex: 1 },
+  timelineText: { color: colors.muted, fontSize: font.bodySmall, flex: 1 },
   timelineBold: { color: '#00E676', fontWeight: '700' },
   checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
   checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: colors.border, backgroundColor: isDark ? '#0C1622' : colors.surface, justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
   checkboxActive: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
-  checkboxLabel: { color: colors.muted, fontSize: 13, flex: 1, lineHeight: 18 },
+  checkboxLabel: { color: colors.muted, fontSize: font.bodySmall, flex: 1, lineHeight: 18 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: colors.background },
   confirmButton: { backgroundColor: colors.buttonBackground, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  confirmButtonText: { color: colors.buttonText, fontSize: 16, fontWeight: '700', marginRight: s(8) },
-  footerSubtext: { color: colors.subtle, fontSize: 12, textAlign: 'center', marginTop: s(10) },
+  confirmButtonText: { color: colors.buttonText, fontSize: font.lg, fontWeight: '700', marginRight: s(8) },
+  footerSubtext: { color: colors.subtle, fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
   footerSubtextBold: { color: '#D4AF37', fontWeight: '600' },
 });

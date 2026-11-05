@@ -1,3 +1,4 @@
+import { font } from '../../../../../theme/typography';
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -167,7 +168,7 @@ const PaymentMethodScreen = ({ onBackPress, onSelectPayment, invoice, amount = 3
       {isPaymentPending && (
         <View style={{ backgroundColor: 'rgba(234,179,8,0.12)', borderWidth: 1, borderColor: 'rgba(234,179,8,0.3)', marginHorizontal: s(16), marginTop: s(6), borderRadius: 10, paddingVertical: s(8), paddingHorizontal: s(12), flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
           <FontAwesome name="hourglass-half" size={12} color="#EAB308" />
-          <Text style={{ color: '#EAB308', fontSize: 12, fontWeight: '700', marginLeft: 6 }}>Payment verifying... please wait</Text>
+          <Text style={{ color: '#EAB308', fontSize: font.sm, fontWeight: '700', marginLeft: 6 }}>Payment verifying... please wait</Text>
         </View>
       )}
 
@@ -278,9 +279,9 @@ const styles = StyleSheet.create({
   logoImage: { width: 130, height: 32 },
   scrollContainer: { paddingHorizontal: s(16), paddingTop: s(8), paddingBottom: s(110) },
   titleContainer: { marginVertical: s(16) },
-  mainTitle: { fontSize: 26, color: '#FFFFFF', fontWeight: '400' },
+  mainTitle: { fontSize: font.displayLarge, color: '#FFFFFF', fontWeight: '400' },
   italicTitle: { fontStyle: 'italic', color: '#EAB308', fontWeight: 'normal' },
-  subTitle: { color: '#9CA3AF', fontSize: 13, marginTop: s(4) },
+  subTitle: { color: '#9CA3AF', fontSize: font.bodySmall, marginTop: s(4) },
   methodsContainer: { gap: 12, marginTop: s(8) },
   methodCard: {
     flexDirection: 'row',
@@ -302,8 +303,8 @@ const styles = StyleSheet.create({
     marginRight: s(12),
   },
   methodInfo: { flex: 1 },
-  methodName: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  methodDesc: { color: '#6B7280', fontSize: 12, marginTop: s(2) },
+  methodName: { color: '#FFFFFF', fontSize: font.md, fontWeight: '700' },
+  methodDesc: { color: '#6B7280', fontSize: font.sm, marginTop: s(2) },
   radio: {
     width: 20,
     height: 20,
@@ -333,10 +334,10 @@ const styles = StyleSheet.create({
   upiAppRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 10, borderWidth: 1, borderColor: '#1E293B', paddingHorizontal: s(12), paddingVertical: s(10), gap: 10 },
   upiAppRowSelected: { borderColor: '#EAB308', backgroundColor: 'rgba(234,179,8,0.08)' },
   upiAppIcon: { width: 32, height: 32, borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1 },
-  upiAppName: { flex: 1, fontSize: 13, fontWeight: '600' },
+  upiAppName: { flex: 1, fontSize: font.bodySmall, fontWeight: '600' },
   radioSmall: { width: 16, height: 16, borderRadius: 8, borderWidth: 1.5, borderColor: '#334155', justifyContent: 'center', alignItems: 'center' },
   radioDotSmall: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EAB308' },
-  secureText: { color: '#9CA3AF', fontSize: 12 },
+  secureText: { color: '#9CA3AF', fontSize: font.sm },
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -357,5 +358,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   payButtonDisabled: { opacity: 0.6 },
-  payButtonText: { color: '#9CA3AF', fontWeight: '600', fontSize: 13 },
+  payButtonText: { color: '#9CA3AF', fontWeight: '600', fontSize: font.bodySmall },
 });

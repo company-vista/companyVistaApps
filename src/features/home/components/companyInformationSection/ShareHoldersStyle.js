@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
@@ -45,7 +46,7 @@ export const styles = StyleSheet.create({
     },
     summaryLabel: {
         color: '#85B7EB',
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '500',
         letterSpacing: 0.7,
         lineHeight: 15,
@@ -53,7 +54,7 @@ export const styles = StyleSheet.create({
     },
     summaryValue: {
         color: '#FFFFFF',
-        fontSize: 25,
+        fontSize: font.displayLarge,
         fontWeight: '800',
         lineHeight: 32,
         marginTop: 6,
@@ -73,7 +74,7 @@ export const styles = StyleSheet.create({
     },
     primaryBadgeText: {
         color: '#85B7EB',
-        fontSize: 10,
+        fontSize: font.xs,
         fontWeight: '500',
         lineHeight: 13,
     },
@@ -84,7 +85,7 @@ export const styles = StyleSheet.create({
         marginTop: 2,
     },
     header: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '600',
         lineHeight: 21,
     },
@@ -100,7 +101,7 @@ export const styles = StyleSheet.create({
         paddingVertical: s(15),
     },
     name: {
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '600',
         lineHeight: 20,
     },
@@ -114,7 +115,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 4,
     },
     roleText: {
-        fontSize: 10,
+        fontSize: font.xs,
         fontWeight: '800',
         lineHeight: 13,
     },
@@ -128,7 +129,7 @@ export const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '500',
         lineHeight: 16,
     },

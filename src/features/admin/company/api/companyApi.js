@@ -174,6 +174,34 @@ export async function fetchCompanyDocuments({ token, companyId } = {}) {
   return [];
 }
 
+export async function fetchCompanyActivityLog({ token, companyId } = {}) {
+  if (!companyId) throw new Error('Company id missing.');
+  const data = await request(
+    { method: 'get', url: `${COMPANY_BASE_URL}/${companyId}/activity-log` },
+    token,
+  );
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  throw new Error('Unexpected activity log response.');
+}
+
+export async function addCompanyActivityLog({
+  token,
+  companyId,
+  action,
+  details,
+} = {}) {
+  if (!companyId) throw new Error('Company id missing.');
+  return request(
+    {
+      method: 'post',
+      url: `${COMPANY_BASE_URL}/${companyId}/activity-log`,
+      data: { action, details },
+    },
+    token,
+  );
+}
+
 export async function fetchCompanyCompliance({ companyId } = {}) {
   if (!companyId) throw new Error('Company id missing.');
   const data = await publicRequest({
@@ -181,6 +209,20 @@ export async function fetchCompanyCompliance({ companyId } = {}) {
     url: `${COMPANY_COMPLIANCE_URL}/${companyId}`,
   });
   return data?.data ?? null;
+}
+
+export async function fetchCompanyComplianceHistory({ token, companyId } = {}) {
+  if (!companyId) throw new Error('Company id missing.');
+  const data = await request(
+    {
+      method: 'get',
+      url: `${API_BASE_URL}/api/company-compliance-history/${companyId}/compliance-history`,
+    },
+    token,
+  );
+  const history = data?.data?.history ?? data?.history;
+  if (Array.isArray(history)) return history;
+  throw new Error('Unexpected compliance history response.');
 }
 
 export async function createCompany({ token, payload } = {}) {

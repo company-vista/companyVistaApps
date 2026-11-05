@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     countText: {
         color: '#ffffff',
         fontSize: font.lg,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     filterRow: {
         flexDirection: 'row',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     activeFilterButton: {},
     filterButtonText: {
         fontSize: font.md,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     activeFilterButtonText: {},
     listCard: {
@@ -302,13 +302,13 @@ const styles = StyleSheet.create({
     emptyTitle: {
         color: '#111827',
         fontSize: font.hero,
-        fontWeight: '900',
+        fontWeight: '400',
         marginTop: 18,
     },
     emptyText: {
         color: '#64748b',
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
         lineHeight: 20,
         marginTop: 8,
         textAlign: 'center',
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     notificationTime: {
         color: '#94a3b8',
         fontSize: font.base,
-        fontWeight: '700',
+        fontWeight: '400',
         marginTop: 8,
     },
     modalOverlay: {
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     },
     cancelButtonText: {
         fontSize: font.xxl,
-        fontWeight: '500',
+        fontWeight: '400',
     },
 });
 export default NotificationScreen;

@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -394,7 +395,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <ActivityIndicator size="large" color="#D4AF37" />
-          <Text style={{ color: colors.muted, marginTop: 12, fontSize: 14 }}>Using your saved profile — setting up your company…</Text>
+          <Text style={{ color: colors.muted, marginTop: 12, fontSize: font.base }}>Using your saved profile — setting up your company…</Text>
         </View>
       </SafeAreaView>
     );
@@ -673,9 +674,9 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  mainTitle: { fontSize: 20, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
+  mainTitle: { fontSize: font.hero, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { fontSize: 12, lineHeight: 18, marginBottom: s(16) },
+  subtitle: { fontSize: font.sm, lineHeight: 18, marginBottom: s(16) },
   summaryCard: {
     width: '100%',
     alignSelf: 'stretch',
@@ -683,16 +684,16 @@ const styles = StyleSheet.create({
     borderWidth: 1, padding: s(18), marginBottom: s(20), minHeight: 105,
   },
   summaryField: { marginBottom: s(8) },
-  summaryFieldLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
+  summaryFieldLabel: { fontSize: font.xs, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
   summaryDivider: { height: 1, marginVertical: s(8) },
   summaryFieldHalf: { flex: 1 },
-  companyNameText: { color: '#C9A84C', fontSize: 16, fontWeight: 'bold' },
+  companyNameText: { color: '#C9A84C', fontSize: font.lg, fontWeight: 'bold' },
   summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: s(12) },
   stateSubtitle: { fontSize: s(15), fontWeight: '600' },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(14), marginBottom: s(8) },
   inputLabel: { fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
   requiredAsterisk: { color: '#EF4444' },
-  passportHint: { fontSize: 10 },
+  passportHint: { fontSize: font.xs },
   inputContainerActive: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
@@ -709,18 +710,18 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
   },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(8), marginBottom: s(12) },
-  verifiedText: { color: '#10B981', fontSize: 10, fontWeight: '600', flex: 1 },
-  changeEmailText: { color: '#C9A84C', fontSize: 10, fontWeight: '700', textDecorationLine: 'underline' },
-  verifyWarning: { color: '#D97706', fontSize: 10, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
+  verifiedText: { color: '#10B981', fontSize: font.xs, fontWeight: '600', flex: 1 },
+  changeEmailText: { color: '#C9A84C', fontSize: font.xs, fontWeight: '700', textDecorationLine: 'underline' },
+  verifyWarning: { color: '#D97706', fontSize: font.xs, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
   dropdownInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: s(14), height: 48,
   },
-  textInput: { flex: 1, fontSize: 13, fontWeight: '500', marginLeft: s(10) },
+  textInput: { flex: 1, fontSize: font.bodySmall, fontWeight: '500', marginLeft: s(10) },
   warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(16), gap: s(6) },
-  warningText: { color: '#D97706', fontSize: 10 },
+  warningText: { color: '#D97706', fontSize: font.xs },
   helperText: { fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
   successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(18), gap: s(6) },
   successText: { color: '#10B981', fontSize: s(12) },
@@ -731,14 +732,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: s(12), height: 48, gap: 6,
   },
-  flagText: { fontSize: 10, fontWeight: 'bold' },
-  codeText: { fontSize: 13, fontWeight: 'bold' },
+  flagText: { fontSize: font.xs, fontWeight: 'bold' },
+  codeText: { fontSize: font.bodySmall, fontWeight: 'bold' },
   phoneInputContainer: {
     flex: 1, borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
-  dropdownValueText: { flex: 1, fontSize: 13, fontWeight: '500' },
+  dropdownValueText: { flex: 1, fontSize: font.bodySmall, fontWeight: '500' },
   checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: s(4), marginBottom: s(20) },
   checkbox: {
     width: 18, height: 18, borderRadius: 5,
@@ -746,26 +747,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  checkboxText: { flex: 1, fontSize: 10, lineHeight: 15 },
+  checkboxText: { flex: 1, fontSize: font.xs, lineHeight: 15 },
   linkText: { color: '#C9A84C', fontWeight: 'bold' },
   primaryBtn: {
     borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(12),
   },
   primaryBtnDisabled: { opacity: 0.4 },
-  primaryBtnText: { fontSize: 15, fontWeight: 'bold' },
-  footerSubtext: { fontSize: 11, textAlign: 'center' },
+  primaryBtnText: { fontSize: font.md, fontWeight: 'bold' },
+  footerSubtext: { fontSize: font.small, textAlign: 'center' },
   goldText: { color: '#C9A84C' },
   loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: s(16), marginBottom: s(4) },
-  loginHint: { fontSize: 14 },
-  loginLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700', textDecorationLine: 'underline' },
+  loginHint: { fontSize: font.base },
+  loginLink: { color: '#C9A84C', fontSize: font.base, fontWeight: '700', textDecorationLine: 'underline' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject },
   modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1 },
-  modalTitle: { fontSize: 14, fontWeight: 'bold' },
+  modalTitle: { fontSize: font.base, fontWeight: 'bold' },
   countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1 },
   countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
-  countryOptionName: { flex: 1, fontSize: 13 },
-  countryOptionCode: { fontSize: 12, marginRight: s(6) },
+  countryOptionName: { flex: 1, fontSize: font.bodySmall },
+  countryOptionCode: { fontSize: font.sm, marginRight: s(6) },
 });

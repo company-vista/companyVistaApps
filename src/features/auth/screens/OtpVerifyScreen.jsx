@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { useState, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
     position: 'relative',
   },
-  mailIcon: { fontSize: 30, marginBottom: s(6), color: '#22D3EE' },
+  mailIcon: { fontSize: font.displayXXL, marginBottom: s(6), color: '#22D3EE' },
   checkBadge: {
     position: 'absolute',
     top: -4,
@@ -290,11 +291,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkText: { color: '#070A12', fontSize: 12, fontWeight: 'bold' },
+  checkText: { color: '#070A12', fontSize: font.sm, fontWeight: 'bold' },
   textSection: { alignItems: 'center', marginVertical: s(15) },
-  title: { color: '#FFFFFF', fontSize: 24, fontWeight: '600', textAlign: 'center' },
+  title: { color: '#FFFFFF', fontSize: font.displayMedium, fontWeight: '600', textAlign: 'center' },
   italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
-  description: { color: '#94A3B8', textAlign: 'center', marginTop: s(6), fontSize: 14 },
+  description: { color: '#94A3B8', textAlign: 'center', marginTop: s(6), fontSize: font.base },
   emailChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,11 +307,11 @@ const styles = StyleSheet.create({
     paddingVertical: s(10),
     marginTop: s(12),
   },
-  chipIcon: { color: '#D4AF37', marginRight: s(8), fontSize: 14 },
-  chipText: { color: '#D4AF37', fontSize: 14, fontWeight: '600' },
+  chipIcon: { color: '#D4AF37', marginRight: s(8), fontSize: font.base },
+  chipText: { color: '#D4AF37', fontSize: font.base, fontWeight: '600' },
   otpSection: { width: '100%', marginVertical: s(10) },
   dividerContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
-  label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
+  label: { color: '#64748B', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
   line: { flex: 1, height: 1, backgroundColor: '#1E293B' },
   codeContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   codeBox: {
@@ -327,14 +328,14 @@ const styles = StyleSheet.create({
   codeBoxActive: { borderColor: '#D4AF37' },
   codeText: {
     color: '#D4AF37',
-    fontSize: 22,
+    fontSize: font.display,
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     textAlign: 'center',
     width: '100%',
     height: '100%',
   },
   resendContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: s(20) },
-  resendLabel: { color: '#64748B', fontSize: 13, marginRight: s(10) },
+  resendLabel: { color: '#64748B', fontSize: font.bodySmall, marginRight: s(10) },
   resendButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -346,9 +347,9 @@ const styles = StyleSheet.create({
     paddingVertical: s(6),
   },
   resendButtonActive: { borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.1)' },
-  timerIcon: { color: '#64748B', fontSize: 12, marginRight: s(6) },
-  resendText: { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
-  resendTextActive: { color: '#D4AF37', fontSize: 12, fontWeight: '700' },
+  timerIcon: { color: '#64748B', fontSize: font.sm, marginRight: s(6) },
+  resendText: { color: '#94A3B8', fontSize: font.sm, fontWeight: '600' },
+  resendTextActive: { color: '#D4AF37', fontSize: font.sm, fontWeight: '700' },
   warningCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -359,8 +360,8 @@ const styles = StyleSheet.create({
     padding: s(12),
     marginVertical: s(10),
   },
-  warningIcon: { fontSize: 14, marginRight: s(10) },
-  warningText: { color: '#94A3B8', fontSize: 12, flex: 1, lineHeight: 16 },
+  warningIcon: { fontSize: font.base, marginRight: s(10) },
+  warningText: { color: '#94A3B8', fontSize: font.sm, flex: 1, lineHeight: 16 },
   boldText: { color: '#FFFFFF', fontWeight: '700' },
   changeEmailButton: {
     flexDirection: 'row',
@@ -373,8 +374,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#070A12',
     marginTop: s(4),
   },
-  editIcon: { color: '#94A3B8', marginRight: s(8), fontSize: 14 },
-  changeEmailText: { color: '#E2E8F0', fontSize: 14, fontWeight: '600' },
+  editIcon: { color: '#94A3B8', marginRight: s(8), fontSize: font.base },
+  changeEmailText: { color: '#E2E8F0', fontSize: font.base, fontWeight: '600' },
   footer: { marginTop: s(20) },
   submitButton: {
     backgroundColor: '#D4AF37',
@@ -386,6 +387,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonDisabled: { backgroundColor: '#1E293B', opacity: 0.8 },
-  submitButtonText: { color: '#070A12', fontSize: 16, fontWeight: '700', marginRight: s(8) },
-  arrowIcon: { color: '#070A12', fontSize: 18, fontWeight: 'bold' },
+  submitButtonText: { color: '#070A12', fontSize: font.lg, fontWeight: '700', marginRight: s(8) },
+  arrowIcon: { color: '#070A12', fontSize: font.xxl, fontWeight: 'bold' },
 });

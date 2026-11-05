@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
     },
     title: {
         fontSize: font.hero,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     amountCard: {
         padding: s(32),
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     },
     amountLabel: {
         fontSize: font.base,
-        fontWeight: '600',
+        fontWeight: '400',
         marginBottom: s(8),
     },
     amountRow: {
@@ -38,12 +38,12 @@ export const styles = StyleSheet.create({
     },
     amountValue: {
         fontSize: font.display,
-        fontWeight: '800',
+        fontWeight: '400',
         marginBottom: s(12),
     },
     amountBracket: {
         fontSize: font.base,
-        fontWeight: '700',
+        fontWeight: '400',
         marginBottom: s(12),
     },
     statusBadge: {
@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
         right: s(12),
         bottom: s(12),
         fontSize: font.sm,
-        fontWeight: '700',
+        fontWeight: '400',
         paddingHorizontal: s(8),
         paddingVertical: s(3),
         borderRadius: 6,
@@ -64,14 +64,14 @@ export const styles = StyleSheet.create({
     },
     statusText: {
         fontSize: font.base,
-        fontWeight: '700',
+        fontWeight: '400',
     },
     section: {
         marginBottom: s(24),
     },
     sectionTitle: {
         fontSize: font.lg,
-        fontWeight: '700',
+        fontWeight: '400',
         marginBottom: s(12),
     },
     sectionCard: {
@@ -88,12 +88,12 @@ export const styles = StyleSheet.create({
     },
     detailLabel: {
         fontSize: font.base,
-        fontWeight: '600',
+        fontWeight: '400',
         flex: 0.4,
     },
     detailValue: {
         fontSize: font.base,
-        fontWeight: '500',
+        fontWeight: '400',
         flex: 0.6,
         textAlign: 'right',
     },
@@ -107,6 +107,6 @@ export const styles = StyleSheet.create({
     downloadButtonText: {
         color: '#4f46e5',
         fontSize: font.md,
-        fontWeight: '600',
+        fontWeight: '400',
     },
 });

@@ -40,14 +40,14 @@ export default StyleSheet.create({
         marginLeft: 12,
     },
     welcomeText: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     userName: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '400',
     },
     userEmail: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     themeButton: {
         padding: 10,
@@ -66,11 +66,11 @@ export default StyleSheet.create({
         marginBottom: 8,
     },
     healthTitle: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     healthPercentage: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: font.xxl,
+        fontWeight: '400',
     },
     progressBarBackground: {
         height: 6,
@@ -82,7 +82,7 @@ export default StyleSheet.create({
         borderRadius: 3,
     },
     healthSubtext: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -92,7 +92,7 @@ export default StyleSheet.create({
     },
     sectionTitleText: {
         fontSize: font.xxl,
-        fontWeight: '500',
+        fontWeight: '400',
         letterSpacing: 0.5,
     },
     mainCard: {
@@ -116,11 +116,11 @@ export default StyleSheet.create({
         marginLeft: 12,
     },
     sectionTitle: {
-        fontSize: 14,
-        fontWeight: '500',
+        fontSize: font.base,
+        fontWeight: '400',
     },
     sectionSubtitle: {
-        fontSize: 12,
+        fontSize: font.sm,
         marginTop: 2,
     },
     dateRow: {
@@ -129,7 +129,7 @@ export default StyleSheet.create({
         marginTop: 4,
     },
     dateText: {
-        fontSize: 11,
+        fontSize: font.small,
         marginLeft: 4,
     },
     badgeWrap: {
@@ -151,8 +151,8 @@ export default StyleSheet.create({
         marginLeft: 6,
     },
     badgeText: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     renewButton: {
         paddingHorizontal: s(13),
@@ -164,8 +164,8 @@ export default StyleSheet.create({
         alignSelf: 'stretch',
     },
     renewButtonText: {
-        fontSize: 13,
-        fontWeight: '700',
+        fontSize: font.bodySmall,
+        fontWeight: '400',
         // textTransform: 'uppercase',
     },
     bottomRow: {
@@ -184,11 +184,11 @@ export default StyleSheet.create({
         marginBottom: 12,
     },
     detailLabel: {
-        fontSize: 11,
-        fontWeight: '600',
+        fontSize: font.small,
+        fontWeight: '400',
     },
     detailValue: {
-        fontSize: 14,
+        fontSize: font.base,
         marginTop: 2,
         marginBottom: 8,
     },

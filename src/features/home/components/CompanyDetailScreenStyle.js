@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../theme/responsive";
 export const styles = StyleSheet.create({
@@ -24,7 +25,7 @@ export const styles = StyleSheet.create({
         gap: 12,
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '700',
         color: '#0F172A',
         textAlign: 'left',
@@ -61,7 +62,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     avatarText: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '700',
         color: '#4F46E5',
     },
@@ -75,7 +76,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     heroName: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '600',
         color: '#0F172A',
         flexShrink: 1,
@@ -86,7 +87,7 @@ export const styles = StyleSheet.create({
         gap: 4,
     },
     heroMetaText: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '500',
         color: '#94A3B8',
         marginTop: 3,
@@ -105,7 +106,7 @@ export const styles = StyleSheet.create({
         borderRadius: 3,
     },
     statusText: {
-        fontSize: 10,
+        fontSize: font.xs,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
@@ -151,7 +152,7 @@ export const styles = StyleSheet.create({
         gap: 12,
     },
     placeholderText: {
-        fontSize: 14,
+        fontSize: font.base,
         color: '#64748B',
     },
     /* empty state */
@@ -161,7 +162,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     emptyText: {
-        fontSize: 19,
+        fontSize: font.title,
         fontWeight: '600',
         color: '#64748B',
     },

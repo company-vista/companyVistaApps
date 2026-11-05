@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
@@ -38,13 +39,13 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#f8fafc',
-        fontSize: 32,
+        fontSize: font.displayXXL,
         fontWeight: '500',
         textAlign: 'center',
     },
     subtitle: {
         color: '#94a3b8',
-        fontSize: 16,
+        fontSize: font.lg,
         lineHeight: 24,
         marginTop: 8,
         textAlign: 'center',
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     },
     label: {
         color: '#1b1e22a9',
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '700',
     },
     verifyButton: {
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     verifyLabel: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '700',
         color: '#f59e0b',
     },
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
         height: '100%',
         padding: 0,
         color: '#f8fafc',
-        fontSize: 16,
+        fontSize: font.lg,
     },
     passwordToggle: {
         width: 34,
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: '#fca5a5',
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '700',
     },
     button: {
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '500',
     },
     authLinkText: {
         color: '#94a3b8',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '500',
         textAlign: 'center',
     },
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     },
     socialTitle: {
         color: '#64748b',
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '700',
     },
     socialRow: {

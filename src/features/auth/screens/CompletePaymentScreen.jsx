@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useCallback, useRef } from 'react';
 import {
   StyleSheet,
@@ -356,15 +357,15 @@ export default function CompletePaymentScreen({ navigation, route }) {
         ) : (
           <>
             <View style={{ backgroundColor: 'rgba(16,185,129,0.08)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)', borderRadius: 12, padding: 12, marginBottom: 12 }}>
-              <Text style={{ color: '#10B981', fontSize: 12, fontWeight: '700' }}>Stripe checkout opened</Text>
-              <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 4 }}>Session: {pendingSession.sessionId.slice(0,20)}... · Complete payment then verify</Text>
+              <Text style={{ color: '#10B981', fontSize: font.sm, fontWeight: '700' }}>Stripe checkout opened</Text>
+              <Text style={{ color: '#94A3B8', fontSize: font.small, marginTop: 4 }}>Session: {pendingSession.sessionId.slice(0,20)}... · Complete payment then verify</Text>
             </View>
             <TouchableOpacity style={[styles.payButton, { backgroundColor: '#10B981' }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handleFinalize} disabled={verifying}>
               {verifying ? <ActivityIndicator size="small" color="#fff" style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color="#fff" style={styles.lockIcon} />}
               <Text style={[styles.payButtonText, { color: '#fff' }]}>{verifying ? 'Verifying...' : 'Verify Payment'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ marginTop: 10, alignItems: 'center' }} onPress={handleCancelPayment}>
-              <Text style={{ color: '#64748B', fontSize: 11 }}>Cancel</Text>
+              <Text style={{ color: '#64748B', fontSize: font.small }}>Cancel</Text>
             </TouchableOpacity>
           </>
         )}
@@ -387,36 +388,36 @@ const styles = StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
+  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
   italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: 13 },
+  subtitle: { color: '#8E9BAE', fontSize: font.bodySmall },
   summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginVertical: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(10) },
-  summaryTitle: { color: '#8E9BAE', fontSize: 14 },
-  summaryPrice: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  summaryTitle: { color: '#8E9BAE', fontSize: font.base },
+  summaryPrice: { color: '#FFFFFF', fontSize: font.base, fontWeight: '700' },
   summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(2) },
-  totalLabel: { color: '#8E9BAE', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: 28, fontWeight: '700' },
+  totalLabel: { color: '#8E9BAE', fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
+  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginTop: s(10), marginBottom: s(12) },
-  sectionTitle: { color: '#6C7A8E', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
+  sectionTitle: { color: '#6C7A8E', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
   sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
   paymentCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(10), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   selectedPaymentCard: { borderColor: '#D4AF37', backgroundColor: '#0E1A29' },
   paymentLeft: { flexDirection: 'row', alignItems: 'center' },
   cardLogoBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
   paymentTextGroup: { marginLeft: s(12) },
-  paymentTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  paymentSubtext: { color: '#6C7A8E', fontSize: 11, marginTop: s(2) },
+  paymentTitle: { color: '#FFFFFF', fontSize: font.base, fontWeight: '700' },
+  paymentSubtext: { color: '#6C7A8E', fontSize: font.small, marginTop: s(2) },
   radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: '#4A5768', justifyContent: 'center', alignItems: 'center' },
   radioOuterSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
   shieldIcon: { marginRight: s(8) },
   securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
-  securityText: { color: '#8E9BAE', fontSize: 11, flex: 1 },
+  securityText: { color: '#8E9BAE', fontSize: font.small, flex: 1 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
   payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center' },
-  cancelBtnText: { color: '#8E9BAE', fontSize: 14, fontWeight: '600' },
+  cancelBtnText: { color: '#8E9BAE', fontSize: font.base, fontWeight: '600' },
   lockIcon: { marginRight: s(8) },
-  payButtonText: { color: '#0A111D', fontSize: 16, fontWeight: '700' },
+  payButtonText: { color: '#0A111D', fontSize: font.lg, fontWeight: '700' },
 });

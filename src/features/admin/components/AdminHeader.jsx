@@ -57,6 +57,13 @@ const AdminHeader = () => {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.iconButton}
+            onPress={() => navigation.navigate('AdminSearch')}
+            accessibilityRole="button"
+            accessibilityLabel="Search admin workspace">
+            <Ionicons name="search-outline" size={22} color="#1E293B" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconButton}
             onPress={() => navigation.navigate('AdminNotifications')}
             accessibilityRole="button"
             accessibilityLabel="Open notifications">

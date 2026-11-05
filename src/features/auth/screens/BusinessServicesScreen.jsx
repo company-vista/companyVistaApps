@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -233,8 +234,8 @@ const styles = StyleSheet.create({
   blueIconBg: { backgroundColor: 'rgba(59, 130, 246, 0.15)' },
   tealIconBg: { backgroundColor: 'rgba(20, 184, 166, 0.15)' },
   cardTextContent: { flex: 1 },
-  cardTitle: { fontSize: 15, fontWeight: '600' },
-  cardSubtitle: { fontSize: 11, marginTop: s(3) },
+  cardTitle: { fontSize: font.md, fontWeight: '600' },
+  cardSubtitle: { fontSize: font.small, marginTop: s(3) },
   greenBadge: {
     backgroundColor: 'rgba(34, 197, 94, 0.2)',
     paddingHorizontal: s(10),
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: s(8),
   },
-  greenBadgeText: { color: '#4ADE80', fontSize: 11, fontWeight: '600' },
+  greenBadgeText: { color: '#4ADE80', fontSize: font.small, fontWeight: '600' },
   blueBadge: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
     paddingHorizontal: s(10),
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: s(8),
   },
-  blueBadgeText: { color: '#60A5FA', fontSize: 11, fontWeight: '600' },
+  blueBadgeText: { color: '#60A5FA', fontSize: font.small, fontWeight: '600' },
   tealBadge: {
     backgroundColor: 'rgba(20, 184, 166, 0.2)',
     paddingHorizontal: s(10),
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: s(8),
   },
-  tealBadgeText: { color: '#2DD4BF', fontSize: 11, fontWeight: '600' },
+  tealBadgeText: { color: '#2DD4BF', fontSize: font.small, fontWeight: '600' },
   pillsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     paddingVertical: s(8),
     borderWidth: 1,
   },
-  pillText: { fontSize: 11, fontWeight: '500' },
+  pillText: { fontSize: font.small, fontWeight: '500' },
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -284,21 +285,21 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(201, 168, 76, 0.3)',
     marginTop: s(8)
   },
-  bannerText: { fontSize: 12, fontWeight: '500' },
+  bannerText: { fontSize: font.sm, fontWeight: '500' },
   bannerLight: { backgroundColor: 'rgba(201, 168, 76, 0.12)', borderColor: 'rgba(201, 168, 76, 0.4)' },
   contentSection: { marginTop: s(24) },
   sectionTagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   goldLine: { width: 16, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
-  sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
+  sectionTag: { color: '#C9A84C', fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
-    fontSize: 17,
+    fontSize: font.xl,
     fontWeight: '600',
     lineHeight: 32,
     marginBottom: s(12),
   },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic' },
   description: {
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 22,
     marginBottom: s(30),
   },
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
     marginTop: s(16),
   },
-  continueBtnText: { color: '#060913', fontSize: 16, fontWeight: 'bold' },
+  continueBtnText: { color: '#060913', fontSize: font.lg, fontWeight: 'bold' },
   skipBtn: { alignItems: 'center', paddingVertical: s(8), marginBottom: s(16) },
-  skipText: { color: '#64748B', fontSize: 13 },
+  skipText: { color: '#64748B', fontSize: font.bodySmall },
 });

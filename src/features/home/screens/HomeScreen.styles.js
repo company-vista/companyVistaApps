@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
@@ -18,12 +19,12 @@ const styles = StyleSheet.create({
     },
     pendingPaymentTitle: {
         color: '#FFFFFF',
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: font.md,
+        fontWeight: '400',
     },
     pendingPaymentText: {
         color: '#8E9BAE',
-        fontSize: 12,
+        fontSize: font.sm,
         marginTop: s(4),
     },
     pendingPaymentButton: {
@@ -37,8 +38,8 @@ const styles = StyleSheet.create({
     },
     pendingPaymentButtonText: {
         color: '#0A111D',
-        fontSize: 14,
-        fontWeight: '700',
+        fontSize: font.base,
+        fontWeight: '400',
     },
     header: {
         flexDirection: 'row',
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     greeting: {
         flex: 1,
         color: '#111827',
-        fontSize: 19,
+        fontSize: font.title,
         fontWeight: '400',
     },
     headerIcon: {
@@ -79,8 +80,8 @@ const styles = StyleSheet.create({
     },
     notificationBadgeText: {
         color: '#ffffff',
-        fontSize: 10,
-        fontWeight: '600',
+        fontSize: font.xs,
+        fontWeight: '400',
     },
     profileButton: {
         width: 36,
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     },
     rewardSubtitle: {
         color: '#6b7280',
-        fontSize: 16,
+        fontSize: font.lg,
         lineHeight: 23,
         marginTop: 6,
     },
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     },
     enrollText: {
         color: '#ffffff',
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '800',
     },
     coin: {
@@ -129,13 +130,13 @@ const styles = StyleSheet.create({
     },
     coinText: {
         color: '#9a3412',
-        fontSize: 22,
+        fontSize: font.display,
         fontWeight: '900',
     },
     sectionTitle: {
         color: '#111827',
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: font.xxl,
+        fontWeight: '400',
         marginTop: 32,
         marginBottom: 18,
     },
@@ -166,12 +167,12 @@ const styles = StyleSheet.create({
     },
     serviceTitle: {
         color: '#111827',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '800',
     },
     serviceSubtitle: {
         color: '#6b7280',
-        fontSize: 14,
+        fontSize: font.base,
         lineHeight: 20,
         marginTop: 5,
     },
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
     },
     favouriteTitle: {
         color: '#111827',
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '800',
         lineHeight: 19,
         marginTop: 8,
@@ -218,12 +219,12 @@ const styles = StyleSheet.create({
     },
     sectionTitleNoMargin: {
         color: '#111827',
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: font.xxl,
+        fontWeight: '400',
     },
     viewAll: {
         color: '#c2410c',
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '800',
     },
     skeletonCard: {
@@ -276,12 +277,12 @@ const styles = StyleSheet.create({
     },
     promoTitle: {
         color: '#111827',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '800',
     },
     promoText: {
         color: '#6b7280',
-        fontSize: 13,
+        fontSize: font.bodySmall,
         marginTop: 5,
     },
     placeholderCard: {
@@ -302,14 +303,14 @@ const styles = StyleSheet.create({
     },
     placeholderTitle: {
         color: '#111827',
-        fontSize: 24,
+        fontSize: font.displayMedium,
         fontWeight: '900',
         marginTop: 18,
     },
     placeholderText: {
         color: '#64748b',
-        fontSize: 15,
-        fontWeight: '700',
+        fontSize: font.md,
+        fontWeight: '400',
         marginTop: 8,
         textAlign: 'center',
     },
@@ -375,8 +376,8 @@ const styles = StyleSheet.create({
     },
     fabMenuText: {
         color: '#111827',
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: font.xs,
+        fontWeight: '400',
         textAlign: 'center',
     },
     bottomNav: {
@@ -414,13 +415,13 @@ const styles = StyleSheet.create({
     },
     navText: {
         color: '#64748b',
-        fontSize: 10,
-        fontWeight: '500',
+        fontSize: font.xs,
+        fontWeight: '400',
         marginTop: 2,
     },
     activeNavText: {
         color: '#ea580c',
-        fontWeight: '600',
+        fontWeight: '400',
     },
     moreOverlay: {
         position: 'absolute',
@@ -460,8 +461,8 @@ const styles = StyleSheet.create({
     },
     sheetTitle: {
         color: '#111827',
-        fontSize: 19,
-        fontWeight: '500',
+        fontSize: font.title,
+        fontWeight: '400',
     },
     sheetCloseButton: {
         width: 36,
@@ -508,7 +509,7 @@ const styles = StyleSheet.create({
     },
     searchTitle: {
         color: '#111827',
-        fontSize: 20,
+        fontSize: font.hero,
         fontWeight: '900',
     },
     searchCloseButton: {
@@ -532,8 +533,8 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         color: '#111827',
-        fontSize: 16,
-        fontWeight: '600',
+        fontSize: font.lg,
+        fontWeight: '400',
         paddingVertical: 10,
         marginLeft: 10,
     },
@@ -545,7 +546,7 @@ const styles = StyleSheet.create({
     },
     searchHint: {
         color: '#64748b',
-        fontSize: 13,
+        fontSize: font.bodySmall,
         lineHeight: 19,
         marginTop: 12,
     },
@@ -590,18 +591,18 @@ const styles = StyleSheet.create({
     },
     companySwitcherTitle: {
         color: '#111827',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '800',
     },
     rewardTitle: {
         color: '#111827',
-        fontSize: 21,
+        fontSize: font.large,
         fontWeight: '800',
     },
     companySwitcherSubtitle: {
         color: '#64748b',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: font.sm,
+        fontWeight: '400',
         marginTop: 2,
     },
     companySwitcherList: {
@@ -630,7 +631,7 @@ const styles = StyleSheet.create({
     },
     companySwitcherAvatarText: {
         color: '#2563eb',
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '800',
     },
     companySwitcherCopy: {
@@ -638,19 +639,19 @@ const styles = StyleSheet.create({
     },
     companySwitcherName: {
         color: '#111827',
-        fontSize: 13,
-        fontWeight: '700',
+        fontSize: font.bodySmall,
+        fontWeight: '400',
     },
     companySwitcherMeta: {
         color: '#64748b',
-        fontSize: 11,
-        fontWeight: '500',
+        fontSize: font.small,
+        fontWeight: '400',
         marginTop: 2,
     },
     companySwitcherEmptyText: {
         color: '#64748b',
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: font.base,
+        fontWeight: '400',
         paddingVertical: 20,
         textAlign: 'center',
     },
@@ -683,12 +684,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     companySwitcherAddLabel: {
-        fontSize: 14,
-        fontWeight: '700',
+        fontSize: font.base,
+        fontWeight: '400',
     },
     companySwitcherAddHint: {
-        fontSize: 11,
-        fontWeight: '500',
+        fontSize: font.small,
+        fontWeight: '400',
         marginTop: 2,
     },
 });

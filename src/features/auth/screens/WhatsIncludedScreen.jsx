@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import {
   StyleSheet,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     color: '#D4AF37',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: font.base,
     lineHeight: 20,
   },
   card: {
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   packageSubtitle: {
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   valueContainer: {
@@ -274,15 +275,15 @@ const styles = StyleSheet.create({
   },
   valueAmount: {
     color: '#00E676',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   valueAmountQuote: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   valueLabel: {
     color: '#00E676',
-    fontSize: 10,
+    fontSize: font.xs,
     opacity: 0.8,
   },
   divider: {
@@ -327,11 +328,11 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: '#64B5F6',
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
   },
   itemDescription: {
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(3),
     lineHeight: 16,
   },
@@ -339,12 +340,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   strikethroughPrice: {
-    fontSize: 11,
+    fontSize: font.small,
     textDecorationLine: 'line-through',
   },
   freeBadge: {
     color: '#00E676',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '700',
     marginTop: s(1),
   },
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
     marginRight: s(10),
   },
   guaranteeText: {
-    fontSize: 12,
+    fontSize: font.sm,
     flex: 1,
     lineHeight: 17,
   },
@@ -378,11 +379,11 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     color: '#D4AF37',
-    fontSize: 22,
+    fontSize: font.display,
     fontWeight: '700',
   },
   statLabel: {
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     marginTop: s(4),
     letterSpacing: 0.5,
@@ -405,7 +406,7 @@ const styles = StyleSheet.create({
     marginRight: s(8),
   },
   footerSubtext: {
-    fontSize: 12,
+    fontSize: font.sm,
     textAlign: 'center',
     marginTop: s(10),
   },

@@ -212,34 +212,13 @@ export async function handleLoginApi({ email, password, loginType = 'client', fo
     }
     let lastError;
     const useAdminRoute = forceAdmin || loginType === 'admin';
-    if (useAdminRoute) {
-        try {
-            const session = await requestLogin(ADMIN_LOGIN_ROUTE, trimmedEmail, password);
-            return buildLoginResult(session, trimmedEmail);
-        }
-        catch (error) {
-            lastError = error;
-        }
-    } else {
-        try {
-            const session = await requestLogin(CLIENT_LOGIN_ROUTE, trimmedEmail, password);
-            return buildLoginResult(session, trimmedEmail);
-        }
-        catch (error) {
-            lastError = error;
-        }
-        // Client route 401/404 deta hai jab email client collection me nahi hota.
-        // Usi case me admin route try karo - is tarah user ko account type choose nahi karna padta.
-        const status = lastError?.response?.status;
-        if (status === 401 || status === 404) {
-            try {
-                const session = await requestLogin(ADMIN_LOGIN_ROUTE, trimmedEmail, password);
-                return buildLoginResult(session, trimmedEmail);
-            }
-            catch (adminError) {
-                lastError = adminError;
-            }
-        }
+    const loginRoute = useAdminRoute ? ADMIN_LOGIN_ROUTE : CLIENT_LOGIN_ROUTE;
+    try {
+        const session = await requestLogin(loginRoute, trimmedEmail, password);
+        return buildLoginResult(session, trimmedEmail);
+    }
+    catch (error) {
+        lastError = error;
     }
     if (lastError?.code === 'NO_TOKEN') {
         Toast.show({

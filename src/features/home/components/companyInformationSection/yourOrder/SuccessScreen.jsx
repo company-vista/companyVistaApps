@@ -1,3 +1,4 @@
+import { font } from '../../../../../theme/typography';
 import React from 'react';
 import {
   StyleSheet,
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
   goldText: {
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   documentIcon: {
-    fontSize: 30,
+    fontSize: font.displayXXL,
     color: '#EAB308',
   },
   titleContainer: {
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(10),
   },
   mainTitle: {
-    fontSize: 28,
+    fontSize: font.displayXL,
     color: '#FFFFFF',
     textAlign: 'center',
   },
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#9CA3AF',
-    fontSize: 14,
+    fontSize: font.base,
     textAlign: 'center',
     marginTop: s(8),
     lineHeight: 20,
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: '#EAB308',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: 'bold',
   },
   verifiedCard: {
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: 'bold',
   },
   infoCard: {
@@ -243,19 +244,19 @@ const styles = StyleSheet.create({
     marginRight: s(12),
   },
   clockIcon: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   cardDetails: {
     flex: 1,
   },
   cardTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   cardSubText: {
     color: '#9CA3AF',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   trackButton: {
@@ -269,12 +270,12 @@ const styles = StyleSheet.create({
   },
   trackButtonText: {
     color: '#000000',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   footerText: {
     color: '#6B7280',
-    fontSize: 12,
+    fontSize: font.sm,
     textAlign: 'center',
   },
 });

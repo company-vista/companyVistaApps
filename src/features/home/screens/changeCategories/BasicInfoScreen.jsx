@@ -517,7 +517,7 @@ const styles = (colors) => StyleSheet.create({
         gap: 12,
     },
     successIcon: {
-        fontSize: 48,
+        fontSize: font.display4XL,
         color: '#22C55E',
     },
     successTitle: {

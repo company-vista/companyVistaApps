@@ -1,5 +1,5 @@
 import { font } from '../../../../theme/typography';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
 import { computeInvoiceGrandTotal } from '../../dashboard/utils/invoiceTotals';
@@ -92,6 +92,7 @@ const getCompanyName = invoice =>
 
 const AdminInvoicesScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
   const [invoices, setInvoices] = useState([]);
@@ -101,7 +102,12 @@ const AdminInvoicesScreen = () => {
     pages: 1,
     currentPage: 1,
   });
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [filters, setFilters] = useState(() => ({
+    ...INITIAL_FILTERS,
+    ...(route.params?.invoiceKind
+      ? { invoiceKind: route.params.invoiceKind }
+      : {}),
+  }));
   const [searchText, setSearchText] = useState('');
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -109,6 +115,16 @@ const AdminInvoicesScreen = () => {
   const [error, setError] = useState('');
   const [statsError, setStatsError] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  useEffect(() => {
+    if (route.params?.invoiceKind) {
+      setFilters(previous => ({
+        ...previous,
+        invoiceKind: route.params.invoiceKind,
+        page: 1,
+      }));
+    }
+  }, [route.params?.invoiceKind]);
 
   const loadInvoices = useCallback(
     async ({ refresh = false } = {}) => {

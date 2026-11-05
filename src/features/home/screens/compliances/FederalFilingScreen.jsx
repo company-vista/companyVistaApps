@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, Switch, Alert, Pressable, } from 'react-native';
 import { useRoute } from '@react-navigation/native';
@@ -408,7 +409,7 @@ const styles = StyleSheet.create({
         paddingTop: 4
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '400',
     },
     card: {
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     cardTitle: {
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '500',
         marginBottom: 12,
     },
@@ -436,7 +437,7 @@ const styles = StyleSheet.create({
         marginRight: 6,
     },
     fieldLabel: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '500',
     },
     rowBetween: {
@@ -465,22 +466,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     dropdownItemText: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     selectorText: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     helpText: {
-        fontSize: 12,
+        fontSize: font.sm,
         marginTop: 6,
         fontWeight: '500',
     },
     subHelpText: {
-        fontSize: 11,
+        fontSize: font.small,
         marginTop: 2,
     },
     requiredBadge: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
     },
     uploadArea: {
@@ -493,13 +494,13 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     uploadText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '500',
         marginTop: 8,
         textAlign: 'center',
     },
     uploadSubText: {
-        fontSize: 11,
+        fontSize: font.small,
         marginTop: 2,
     },
     fileList: {
@@ -517,7 +518,7 @@ const styles = StyleSheet.create({
     fileItemText: {
         flex: 1,
         marginLeft: 8,
-        fontSize: 12,
+        fontSize: font.sm,
     },
     removeButton: {
         marginLeft: 8,
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
         padding: 12,
         minHeight: 80,
         textAlignVertical: 'top',
-        fontSize: 14,
+        fontSize: font.base,
     },
     trackerContainer: {
         paddingLeft: 4,
@@ -539,7 +540,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     stepText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         marginLeft: 8,
     },
     stepLine: {
@@ -560,11 +561,11 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     supportTitle: {
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '700',
     },
     supportDesc: {
-        fontSize: 12,
+        fontSize: font.sm,
         lineHeight: 16,
         marginBottom: 12,
     },
@@ -575,7 +576,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     supportButtonText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '600',
     },
     submitButton: {
@@ -588,11 +589,11 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     submitButtonText: {
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '700',
     },
     footerDisclaimer: {
-        fontSize: 11,
+        fontSize: font.small,
         textAlign: 'center',
         marginTop: 12,
         lineHeight: 14,
@@ -602,7 +603,7 @@ const styles = StyleSheet.create({
         elevation: 0,
     },
     statusMessage: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         textAlign: 'center',
         marginTop: 10,
         fontWeight: '600',

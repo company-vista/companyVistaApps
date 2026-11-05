@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: '#94A3B8',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   brandContainer: {
@@ -193,12 +193,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1A253',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
     color: '#64748B',
-    fontSize: 7,
+    fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
   },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   questionStepText: {
     color: '#8B5CF6',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1.5,
     marginBottom: s(8),
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
     marginTop: s(8),
     marginBottom: s(20),
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     borderColor: '#D1A253',
   },
   pillText: {
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '400',
   },
   pillTextUnselected: {
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   numberBadgeText: {
     color: '#0B0E17',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: 'bold',
   },
   noteCard: {
@@ -307,14 +307,14 @@ const styles = StyleSheet.create({
   },
   noteIcon: {
     color: '#8B5CF6',
-    fontSize: 16,
+    fontSize: font.lg,
     marginRight: s(10),
     marginTop: s(1),
   },
   noteText: {
     flex: 1,
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 18,
   },
   noteBold: {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 1.2,
     marginRight: s(12),
@@ -366,17 +366,17 @@ const styles = StyleSheet.create({
   },
   numberBadgeTextLarge: {
     color: '#0B0E17',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: 'bold',
   },
   priorityTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
   },
   weightText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   bottomContainer: {
     paddingHorizontal: s(16),
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#0B0E17',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
   },
   nextButtonDisabled: {

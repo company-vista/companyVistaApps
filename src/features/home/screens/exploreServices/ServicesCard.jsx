@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -108,18 +109,18 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     title: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '500',
         flex: 1,
         marginRight: 8,
     },
     price: {
-        fontSize: 17,
+        fontSize: font.xl,
         fontWeight: '500',
         color: '#FFA500',
     },
     description: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         lineHeight: 20,
         marginBottom: 20,
     },
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     outlineButtonText: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '500',
     },
     primaryButton: {
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     primaryButtonText: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '500',
     },
 });

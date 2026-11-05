@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     favouriteTitle: {
-        fontSize: 10,
+        fontSize: font.xs,
         fontWeight: '600',
         lineHeight: 12,
         marginTop: 5,

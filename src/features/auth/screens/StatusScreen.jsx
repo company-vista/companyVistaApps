@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React from 'react';
 import {
   StyleSheet,
@@ -169,7 +170,7 @@ const StatusScreen = ({ navigation, route }) => {
         {!isContinueEnabled && (
           <View style={{ backgroundColor: 'rgba(234,179,8,0.08)', borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
             <CheckCircle size={16} color="#EAB308" style={{ marginRight: 8 }} />
-            <Text style={{ color: '#EAB308', fontSize: 11, flex: 1 }}>
+            <Text style={{ color: '#EAB308', fontSize: font.small, flex: 1 }}>
               {!isShareholderDone ? 'Complete shareholders & ownership first' : 'Complete KYC documents first'} — then Continue will be enabled
             </Text>
           </View>
@@ -183,8 +184,8 @@ const StatusScreen = ({ navigation, route }) => {
           <Text style={styles.footerNote}>{isContinueEnabled ? 'Filing begins — redirecting to progress' : 'Filing begins once both steps are complete'}</Text>
           {!isContinueEnabled && (
             <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 10 }}>
-              {!isShareholderDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: 10 }}>Shareholders pending</Text></View>}
-              {!isKycDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: 10 }}>KYC pending</Text></View>}
+              {!isShareholderDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: font.xs }}>Shareholders pending</Text></View>}
+              {!isKycDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: font.xs }}>KYC pending</Text></View>}
             </View>
           )}
         </View>
@@ -213,12 +214,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1D5DB',
-    fontSize: 18,
+    fontSize: font.xxl,
     letterSpacing: 1,
   },
   brandSub: {
     color: '#6B7280',
-    fontSize: 8,
+    fontSize: font.tiny,
     letterSpacing: 1.5,
     marginTop: 2,
   },
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
   },
   iconWrapper: {
     marginVertical: 10,
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   mainTitle: {
-    fontSize: 28,
+    fontSize: font.displayXL,
     color: '#FFFFFF',
     fontWeight: '400',
   },
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#94A3B8',
-    fontSize: 14,
+    fontSize: font.base,
     textAlign: 'center',
     marginTop: 8,
     paddingHorizontal: s(20),
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
   },
   orderBadgeText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   cardsContainer: {
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
     marginBottom: 10,
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
   stepNumberText: {
     color: '#E2E8F0',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
   },
   stepCompletedBox: {
     backgroundColor: '#10B981',
@@ -373,12 +374,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   cardDesc: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 2,
   },
   bottomSection: {
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#070C15',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
@@ -420,13 +421,13 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: '#94A3B8',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
     marginLeft: 8,
   },
   footerNote: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 12,
   },
 });

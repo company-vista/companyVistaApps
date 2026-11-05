@@ -188,47 +188,54 @@ const CompanyManagementScreen = () => {
     );
   };
 
+  const openCompany = item =>
+    navigation.navigate('AdminCompanyDetails', {
+      companyId: item.id,
+      company: item.raw,
+    });
+
   const renderCompany = ({ item }) => (
     <View style={styles.companyCard}>
-      <View style={styles.cardHeader}>
-        <View style={styles.cardLeft}>
-          <View style={styles.avatarBox}>
-            <Text style={styles.avatarText}>{(item.name || '?')[0]}</Text>
+      <TouchableOpacity
+        activeOpacity={0.75}
+        onPress={() => openCompany(item)}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${item.name}`}>
+        <View style={styles.cardHeader}>
+          <View style={styles.cardLeft}>
+            <View style={styles.avatarBox}>
+              <Text style={styles.avatarText}>{(item.name || '?')[0]}</Text>
+            </View>
+            <View style={styles.companyInfo}>
+              <Text style={styles.companyName} numberOfLines={1}>{item.name}</Text>
+              <Text style={styles.companyType}>{item.type}</Text>
+            </View>
           </View>
-          <View style={styles.companyInfo}>
-            <Text style={styles.companyName} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.companyType}>{item.type}</Text>
+
+          <View style={[styles.statusBadge, { backgroundColor: item.bgColor }]}>
+            <Text style={[styles.statusText, { color: item.statusColor }]} numberOfLines={1}>
+              {item.status}
+            </Text>
           </View>
         </View>
 
-        <View style={[styles.statusBadge, { backgroundColor: item.bgColor }]}>
-          <Text style={[styles.statusText, { color: item.statusColor }]} numberOfLines={1}>
-            {item.status}
-          </Text>
+        <View style={styles.cardDetailsSection}>
+          <View style={styles.footerDetail}>
+            <Ionicons name="globe-outline" size={14} color="#64748B" />
+            <Text style={styles.footerText} numberOfLines={1}>{item.country}</Text>
+          </View>
+          <View style={styles.footerDetail}>
+            <Ionicons name="people-outline" size={14} color="#64748B" />
+            <Text style={styles.footerText}>{item.shareholders}</Text>
+          </View>
         </View>
-      </View>
-
-      <View style={styles.cardDetailsSection}>
-        <View style={styles.footerDetail}>
-          <Ionicons name="globe-outline" size={14} color="#64748B" />
-          <Text style={styles.footerText} numberOfLines={1}>{item.country}</Text>
-        </View>
-        <View style={styles.footerDetail}>
-          <Ionicons name="people-outline" size={14} color="#64748B" />
-          <Text style={styles.footerText}>{item.shareholders}</Text>
-        </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Action Buttons Row (View, Edit, Delete) */}
       <View style={styles.cardActionsFooter}>
         <TouchableOpacity
           style={styles.actionItem}
-          onPress={() =>
-            navigation.navigate('AdminCompanyDetails', {
-              companyId: item.id,
-              company: item.raw,
-            })
-          }>
+          onPress={() => openCompany(item)}>
           <Ionicons name="eye-outline" size={15} color="#4F46E5" />
           <Text style={[styles.actionText, { color: '#4F46E5' }]}>View</Text>
         </TouchableOpacity>

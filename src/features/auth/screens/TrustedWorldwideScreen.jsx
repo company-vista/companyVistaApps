@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     marginTop: s(18)
   },
   counterNumber: {
-    fontSize: 32,
+    fontSize: font.displayXXL,
     fontWeight: '600',
     // fontFamily: 'serif',
   },
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     color: '#C9A84C',
   },
   counterLabel: {
-    fontSize: 10,
+    fontSize: font.xs,
     letterSpacing: 1.5,
     fontWeight: '600',
     marginTop: s(4),
@@ -192,8 +193,8 @@ const styles = StyleSheet.create({
   greenCard: { borderColor: 'rgba(16, 185, 129, 0.3)' },
   blueCard: { borderColor: 'rgba(96, 165, 250, 0.3)' },
   purpleCard: { borderColor: 'rgba(168, 85, 247, 0.3)' },
-  statNumber: { fontSize: 22, fontWeight: '600',  marginTop: s(6) },
-  statLabel: { fontSize: 11, marginTop: s(2) },
+  statNumber: { fontSize: font.display, fontWeight: '600',  marginTop: s(6) },
+  statLabel: { fontSize: font.small, marginTop: s(2) },
   testimonialCard: {
     width: '100%',
     flexDirection: 'row',
@@ -211,17 +212,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: s(12),
   },
-  avatarText: { color: '#060913', fontWeight: 'bold', fontSize: 12 },
+  avatarText: { color: '#060913', fontWeight: 'bold', fontSize: font.sm },
   testimonialContent: { flex: 1 },
-  stars: { color: '#C9A84C', fontSize: 10, marginBottom: s(4) },
-  reviewText: { fontSize: 14,fontWeight: 400, lineHeight: 16 },
-  authorText: { fontSize: 10, marginTop: s(4) },
+  stars: { color: '#C9A84C', fontSize: font.xs, marginBottom: s(4) },
+  reviewText: { fontSize: font.base,fontWeight: 400, lineHeight: 16 },
+  authorText: { fontSize: font.xs, marginTop: s(4) },
   contentSection: { marginTop: s(4) },
   tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   goldLine: { width: 18, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
-  sectionTag: { color: '#C9A84C', fontSize: 11, letterSpacing: 1.2, fontWeight: 'bold' },
+  sectionTag: { color: '#C9A84C', fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
   mainHeading: {
-    fontSize: 22,
+    fontSize: font.display,
     fontWeight: '500',
     lineHeight: 36,
     marginBottom: s(12),
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
   italicGold: { color: '#C9A84C', fontStyle: 'italic' },
   boldText: { fontWeight: 'bold' },
   descriptionText: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 20,
     marginBottom: s(24),
   },
@@ -255,5 +256,5 @@ const styles = StyleSheet.create({
     paddingVertical: s(14),
     alignItems: 'center',
   },
-  btnText: { fontSize: 16, fontWeight: 'bold' },
+  btnText: { fontSize: font.lg, fontWeight: 'bold' },
 });

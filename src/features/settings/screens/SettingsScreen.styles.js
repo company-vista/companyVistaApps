@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from 'react-native';
 import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
@@ -10,7 +11,7 @@ const styles = StyleSheet.create({
         gap: s(12),
     },
     sectionHeader: {
-        fontSize: 17,
+        fontSize: font.xl,
         fontWeight: '400',
         textTransform: 'capitalize',
         letterSpacing: 0.5,
@@ -36,11 +37,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     title: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '400',
     },
     subtitle: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '400',
         marginTop: s(4),
     },

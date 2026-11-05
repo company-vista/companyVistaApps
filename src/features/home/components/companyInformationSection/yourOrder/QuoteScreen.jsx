@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#9CA3AF',
-    fontSize: 14,
+    fontSize: font.base,
     marginTop: s(4),
   },
   quoteCard: {
@@ -311,11 +311,11 @@ const styles = StyleSheet.create({
   quoteHeader: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: font.lg,
   },
   quoteSubText: {
     color: '#9CA3AF',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   breakdownCard: {
@@ -333,12 +333,12 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#9CA3AF',
-    fontSize: 14,
+    fontSize: font.base,
   },
   value: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 15,
+    fontSize: font.md,
   },
   divider: {
     height: 1,
@@ -353,17 +353,17 @@ const styles = StyleSheet.create({
   totalLabel: {
     color: '#9CA3AF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(6),
   },
   totalAmount: {
     color: '#EAB308',
-    fontSize: 28,
+    fontSize: font.displayXL,
     fontWeight: '500',
   },
   convertedAmount: {
     color: '#6B7280',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   validityCard: {
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   validityText: {
     color: '#9CA3AF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   boldText: {
     color: '#EAB308',
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     color: '#6B7280',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: 'bold',
     marginHorizontal: s(10),
     letterSpacing: 1,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   checkText: {
     color: '#D1D5DB',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginLeft: s(8),
   },
   noteCard: {
@@ -441,17 +441,17 @@ const styles = StyleSheet.create({
   avatarText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   noteTitle: {
     color: '#60A5FA',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: font.base,
     marginBottom: s(4),
   },
   noteDescription: {
     color: '#9CA3AF',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 18,
   },
   button: {
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#000000',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
 });

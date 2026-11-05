@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
@@ -25,10 +26,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ForgotPasswordScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
   const insets = useSafeAreaInsets();
-  const [email, setEmail] = useState('');
+  const accountType = route.params?.accountType === 'admin' ? 'admin' : 'client';
+  const [email, setEmail] = useState(route.params?.email || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [linkSent, setLinkSent] = useState(false);
 
   async function handleSubmit() {
     const trimmed = email.trim();
@@ -47,12 +51,22 @@ export default function ForgotPasswordScreen() {
     setError('');
     setLoading(true);
     try {
-      const res = await forgotPassword(trimmed);
+      const res = await forgotPassword(trimmed, accountType);
 
       // backend returns "Email not found" string check (kept from old logic)
       if (res?.message === 'Email not found') {
         setError(res.message);
         Toast.show({ type: 'error', text1: res.message });
+        return;
+      }
+
+      if (res?.success === false) {
+        throw new Error(res?.message || 'Unable to send password reset email.');
+      }
+
+      if (accountType === 'admin') {
+        setLinkSent(true);
+        Toast.show({ type: 'success', text1: 'Reset link sent', text2: 'Check your email to continue.' });
         return;
       }
 
@@ -94,7 +108,9 @@ export default function ForgotPasswordScreen() {
               Forgot your <Text style={styles.italicTitle}>password?</Text>
             </Text>
             <Text style={styles.description}>
-              No problem. Enter your registered email and we&apos;ll send you a verification code.
+              {accountType === 'admin'
+                ? 'Enter your admin email and we’ll send you a secure password reset link.'
+                : 'No problem. Enter your registered email and we’ll send you a verification code.'}
             </Text>
           </View>
 
@@ -128,8 +144,9 @@ export default function ForgotPasswordScreen() {
             <View style={styles.infoCard}>
               <Text style={styles.infoIcon}>⏱</Text>
               <Text style={styles.infoText}>
-                The code expires in <Text style={styles.boldText}>10 minutes</Text>. Check your spam
-                folder if you don&apos;t see it.
+                {accountType === 'admin'
+                  ? <>The reset link expires in <Text style={styles.boldText}>1 hour</Text>. Check your spam folder if it doesn’t arrive.</>
+                  : <>The code expires in <Text style={styles.boldText}>10 minutes</Text>. Check your spam folder if you don’t see it.</>}
               </Text>
             </View>
 
@@ -148,17 +165,30 @@ export default function ForgotPasswordScreen() {
             <Pressable
               style={[styles.submitButton, loading && { opacity: 0.7 }]}
               onPress={handleSubmit}
-              disabled={loading}
+              disabled={loading || linkSent}
               android_ripple={{ color: '#B8941F' }}>
               {loading ? (
                 <ActivityIndicator color="#070A12" />
+              ) : linkSent ? (
+                <>
+                  <Text style={styles.submitButtonText}>Link sent — check your email</Text>
+                  <Text style={styles.arrowIcon}>✓</Text>
+                </>
               ) : (
                 <>
-                  <Text style={styles.submitButtonText}>Send Verification Code</Text>
+                  <Text style={styles.submitButtonText}>
+                    {accountType === 'admin' ? 'Send Reset Link' : 'Send Verification Code'}
+                  </Text>
                   <Text style={styles.arrowIcon}>→</Text>
                 </>
               )}
             </Pressable>
+
+            {linkSent && (
+              <Text style={styles.linkSentHint}>
+                Open the link in your email on this device to set a new password.
+              </Text>
+            )}
 
             <View style={styles.bottomLinkContainer}>
               <Text style={styles.bottomText}>Remembered it? </Text>
@@ -234,7 +264,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
   },
   lockIcon: {
-    fontSize: 28,
+    fontSize: font.displayXL,
   },
   textSection: {
     alignItems: 'center',
@@ -243,7 +273,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: '500',
     textAlign: 'center',
   },
@@ -256,7 +286,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: s(10),
-    fontSize: 14,
+    fontSize: font.base,
     lineHeight: 20,
     paddingHorizontal: s(10),
   },
@@ -265,7 +295,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
     marginBottom: s(8),
@@ -285,22 +315,22 @@ const styles = StyleSheet.create({
   },
   inputIcon: {
     color: '#D4AF37',
-    fontSize: 16,
+    fontSize: font.lg,
     marginRight: s(10),
   },
   input: {
     flex: 1,
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
   },
   errorText: {
     color: '#fca5a5',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(6),
   },
   subtext: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(6),
     marginBottom: s(16),
   },
@@ -316,18 +346,18 @@ const styles = StyleSheet.create({
   },
   infoIcon: {
     color: '#94A3B8',
-    fontSize: 16,
+    fontSize: font.lg,
     marginRight: s(10),
   },
   infoText: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     flex: 1,
     lineHeight: 18,
   },
   infoTextBold: {
     color: '#E2E8F0',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
     flex: 1,
   },
@@ -350,13 +380,19 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: '#070A12',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     marginRight: s(8),
   },
+  linkSentHint: {
+    color: '#64748B',
+    fontSize: font.sm,
+    textAlign: 'center',
+    marginTop: s(12),
+  },
   arrowIcon: {
     color: '#070A12',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
   bottomLinkContainer: {
@@ -365,11 +401,11 @@ const styles = StyleSheet.create({
   },
   bottomText: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   linkText: {
     color: '#D4AF37',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
 });

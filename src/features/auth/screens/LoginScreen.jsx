@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -45,9 +46,9 @@ const COUNTRIES = [
   { code: '+61', iso: 'AU', name: 'Australia' },
 ];
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, route }) => {
   const [loginMethod, setLoginMethod] = useState('email');
-  const [accountType, setAccountType] = useState('client');
+  const [accountType, setAccountType] = useState(route?.params?.accountType || 'client');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -102,6 +103,10 @@ const LoginScreen = ({ navigation }) => {
 
   async function handleGoogleSignIn() {
     if (isLoading) return;
+    if (accountType === 'admin') {
+      Toast.show({ type: 'error', text1: 'Admin login', text2: 'Please log in with your admin email and password.' });
+      return;
+    }
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       try { await GoogleSignin.signOut(); } catch (e) { console.error(e); }
@@ -166,7 +171,10 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tabButton, accountType === 'admin' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
-            onPress={() => setAccountType('admin')}
+            onPress={() => {
+              setAccountType('admin');
+              setLoginMethod('email');
+            }}
             activeOpacity={0.8}
           >
             <Ionicons name="shield-checkmark-outline" size={14} color={accountType === 'admin' ? '#C9A84C' : colors.subtle} />
@@ -245,7 +253,10 @@ const LoginScreen = ({ navigation }) => {
             </View>
             <Text style={[styles.rememberText, { color: colors.muted }]}>Remember me</Text>
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('ForgotPassword')}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('ForgotPassword', { accountType, email })}
+          >
             <Text style={styles.forgotText}>Forgot password?</Text>
           </TouchableOpacity>
         </View>
@@ -262,35 +273,41 @@ const LoginScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.loginMethodLink}
-          activeOpacity={0.8}
-          onPress={() => setLoginMethod(loginMethod === 'email' ? 'mobile' : 'email')}
-        >
-          <Text style={styles.createAccountLink}>
-            {loginMethod === 'email' ? 'Login with mobile number?' : 'Login with email?'}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Divider */}
-        <View style={styles.dividerRow}>
-          <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-          <Text style={[styles.dividerText, { color: colors.subtle }]}>or continue with</Text>
-          <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-        </View>
-
-        {/* Social Login */}
-        <View style={styles.socialGrid}>
-          <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8} onPress={handleGoogleSignIn}>
-            <FontAwesome name="google" size={14} color="#ea4335" />
-            <Text style={[styles.socialBtnText, { color: colors.text }]}>Google</Text>
+        {accountType === 'client' && (
+          <TouchableOpacity
+            style={styles.loginMethodLink}
+            activeOpacity={0.8}
+            onPress={() => setLoginMethod(loginMethod === 'email' ? 'mobile' : 'email')}
+          >
+            <Text style={styles.createAccountLink}>
+              {loginMethod === 'email' ? 'Login with mobile number?' : 'Login with email?'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
-            <Ionicons name="logo-apple" size={16} color={isDark ? '#FFFFFF' : '#000000'} />
-            <Text style={[styles.socialBtnText, { color: colors.text }]}>Apple</Text>
-          </TouchableOpacity>
+        )}
 
-        </View>
+        {accountType === 'client' && (
+          <>
+            {/* Divider */}
+            <View style={styles.dividerRow}>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              <Text style={[styles.dividerText, { color: colors.subtle }]}>or continue with</Text>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            </View>
+
+            {/* Social Login */}
+            <View style={styles.socialGrid}>
+              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8} onPress={handleGoogleSignIn}>
+                <FontAwesome name="google" size={14} color="#ea4335" />
+                <Text style={[styles.socialBtnText, { color: colors.text }]}>Google</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
+                <Ionicons name="logo-apple" size={16} color={isDark ? '#FFFFFF' : '#000000'} />
+                <Text style={[styles.socialBtnText, { color: colors.text }]}>Apple</Text>
+              </TouchableOpacity>
+
+            </View>
+          </>
+        )}
 
         {/* Create Account Link */}
         <Text style={[styles.signupText, { color: colors.muted }]}>
@@ -360,7 +377,7 @@ const styles = StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10.4) },
   mainTitle: { color: '#FFFFFF', fontSize: s(26), fontWeight: '500', lineHeight: s(34), marginBottom: s(6), marginTop: s(10), marginLeft: s(2) },
   italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: 12, lineHeight: 18, marginBottom: s(20) },
+  subtitle: { color: '#94A3B8', fontSize: font.sm, lineHeight: 18, marginBottom: s(20) },
   tabContainer: {
     flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: 12, padding: s(3), borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
@@ -368,9 +385,9 @@ const styles = StyleSheet.create({
   },
   tabButton: { flex: 1, paddingVertical: s(10), alignItems: 'center', borderRadius: 9, flexDirection: 'row', justifyContent: 'center', gap: 6 },
   activeTabButton: { backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  tabText: { color: '#64748B', fontSize: 12, fontWeight: '600' },
+  tabText: { color: '#64748B', fontSize: font.sm, fontWeight: '600' },
   activeTabText: { color: '#C9A84C', fontWeight: 'bold' },
-  inputLabel: { color: '#64748B', fontSize: 14, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
+  inputLabel: { color: '#64748B', fontSize: font.base, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
   inputContainer: {
     width: '100%',
     flexDirection: 'row', alignItems: 'center',
@@ -379,8 +396,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(14), height: s(48), marginBottom: s(16),
   },
   inputContainerError: { borderColor: '#EF4444' },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: 16, fontWeight: '500', marginLeft: s(10) },
-  errorText: { color: '#EF4444', fontSize: 14, marginTop: -12, marginBottom: s(12) },
+  textInput: { flex: 1, color: '#FFFFFF', fontSize: font.lg, fontWeight: '500', marginLeft: s(10) },
+  errorText: { color: '#EF4444', fontSize: font.base, marginTop: -12, marginBottom: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10, marginBottom: s(16) },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
@@ -388,8 +405,8 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: s(12), height: 48, gap: 6,
   },
-  flagText: { color: '#64748B', fontSize: 10, fontWeight: 'bold' },
-  codeText: { color: '#FFFFFF', fontSize: 13, fontWeight: 'bold' },
+  flagText: { color: '#64748B', fontSize: font.xs, fontWeight: 'bold' },
+  codeText: { color: '#FFFFFF', fontSize: font.bodySmall, fontWeight: 'bold' },
   phoneInputContainer: {
     flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -403,27 +420,27 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  rememberText: { color: '#64748B', fontSize: 11 },
-  forgotText: { color: '#C9A84C', fontSize: 11, fontWeight: '500' },
+  rememberText: { color: '#64748B', fontSize: font.small },
+  forgotText: { color: '#C9A84C', fontSize: font.small, fontWeight: '500' },
   loginBtn: {
     backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(10),
   },
   loginBtnDisabled: { opacity: 0.4 },
-  loginBtnText: { color: '#060913', fontSize: 14, fontWeight: 'bold' },
+  loginBtnText: { color: '#060913', fontSize: font.base, fontWeight: 'bold' },
   loginMethodLink: { alignItems: 'center', marginBottom: s(20) },
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(20) },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  dividerText: { color: '#475569', fontSize: 10, paddingHorizontal: s(12) },
+  dividerText: { color: '#475569', fontSize: font.xs, paddingHorizontal: s(12) },
   socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: s(24) },
   socialBtn: {
     width: '48%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(12),
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: s(12), gap: s(8),
   },
-  socialBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' },
-  signupText: { color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: s(20) },
-  createAccountLink: { color: '#C9A84C', fontWeight: 'bold', fontSize: 15 },
+  socialBtnText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: 'bold' },
+  signupText: { color: '#64748B', fontSize: font.base, textAlign: 'center', marginBottom: s(20) },
+  createAccountLink: { color: '#C9A84C', fontWeight: 'bold', fontSize: font.md },
   supportContainer: { alignItems: 'center' },
   supportBtn: {
     flexDirection: 'row', alignItems: 'center',
@@ -431,16 +448,16 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: s(16), paddingVertical: s(8), gap: 6,
   },
-  supportBtnText: { color: '#94A3B8', fontSize: 11, fontWeight: '500' },
+  supportBtnText: { color: '#94A3B8', fontSize: font.small, fontWeight: '500' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject },
   modalContent: { backgroundColor: '#111827', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
+  modalTitle: { color: '#FFFFFF', fontSize: font.base, fontWeight: 'bold' },
   countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
-  countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: 13 },
-  countryOptionCode: { color: '#94A3B8', fontSize: 12, marginRight: s(6) },
+  countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: font.bodySmall },
+  countryOptionCode: { color: '#94A3B8', fontSize: font.sm, marginRight: s(6) },
   checkCircle: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 1.5,
     alignItems: 'center', justifyContent: 'center',

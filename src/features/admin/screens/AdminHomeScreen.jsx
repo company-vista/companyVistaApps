@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import logos from  '../../../../src/assets/images/Logo1.png'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../store/hooks';
@@ -26,6 +27,7 @@ import {
 } from '../dashboard/utils/dashboardFormat';
 import QuickActions from '../quickActions/QuickActions';
 import AdminFinanceScreen from '../finance/AdminFinanceScreen';
+import { ImageBackground } from 'react-native-web';
 
 const NEW_COMPANY_SOURCES = ['client_signup', 'public_link'];
 
@@ -66,7 +68,7 @@ const AdminDashboard = () => {
         if (!response?.stats && !response?.invoices && !response?.companies) {
           throw new Error(
             response?.errors?.[0]?.message ||
-              'Failed to load dashboard. Please try again.',
+            'Failed to load dashboard. Please try again.',
           );
         }
 
@@ -231,6 +233,7 @@ const AdminDashboard = () => {
   }
 
   return (
+
     <View style={styles.container}>
       <StatusBar
         barStyle="dark-content"
@@ -254,13 +257,21 @@ const AdminDashboard = () => {
           <TouchableOpacity style={styles.outlinedButton}>
             <Text style={styles.outlinedButtonText}>↑ Upload Document</Text>
           </TouchableOpacity>
-
         </View>
 
-        <AdminStatsCards
+       
+
+        {/* <AdminStatsCards
           stats={stats}
           currencyTotals={currencyTotals}
-        />
+        /> */}
+
+        <QuickActions />
+
+        <View style={styles.financeSection}>
+          <Text style={styles.sectionTitle}>Finance</Text>
+          <AdminFinanceScreen showHeader={false} />
+        </View>
 
         <AdminNewCompanies
           companies={mappedCompanies}
@@ -274,12 +285,6 @@ const AdminDashboard = () => {
           />
         </View>
 
-        <QuickActions />
-
-        <View style={styles.financeSection}>
-          <Text style={styles.sectionTitle}>Finance</Text>
-          <AdminFinanceScreen showHeader={false} />
-        </View>
       </ScrollView>
     </View>
   );

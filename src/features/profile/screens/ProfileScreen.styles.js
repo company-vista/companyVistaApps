@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#111827',
-        fontSize: 22,
+        fontSize: font.display,
         fontWeight: '400',
     },
     editButton: {
@@ -35,8 +36,8 @@ const styles = StyleSheet.create({
     },
     editText: {
         color: '#0f766e',
-        fontSize: 14,
-        fontWeight: '900',
+        fontSize: font.base,
+        fontWeight: '400',
     },
     profileCard: {
         alignItems: 'center',
@@ -83,13 +84,13 @@ const styles = StyleSheet.create({
     },
     name: {
         color: '#111827',
-        fontSize: 28,
+        fontSize: font.displayXL,
         fontWeight: '400',
         marginTop: s(16),
     },
     subtitle: {
         color: '#64748b',
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '400',
         marginTop: s(5),
     },
@@ -112,8 +113,8 @@ const styles = StyleSheet.create({
         gap: s(8),
     },
     progressTitle: {
-        fontSize: 14,
-        fontWeight: '700',
+        fontSize: font.base,
+        fontWeight: '400',
         color: '#111827',
     },
     progressBadge: {
@@ -123,8 +124,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#ecfeff',
     },
     progressBadgeText: {
-        fontSize: 12,
-        fontWeight: '800',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     progressSubRow: {
         flexDirection: 'row',
@@ -133,12 +134,12 @@ const styles = StyleSheet.create({
         marginTop: s(6),
     },
     progressPercent: {
-        fontSize: 13,
-        fontWeight: '800',
+        fontSize: font.bodySmall,
+        fontWeight: '400',
     },
     progressSubText: {
-        fontSize: 11,
-        fontWeight: '500',
+        fontSize: font.small,
+        fontWeight: '400',
         flex: 1,
     },
     progressTrack: {
@@ -171,16 +172,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     progressFieldLabel: {
-        fontSize: 11,
-        fontWeight: '600',
+        fontSize: font.small,
+        fontWeight: '400',
     },
     progressCta: {
         marginTop: s(10),
         alignSelf: 'flex-start',
     },
     progressCtaText: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     switchAccountButton: {
         minHeight: 70,
@@ -208,13 +209,13 @@ const styles = StyleSheet.create({
     },
     switchAccountTitle: {
         color: '#111827',
-        fontSize: 15,
-        fontWeight: '500',
+        fontSize: font.md,
+        fontWeight: '400',
     },
     switchAccountSubtitle: {
         color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: font.sm,
+        fontWeight: '400',
         marginTop: s(4),
     },
     detailsCard: {
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         color: '#64748b',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '400',
         marginBottom: s(2),
     },
@@ -253,8 +254,8 @@ const styles = StyleSheet.create({
     },
     logoutText: {
         // color: '#000',
-        fontSize: 16,
-        fontWeight: '500',
+        fontSize: font.lg,
+        fontWeight: '400',
     },
     detailRow: {
         flexDirection: 'row',
@@ -277,12 +278,12 @@ const styles = StyleSheet.create({
     },
     detailLabel: {
         color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '500',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     detailValue: {
         color: '#111827',
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '400',
         marginTop: s(4),
     },
@@ -306,12 +307,12 @@ const styles = StyleSheet.create({
         gap: s(14),
     },
     emailDropdownValue: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '400',
     },
     emailDropdownBadge: {
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: font.xs,
+        fontWeight: '400',
         paddingHorizontal: s(7),
         paddingVertical: s(2),
         borderRadius: 6,
@@ -329,8 +330,8 @@ const styles = StyleSheet.create({
         gap: s(6),
     },
     emailDropdownPrimaryLabel: {
-        fontSize: 10,
-        fontWeight: '700',
+        fontSize: font.xs,
+        fontWeight: '400',
         color: '#ffffff',
         backgroundColor: '#dc2626',
         paddingHorizontal: s(6),
@@ -357,7 +358,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: s(10),
         paddingVertical: s(8),
-        fontSize: 14,
+        fontSize: font.base,
     },
     emailInputSubmit: {
         width: 28,
@@ -376,8 +377,8 @@ const styles = StyleSheet.create({
     },
     versionText: {
         color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: font.sm,
+        fontWeight: '400',
         marginTop: s(18),
         textAlign: 'center',
     },
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
     },
     switchSheetAccountName: {
         flex: 1,
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '400',
     },
     switchSheetAddRow: {
@@ -448,12 +449,12 @@ const styles = StyleSheet.create({
     },
     switchSheetAddText: {
         flex: 1,
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '400',
     },
     metaText: {
-        fontSize: 14,
-        fontWeight: '700',
+        fontSize: font.base,
+        fontWeight: '400',
         marginTop: s(16),
         textAlign: 'center',
     },

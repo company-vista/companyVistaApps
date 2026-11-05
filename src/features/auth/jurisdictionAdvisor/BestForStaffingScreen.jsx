@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: '#94A3B8',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   brandContainer: {
@@ -185,12 +185,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1A253',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
     color: '#64748B',
-    fontSize: 7,
+    fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
   },
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
     marginTop: s(6),
     marginBottom: s(16),
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: '#A5B4FC',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   offshoreNoticeCard: {
@@ -261,16 +261,16 @@ const styles = StyleSheet.create({
     marginRight: s(10),
   },
   warningIcon: {
-    fontSize: 14,
+    fontSize: font.base,
   },
   noticeTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   noticeDescription: {
     color: '#8A8D9B',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 18,
   },
   matchCard: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: '#D1A253',
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
@@ -310,19 +310,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   countryCodeText: {
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: 'bold',
     color: '#334155',
     marginRight: s(12),
   },
   countryName: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: 'bold',
   },
   stateSubtitle: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: s(2),
   },
   matchPercentageContainer: {
@@ -331,12 +331,12 @@ const styles = StyleSheet.create({
   },
   matchPercentage: {
     color: '#D1A253',
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: '300',
   },
   matchLabel: {
     color: '#64748B',
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -352,13 +352,13 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#10B981',
-    fontSize: 14,
+    fontSize: font.base,
     marginRight: s(10),
     marginTop: s(1),
   },
   featureText: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 18,
     flex: 1,
   },
@@ -383,12 +383,12 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#0B0E17',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   addonText: {
     color: '#475569',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(10),
   },
 });

@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,12 +19,14 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
+import { resetPassword } from '../api/forgotPasswordApi';
 import { s } from '../../../theme/responsive';
 
 export default function ResetPasswordScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { token } = route.params || {};
+  const accountType = route.params?.accountType === 'admin' ? 'admin' : 'client';
   const insets = useSafeAreaInsets();
 
   const [newPassword, setNewPassword] = useState('');
@@ -63,13 +66,9 @@ export default function ResetPasswordScreen() {
     }
     setLoading(true);
     try {
-      const { API_BASE_URL } = await import('../../../config/api');
-      const axios = (await import('axios')).default;
-      await axios.post(`${API_BASE_URL}/api/client/auth/reset-password/${token}`, {
-        password: newPassword.trim(),
-      });
+      await resetPassword({ token, password: newPassword.trim(), accountType });
       Toast.show({ type: 'success', text1: 'Password reset successful' });
-      navigation.replace('PasswordUpdated', { email: route.params?.email });
+      navigation.replace('PasswordUpdated', { email: route.params?.email, accountType });
     } catch (error) {
       const message = error?.response?.data?.message || 'Something went wrong. Please try again.';
       Toast.show({ type: 'error', text1: 'Error', text2: message });
@@ -220,43 +219,43 @@ const styles = StyleSheet.create({
     width: 60, height: 60, borderRadius: 50, borderWidth: 1.5, borderColor: '#00f5d479',
     justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30',
   },
-  lockIcon: { fontSize: 26 },
+  lockIcon: { fontSize: font.displayLarge },
   textSection: { alignItems: 'center', marginVertical: 10 },
-  title: { color: '#FFFFFF', fontSize: 24, fontWeight: '400', textAlign: 'center' },
+  title: { color: '#FFFFFF', fontSize: font.displayMedium, fontWeight: '400', textAlign: 'center' },
   italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
-  description: { color: '#94A3B8', textAlign: 'center', marginTop: 6, fontSize: 14 },
+  description: { color: '#94A3B8', textAlign: 'center', marginTop: 6, fontSize: font.base },
   form: { width: '100%' },
-  label: { color: '#64748B', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
+  label: { color: '#64748B', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
   inputContainer: {
     flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B',
     borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: s(12), height: 52,
   },
   inputContainerSuccess: { borderColor: '#10B981' },
   inputContainerError: { borderColor: '#EF4444' },
-  inputIcon: { fontSize: 16, marginRight: 10 },
-  input: { flex: 1, color: '#FFFFFF', fontSize: 15 },
-  eyeIcon: { color: '#94A3B8', fontSize: 16 },
-  successIcon: { color: '#10B981', fontSize: 18, fontWeight: 'bold' },
+  inputIcon: { fontSize: font.lg, marginRight: 10 },
+  input: { flex: 1, color: '#FFFFFF', fontSize: font.md },
+  eyeIcon: { color: '#94A3B8', fontSize: font.lg },
+  successIcon: { color: '#10B981', fontSize: font.xxl, fontWeight: 'bold' },
   strengthBarContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
   strengthSegment: { flex: 1, height: 3, backgroundColor: '#1E293B', borderRadius: 2, marginHorizontal: 2 },
   strengthLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  subtext: { color: '#64748B', fontSize: 12 },
-  strengthText: { fontSize: 12, fontWeight: '600' },
+  subtext: { color: '#64748B', fontSize: font.sm },
+  strengthText: { fontSize: font.sm, fontWeight: '600' },
   checklistCard: { backgroundColor: '#0B1120', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, padding: 14, marginBottom: 14 },
   checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   checkCircle: { width: 18, height: 18, borderRadius: 9, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
   checkCircleOk: { backgroundColor: '#064E3B' },
   checkCircleOff: { backgroundColor: '#1E293B' },
-  checkMark: { fontSize: 11, fontWeight: 'bold' },
-  checkText: { fontSize: 13 },
+  checkMark: { fontSize: font.small, fontWeight: 'bold' },
+  checkText: { fontSize: font.bodySmall },
   matchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-  matchIcon: { fontSize: 12, marginRight: 6 },
-  matchText: { fontSize: 12 },
+  matchIcon: { fontSize: font.sm, marginRight: 6 },
+  matchText: { fontSize: font.sm },
   footer: { marginTop: 20 },
   submitButton: {
     backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 24,
     flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
   },
-  submitButtonText: { color: '#070A12', fontSize: 16, fontWeight: '700', marginRight: 8 },
-  arrowIcon: { color: '#070A12', fontSize: 18, fontWeight: 'bold' },
+  submitButtonText: { color: '#070A12', fontSize: font.lg, fontWeight: '700', marginRight: 8 },
+  arrowIcon: { color: '#070A12', fontSize: font.xxl, fontWeight: 'bold' },
 });

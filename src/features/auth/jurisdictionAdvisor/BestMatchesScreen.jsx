@@ -461,14 +461,14 @@ export default function BestMatchesScreen({ navigation, route }) {
         {alsoPossible.map(item => (
           <TouchableOpacity key={item.name} style={[styles.altCard, styles.altCardSmall]} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
             <View style={styles.altLeft}>
-              <Text style={[styles.altFlag, { fontSize: 20 }]}>{item.flag}</Text>
+              <Text style={[styles.altFlag, { fontSize: font.hero }]}>{item.flag}</Text>
               <View style={styles.altTextWrap}>
-                <Text style={[styles.altName, { fontSize: 14 }]}>{item.name}</Text>
+                <Text style={[styles.altName, { fontSize: font.base }]}>{item.name}</Text>
                 <Text style={styles.altDesc}>{item.desc}</Text>
               </View>
             </View>
             <View style={styles.altMatchWrap}>
-              <Text style={[styles.altMatch, { fontSize: 16 }]}>{item.match}%</Text>
+              <Text style={[styles.altMatch, { fontSize: font.lg }]}>{item.match}%</Text>
               <Text style={styles.altMatchLabel}>MATCH</Text>
             </View>
           </TouchableOpacity>
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: '#94A3B8',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
   },
   brandContainer: {
@@ -531,12 +531,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1A253',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
     color: '#64748B',
-    fontSize: 7,
+    fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
   },
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: font.bodySmall,
     color: '#64748B',
     marginTop: s(6),
     marginBottom: s(16),
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: '#A5B4FC',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '500',
   },
   matchCard: {
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: '#D1A253',
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
@@ -620,19 +620,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   countryCodeText: {
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: 'bold',
     color: '#334155',
     marginRight: s(12),
   },
   countryName: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: 'bold',
   },
   stateSubtitle: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: s(2),
   },
   matchPercentageContainer: {
@@ -640,12 +640,12 @@ const styles = StyleSheet.create({
   },
   matchPercentage: {
     color: '#D1A253',
-    fontSize: 24,
+    fontSize: font.displayMedium,
     fontWeight: '300',
   },
   matchLabel: {
     color: '#64748B',
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   },
   whyDesc: {
     color: '#CBD5E1',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 19,
   },
   scoreRow: {
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     letterSpacing: 0.3,
   },
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
   },
   fitChipIcon: {
     color: '#10B981',
-    fontSize: 10,
+    fontSize: font.xs,
     marginRight: s(5),
   },
   fitChipIconStrong: {
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
   },
   fitChipText: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
   },
   fitChipTextStrong: {
     color: '#D1A253',
@@ -726,13 +726,13 @@ const styles = StyleSheet.create({
   },
   cautionIcon: {
     color: '#D1A253',
-    fontSize: 12,
+    fontSize: font.sm,
     marginRight: s(8),
     marginTop: s(1),
   },
   cautionText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 16,
     flex: 1,
   },
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   },
   profileTitle: {
     color: '#64748B',
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     letterSpacing: 1.2,
     marginBottom: s(10),
@@ -761,7 +761,7 @@ const styles = StyleSheet.create({
   profileLabel: {
     width: s(104),
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
   },
   profileTrack: {
     flex: 1,
@@ -779,7 +779,7 @@ const styles = StyleSheet.create({
   profileValue: {
     width: s(28),
     color: '#64748B',
-    fontSize: 10,
+    fontSize: font.xs,
     textAlign: 'right',
   },
   featuresList: {
@@ -795,13 +795,13 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     color: '#10B981',
-    fontSize: 14,
+    fontSize: font.base,
     marginRight: s(10),
     marginTop: s(1),
   },
   featureText: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 18,
     flex: 1,
   },
@@ -819,12 +819,12 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   warningIcon: {
-    fontSize: 14,
+    fontSize: font.base,
     marginRight: s(8),
   },
   warningText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     lineHeight: 16,
     flex: 1,
   },
@@ -847,23 +847,23 @@ const styles = StyleSheet.create({
   },
   priceAmount: {
     color: '#D1A253',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: 'bold',
     marginRight: s(8),
   },
   priceNote: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
   },
   customQuoteText: {
     color: '#D1A253',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     fontStyle: 'italic',
   },
   timeframeText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 1.2,
     marginRight: s(12),
@@ -904,19 +904,19 @@ const styles = StyleSheet.create({
     gap: s(10),
   },
   altFlag: {
-    fontSize: 22,
+    fontSize: font.display,
   },
   altTextWrap: {
     flex: 1,
   },
   altName: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
   },
   altDesc: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: s(2),
     lineHeight: 14,
   },
@@ -926,12 +926,12 @@ const styles = StyleSheet.create({
   },
   altMatch: {
     color: '#D1A253',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
   },
   altMatchLabel: {
     color: '#64748B',
-    fontSize: 8,
+    fontSize: font.tiny,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
@@ -945,13 +945,13 @@ const styles = StyleSheet.create({
   },
   excludedText: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
     lineHeight: 15,
     textAlign: 'center',
   },
   guidanceText: {
     color: '#475569',
-    fontSize: 10,
+    fontSize: font.xs,
     textAlign: 'center',
     marginTop: s(10),
     lineHeight: 14,
@@ -971,7 +971,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#0B0E17',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   browseButton: {
@@ -980,6 +980,6 @@ const styles = StyleSheet.create({
   },
   browseText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
 });

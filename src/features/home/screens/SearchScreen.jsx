@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: font.base,
-        fontWeight: '600',
+        fontWeight: '400',
         letterSpacing: 0.5,
         paddingHorizontal: s(16),
         paddingTop: 20,

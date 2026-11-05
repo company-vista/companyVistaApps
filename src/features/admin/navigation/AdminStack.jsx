@@ -6,6 +6,10 @@ import DeactivateAccountScreen from '../../settings/screens/DeactivateAccountScr
 import DeleteAccountScreen from '../../settings/screens/DeleteAccountScreen';
 
 import AdminCompanyScreen from '../company/screens/AdminCompanyScreen';
+import AdminClientsScreen from '../clients/screens/AdminClientsScreen';
+import AdminClientDetailsScreen from '../clients/screens/AdminClientDetailsScreen';
+import AdminCreateClientScreen from '../clients/screens/AdminCreateClientScreen';
+import AdminSearchScreen from '../search/screens/AdminSearchScreen';
 import AdminDocumentsScreen from '../documents/AdminDocumentsScreen';
 import AdminChatListScreen from '../messages/screens/AdminChatListScreen';
 import AdminMessageScreen from '../messages/screens/AdminMessageScreen';
@@ -45,6 +49,26 @@ export default function AdminStack() {
         layout={FullScreenLayout}
       />
       <Stack.Screen name="AdminCompany" component={AdminCompanyScreen} layout={AdminScreenLayout} />
+      <Stack.Screen
+        name="AdminClients"
+        component={AdminClientsScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminClientDetails"
+        component={AdminClientDetailsScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminCreateClient"
+        component={AdminCreateClientScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminSearch"
+        component={AdminSearchScreen}
+        layout={FullScreenLayout}
+      />
       <Stack.Screen name="AdminDocuments" component={AdminDocumentsScreen} layout={AdminScreenLayout} />
       <Stack.Screen name="AdminChatList" component={AdminChatListScreen} layout={AdminScreenLayout} />
       <Stack.Screen

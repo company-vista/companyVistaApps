@@ -12,7 +12,7 @@ const AdminBottomTab = () => {
 
   const tabs = [
     { key: 'AdminHome', label: 'Home', icon: '🏠', route: 'AdminHome' },
-    { key: 'AdminCompany', label: 'Company', icon: '🏢', route: 'AdminCompany' },
+    { key: 'AdminCompany', label: 'Registred Com.', icon: '🏢', route: 'AdminCompany' },
     { key: 'AdminMessages', label: 'Messages', icon: '💬', route: 'AdminChatList' },
     { key: 'AdminDocuments', label: 'Documents', icon: '📄', route: 'AdminDocuments' },
     { key: 'AdminProfile', label: 'Profile', icon: '👤', route: 'AdminProfile' },
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   navIcon: {
     fontSize: font.lg,
-    opacity: 0.5,
+    opacity: 1.8,
   },
   activeNavIcon: {
     opacity: 1,
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     fontSize: font.xs,
     color: '#64748B',
     marginTop: 2,
+    fontWeight: '500',
   },
   activeNavText: {
     color: '#1E3A8A',

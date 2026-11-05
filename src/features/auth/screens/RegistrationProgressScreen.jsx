@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
@@ -112,7 +113,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
           {isLockedPending ? <Clock size={14} color="#EAB308" /> : null}
         </View>
       </View>
-      {isLockedPending ? <Text style={{ color: '#EAB308', fontSize: 11, textAlign: 'center', marginBottom: 8 }}>Status: pending — waiting for active</Text> : null}
+      {isLockedPending ? <Text style={{ color: '#EAB308', fontSize: font.small, textAlign: 'center', marginBottom: 8 }}>Status: pending — waiting for active</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Title Section */}
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mainTitle: {
-    fontSize: 26,
+    fontSize: font.displayLarge,
     color: '#FFFFFF',
     fontWeight: '400',
   },
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: 6,
   },
   progressCard: {
@@ -348,23 +349,23 @@ const styles = StyleSheet.create({
   },
   progressCardLabel: {
     color: '#64748B',
-    fontSize: 10,
+    fontSize: font.xs,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   progressCardValue: {
     color: '#EAB308',
-    fontSize: 22,
+    fontSize: font.display,
     fontWeight: '500',
     marginTop: 4,
   },
   progressCardEstLabel: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
   },
   progressCardEstDate: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '700',
     marginTop: 4,
   },
@@ -386,11 +387,11 @@ const styles = StyleSheet.create({
   },
   stepCountText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   onScheduleText: {
     color: '#10B981',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   timelineContainer: {
@@ -457,28 +458,28 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   stepTitleActive: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   stepTitlePending: {
     color: '#64748B',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '600',
   },
   stepDesc: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 4,
     lineHeight: 18,
   },
   stepDescPending: {
     color: '#475569',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 4,
     lineHeight: 18,
   },
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
   },
   timeStampText: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginLeft: 6,
   },
   inProgressBadge: {
@@ -513,12 +514,12 @@ const styles = StyleSheet.create({
   },
   inProgressBadgeText: {
     color: '#EAB308',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
   },
   subNotePending: {
     color: '#475569',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 6,
   },
   dividerRow: {
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     color: '#475569',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
     marginRight: 10,
@@ -557,11 +558,11 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   rowValue: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '600',
   },
   goldText: {
@@ -591,17 +592,17 @@ const styles = StyleSheet.create({
   },
   docCardTitle: {
     color: '#94A3B8',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   docCardSub: {
     color: '#475569',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 2,
   },
   pendingBadgeText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
 });

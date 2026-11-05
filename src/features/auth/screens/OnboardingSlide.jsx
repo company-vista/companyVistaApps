@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, Animated, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   topLogo: { position: 'absolute', top: 50, left: 12, width: 180, height: 38, resizeMode: 'contain', zIndex: 10 },
   remoteButton: { position: 'absolute', top: 98, left: 20, backgroundColor: 'rgba(201, 168, 76, 0.15)', borderWidth: 1, borderColor: 'rgba(201, 168, 76, 0.3)', borderRadius: 20, paddingHorizontal: s(14), paddingVertical: s(6), zIndex: 10 },
-  remoteButtonText: { fontSize: 12, fontWeight: '600', color: '#c9a84c', letterSpacing: 0.5 },
+  remoteButtonText: { fontSize: font.sm, fontWeight: '600', color: '#c9a84c', letterSpacing: 0.5 },
   artSection: { height: '50%', alignItems: 'center', justifyContent: 'center' },
   artBadge: {
     width: 120,
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  artIcon: { fontSize: 54 },
+  artIcon: { fontSize: font.display5XL },
   globeContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -232,8 +233,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   badgeLeftLight: { backgroundColor: 'rgba(255, 255, 255, 0.92)', borderColor: 'rgba(59, 130, 246, 0.45)' },
-  badgeLive: { fontSize: 12, fontWeight: '700', color: '#3b82f6', letterSpacing: 1, marginBottom: s(4) },
-  badgeLeftSub: { fontSize: 12, color: 'rgba(255, 255, 255, 0.4)' },
+  badgeLive: { fontSize: font.sm, fontWeight: '700', color: '#3b82f6', letterSpacing: 1, marginBottom: s(4) },
+  badgeLeftSub: { fontSize: font.sm, color: 'rgba(255, 255, 255, 0.4)' },
   badgeSubLight: { color: 'rgba(15, 23, 42, 0.5)' },
   badgeRight: {
     backgroundColor: 'rgba(11, 17, 32, 0.85)',
@@ -250,9 +251,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   badgeRightLight: { backgroundColor: 'rgba(255, 255, 255, 0.92)', borderColor: 'rgba(201, 168, 76, 0.5)' },
-  badgeAvailable: { fontSize: 10, fontWeight: '700', color: '#c9a84c', letterSpacing: 1, marginBottom: s(2) },
-  badgeNumber: { fontSize: 28, fontWeight: '600', color: '#c9a84c', marginBottom: s(2) },
-  badgeCountries: { fontSize: 12, color: 'rgba(255, 255, 255, 0.4)' },
+  badgeAvailable: { fontSize: font.xs, fontWeight: '700', color: '#c9a84c', letterSpacing: 1, marginBottom: s(2) },
+  badgeNumber: { fontSize: font.displayXL, fontWeight: '600', color: '#c9a84c', marginBottom: s(2) },
+  badgeCountries: { fontSize: font.sm, color: 'rgba(255, 255, 255, 0.4)' },
   stepperContainer: { alignItems: 'center', justifyContent: 'center', width: '100%', paddingHorizontal: s(30), marginTop: -8, marginBottom: s(10) },
   stepperRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   stepperStep: { alignItems: 'center', width: 64 },
@@ -269,8 +270,8 @@ const styles = StyleSheet.create({
     // shadowRadius: 6,
     // elevation: 4,
   },
-  stepperNumber: { fontSize: 14, fontWeight: '700' },
-  stepperLabel: { fontSize: 12, fontWeight: '500', marginTop: s(8), textAlign: 'center' },
+  stepperNumber: { fontSize: font.base, fontWeight: '700' },
+  stepperLabel: { fontSize: font.sm, fontWeight: '500', marginTop: s(8), textAlign: 'center' },
   stepperLine: { width: 30, height: 1, marginHorizontal: -4 },
   contentSection: {
     flex: 1,
@@ -290,18 +291,18 @@ const styles = StyleSheet.create({
   },
   eyebrowContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
   eyebrowDash: { width: 18, height: 1, backgroundColor: '#c9a84c', marginRight: s(8) },
-  eyebrowText: { fontSize: 12, fontWeight: '700', letterSpacing: 1.5, color: '#c9a84c' },
-  title: { fontSize: 24, fontWeight: '300', lineHeight: 30, marginBottom: s(12) },
+  eyebrowText: { fontSize: font.sm, fontWeight: '700', letterSpacing: 1.5, color: '#c9a84c' },
+  title: { fontSize: font.displayMedium, fontWeight: '300', lineHeight: 30, marginBottom: s(12) },
   titleItalic: { fontStyle: 'italic', color: '#c9a84c' },
-  body: { fontSize: 14, lineHeight: 20, marginBottom: 4 },
+  body: { fontSize: font.base, lineHeight: 20, marginBottom: 4 },
   dotsContainer: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: s(16) },
   dot: { width: 6, height: 6, borderRadius: 3 },
   activeDot: { width: 22, backgroundColor: '#c9a84c', borderRadius: 4 },
   nextButton: { borderRadius: 24, overflow: 'hidden', marginBottom: s(8) },
   gradientButton: { height: 50, alignItems: 'center', justifyContent: 'center' },
-  nextButtonText: { fontSize: 16, fontWeight: '700', color: '#0a0f1e' },
+  nextButtonText: { fontSize: font.lg, fontWeight: '700', color: '#0a0f1e' },
   skipButton: { height: 34, alignItems: 'center', justifyContent: 'center', marginBottom: s(4) },
-  skipText: { fontSize: 12, fontWeight: '500' },
+  skipText: { fontSize: font.sm, fontWeight: '500' },
   scrollBody: { flex: 1 },
   scrollContent: { paddingBottom: s(8) },
 });

@@ -11,6 +11,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
@@ -30,6 +31,9 @@ const AdminProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const user = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
+  const [isSecurityExpanded, setIsSecurityExpanded] = useState(false);
+  const [isAccountExpanded, setIsAccountExpanded] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -230,9 +234,83 @@ const AdminProfileScreen = () => {
           </Pressable>
         </View>
 
-        <View style={styles.menuGroup}>{renderMenuItems(securityItems)}</View>
+        <View style={styles.menuGroup}>
+          <View style={styles.menuRow}>
+            <Ionicons
+              name="notifications-outline"
+              size={20}
+              color="#1F2937"
+              style={styles.menuIcon}
+            />
+            <View style={styles.menuText}>
+              <Text style={styles.menuTitle}>Notifications</Text>
+              <Text style={styles.menuSubtitle}>
+                Turn notifications on or off
+              </Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: '#CBD5E1', true: '#93C5FD' }}
+              thumbColor={notificationsEnabled ? '#2563EB' : '#F8FAFC'}
+              accessibilityLabel="Toggle notifications"
+            />
+          </View>
+        </View>
+
+        <View style={styles.menuGroup}>
+          <Pressable
+            onPress={() => setIsSecurityExpanded(previous => !previous)}
+            accessibilityRole="button"
+            accessibilityLabel="Security"
+            accessibilityState={{ expanded: isSecurityExpanded }}
+            style={styles.menuRow}>
+            <Ionicons
+              name="shield-outline"
+              size={20}
+              color="#1F2937"
+              style={styles.menuIcon}
+            />
+            <View style={styles.menuText}>
+              <Text style={styles.menuTitle}>Security</Text>
+              <Text style={styles.menuSubtitle}>
+                Password, help & support, terms & policies
+              </Text>
+            </View>
+            <Ionicons
+              name={isSecurityExpanded ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#64748B"
+            />
+          </Pressable>
+          {isSecurityExpanded ? renderMenuItems(securityItems) : null}
+        </View>
         <View style={[styles.menuGroup, styles.accountGroup]}>
-          {renderMenuItems(accountItems)}
+          <Pressable
+            onPress={() => setIsAccountExpanded(previous => !previous)}
+            accessibilityRole="button"
+            accessibilityLabel="Account"
+            accessibilityState={{ expanded: isAccountExpanded }}
+            style={styles.menuRow}>
+            <Ionicons
+              name="person-circle-outline"
+              size={20}
+              color="#1F2937"
+              style={styles.menuIcon}
+            />
+            <View style={styles.menuText}>
+              <Text style={styles.menuTitle}>Account</Text>
+              <Text style={styles.menuSubtitle}>
+                Logout, deactivate or delete account
+              </Text>
+            </View>
+            <Ionicons
+              name={isAccountExpanded ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#64748B"
+            />
+          </Pressable>
+          {isAccountExpanded ? renderMenuItems(accountItems) : null}
         </View>
 
         <Text style={styles.versionText}>App version 1.7.0</Text>

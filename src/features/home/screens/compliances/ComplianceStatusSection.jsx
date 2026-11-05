@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
     sectionTitle: {
         color: '#2C2C2A',
         fontSize: font.xl,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     sectionLink: {
         color: '#D85A30',
         fontSize: font.sm,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     complianceRow: {
         flexDirection: 'row',

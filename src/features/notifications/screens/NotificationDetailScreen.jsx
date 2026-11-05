@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     },
     dropdownOptionText: {
         fontSize: font.md,
-        fontWeight: '500',
+        fontWeight: '400',
     },
     headerTitle: {
         color: '#111827',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     time: {
         color: '#94a3b8',
         fontSize: font.sm,
-        fontWeight: '500',
+        fontWeight: '400',
         marginTop: 8,
     },
     divider: {
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     message: {
         color: '#64748b',
         fontSize: font.lg,
-        fontWeight: '500',
+        fontWeight: '400',
         lineHeight: 22,
     },
 });

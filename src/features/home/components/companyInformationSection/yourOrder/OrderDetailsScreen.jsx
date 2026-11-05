@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#94A3B8',
-    fontSize: 14,
+    fontSize: font.base,
     marginTop: s(6),
   },
   statusBanner: {
@@ -394,13 +394,13 @@ const styles = StyleSheet.create({
   },
   bannerTitle: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: 'bold',
     marginBottom: s(4),
   },
   bannerDescription: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 18,
   },
   timeInfoContainer: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   timeInfoText: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   boldTimeText: {
     color: '#3B82F6',
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: 'bold',
     letterSpacing: 1,
     marginRight: s(10),
@@ -468,11 +468,11 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#64748B',
-    fontSize: 14,
+    fontSize: font.base,
   },
   value: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   goldText: {
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
   },
   inProgressText: {
     color: '#3B82F6',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
   },
   timelineLine: {
@@ -555,19 +555,19 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: 'bold',
     marginBottom: s(4),
   },
   stepDescription: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 18,
     marginBottom: s(4),
   },
   stepDate: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   nextButton: {
     flexDirection: 'row',
@@ -581,18 +581,18 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     color: '#0A0A0A',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   nextArrow: {
     color: '#0A0A0A',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: '700',
     marginTop: -2,
   },
   footerText: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     textAlign: 'center',
   },
 });

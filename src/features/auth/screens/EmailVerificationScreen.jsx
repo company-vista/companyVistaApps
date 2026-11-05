@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
@@ -16,14 +17,12 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { API_BASE_URL } from '../../../config/api';
 import { handleResendVerificationApi } from '../api/signupApi';
+import { verifyAdminEmailToken } from '../api/forgotPasswordApi';
 import { s } from '../../../theme/responsive';
 
 const VerifyEmailScreen = (props) => {
   const { navigation, route } = props;
   const email = props.email || route?.params?.email || 'rajesh@meridianglobal.com';
-  useEffect(() => {
-    console.log('=== EMAIL VERIFY SCREEN DATA ===', JSON.stringify(route?.params, null, 2));
-  }, []);
   const signupToken = props.signupToken || route?.params?.signupToken;
   const signupClientId = props.signupClientId || route?.params?.signupClientId;
   const onEditPress = props.onEditPress;
@@ -42,10 +41,15 @@ const VerifyEmailScreen = (props) => {
   const otpString = code.join('');
 
   useEffect(() => {
+    if (route?.params?.accountType === 'admin' && route?.params?.token) return undefined;
     if (countdown <= 0) return;
     const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(timer);
-  }, [countdown]);
+  }, [countdown, route?.params?.accountType, route?.params?.token]);
+
+  if (route?.params?.accountType === 'admin' && route?.params?.token) {
+    return <AdminEmailVerification navigation={navigation} token={route.params.token} />;
+  }
 
   const handleCodeChange = (text, index) => {
     if (text.length > 1) text = text.slice(-1);
@@ -271,6 +275,77 @@ const VerifyEmailScreen = (props) => {
   );
 };
 
+function AdminEmailVerification({ navigation, token }) {
+  const [status, setStatus] = useState('verifying');
+  const [error, setError] = useState('');
+  const [retry, setRetry] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    verifyAdminEmailToken(token)
+      .then(response => {
+        if (response?.success === false) {
+          throw new Error(response.message || 'Email verification failed.');
+        }
+        if (active) {
+          setStatus('verified');
+          Toast.show({ type: 'success', text1: 'Email verified' });
+        }
+      })
+      .catch(verificationError => {
+        if (active) {
+          setError(verificationError?.response?.data?.message || verificationError?.message || 'Email verification failed.');
+          setStatus('error');
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [token, retry]);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <View style={styles.adminVerifyContent}>
+        {status === 'verifying' ? (
+          <>
+            <ActivityIndicator size="large" color="#D4AF37" />
+            <Text style={styles.adminVerifyDescription}>Verifying your email</Text>
+          </>
+        ) : (
+          <>
+            <Text style={[styles.adminVerifyTitle, status === 'verified' ? styles.adminVerifySuccess : styles.adminVerifyError]}>
+              {status === 'verified' ? 'Email verified' : 'Verification failed'}
+            </Text>
+            <Text style={styles.adminVerifyDescription}>
+              {status === 'verified'
+                ? 'Your admin email is verified. You can now log in.'
+                : error}
+            </Text>
+            <TouchableOpacity
+              style={styles.adminVerifyAction}
+              activeOpacity={0.8}
+              onPress={() => {
+                if (status === 'verified') {
+                  navigation.reset({ index: 0, routes: [{ name: 'Login', params: { accountType: 'admin' } }] });
+                } else {
+                  setError('');
+                  setStatus('verifying');
+                  setRetry(value => value + 1);
+                }
+              }}>
+              <Text style={styles.adminVerifyActionText}>
+                {status === 'verified' ? 'Continue to Admin Login' : 'Try again'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </SafeAreaView>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -303,7 +378,7 @@ const styles = StyleSheet.create({
   },
   iconText: {
     color: '#94A3B8',
-    fontSize: 18,
+    fontSize: font.xxl,
   },
   heroSection: {
     alignItems: 'center',
@@ -311,7 +386,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: '#E2E8F0',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '700',
     marginBottom: s(15),
   },
@@ -338,7 +413,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
   },
   checkIcon: {
-    fontSize: 32,
+    fontSize: font.displayXXL,
     color: '#D4AF37',
   },
   textSection: {
@@ -348,7 +423,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 26,
+    fontSize: font.displayLarge,
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -361,7 +436,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: s(6),
-    fontSize: 13,
+    fontSize: font.bodySmall,
     lineHeight: 18,
   },
   emailChip: {
@@ -378,11 +453,11 @@ const styles = StyleSheet.create({
   chipIcon: {
     color: '#D4AF37',
     marginRight: s(8),
-    fontSize: 14,
+    fontSize: font.base,
   },
   chipText: {
     color: '#D4AF37',
-    fontSize: 14,
+    fontSize: font.base,
     fontWeight: '600',
   },
   otpSection: {
@@ -410,7 +485,7 @@ const styles = StyleSheet.create({
   },
   codeText: {
     color: '#D4AF37',
-    fontSize: 22,
+    fontSize: font.display,
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     textAlign: 'center',
     width: '100%',
@@ -432,12 +507,12 @@ const styles = StyleSheet.create({
   },
   badgeCheck: {
     color: '#10B981',
-    fontSize: 12,
+    fontSize: font.sm,
     marginRight: s(6),
   },
   verifiedText: {
     color: '#10B981',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   resendRow: {
@@ -447,11 +522,11 @@ const styles = StyleSheet.create({
   },
   resendLabel: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: font.bodySmall,
   },
   resendLink: {
     color: '#D4AF37',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
   },
   resendLinkDisabled: {
@@ -468,7 +543,7 @@ const styles = StyleSheet.create({
   },
   draftLabel: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
     marginRight: s(10),
@@ -496,20 +571,20 @@ const styles = StyleSheet.create({
   },
   usTag: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   companyName: {
     color: '#D4AF37',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     fontWeight: '700',
   },
   draftLocation: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
   },
   savedStatus: {
     color: '#D4AF37',
-    fontSize: 12,
+    fontSize: font.sm,
     fontWeight: '600',
   },
   savedBanner: {
@@ -521,14 +596,49 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: s(12),
   },
+  adminVerifyContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: s(24),
+  },
+  adminVerifyTitle: {
+    fontSize: font.displayMedium,
+    fontWeight: '700',
+  },
+  adminVerifySuccess: {
+    color: '#10B981',
+  },
+  adminVerifyError: {
+    color: '#EF4444',
+  },
+  adminVerifyDescription: {
+    color: '#94A3B8',
+    fontSize: font.base,
+    lineHeight: 22,
+    marginTop: s(12),
+    textAlign: 'center',
+  },
+  adminVerifyAction: {
+    backgroundColor: '#D4AF37',
+    borderRadius: 24,
+    marginTop: s(28),
+    paddingHorizontal: s(24),
+    paddingVertical: s(14),
+  },
+  adminVerifyActionText: {
+    color: '#070A12',
+    fontSize: font.base,
+    fontWeight: '700',
+  },
   bannerCheck: {
     color: '#10B981',
-    fontSize: 14,
+    fontSize: font.base,
     marginRight: s(10),
   },
   bannerText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     flex: 1,
     lineHeight: 16,
   },
@@ -550,13 +660,13 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: '#070A12',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     marginRight: s(8),
   },
   arrowIcon: {
     color: '#070A12',
-    fontSize: 18,
+    fontSize: font.xxl,
     fontWeight: 'bold',
   },
 });

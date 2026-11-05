@@ -5,8 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 
 export const QUICK_ACTIONS = [
   { key: 'create-invoice', title: 'Create Invoice', icon: '📄' },
-  { key: 'add-client', title: 'Add Client', icon: '👤' },
-  { key: 'record-payment', title: 'Payment record', icon: '💳' },
+  { key: 'add-client', title: 'Clients', icon: '👤' },
+  // { key: 'record-payment', title: 'Payment record', icon: '💳' },
   { key: 'add-expense', title: 'Add Expense', icon: '💸' },
   { key: 'vista-leads', title: 'Vista Leads', icon: '👥' },
 ];
@@ -16,6 +16,8 @@ const QuickActions = () => {
   const handlePress = action => {
     if (action.key === 'create-invoice') {
       navigation.navigate('AdminCreateInvoice');
+    } else if (action.key === 'add-client') {
+      navigation.navigate('AdminClients');
     } else if (action.key === 'add-expense') {
       navigation.navigate('AdminAddExpense');
     } else if (action.key === 'vista-leads') {
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   quickActionsSection: {
-    marginTop: 20,
+    marginTop: 10,
   },
   grid: {
     flexDirection: 'row',

@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from 'react-native';
 import { s } from '../../../theme/responsive';
 const styles = StyleSheet.create({
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: '#111827',
-        fontSize: 20,
+        fontSize: font.hero,
         fontWeight: '400',
     },
     content: {
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '800',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     inputRow: {
         minHeight: 50,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         color: '#111827',
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '400',
         paddingVertical: 0,
     },
@@ -114,8 +115,8 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         color: '#111827',
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: font.xxl,
+        fontWeight: '400',
         textAlign: 'center',
     },
     datePickerColumns: {
@@ -130,8 +131,8 @@ const styles = StyleSheet.create({
     },
     dateLabel: {
         color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '800',
+        fontSize: font.sm,
+        fontWeight: '400',
     },
     dateStepButton: {
         width: '100%',
@@ -144,8 +145,8 @@ const styles = StyleSheet.create({
     },
     dateValue: {
         color: '#111827',
-        fontSize: 17,
-        fontWeight: '700',
+        fontSize: font.xl,
+        fontWeight: '400',
     },
     modalActions: {
         flexDirection: 'row',
@@ -163,12 +164,12 @@ const styles = StyleSheet.create({
     },
     modalButtonText: {
         color: '#111827',
-        fontSize: 14,
-        fontWeight: '800',
+        fontSize: font.base,
+        fontWeight: '400',
     },
     modalDoneText: {
         color: '#ffffff',
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: '900',
     },
 });

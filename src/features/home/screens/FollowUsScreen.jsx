@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         color: '#111827',
-        fontSize: 20,
+        fontSize: font.hero,
         fontWeight: '500',
     },
     content: {

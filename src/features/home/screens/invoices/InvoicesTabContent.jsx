@@ -359,7 +359,7 @@ const getStyles = (colors) => {
         companyName: {
             color: palette.accentText,
             fontSize: font.xxl,
-            fontWeight: '500',
+            fontWeight: '400',
         },
         searchRow: {
             flexDirection: 'row',
@@ -391,7 +391,7 @@ const getStyles = (colors) => {
         },
         foundSubtitle: {
             fontSize: font.lg,
-            fontWeight: '500',
+            fontWeight: '400',
         },
         sortRow: {
             alignItems: 'center',
@@ -402,7 +402,7 @@ const getStyles = (colors) => {
         },
         sortLabel: {
             fontSize: font.lg,
-            fontWeight: '700',
+            fontWeight: '400',
         },
         sortDropdown: {
             alignItems: 'center',
@@ -412,7 +412,7 @@ const getStyles = (colors) => {
         sortValue: {
             color: palette.link,
             fontSize: font.lg,
-            fontWeight: '900',
+            fontWeight: '400',
         },
         sortDropdownList: {
             position: 'absolute',
@@ -437,11 +437,11 @@ const getStyles = (colors) => {
         sortDropdownItemText: {
             color: palette.primaryText,
             fontSize: font.lg,
-            fontWeight: '500',
+            fontWeight: '400',
         },
         stateText: {
             fontSize: font.md,
-            fontWeight: '500',
+            fontWeight: '400',
             lineHeight: 19,
             paddingVertical: 8,
         },
@@ -477,7 +477,7 @@ const getStyles = (colors) => {
             borderColor: palette.actionBorder,
             borderWidth: 1,
             borderRadius: 18,
-            height: 40,
+            height: 38,
             justifyContent: 'center',
             marginRight: 12,
             width: 40,
@@ -494,7 +494,7 @@ const getStyles = (colors) => {
         invoiceCompany: {
             color: palette.primaryText,
             fontSize: font.lg,
-            fontWeight: '500',
+            fontWeight: '400',
             marginTop: 4,
         },
         invoiceDivider: {
@@ -534,7 +534,7 @@ const getStyles = (colors) => {
         amount: {
             color: palette.primaryText,
             fontSize: font.xxl,
-            fontWeight: '600',
+            fontWeight: '400',
             letterSpacing: 0,
             textAlign: 'right',
         },

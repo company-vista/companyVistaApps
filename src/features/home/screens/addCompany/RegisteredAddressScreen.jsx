@@ -67,7 +67,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
             </TouchableOpacity>
           </View>
 
-          {attemptedSubmit && hasAddress === null && (<Text style={{ fontSize: 13, color: colors.danger, marginBottom: 8 }}>
+          {attemptedSubmit && hasAddress === null && (<Text style={{ fontSize: font.bodySmall, color: colors.danger, marginBottom: 8 }}>
               Please select whether you have a registered address.
             </Text>)}
 
@@ -129,7 +129,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
             </View>
           </TouchableOpacity>
 
-          {attemptedSubmit && hasAgent === null && (<Text style={{ fontSize: 13, color: colors.danger, marginBottom: 8 }}>
+          {attemptedSubmit && hasAgent === null && (<Text style={{ fontSize: font.bodySmall, color: colors.danger, marginBottom: 8 }}>
               Please select whether you need a local representative.
             </Text>)}
 

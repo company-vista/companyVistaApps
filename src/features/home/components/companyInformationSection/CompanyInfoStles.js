@@ -1,9 +1,10 @@
+import { font } from '../../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
 export const styles = StyleSheet.create({
     container: { paddingHorizontal: s(4) },
     sectionHeader: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '700',
         letterSpacing: 0.3,
         marginBottom: 10,
@@ -36,14 +37,14 @@ export const styles = StyleSheet.create({
     },
     fieldCopy: { flex: 1 },
     fieldLabel: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
         letterSpacing: 0.5,
         textTransform: 'uppercase',
         marginBottom: 3,
     },
     fieldValue: {
-        fontSize: 15,
+        fontSize: font.md,
         fontWeight: '600',
         lineHeight: 20,
     },

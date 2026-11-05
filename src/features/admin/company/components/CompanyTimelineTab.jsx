@@ -60,13 +60,59 @@ const getStatusPillStyle = tone => {
   };
 };
 
-const CompanyTimelineTab = ({ company, compliance }) => {
+const getLatestUniqueHistory = (history, sectionKey) => {
+  const latestByDueDate = new Map();
+  history.forEach(entry => {
+    const filing = entry?.[sectionKey];
+    if (!filing?.dueDate) return;
+    const dueDate = new Date(filing.dueDate);
+    if (Number.isNaN(dueDate.getTime())) return;
+    const key = dueDate.toISOString();
+    const current = latestByDueDate.get(key);
+    if (!current || Number(entry?.version || 0) > Number(current.version || 0)) {
+      latestByDueDate.set(key, { ...entry, filing });
+    }
+  });
+  return Array.from(latestByDueDate.values()).sort(
+    (first, second) =>
+      Number(second?.version || 0) - Number(first?.version || 0),
+  );
+};
+
+const CompanyTimelineTab = ({
+  company,
+  compliance,
+  complianceHistory = [],
+  historyLoading = false,
+  historyError = '',
+  onRetryHistory,
+}) => {
   const timeline = useMemo(() => buildTimeline(company), [company]);
   const addonCompliance = useMemo(
     () => getAddonComplianceItems(compliance),
     [compliance],
   );
   const addonItems = addonCompliance.filter(entry => entry.item);
+  const filingHistory = useMemo(
+    () => [
+      {
+        key: 'annualFiling',
+        title: 'State Filing',
+        entries: getLatestUniqueHistory(complianceHistory, 'annualFiling'),
+      },
+      {
+        key: 'federalTaxFiling',
+        title: 'Federal Filing',
+        entries: getLatestUniqueHistory(complianceHistory, 'federalTaxFiling'),
+      },
+      {
+        key: 'resident',
+        title: 'Agent & Address',
+        entries: getLatestUniqueHistory(complianceHistory, 'resident'),
+      },
+    ],
+    [complianceHistory],
+  );
 
   const federalItem = getItem(compliance, [
     'federalTaxFiling',
@@ -389,6 +435,79 @@ const CompanyTimelineTab = ({ company, compliance }) => {
           <View>{addonItems.map(entry => renderAddonCard(entry))}</View>
         </View>
       ) : null}
+
+      <View style={[styles.sectionHeaderRow, styles.detailsHeaderRow]}>
+        <Text style={styles.sectionTitle}>Compliance Filing History</Text>
+      </View>
+      {historyLoading ? (
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyText}>Loading filing history...</Text>
+        </View>
+      ) : historyError ? (
+        <View style={styles.emptyBox}>
+          <Text style={styles.activityErrorText}>{historyError}</Text>
+          {onRetryHistory ? (
+            <TouchableOpacity
+              style={styles.activityRetryButton}
+              activeOpacity={0.8}
+              onPress={onRetryHistory}
+            >
+              <Text style={styles.activityRetryText}>Try again</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ) : filingHistory.some(group => group.entries.length) ? (
+        filingHistory.map(group => {
+          if (!group.entries.length) return null;
+          return (
+            <View key={group.key} style={styles.filingHistoryGroup}>
+              <Text style={styles.filingHistoryTitle}>{group.title}</Text>
+              {group.entries.map((entry, index) => {
+                const filing = entry.filing;
+                const meta = getFilingMeta(filing);
+                const pill = getStatusPillStyle(meta.tone);
+                const dueDate = new Date(filing.dueDate);
+                return (
+                  <View
+                    key={entry._id || `${group.key}-${filing.dueDate}-${index}`}
+                    style={[
+                      styles.filingHistoryRow,
+                      index === group.entries.length - 1 &&
+                        styles.filingHistoryRowLast,
+                    ]}
+                  >
+                    <View style={styles.filingHistoryDetails}>
+                      <Text style={styles.filingHistoryYear}>
+                        {filing.applicableYear ||
+                          (Number.isNaN(dueDate.getTime())
+                            ? 'Year not set'
+                            : dueDate.getFullYear())}
+                      </Text>
+                      <Text style={styles.filingHistoryDate}>
+                        Due {formatDate(filing.dueDate)}
+                      </Text>
+                      {entry.changeReason ? (
+                        <Text style={styles.filingHistoryReason}>
+                          {entry.changeReason}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <View style={[styles.webPill, pill.pill]}>
+                      <Text style={[styles.webPillText, pill.text]}>
+                        {meta.label}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          );
+        })
+      ) : (
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyText}>No filing history available</Text>
+        </View>
+      )}
 
       <View style={[styles.sectionHeaderRow, styles.detailsHeaderRow]}>
         <Text style={styles.sectionTitle}>Recent Activity</Text>

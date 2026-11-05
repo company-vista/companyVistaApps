@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useEffect, useState } from 'react';
 import { Alert, Linking, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { useRoute } from '@react-navigation/native';
@@ -39,8 +40,8 @@ const getIconName = (icon) => {
 const BreakdownRow = ({ label, value, isTotal = false }) => {
     const colors = useThemeColors();
     return (<View style={[styles.breakdownRow, isTotal && { borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 6, marginTop: 4 }]}>
-      <Text style={[{ fontSize: 12, color: isTotal ? colors.text : colors.muted }, isTotal && { fontWeight: '600' }]}>{label}</Text>
-      <Text style={[{ fontSize: 12, color: colors.text }, isTotal && { fontWeight: '600' }]}>{value}</Text>
+      <Text style={[{ fontSize: font.sm, color: isTotal ? colors.text : colors.muted }, isTotal && { fontWeight: '600' }]}>{label}</Text>
+      <Text style={[{ fontSize: font.sm, color: colors.text }, isTotal && { fontWeight: '600' }]}>{value}</Text>
     </View>);
 };
 const buildAddressServices = (apiData, action) => {
@@ -323,24 +324,24 @@ const styles = StyleSheet.create({
     yearHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     yearLabel: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     yearIconBox: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-    yearIconText: { fontSize: 14 },
-    yearTitle: { fontSize: 14, fontWeight: '500' },
-    yearSubtitle: { fontSize: 11 },
+    yearIconText: { fontSize: font.base },
+    yearTitle: { fontSize: font.base, fontWeight: '500' },
+    yearSubtitle: { fontSize: font.small },
     deselectBtn: { borderRadius: 20, paddingHorizontal: s(12), paddingVertical: 5 },
-    deselectBtnText: { fontSize: 11, fontWeight: '500' },
+    deselectBtnText: { fontSize: font.small, fontWeight: '500' },
     serviceCard: { borderRadius: 12, borderStyle: 'solid', padding: 14 },
     cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
     checkbox: { width: 20, height: 20, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-    checkboxTick: { color: 'white', fontSize: 12 },
+    checkboxTick: { color: 'white', fontSize: font.sm },
     cardIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     cardInfo: { flex: 1 },
-    cardName: { fontSize: 13, fontWeight: '500' },
+    cardName: { fontSize: font.bodySmall, fontWeight: '500' },
     expiredBadge: { borderRadius: 20, paddingHorizontal: s(7), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 3 },
-    expiredBadgeText: { fontSize: 10, fontWeight: '500' },
-    cardDates: { fontSize: 11, marginTop: 4 },
+    expiredBadgeText: { fontSize: font.xs, fontWeight: '500' },
+    cardDates: { fontSize: font.small, marginTop: 4 },
     dueDateText: { fontWeight: '500' },
-    cardPrice: { fontSize: 18, fontWeight: '500', marginTop: 10 },
-    cardSubLabel: { fontSize: 11 },
+    cardPrice: { fontSize: font.xxl, fontWeight: '500', marginTop: 10 },
+    cardSubLabel: { fontSize: font.small },
     breakdown: { borderRadius: 8, padding: 12, marginTop: 10, gap: 4 },
     breakdownRow: { flexDirection: 'row', justifyContent: 'space-between' },
     checkoutSection: { borderRadius: 12, padding: 14, gap: 10 },
@@ -363,42 +364,42 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     detailLabel: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: '600',
         textTransform: 'uppercase',
         marginBottom: 2,
     },
     detailValue: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: '500',
     },
-    checkoutEyebrow: { fontSize: 11, fontWeight: '600', letterSpacing: 0.8 },
-    checkoutTitle: { fontSize: 16, fontWeight: '600' },
-    checkoutDesc: { fontSize: 12 },
+    checkoutEyebrow: { fontSize: font.small, fontWeight: '600', letterSpacing: 0.8 },
+    checkoutTitle: { fontSize: font.lg, fontWeight: '600' },
+    checkoutDesc: { fontSize: font.sm },
     selectedServices: { borderRadius: 10, padding: 10, gap: 8 },
     ssHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    ssHeaderLabel: { fontSize: 12, fontWeight: '500' },
+    ssHeaderLabel: { fontSize: font.sm, fontWeight: '500' },
     ssCount: { borderRadius: 999, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
-    ssCountText: { color: '#ffffff', fontSize: 12, fontWeight: '600' },
+    ssCountText: { color: '#ffffff', fontSize: font.sm, fontWeight: '600' },
     ssItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 8, padding: 10 },
     ssItemIcon: { width: 30, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-    ssItemIconText: { fontSize: 14 },
+    ssItemIconText: { fontSize: font.base },
     ssItemInfo: { flex: 1, marginLeft: 8 },
-    ssItemName: { fontSize: 12, fontWeight: '500' },
-    ssItemMeta: { fontSize: 11, marginTop: 2 },
+    ssItemName: { fontSize: font.sm, fontWeight: '500' },
+    ssItemMeta: { fontSize: font.small, marginTop: 2 },
     ssItemPriceBox: { alignItems: 'flex-end' },
-    ssItemPrice: { fontSize: 12, fontWeight: '600' },
-    ssItemBase: { fontSize: 10, marginTop: 2 },
+    ssItemPrice: { fontSize: font.sm, fontWeight: '600' },
+    ssItemBase: { fontSize: font.xs, marginTop: 2 },
     totalDue: { borderRadius: 10, padding: 12, gap: 6 },
     totalDueRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     totalDueLabel: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    totalDueDollar: { fontSize: 14, fontWeight: '600' },
-    totalDueLabelText: { fontSize: 13, fontWeight: '600' },
-    totalDueAmount: { fontSize: 16, fontWeight: '700' },
-    totalNote: { fontSize: 11 },
+    totalDueDollar: { fontSize: font.base, fontWeight: '600' },
+    totalDueLabelText: { fontSize: font.bodySmall, fontWeight: '600' },
+    totalDueAmount: { fontSize: font.lg, fontWeight: '700' },
+    totalNote: { fontSize: font.small },
     payBtn: { borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     payBtnDisabled: { opacity: 0.6 },
-    payBtnText: { color: '#ffffff', fontSize: 14, fontWeight: '700' },
-    secureNote: { fontSize: 11, textAlign: 'center' },
+    payBtnText: { color: '#ffffff', fontSize: font.base, fontWeight: '700' },
+    secureNote: { fontSize: font.small, textAlign: 'center' },
 });
 export default AddressRenewalScreen;

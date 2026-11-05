@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -350,9 +351,9 @@ const ShareholdersScreen = ({ navigation, route }) => {
             </View>
             {(item.address || item.pincode || item.passportNumber) && (
               <View style={{ marginTop: 8, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-                {item.address ? <Text style={{ color: '#94A3B8', fontSize: 11, lineHeight: 14 }} numberOfLines={2}>{item.address}</Text> : null}
-                {item.pincode ? <Text style={{ color: '#64748B', fontSize: 10, marginTop: 2 }}>Pincode: {item.pincode}</Text> : null}
-                {item.passportNumber ? <Text style={{ color: '#94A3B8', fontSize: 11, marginTop: 2 }}>Passport: {item.passportNumber}</Text> : null}
+                {item.address ? <Text style={{ color: '#94A3B8', fontSize: font.small, lineHeight: 14 }} numberOfLines={2}>{item.address}</Text> : null}
+                {item.pincode ? <Text style={{ color: '#64748B', fontSize: font.xs, marginTop: 2 }}>Pincode: {item.pincode}</Text> : null}
+                {item.passportNumber ? <Text style={{ color: '#94A3B8', fontSize: font.small, marginTop: 2 }}>Passport: {item.passportNumber}</Text> : null}
               </View>
             )}
           </View>
@@ -424,7 +425,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 4 }}>
               {['Shareholder','Director','Authorized Representative'].map(d => (
                 <TouchableOpacity key={d} onPress={() => setNewDesignation(d)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: newDesignation===d ? '#EAB308' : 'rgba(255,255,255,0.1)', backgroundColor: newDesignation===d ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.04)', alignItems: 'center' }}>
-                  <Text style={{ color: newDesignation===d ? '#EAB308' : '#94A3B8', fontSize: 11, fontWeight: '600' }}>{d}</Text>
+                  <Text style={{ color: newDesignation===d ? '#EAB308' : '#94A3B8', fontSize: font.small, fontWeight: '600' }}>{d}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -440,7 +441,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
             <View style={styles.modalInputBox}>
               <TextInput style={styles.modalInput} value={newPassport} onChangeText={t => setNewPassport(t.replace(/[^a-zA-Z0-9]/g,'').toUpperCase())} placeholder="e.g. A1234567" placeholderTextColor="#64748B" autoCapitalize="characters" maxLength={12} />
             </View>
-            {!companyId ? <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 8 }}>Company ID missing — cannot save to backend</Text> : null}
+            {!companyId ? <Text style={{ color: '#EF4444', fontSize: font.small, marginTop: 8 }}>Company ID missing — cannot save to backend</Text> : null}
             <View style={styles.modalBtnRow}>
               <TouchableOpacity style={styles.modalCancelBtn} onPress={handleCloseModal} disabled={saving}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
@@ -488,12 +489,12 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#D1D5DB',
-    fontSize: 16,
+    fontSize: font.lg,
     letterSpacing: 0.5,
   },
   brandSub: {
     color: '#6B7280',
-    fontSize: 8,
+    fontSize: font.tiny,
     letterSpacing: 1.5,
   },
   stepProgressBar: {
@@ -519,7 +520,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mainTitle: {
-    fontSize: 26,
+    fontSize: font.displayLarge,
     color: '#FFFFFF',
     fontWeight: '400',
   },
@@ -534,7 +535,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginTop: 6,
   },
   allocatedBanner: {
@@ -549,7 +550,7 @@ const styles = StyleSheet.create({
   },
   allocatedText: {
     color: '#9CA3AF',
-    fontSize: 13,
+    fontSize: font.bodySmall,
     marginLeft: 10,
     flex: 1,
   },
@@ -582,26 +583,26 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: font.base,
   },
   userName: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: font.md,
     fontWeight: '700',
   },
   userRole: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: font.sm,
     marginTop: 2,
   },
   userEmail: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 3,
   },
   userPhone: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: font.small,
     marginTop: 1,
   },
   ownershipGroup: {
@@ -610,12 +611,12 @@ const styles = StyleSheet.create({
   },
   ownershipValue: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: font.hero,
     fontWeight: '400',
   },
   ownershipLabel: {
     color: '#64748B',
-    fontSize: 9,
+    fontSize: font.caption,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
@@ -633,7 +634,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '500',
   },
   completeBadge: {
@@ -648,7 +649,7 @@ const styles = StyleSheet.create({
   },
   completeBadgeText: {
     color: '#10B981',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
     marginLeft: 4,
   },
@@ -660,7 +661,7 @@ const styles = StyleSheet.create({
   },
   kycBadgeText: {
     color: '#EAB308',
-    fontSize: 11,
+    fontSize: font.small,
     fontWeight: '600',
   },
   addButton: {
@@ -678,7 +679,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#EAB308',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: font.base,
     marginLeft: 8,
   },
   infoBox: {
@@ -693,7 +694,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: font.sm,
     marginLeft: 10,
     flex: 1,
     lineHeight: 18,
@@ -710,16 +711,16 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#070C15',
-    fontSize: 16,
+    fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: s(20) },
   modalCard: { backgroundColor: '#0F172A', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  modalLabel: { color: '#94A3B8', fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 8 },
+  modalTitle: { color: '#FFFFFF', fontSize: font.lg, fontWeight: '700', marginBottom: 12 },
+  modalLabel: { color: '#94A3B8', fontSize: font.xs, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 8 },
   modalInputBox: { backgroundColor: '#070C15', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
-  modalInput: { color: '#FFFFFF', fontSize: 14 },
+  modalInput: { color: '#FFFFFF', fontSize: font.base },
   modalBtnRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   modalCancelBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   modalCancelText: { color: '#94A3B8', fontWeight: '600' },

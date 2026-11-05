@@ -1,3 +1,4 @@
+import { font } from '../../../theme/typography';
 import { StyleSheet } from 'react-native';
 import { s } from "../../../theme/responsive";
 const styles = StyleSheet.create({
@@ -25,11 +26,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     title: {
-        fontSize: 15,
-        fontWeight: '500',
+        fontSize: font.md,
+        fontWeight: '400',
     },
     subtitle: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: '400',
         marginTop: 4,
     },

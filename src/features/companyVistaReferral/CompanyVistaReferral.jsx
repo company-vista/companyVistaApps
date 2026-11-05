@@ -1,3 +1,4 @@
+import { font } from '../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import { s } from '../../theme/responsive';
@@ -37,16 +38,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     headerI: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '700',
         marginRight: 11,
     },
     heartIcon: {
-        fontSize: 18,
+        fontSize: font.xxl,
         marginRight: 12,
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: '600',
     },
     imageWrapper: {

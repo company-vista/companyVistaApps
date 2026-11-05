@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     title: {
         flex: 1,
         color: '#111827',
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: '600',
     },
     content: {

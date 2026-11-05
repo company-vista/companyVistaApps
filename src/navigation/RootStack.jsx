@@ -13,6 +13,19 @@ const appTheme = {
         background: '#0f172a',
     },
 };
+const linking = {
+    prefixes: ['vistaapp://'],
+    config: {
+        screens: {
+            Auth: {
+                screens: {
+                    EmailVerification: 'verify-email/:token',
+                    ResetPassword: 'reset-password/:token',
+                },
+            },
+        },
+    },
+};
 export default function RootStack() {
     const { isAuthenticated, redirectToLogin, isAdmin } = useAppSelector(state => state.auth);
     // Login ke baad role ke hisaab se dashboard decide hoga - admin alag stack par jayega
@@ -20,7 +33,7 @@ export default function RootStack() {
     // Auth screen ka key logout/cold-start par change hota hai taaki AuthStack naya mount ho.
     // Bina key ke React same position ka Stack.Screen reuse kar leta hai aur AuthStack
     // purane route (Onboarding/deep signup) par atak jata hai - Login kabhi nahi khulta.
-    return (<NavigationContainer theme={appTheme}>
+    return (<NavigationContainer theme={appTheme} linking={linking}>
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0f172a' } }}>
         {canAccessDashboard ? (<Stack.Screen name={isAdmin ? 'Admin' : 'Main'} component={isAdmin ? AdminStack : MainStack}/>) : (<Stack.Screen key={redirectToLogin ? 'auth-login' : 'auth-onboarding'} name="Auth" component={AuthStack}/>)}
       </Stack.Navigator>

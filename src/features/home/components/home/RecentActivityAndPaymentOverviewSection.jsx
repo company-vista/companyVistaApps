@@ -35,18 +35,18 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: font.xl,
-        fontWeight: '500',
+        fontWeight: '400',
         marginBottom: 12,
         marginLeft: 2,
     },
     grid: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        columnGap: 8,
+        columnGap: 14,
         justifyContent: 'flex-start',
     },
     item: {
-        width: '20%',
+        width: '23%',
         alignItems: 'center',
     },
     card: {
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     cardTitle: {
-        fontSize: 12,
-        fontWeight: '500',
+        fontSize: font.sm,
+        fontWeight: '400',
         textAlign: 'center',
         lineHeight: 15,
         marginTop: 6,

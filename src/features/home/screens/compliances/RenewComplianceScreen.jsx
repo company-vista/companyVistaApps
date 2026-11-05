@@ -1,3 +1,4 @@
+import { font } from '../../../../theme/typography';
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, StatusBar, InteractionManager, } from "react-native";
 import { useRoute } from '@react-navigation/native';
@@ -284,14 +285,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     yearIconText: {
-        fontSize: 22,
+        fontSize: font.display,
     },
     yearTitle: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: "500",
     },
     yearSubtitle: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     deselectBtn: {
         borderRadius: 20,
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     deselectBtnText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: "500",
     },
     serviceCard: {
@@ -322,7 +323,7 @@ const styles = StyleSheet.create({
     },
     checkboxTick: {
         color: "white",
-        fontSize: 12,
+        fontSize: font.sm,
     },
     cardIcon: {
         width: 32,
@@ -332,13 +333,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     cardIconText: {
-        fontSize: 16,
+        fontSize: font.lg,
     },
     cardInfo: {
         flex: 1,
     },
     cardName: {
-        fontSize: 16,
+        fontSize: font.lg,
         fontWeight: "500",
     },
     expiredBadge: {
@@ -349,23 +350,23 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     expiredBadgeText: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: "500",
     },
     cardDates: {
-        fontSize: 12,
+        fontSize: font.sm,
         marginTop: 4,
     },
     dueDateText: {
         fontWeight: "500",
     },
     cardPrice: {
-        fontSize: 18,
+        fontSize: font.xxl,
         fontWeight: "600",
         marginTop: 10,
     },
     cardSubLabel: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     breakdown: {
         borderRadius: 8,
@@ -383,10 +384,10 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     breakdownLabel: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     breakdownValue: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     checkoutSection: {
         borderRadius: 12,
@@ -394,18 +395,18 @@ const styles = StyleSheet.create({
         padding: 14,
     },
     checkoutEyebrow: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: "600",
         letterSpacing: 0.6,
         marginBottom: 4,
     },
     checkoutTitle: {
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: "500",
         marginBottom: 4,
     },
     checkoutDesc: {
-        fontSize: 12,
+        fontSize: font.sm,
         lineHeight: 18,
     },
     selectedServices: {
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     ssHeaderLabel: {
-        fontSize: 12,
+        fontSize: font.sm,
     },
     ssCount: {
         borderWidth: 0.5,
@@ -431,7 +432,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     ssCountText: {
-        fontSize: 11,
+        fontSize: font.small,
         fontWeight: "500",
     },
     ssItem: {
@@ -447,27 +448,27 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     ssItemIconText: {
-        fontSize: 14,
+        fontSize: font.base,
     },
     ssItemInfo: {
         flex: 1,
     },
     ssItemName: {
-        fontSize: 12,
+        fontSize: font.sm,
         fontWeight: "500",
     },
     ssItemMeta: {
-        fontSize: 11,
+        fontSize: font.small,
     },
     ssItemPriceBox: {
         alignItems: "flex-end",
     },
     ssItemPrice: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: "500",
     },
     ssItemBase: {
-        fontSize: 11,
+        fontSize: font.small,
     },
     totalDue: {
         borderRadius: 8,
@@ -486,17 +487,17 @@ const styles = StyleSheet.create({
         gap: 5,
     },
     totalDueDollar: {
-        fontSize: 15,
+        fontSize: font.md,
     },
     totalDueLabelText: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
     },
     totalDueAmount: {
-        fontSize: 22,
+        fontSize: font.display,
         fontWeight: "500",
     },
     totalNote: {
-        fontSize: 11,
+        fontSize: font.small,
         lineHeight: 16,
     },
     payBtn: {
@@ -508,12 +509,12 @@ const styles = StyleSheet.create({
     },
     payBtnText: {
         color: "white",
-        fontSize: 14,
+        fontSize: font.base,
         fontWeight: "500",
     },
     secureNote: {
         textAlign: "center",
-        fontSize: 11,
+        fontSize: font.small,
         marginTop: 8,
     },
     detailsGrid: {
@@ -537,11 +538,11 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     detailLabel: {
-        fontSize: 11,
+        fontSize: font.small,
         marginBottom: 3,
     },
     detailValue: {
-        fontSize: 13,
+        fontSize: font.bodySmall,
         fontWeight: "500",
     },
 });
