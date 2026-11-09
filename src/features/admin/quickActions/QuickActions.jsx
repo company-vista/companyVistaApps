@@ -9,6 +9,7 @@ export const QUICK_ACTIONS = [
   // { key: 'record-payment', title: 'Payment record', icon: '💳' },
   { key: 'add-expense', title: 'Add Expense', icon: '💸' },
   { key: 'vista-leads', title: 'Vista Leads', icon: '👥' },
+  { key: 'blog', title: 'Blog', icon: '📝' },
 ];
 
 const QuickActions = () => {
@@ -22,6 +23,8 @@ const QuickActions = () => {
       navigation.navigate('AdminAddExpense');
     } else if (action.key === 'vista-leads') {
       navigation.navigate('CompanyVistaLeads');
+    } else if (action.key === 'blog') {
+      navigation.navigate('AdminBlogs');
     }
   };
 

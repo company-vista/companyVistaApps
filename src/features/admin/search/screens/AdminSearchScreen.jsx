@@ -25,6 +25,7 @@ const SHORTCUTS = [
   { key: 'invoices', label: 'Invoices', icon: 'document-text-outline', screen: 'AdminInvoices', params: { invoiceKind: 'all' } },
   { key: 'estimates', label: 'Estimates', icon: 'receipt-outline', screen: 'AdminInvoices', params: { invoiceKind: 'estimate' } },
   { key: 'payment-records', label: 'Payment Records', icon: 'card-outline', screen: 'AdminTransactions' },
+  { key: 'documents', label: 'Documents', icon: 'folder-open-outline', screen: 'AdminDocuments' },
   { key: 'notifications', label: 'Notifications', icon: 'notifications-outline', screen: 'AdminNotifications' },
 ];
 

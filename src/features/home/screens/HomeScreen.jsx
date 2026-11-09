@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, BackHandler, Easing, View, } from 'react-native';
+import { ActivityIndicator, Animated, BackHandler, Easing, StyleSheet, View, } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
@@ -29,10 +29,16 @@ import CompanyTabContent from '../components/CompanyTabContent';
 import DocumentsTabContent from './documents/DocumentsTabContent';
 import HomeTabContent from '../components/HomeTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
-import DashboardSkeleton from '../../../components/skeletons/HomeScreen';
 import FloatingPlusButton from '../../../components/floatingPlusButton/FloatingPlusButton';
 import FloatingPlusButtonCard from '../../../components/floatingPlusButton/FloatingPlusButtonCard';
 const emptyCompanies = [];
+const centeredLoadingStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+}).container;
 export default function HomeScreen() {
     const navigation = useNavigation();
     const route = useRoute();
@@ -105,9 +111,11 @@ export default function HomeScreen() {
     
     useEffect(() => {
         if (routePendingCompanySection) {
+            setIsOrderDetailsOpen(false);
             setActiveCompanySection(routePendingCompanySection);
+            navigation.setParams({ pendingCompanySection: undefined });
         }
-    }, [routePendingCompanySection]);
+    }, [routePendingCompanySection, navigation]);
     const pendingOpenOrderDetails = useAppSelector((s) => s.auth.pendingOpenOrderDetails);
     const pendingOpenRegistrationProgress = useAppSelector((s) => s.auth.pendingOpenRegistrationProgress);
     const pendingOpenRegistrationTracking = useAppSelector((s) => s.auth.pendingOpenRegistrationTracking);
@@ -417,12 +425,14 @@ export default function HomeScreen() {
     const handledRouteActionRef = useRef(null);
     useEffect(() => {
         if (!routePendingHomeAction) {
+            handledRouteActionRef.current = null;
             return;
         }
         if (handledRouteActionRef.current === routePendingHomeAction) {
             return;
         }
         handledRouteActionRef.current = routePendingHomeAction;
+        setIsOrderDetailsOpen(false);
         if (routePendingHomeAction === 'subscription') {
             setIsSubscriptionOpen(true);
             setSearchOpenedScreen('subscription');
@@ -444,6 +454,7 @@ export default function HomeScreen() {
         else if (routePendingHomeAction === 'transactions') {
             navigation.navigate('Transactions', { companyId: selectedCompany?.id });
         }
+        navigation.setParams({ pendingHomeAction: undefined });
         // eslint-disable-next-line react-hooks/exhaustive-deps -- handledRouteActionRef upar hi ek hi action ko ek hi baar handle karne ki guarantee kar raha hai, is liye extra deps (jo beech me identity badal sakte hain) add karne se effect dobara trigger hoga aur user beech me redirect ho jayega.
     }, [routePendingHomeAction, navigation, openAddCompanyFlow, selectedCompany?.id]);
     // Signup flow: after login, open AddCompany directly without showing Home (per requirement)
@@ -468,6 +479,14 @@ export default function HomeScreen() {
         });
         return () => sub.remove();
     }, [isAddCompanyMandatory, dispatch]);
+    useFocusEffect(useCallback(() => {
+        if (!selectedDocumentForView) return undefined;
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            setSelectedDocumentForView(null);
+            return true;
+        });
+        return () => sub.remove();
+    }, [selectedDocumentForView]));
     useEffect(() => {
         Animated.loop(Animated.sequence([
             Animated.timing(bellAnim, {
@@ -1000,7 +1019,7 @@ export default function HomeScreen() {
             {activeTab === 'home' && unpaidCompany ? (
                 <PendingPaymentBanner colors={colors} companyLabel={unpaidCompanyLabel} amount={unpaidCompanyAmount} onPayPress={handleResumePaymentPress} />
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <DashboardSkeleton /> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -1015,6 +1034,8 @@ export default function HomeScreen() {
             {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
                 if (action.id === 'federal_filing')
                     navigation.navigate('FederalFiling', { selectedAction: action });
+                else if (action.id === 'agent_address')
+                    navigation.navigate('AddressRenewal', { selectedAction: action });
                 else if (action.id === 'address')
                     navigation.navigate('AddressRenewal', { selectedAction: action });
                 else if (action.id === 'annual_filing')

@@ -368,7 +368,7 @@ const getStyles = (colors) => {
         },
         searchBox: {
             alignItems: 'center',
-            borderRadius: 28,
+            borderRadius: 12,
             borderWidth: 1,
             flex: 1,
             flexDirection: 'row',

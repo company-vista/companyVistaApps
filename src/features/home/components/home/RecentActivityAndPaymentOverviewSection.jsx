@@ -8,18 +8,22 @@ function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, onR
     const isLight = colors.mode === 'light';
     const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
     const recentActivities = [
-        { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.5)' },
-        { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.5)' },
-        { title: 'Registration Tracking', subtitle: companySubtitle, icon: 'map-marker', onItemPress: onRegistrationTrackingPress, iconColor: '#0891b2', iconBg: 'rgba(8, 145, 178, 0.1)', borderColor: 'rgba(8, 145, 178, 0.5)' },
+        { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.25)' },
+        { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.25)' },
+        { title: 'Registration Tracking', subtitle: companySubtitle, icon: 'map-marker', onItemPress: onRegistrationTrackingPress, iconColor: '#0891b2', iconBg: 'rgba(8, 145, 178, 0.1)', borderColor: 'rgba(8, 145, 178, 0.25)' },
     ];
     return (<View style={styles.wrapper}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Links</Text>
       <View style={styles.grid}>
         {recentActivities.map(item => (
           <View key={item.title} style={styles.item}>
-            <Pressable style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderColor: isLight ? item.borderColor : 'rgba(255,255,255,0.08)', borderWidth: isLight ? 1 : 1 }]} onPress={item.onItemPress}>
+            <Pressable style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderColor: isLight ? item.borderColor : 'rgba(255,255,255,0.08)', borderWidth: 1 }]} onPress={item.onItemPress}>
               <View style={styles.iconContainer}>
-                <FontAwesome name={item.icon} size={24} color={item.iconColor}/>
+                <FontAwesome
+                  name={item.icon}
+                  size={24}
+                  color={isLight ? item.iconColor : '#ffffffc2'}
+                />
               </View>
             </Pressable>
             <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2} ellipsizeMode="tail">{item.title}</Text>
@@ -46,12 +50,12 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     item: {
-        width: '23%',
+        width: '21%',
         alignItems: 'center',
     },
     card: {
         width: '100%',
-        aspectRatio: 1,
+        aspectRatio: 1.12,
         borderWidth: 1,
         borderRadius: 10,
         alignItems: 'center',
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
         fontSize: font.sm,
         fontWeight: '400',
         textAlign: 'center',
-        lineHeight: 15,
+        lineHeight: 16,
         marginTop: 6,
     },
 });

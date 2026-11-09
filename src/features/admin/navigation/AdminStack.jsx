@@ -9,6 +9,7 @@ import AdminCompanyScreen from '../company/screens/AdminCompanyScreen';
 import AdminClientsScreen from '../clients/screens/AdminClientsScreen';
 import AdminClientDetailsScreen from '../clients/screens/AdminClientDetailsScreen';
 import AdminCreateClientScreen from '../clients/screens/AdminCreateClientScreen';
+import AdminEditClientScreen from '../clients/screens/AdminEditClientScreen';
 import AdminSearchScreen from '../search/screens/AdminSearchScreen';
 import AdminDocumentsScreen from '../documents/AdminDocumentsScreen';
 import AdminChatListScreen from '../messages/screens/AdminChatListScreen';
@@ -27,6 +28,7 @@ import {
   AdminCompanyRecordsScreen,
 } from '../company/screens/AdminCompanyDetailsScreen';
 import AdminLayout from '../components/AdminLayout';
+import AdminBlogsScreen from '../blogs/AdminBlogsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +40,11 @@ export default function AdminStack() {
     <Stack.Navigator
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AdminHome" component={AdminHomeScreen} layout={AdminScreenLayout} />
+      <Stack.Screen
+        name="AdminBlogs"
+        component={AdminBlogsScreen}
+        layout={FullScreenLayout}
+      />
       <Stack.Screen
         name="AdminProfile"
         component={AdminProfileScreen}
@@ -62,6 +69,11 @@ export default function AdminStack() {
       <Stack.Screen
         name="AdminCreateClient"
         component={AdminCreateClientScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminEditClient"
+        component={AdminEditClientScreen}
         layout={FullScreenLayout}
       />
       <Stack.Screen

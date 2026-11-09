@@ -1,6 +1,6 @@
 import { font } from '../../../theme/typography';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -8,15 +8,76 @@ import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
 import DocumentCard from './components/DocumentCard';
 
+const isMailOrLetterDocument = item => {
+  const documentType = [
+    item?.sourceGroup,
+    item?.documentType,
+    item?.type,
+    item?.documentTypeKey,
+    item?.category,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return documentType.includes('mail') || documentType.includes('letter');
+};
+
+const isDraftDocument = item =>
+  item?.isDraft === true ||
+  String(item?.isDraft).toLowerCase() === 'true' ||
+  String(item?.status || '').toLowerCase() === 'draft';
+
+const isItrDocument = item => {
+  const documentDetails = [
+    item?.sourceGroup,
+    item?.documentType,
+    item?.type,
+    item?.documentTypeKey,
+    item?.category,
+    item?.originalFileName,
+    item?.fileName,
+    item?.title,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return /\bitr(?:\s*[-_]?\s*\d+)?\b|income\s+tax\s+return/.test(documentDetails);
+};
+
+const getLockedCompanyName = item =>
+  item?.company?.companyName ||
+  item?.company?.name ||
+  item?.companyName ||
+  item?.companyId?.companyName ||
+  item?.companyId?.name ||
+  'Company';
+
+const formatLockedDate = value => {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? ''
+    : date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+};
+
 const AdminDocumentsScreen = () => {
   const navigation = useNavigation();
   const token = useAppSelector(state => state.auth.token);
   const [loading, setLoading] = useState(true);
   const [documents, setDocuments] = useState([]);
+  const [lockedDocuments, setLockedDocuments] = useState([]);
+  const [lockedLoading, setLockedLoading] = useState(false);
+  const [lockedError, setLockedError] = useState('');
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [documentFilter, setDocumentFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
 
   const fetchDocuments = async () => {
     if (!token) {
@@ -46,6 +107,51 @@ const AdminDocumentsScreen = () => {
     fetchDocuments();
   }, [token]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLockedDocuments = async () => {
+      if (!token) {
+        setLockedError('Auth token missing');
+        return;
+      }
+
+      setLockedLoading(true);
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/api/locked-documents`,
+          {
+            headers: {
+              Authorization: `******`,
+              'x-auth-token': token,
+            },
+          },
+        );
+        if (!isMounted) return;
+        const data = response.data?.data;
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid locked documents response');
+        }
+        setLockedDocuments(data);
+        setLockedError('');
+      } catch (requestError) {
+        if (isMounted) {
+          setLockedError(
+            requestError?.response?.data?.message ||
+              requestError?.message ||
+              'Failed to load locked documents',
+          );
+        }
+      } finally {
+        if (isMounted) setLockedLoading(false);
+      }
+    };
+
+    fetchLockedDocuments();
+    return () => {
+      isMounted = false;
+    };
+  }, [token]);
+
   const handleDelete = async (doc) => {
     if (!doc._id && !doc.id) {
       Alert.alert('Error', 'Invalid document');
@@ -73,6 +179,15 @@ const AdminDocumentsScreen = () => {
   const filteredDocuments = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     let result = Array.isArray(documents) ? documents : [];
+    if (activeTab === 'locked') return [];
+    if (activeTab === 'mailsAndLetters') {
+      result = result.filter(isMailOrLetterDocument);
+    }
+    if (documentFilter === 'draft') {
+      result = result.filter(isDraftDocument);
+    } else if (documentFilter === 'itr') {
+      result = result.filter(isItrDocument);
+    }
     if (typeFilter !== 'all') {
       result = result.filter(item => {
         const docType = item.documentType || item.type || item.documentTypeKey || item.category || '';
@@ -87,39 +202,175 @@ const AdminDocumentsScreen = () => {
       const uploadedBy = (item.uploadedBy || item.uploadedByName || item.createdBy?.name || '').toLowerCase();
       return title.includes(query) || companyName.includes(query) || docType.includes(query) || uploadedBy.includes(query);
     });
-  }, [documents, searchQuery, typeFilter]);
+  }, [activeTab, documents, documentFilter, searchQuery, typeFilter]);
+
+  const filteredLockedDocuments = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return lockedDocuments;
+    return lockedDocuments.filter(item => {
+      const companyName = getLockedCompanyName(item).toLowerCase();
+      const dates = (Array.isArray(item.documentDates) ? item.documentDates : [])
+        .map(formatLockedDate)
+        .join(' ')
+        .toLowerCase();
+      return companyName.includes(query) || dates.includes(query);
+    });
+  }, [lockedDocuments, searchQuery]);
 
   const renderItem = ({ item }) => (
     <DocumentCard item={item} token={token} onDelete={handleDelete} deletingId={deletingId} />
   );
 
+  const renderLockedItem = ({ item, index }) => {
+    const dates = Array.isArray(item.documentDates) ? item.documentDates : [];
+    const isUnlocked =
+      Array.isArray(item.unlockedIndices) && item.unlockedIndices.length > 0;
+    return (
+      <View style={styles.lockedCard}>
+        <View style={styles.lockedCardHeader}>
+          <View style={styles.lockedIconWrap}>
+            <Ionicons
+              name={isUnlocked ? 'lock-open-outline' : 'lock-closed-outline'}
+              size={18}
+              color={isUnlocked ? '#16A34A' : '#DC2626'}
+            />
+          </View>
+          <View style={styles.lockedInfo}>
+            <Text style={styles.lockedCompany} numberOfLines={2}>
+              {getLockedCompanyName(item)}
+            </Text>
+            <Text style={styles.lockedDate}>
+              Created: {formatLockedDate(item.createdAt) || '—'}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.lockedStatus,
+              isUnlocked ? styles.unlockedStatus : styles.lockedStatusBadge,
+            ]}>
+            <Text
+              style={[
+                styles.lockedStatusText,
+                isUnlocked ? styles.unlockedStatusText : styles.lockedStatusTextColor,
+              ]}>
+              {isUnlocked ? 'Unlocked' : 'Locked'}
+            </Text>
+          </View>
+        </View>
+        {dates.length > 0 ? (
+          <View style={styles.lockedDates}>
+            <Text style={styles.lockedDatesLabel}>Document dates</Text>
+            {dates.map((date, dateIndex) => (
+              <Text
+                key={`${item._id || item.id || index}-${dateIndex}`}
+                style={styles.lockedDateItem}>
+                {formatLockedDate(date) || '—'}
+              </Text>
+            ))}
+          </View>
+        ) : null}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Documents</Text>
-        {!loading && !error ? (
+        {activeTab === 'locked' ? (
+          !lockedLoading && !lockedError ? (
+            <Text style={styles.countText}>
+              {filteredLockedDocuments.length}{' '}
+              {filteredLockedDocuments.length === 1
+                ? 'locked document'
+                : 'locked documents'}
+            </Text>
+          ) : null
+        ) : !loading && !error ? (
           <Text style={styles.countText}>
-            {filteredDocuments.length} {filteredDocuments.length === 1 ? 'document' : 'documents'}{typeFilter !== 'all' ? ` • ${typeFilter}` : ''}
+            {filteredDocuments.length}{' '}
+            {filteredDocuments.length === 1 ? 'document' : 'documents'}
+            {activeTab === 'mailsAndLetters'
+              ? ' • Mails & Letters'
+              : typeFilter !== 'all'
+                ? ` • ${typeFilter}`
+                : ' • All Docs'}
           </Text>
         ) : null}
       </View>
-      <View style={styles.actionButtonsRow}>
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7} onPress={() => {
-          try {
-            navigation.navigate('UploadCompanyDocument');
-          } catch (e) {
-            Alert.alert('Error', 'Unable to open upload screen');
-          }
-        }}>
-          <Text style={styles.actionBtnText}>Upload Docs</Text>
+      <ScrollView
+        horizontal
+        style={styles.tabsScroll}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabsRow}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityState={{ selected: activeTab === 'all' }}
+          style={[styles.tabBtn, activeTab === 'all' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+          onPress={() => {
+            setTypeFilter('all');
+            setActiveTab('all');
+          }}>
+          <Text
+            style={[
+              styles.tabBtnText,
+              activeTab === 'all' && styles.tabBtnTextActive,
+            ]}>
+            All Docs
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7} onPress={() => Alert.alert('Draft Docs', 'Coming soon')}>
-          <Text style={styles.actionBtnText}>Draft Docs</Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityState={{ selected: activeTab === 'mailsAndLetters' }}
+          style={[
+            styles.tabBtn,
+            activeTab === 'mailsAndLetters' && styles.tabBtnActive,
+          ]}
+          activeOpacity={0.7}
+          onPress={() => {
+            setTypeFilter('all');
+            setActiveTab('mailsAndLetters');
+          }}>
+          <Text
+            style={[
+              styles.tabBtnText,
+              activeTab === 'mailsAndLetters' && styles.tabBtnTextActive,
+            ]}>
+            Mails & Letters
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7} onPress={() => Alert.alert('Locked Docs', 'Coming soon')}>
-          <Text style={styles.actionBtnText}>Locked Docs</Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          style={styles.tabBtn}
+          activeOpacity={0.7}
+          onPress={() => {
+            try {
+              navigation.navigate('UploadCompanyDocument');
+            } catch (e) {
+              Alert.alert('Error', 'Unable to open upload screen');
+            }
+          }}>
+          <Text style={styles.tabBtnText}>Upload Docs</Text>
         </TouchableOpacity>
-      </View>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityState={{ selected: activeTab === 'locked' }}
+          style={[styles.tabBtn, activeTab === 'locked' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+          onPress={() => {
+            setTypeFilter('all');
+            setActiveTab('locked');
+          }}>
+          <Text
+            style={[
+              styles.tabBtnText,
+              activeTab === 'locked' && styles.tabBtnTextActive,
+            ]}>
+            Locked Docs
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
       <View style={styles.searchWrapper}>
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
@@ -132,37 +383,71 @@ const AdminDocumentsScreen = () => {
               onChangeText={setSearchQuery}
             />
           </View>
-          <TouchableOpacity
-            style={[styles.filterBtn, typeFilter !== 'all' && styles.filterBtnActive]}
+          {activeTab !== 'locked' ? <TouchableOpacity
+            style={[styles.filterBtn, documentFilter !== 'all' && styles.filterBtnActive]}
+            accessibilityRole="button"
             activeOpacity={0.7}
             onPress={() => {
-              const types = Array.from(
-                new Set(
-                  (Array.isArray(documents) ? documents : [])
-                    .map(item => item.documentType || item.type || item.documentTypeKey || item.category)
-                    .filter(Boolean)
-                )
-              ).sort((a, b) => String(a).localeCompare(String(b)));
-              const options = [
-                { text: 'All Types', onPress: () => setTypeFilter('all') },
-                ...types.map(t => ({ text: String(t), onPress: () => setTypeFilter(String(t)) })),
+              Alert.alert('Filter documents', '', [
+                {
+                  text: 'Draft Docs',
+                  onPress: () => {
+                    setTypeFilter('all');
+                    setDocumentFilter('draft');
+                  },
+                },
+                {
+                  text: 'ITR',
+                  onPress: () => {
+                    setTypeFilter('all');
+                    setDocumentFilter('itr');
+                  },
+                },
                 { text: 'Cancel', style: 'cancel' },
-              ];
-              Alert.alert('Filter by Type', '', options, { cancelable: true });
+              ], { cancelable: true });
             }}>
-            <Ionicons name="filter-outline" size={18} color={typeFilter !== 'all' ? '#1E3A8A' : '#475569'} />
-          </TouchableOpacity>
+            <Ionicons name="filter-outline" size={18} color={documentFilter !== 'all' ? '#1E3A8A' : '#475569'} />
+          </TouchableOpacity> : null}
         </View>
       </View>
-      {typeFilter !== 'all' ? (
+      {documentFilter !== 'all' || typeFilter !== 'all' ? (
         <View style={styles.activeFilterRow}>
-          <Text style={styles.activeFilterText}>Filtered: {typeFilter}</Text>
-          <TouchableOpacity onPress={() => setTypeFilter('all')}>
+          <Text style={styles.activeFilterText}>
+            Filtered: {documentFilter === 'draft' ? 'Draft Docs' : documentFilter === 'itr' ? 'ITR' : typeFilter}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setTypeFilter('all');
+              setDocumentFilter('all');
+            }}>
             <Text style={styles.clearFilterText}>Clear</Text>
           </TouchableOpacity>
         </View>
       ) : null}
-      {loading ? (
+      {activeTab === 'locked' ? (
+        lockedLoading ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="small" color="#1E3A8A" />
+          </View>
+        ) : lockedError ? (
+          <View style={styles.center}>
+            <Text style={styles.errorText}>{lockedError}</Text>
+          </View>
+        ) : filteredLockedDocuments.length === 0 ? (
+          <View style={styles.center}>
+            <Text style={styles.text}>No locked documents found</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredLockedDocuments}
+            keyExtractor={(item, index) =>
+              String(item._id || item.id || index)
+            }
+            renderItem={renderLockedItem}
+            contentContainerStyle={styles.list}
+          />
+        )
+      ) : loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="small" color="#1E3A8A" />
         </View>
@@ -222,27 +507,116 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-  actionButtonsRow: {
+  lockedCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+  },
+  lockedCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
   },
-  actionBtn: {
+  lockedIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#FEF2F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lockedInfo: {
     flex: 1,
+  },
+  lockedCompany: {
+    color: '#1E293B',
+    fontSize: font.bodySmall,
+    fontWeight: '700',
+  },
+  lockedDate: {
+    color: '#64748B',
+    fontSize: font.xs,
+    marginTop: 3,
+  },
+  lockedStatus: {
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  lockedStatusBadge: {
+    backgroundColor: '#FEF2F2',
+  },
+  unlockedStatus: {
+    backgroundColor: '#F0FDF4',
+  },
+  lockedStatusText: {
+    fontSize: font.xs,
+    fontWeight: '700',
+  },
+  lockedStatusTextColor: {
+    color: '#DC2626',
+  },
+  unlockedStatusText: {
+    color: '#16A34A',
+  },
+  lockedDates: {
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+    marginTop: 12,
+    paddingTop: 10,
+    gap: 5,
+  },
+  lockedDatesLabel: {
+    color: '#475569',
+    fontSize: font.xs,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  lockedDateItem: {
+    color: '#64748B',
+    fontSize: font.sm,
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  tabsScroll: {
+    flexGrow: 0,
+    minHeight: 52,
+  },
+  tabBtn: {
+    minWidth: 140,
+    height: 42,
+    flexShrink: 0,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E2E8F0',
     borderRadius: 8,
     paddingVertical: 10,
+    paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionBtnText: {
+  tabBtnText: {
     fontSize: font.sm,
+    lineHeight: font.base,
     fontWeight: '600',
     color: '#334155',
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  tabBtnActive: {
+    borderColor: '#1E3A8A',
+    backgroundColor: '#EFF6FF',
+  },
+  tabBtnTextActive: {
+    color: '#1E3A8A',
   },
   searchWrapper: {
     paddingHorizontal: 16,

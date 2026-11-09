@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   tabActive: { borderColor: '#3B82F6', backgroundColor: '#EFF6FF' },
-  tabText: { color: '#64748B', fontSize: font.xs, fontWeight: '700' },
+  tabText: { color: '#64748B', fontSize: font.xm, fontWeight: '700' },
   tabTextActive: { color: '#1D4ED8' },
   tabCount: {
     minWidth: 20,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabCountActive: { backgroundColor: '#DBEAFE' },
-  tabCountText: { color: '#64748B', fontSize: font.tiny, fontWeight: '800' },
+  tabCountText: { color: '#64748B', fontSize: font.xm, fontWeight: '800' },
   tabCountTextActive: { color: '#1D4ED8' },
   list: { flex: 1 },
   listContent: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 20 },
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
   },
   cardTitleBlock: { flex: 1, minWidth: 0 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  notificationTitle: { flexShrink: 1, color: '#0F172A', fontSize: font.sm, fontWeight: '800' },
+  notificationTitle: { flexShrink: 1, color: '#0F172A', fontSize: font.md, fontWeight: '500' },
   newBadge: {
     backgroundColor: '#DBEAFE',
     borderRadius: 10,

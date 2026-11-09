@@ -1,6 +1,7 @@
 import { font } from '../../../../theme/typography';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
   ActivityIndicator,
   FlatList,
   Pressable,
@@ -18,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
 import { s } from '../../../../theme/responsive';
 import {
+  deleteAdminClient,
   fetchAdminClientStats,
   fetchAdminClients,
 } from '../api/adminClientsApi';
@@ -78,6 +80,7 @@ const AdminClientsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const [deletingClientId, setDeletingClientId] = useState(null);
 
   const loadClients = useCallback(
     async (refresh = false) => {
@@ -137,6 +140,42 @@ const AdminClientsScreen = () => {
     }, 350);
     return () => clearTimeout(timeout);
   }, [searchQuery, searchText]);
+
+  const confirmDeleteClient = client => {
+    const clientId = client._id || client.id;
+    if (!clientId) {
+      Alert.alert('Unable to delete client', 'Client ID is missing.');
+      return;
+    }
+
+    Alert.alert(
+      'Delete client?',
+      `Are you sure you want to delete ${client.name || client.email || 'this client'}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setDeletingClientId(clientId);
+            try {
+              await deleteAdminClient({ token, id: clientId });
+              await Promise.all([loadClients(true), loadStats()]);
+              Alert.alert('Client deleted', 'The client was deleted successfully.');
+            } catch (deleteError) {
+              Alert.alert(
+                'Unable to delete client',
+                deleteError.message || 'Please try again.',
+              );
+            } finally {
+              setDeletingClientId(null);
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
 
   const renderEmptyState = () => {
     if (loading) {
@@ -200,6 +239,33 @@ const AdminClientsScreen = () => {
               {String(item.status || 'active').toUpperCase()}
             </Text>
           </View>
+          <Pressable
+            style={styles.editIcon}
+            onPress={event => {
+              event.stopPropagation();
+              navigation.navigate('AdminEditClient', {
+                clientId: item._id || item.id,
+              });
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Edit client ${name}`}>
+            <Ionicons name="create-outline" size={17} color="#2563EB" />
+          </Pressable>
+          <Pressable
+            style={styles.deleteIcon}
+            onPress={event => {
+              event.stopPropagation();
+              confirmDeleteClient(item);
+            }}
+            disabled={deletingClientId === (item._id || item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Delete client ${name}`}>
+            {deletingClientId === (item._id || item.id) ? (
+              <ActivityIndicator size="small" color="#DC2626" />
+            ) : (
+              <Ionicons name="trash-outline" size={17} color="#DC2626" />
+            )}
+          </Pressable>
         </View>
         <View style={styles.cardDetails}>
           <View style={styles.detailLine}>
@@ -497,6 +563,24 @@ const styles = StyleSheet.create({
   clientRole: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
   statusBadge: { paddingHorizontal: s(8), paddingVertical: s(4), borderRadius: s(7) },
   statusText: { fontSize: font.tiny, fontWeight: '700' },
+  editIcon: {
+    width: s(30),
+    height: s(30),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: s(6),
+    borderRadius: s(8),
+    backgroundColor: '#EFF6FF',
+  },
+  deleteIcon: {
+    width: s(30),
+    height: s(30),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: s(6),
+    borderRadius: s(8),
+    backgroundColor: '#FEF2F2',
+  },
   cardDetails: {
     gap: s(7),
     paddingVertical: s(10),

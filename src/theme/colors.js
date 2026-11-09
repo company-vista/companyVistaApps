@@ -53,7 +53,7 @@ export const appThemes = {
         authBackground: '#020617',
         surface: '#06080ecb',
         surfaceAlt: '#164e63',
-        cardHighlight: '#1E1E1E',
+        cardHighlight: '#1E222A',
         cardElevated: '#0D1B2A',
         sheet: '#111827',
         text: '#f8fafcf1',

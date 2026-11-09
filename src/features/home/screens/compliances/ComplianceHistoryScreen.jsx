@@ -5,7 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useThemeColors } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
-import { fetchCompanyComplianceHistory } from '../../api/clientProfileApi';
+import { fetchCompanyComplianceHistory, fetchUkComplianceHistory } from '../../api/clientProfileApi';
 import { formatDate } from '../../../../constants/dateFormatter';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { s } from '../../../../theme/responsive';
@@ -43,10 +43,15 @@ const ComplianceHistoryScreen = () => {
                 return;
             }
             setIsHistoryLoading(true);
-            const result = await fetchCompanyComplianceHistory({
-                companyId: selectedAction.companyId,
-                token,
-            });
+            const result = selectedAction.complianceSource === 'uk'
+                ? await fetchUkComplianceHistory({
+                    companyId: selectedAction.companyId,
+                    token,
+                })
+                : await fetchCompanyComplianceHistory({
+                    companyId: selectedAction.companyId,
+                    token,
+                });
             if (!isMounted) {
                 return;
             }
@@ -63,7 +68,7 @@ const ComplianceHistoryScreen = () => {
         return () => {
             isMounted = false;
         };
-    }, [selectedAction.companyId, token]);
+    }, [selectedAction.companyId, selectedAction.complianceSource, token]);
     const actionMatchTerms = React.useMemo(() => {
         switch (selectedAction.id) {
             case 'address':
@@ -83,6 +88,9 @@ const ComplianceHistoryScreen = () => {
         }
     }, [selectedAction.id, selectedAction.title]);
     const getActionSegmentKeys = () => {
+        if (selectedAction.complianceSource === 'uk') {
+            return [selectedAction.id];
+        }
         switch (selectedAction.id) {
             case 'agent_address':
                 return ['Address', 'resident'];
@@ -165,7 +173,8 @@ const ComplianceHistoryScreen = () => {
     };
     const filteredHistory = history.filter(matchesSelectedAction);
     const pendingHistory = filteredHistory.some(record => getHistoryStatus(record).toLowerCase().includes('pending'));
-    const showRenewButton = String(selectedAction.status ?? '').toLowerCase().includes('pending') || pendingHistory;
+    const showRenewButton = selectedAction.complianceSource !== 'uk' &&
+        (String(selectedAction.status ?? '').toLowerCase().includes('pending') || pendingHistory);
     const formatRecordValue = (value, isDate = false) => {
         if (value == null || String(value).trim() === '') {
             return '--';

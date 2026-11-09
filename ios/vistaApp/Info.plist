@@ -35,7 +35,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is used to capture your passport photo, proof of address and selfie for identity verification.</string>
+	<string>Camera is used to capture identity documents and photos shared in messages.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>

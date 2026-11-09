@@ -182,7 +182,12 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
         const response = await axios.post(SIGNUP_STEP1_ROUTE, fullPayload, config);
         const token = findDeepValue(response.data, TOKEN_KEYS) || getHeaderToken(response.headers);
         const clientId = findDeepValue(response.data, CLIENT_ID_KEYS);
-        const companyId = findDeepValue(response.data, ['companyId', 'company_id', 'companyID']);
+        const companyRecord = response.data?.company
+            || response.data?.data?.company
+            || response.data?.createdCompany
+            || response.data?.data?.createdCompany;
+        const companyId = findDeepValue(response.data, ['companyId', 'company_id', 'companyID'])
+            || findDeepValue(companyRecord, CLIENT_ID_KEYS);
         const pricingType = response.data?.pricingType || response.data?.data?.pricingType || '';
         // backend computes totalAmount = pricingType==='fixed' ? computeOrderTotal(body) : 0 — response shape alag ho sakta hai isliye deep check
         const totalAmount = response.data?.totalAmount ?? response.data?.total_amount ?? response.data?.data?.totalAmount ?? response.data?.data?.total_amount ?? response.data?.company?.totalAmount ?? response.data?.company?.total_amount ?? response.data?.data?.company?.totalAmount ?? response.data?.data?.company?.total_amount ?? 0;
@@ -229,6 +234,7 @@ export async function handleSignupApi({ firstName, lastName, fullName, email, ph
             lastName: trimmedLastName,
             token: '',
             clientId: '',
+            requestMayHaveCreatedCompany: !status || status >= 500,
         };
     }
 }

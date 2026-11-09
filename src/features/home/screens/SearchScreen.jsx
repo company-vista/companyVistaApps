@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
         margin: 16,
         marginBottom: 8,
         paddingHorizontal: s(14),
-        borderRadius: 28,
+        borderRadius: 12,
     },
     searchIcon: {
         marginRight: 10,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     },
     settingsLabel: {
         flex: 1,
-        fontSize: font.xl,
+        fontSize: font.md,
         fontWeight: '400',
     },
     listContent: {

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, FlatList, Image, Keyboard, Linking, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { pick, types } from '@react-native-documents/picker';
+import { launchCamera } from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
@@ -35,17 +36,7 @@ const MIME_TYPES_BY_EXTENSION = {
   txt: 'text/plain',
 };
 
-const MIN_INPUT_HEIGHT = 40;
-const MAX_INPUT_HEIGHT = 120;
-const INPUT_LINE_HEIGHT = 22;
-
-const getInputHeightForText = text => {
-  const lineBreaks = (text.match(/\n/g) || []).length;
-  return Math.min(
-    MAX_INPUT_HEIGHT,
-    MIN_INPUT_HEIGHT + lineBreaks * INPUT_LINE_HEIGHT,
-  );
-};
+const MIN_INPUT_HEIGHT = 56;
 
 const getAttachmentMimeType = file => {
   if (file.type) return file.type;
@@ -174,6 +165,7 @@ const AdminMessageScreen = () => {
   const token = useAppSelector(state => state.auth.token);
   const [message, setMessage] = useState('');
   const [inputHeight, setInputHeight] = useState(MIN_INPUT_HEIGHT);
+  const [attachmentSheetVisible, setAttachmentSheetVisible] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -246,7 +238,6 @@ const AdminMessageScreen = () => {
       const sentMessage = await sendAdminMessage({ id: conversationId, text, token });
       setMessages(prev => [...prev, sentMessage]);
       setMessage('');
-      setInputHeight(MIN_INPUT_HEIGHT);
       setError('');
     } catch (sendError) {
       const failedMessage = sendError?.response?.data?.data;
@@ -264,7 +255,6 @@ const AdminMessageScreen = () => {
   const sendAttachment = async () => {
     if (sending || !conversationId) return;
 
-    setSending(true);
     try {
       const selectedFiles = await pick({
         type: [
@@ -284,27 +274,11 @@ const AdminMessageScreen = () => {
       });
       const selectedFile = selectedFiles?.[0];
       if (!selectedFile?.uri) return;
-
-      const sentMessage = await sendAdminMediaMessage({
-        id: conversationId,
-        file: {
-          uri: selectedFile.uri,
-          name: selectedFile.name,
-          type: getAttachmentMimeType(selectedFile),
-        },
-        caption: message,
-        token,
+      await sendMediaFile({
+        uri: selectedFile.uri,
+        name: selectedFile.name,
+        type: getAttachmentMimeType(selectedFile),
       });
-      setMessages(prev => [
-        ...prev,
-        {
-          ...sentMessage,
-          mediaUrl: selectedFile.uri,
-          remoteMediaUrl: sentMessage.mediaUrl,
-        },
-      ]);
-      setMessage('');
-      setError('');
     } catch (sendError) {
       if (
         sendError?.code === 'DOCUMENT_PICKER_CANCELED' ||
@@ -319,8 +293,63 @@ const AdminMessageScreen = () => {
       const errorMessage = getAdminMessagesError(sendError);
       setError(errorMessage);
       Alert.alert('Attachment not sent', errorMessage);
+    }
+  };
+
+  const sendMediaFile = async file => {
+    if (sending || !conversationId) return;
+    setSending(true);
+    try {
+      const sentMessage = await sendAdminMediaMessage({
+        id: conversationId,
+        file,
+        caption: message,
+        token,
+      });
+      setMessages(prev => [
+        ...prev,
+        {
+          ...sentMessage,
+          mediaUrl: file.uri,
+          remoteMediaUrl: sentMessage.mediaUrl,
+        },
+      ]);
+      setMessage('');
+      setError('');
+    } catch (sendError) {
+      const failedMessage = sendError?.response?.data?.data;
+      if (failedMessage) {
+        setMessages(prev => [...prev, failedMessage]);
+      }
+      const errorMessage = getAdminMessagesError(sendError);
+      setError(errorMessage);
+      Alert.alert('Attachment not sent', errorMessage);
     } finally {
       setSending(false);
+    }
+  };
+
+  const captureAndSendPhoto = async () => {
+    setAttachmentSheetVisible(false);
+    try {
+      const result = await launchCamera({
+        mediaType: 'photo',
+        quality: 0.9,
+        saveToPhotos: false,
+      });
+      if (result.didCancel) return;
+      if (result.errorCode) {
+        throw new Error(result.errorMessage || 'Unable to open the camera.');
+      }
+      const photo = result.assets?.[0];
+      if (!photo?.uri) return;
+      await sendMediaFile({
+        uri: photo.uri,
+        name: photo.fileName || `message-photo-${Date.now()}.jpg`,
+        type: photo.type || 'image/jpeg',
+      });
+    } catch (cameraError) {
+      Alert.alert('Camera unavailable', getAdminMessagesError(cameraError));
     }
   };
 
@@ -412,10 +441,10 @@ const AdminMessageScreen = () => {
           <View style={styles.inputRow}>
             <TouchableOpacity
               style={[styles.attachBtn, sending && styles.sendBtnDisabled]}
-              onPress={sendAttachment}
+              onPress={() => setAttachmentSheetVisible(true)}
               disabled={sending || !conversationId}
               accessibilityRole="button"
-              accessibilityLabel="Attach and send a file">
+              accessibilityLabel="Open attachment options">
               <Ionicons name="attach" size={22} color="#1E3A8A" />
             </TouchableOpacity>
             <TextInput
@@ -425,38 +454,92 @@ const AdminMessageScreen = () => {
               onChangeText={value => {
                 if (sending) return;
                 setMessage(value);
-                setInputHeight(getInputHeightForText(value));
               }}
               onContentSizeChange={event => {
-                const contentHeight = event.nativeEvent.contentSize.height;
-                setInputHeight(
-                  Math.max(
-                    getInputHeightForText(message),
-                    Math.min(MAX_INPUT_HEIGHT, contentHeight),
-                  ),
-                );
+                setInputHeight(Math.max(
+                  MIN_INPUT_HEIGHT,
+                  event.nativeEvent.contentSize.height,
+                ));
               }}
               multiline
               submitBehavior="newline"
               returnKeyType="default"
               textAlignVertical="top"
-              scrollEnabled={inputHeight >= MAX_INPUT_HEIGHT}
+              scrollEnabled={false}
               style={[styles.input, { height: inputHeight }]}
             />
-            <TouchableOpacity
-              style={[
-                styles.sendBtn,
-                sending && styles.sendBtnDisabled,
-              ]}
-              onPress={sendMessage}
-              disabled={sending || !conversationId || !message.trim()}
-              accessibilityRole="button"
-              accessibilityLabel="Send message">
-              <Ionicons name="send" size={20} color="#FFFFFF" />
-            </TouchableOpacity>
+            {message.trim() ? (
+              <TouchableOpacity
+                style={[
+                  styles.sendBtn,
+                  sending && styles.sendBtnDisabled,
+                ]}
+                onPress={sendMessage}
+                disabled={sending || !conversationId}
+                accessibilityRole="button"
+                accessibilityLabel="Send message">
+                <Ionicons name="send" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            ) : (
+              <View
+                style={[styles.sendBtn, styles.micBtn]}
+                accessible
+                accessibilityRole="image"
+                accessibilityLabel="Microphone">
+                <Ionicons name="mic" size={20} color="#1E3A8A" />
+              </View>
+            )}
           </View>
         </Animated.View>
       </View>
+      <Modal
+        visible={attachmentSheetVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setAttachmentSheetVisible(false)}>
+        <View style={styles.attachmentModal}>
+          <Pressable
+            style={styles.attachmentBackdrop}
+            onPress={() => setAttachmentSheetVisible(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Close attachment options"
+          />
+          <View
+            style={[
+              styles.attachmentSheet,
+              { paddingBottom: Math.max(insets.bottom, 16) },
+            ]}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>Share</Text>
+            <View style={styles.attachmentOptions}>
+              <TouchableOpacity
+                style={styles.attachmentOption}
+                onPress={() => {
+                  setAttachmentSheetVisible(false);
+                  sendAttachment();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Choose a file">
+                <View style={styles.attachmentOptionIcon}>
+                  <Ionicons name="document-outline" size={24} color="#1E3A8A" />
+                </View>
+                <Text style={styles.attachmentOptionLabel}>Files</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.attachmentOption}
+                onPress={captureAndSendPhoto}
+                disabled={sending}
+                accessibilityRole="button"
+                accessibilityLabel="Take and send a photo">
+                <View style={styles.attachmentOptionIcon}>
+                  <Ionicons name="camera-outline" size={24} color="#1E3A8A" />
+                </View>
+                <Text style={styles.attachmentOptionLabel}>Camera</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -572,15 +655,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 4,
   },
   bubbleAdmin: {
-    backgroundColor: '#1E3A8A',
+    backgroundColor: '#E3F2FD',
     borderTopRightRadius: 4,
+    color: '#111111',
   },
   messageImage: {
     width: 200,
     height: 160,
     borderRadius: 8,
     marginBottom: 4,
-    backgroundColor: '#1E3A8A',
+    backgroundColor: '#E3F2FD',
   },
   messageImageFallback: {
     width: 200,
@@ -593,7 +677,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.12)',
   },
   messageImageFallbackText: {
-    color: '#BFDBFE',
+    color: '#111111',
     fontSize: font.caption,
     textAlign: 'center',
   },
@@ -624,7 +708,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
   },
   msgTextAdmin: {
-    color: '#FFFFFF',
+    color: '#111111',
   },
   msgTime: {
     fontSize: font.caption,
@@ -635,7 +719,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   msgTimeAdmin: {
-    color: '#BFDBFE',
+    color: '#111111',
   },
   inputPanel: {
     paddingHorizontal: 12,
@@ -668,7 +752,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   msgTextBold: {
-    fontWeight: '700',
+    fontWeight: '800',
   },
   msgTextItalic: {
     fontStyle: 'italic',
@@ -688,6 +772,62 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#1E3A8A',
     borderRadius: 20,
+    transform: [{ rotate: '-23deg' }],
+  },
+  micBtn: {
+    backgroundColor: '#F1F5F9',
+    transform: [{ rotate: '0deg' }],
+  },
+  attachmentModal: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  attachmentBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+  },
+  attachmentSheet: {
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  sheetHandle: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#CBD5E1',
+    marginBottom: 16,
+  },
+  sheetTitle: {
+    color: '#1E293B',
+    fontSize: font.md,
+    fontWeight: '600',
+    marginBottom: 20,
+  },
+  attachmentOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  attachmentOption: {
+    alignItems: 'center',
+    width: 80,
+    marginBottom: 12,
+  },
+  attachmentOptionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6FF',
+    marginBottom: 8,
+  },
+  attachmentOptionLabel: {
+    color: '#334155',
+    fontSize: font.caption,
   },
   sendBtnDisabled: {
     opacity: 0.5,

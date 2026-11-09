@@ -357,7 +357,7 @@ const getStyles = (colors) => {
             flexDirection: 'row',
             alignItems: 'center',
             backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-            borderRadius: 28,
+            borderRadius: 12,
             paddingHorizontal: s(16),
             height: 50,
             marginBottom: 20,
@@ -367,7 +367,7 @@ const getStyles = (colors) => {
         searchInput: {
             flex: 1,
             marginLeft: 10,
-            fontSize: font.lg,
+            fontSize: font.md,
             color: palette.primaryText,
         },
         filterRow: {
@@ -375,12 +375,12 @@ const getStyles = (colors) => {
             justifyContent: 'flex-end',
             alignItems: 'center',
             gap: 8,
-            marginBottom: 16,
+            marginBottom: 21,
             position: 'relative',
         },
         sortLabel: {
             fontSize: font.md,
-            fontWeight: '700',
+            fontWeight: '500',
         },
         sortDropdown: {
             flexDirection: 'row',
@@ -389,7 +389,7 @@ const getStyles = (colors) => {
         },
         sortValue: {
             fontSize: font.md,
-            fontWeight: '900',
+            fontWeight: '500',
         },
         sortDropdownList: {
             position: 'absolute',
@@ -418,7 +418,7 @@ const getStyles = (colors) => {
         tabsRow: {
             flexDirection: 'row',
             backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-            borderRadius: 999,
+            borderRadius: 12,
             padding: 4,
             gap: 4,
             marginBottom: 18,
@@ -432,7 +432,7 @@ const getStyles = (colors) => {
             justifyContent: 'center',
             paddingVertical: 9,
             paddingHorizontal: s(6),
-            borderRadius: 999,
+            borderRadius: 12,
             gap: 4,
             minWidth: 0,
         },
@@ -500,7 +500,7 @@ const getStyles = (colors) => {
         },
         card: {
             backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-            borderRadius: 16,
+            borderRadius: 14,
             padding: 12,
             borderWidth: 1,
             borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
@@ -526,7 +526,7 @@ const getStyles = (colors) => {
         },
         cardTitle: {
             fontSize: font.md,
-            fontWeight: '500',
+            fontWeight: '400',
             color: palette.primaryText,
             marginBottom: 2,
         },
@@ -574,7 +574,7 @@ const getStyles = (colors) => {
         },
         cardLink: {
             fontSize: font.base,
-            fontWeight: '400',
+            fontWeight: '300',
             color: palette.link,
         },
         lockedCard: {

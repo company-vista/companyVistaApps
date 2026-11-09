@@ -340,3 +340,38 @@ export async function fetchCompanyComplianceHistory({ companyId, token, }) {
         };
     }
 }
+
+export async function fetchUkComplianceHistory({ companyId, token, section = 'core' }) {
+    if (!token || !companyId) {
+        return {
+            error: !token ? 'Auth token missing. Please login again.' : 'Company id missing.',
+            history: [],
+            isSuccess: false,
+        };
+    }
+    try {
+        const response = await axios.get(
+            `${API_BASE_URL}/api/uk-compliance/${section}/${companyId}/history`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'x-auth-token': token,
+                },
+                timeout: API_REQUEST_TIMEOUT_MS,
+            },
+        );
+        const history = response.data?.data;
+        return {
+            error: '',
+            history: Array.isArray(history) ? history : [],
+            isSuccess: response.data.success ?? true,
+        };
+    }
+    catch (error) {
+        return {
+            error: getErrorMessage(error),
+            history: [],
+            isSuccess: false,
+        };
+    }
+}

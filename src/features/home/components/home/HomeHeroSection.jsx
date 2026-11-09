@@ -102,7 +102,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
 
       <Pressable onPress={onAddToCompanyPress ?? onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#ECFDF5' : 'rgba(52,211,153,0.18)' }]}>
-          <FontAwesome name="plus-circle" size={14} color={isLight ? '#047857' : '#34D399'} />
+          <FontAwesome name="plus-circle" size={14} color="#FFFFFF" />
         </View>
         {/* Company already hai to "Create" galat lagta hai — user sochega dobara
             banau. Ab clear hota hai ki nayi company add ho rahi hai. */}
@@ -110,13 +110,13 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
       </Pressable> 
       <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle]}>
-          <FontAwesome name="cog" size={16} color={isLight ? colors.accent : '#85B7EB'} />
+          <FontAwesome name="cog" size={16} color="#FFFFFF" />
         </View>
         <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Manage</Text>
       </Pressable>
       <Pressable onPress={onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FEF2F2' : 'rgba(240,149,149,0.15)' }]}>
-          <FontAwesome name="info-circle" size={16} color={isLight ? '#dc2626' : '#F09595'} />
+          <FontAwesome name="info-circle" size={16} color="#FFFFFF" />
         </View>
         <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Company Info</Text>
       </Pressable>

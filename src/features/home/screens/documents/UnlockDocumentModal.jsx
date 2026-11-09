@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     priceValue: {
-        fontSize: s(26),
+        fontSize: font.displayLarge,
         fontWeight: '800',
         color: '#FAC775',
     },

@@ -1,5 +1,5 @@
 import { font } from '../../../theme/typography';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -112,6 +112,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   const [isChecked, setIsChecked] = useState(false);
   const [localAddOns, setLocalAddOns] = useState(selectedAddOns || {});
   const [confirming, setConfirming] = useState(false);
+  const confirmingRef = useRef(false);
 
   // Sync if params change (e.g. coming back from OptionalAddOns)
   React.useEffect(() => { setLocalAddOns(selectedAddOns || {}); }, [JSON.stringify(selectedAddOns)]);
@@ -263,12 +264,22 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
   const isQuotedForBtn = !hasPriceForBtn;
 
   const handleConfirm = async () => {
-    if (confirming) return; // double-click se duplicate company na bane
+    if (route.params?.signupSubmissionUncertain || pendingOrder?.signupSubmissionUncertain) {
+      Toast.show({
+        type: 'error',
+        text1: 'Company creation status is unknown',
+        text2: 'Please contact support before trying again.',
+      });
+      confirmingRef.current = false;
+      setConfirming(false);
+      return;
+    }
+    if (confirmingRef.current) return;
+    confirmingRef.current = true;
     setConfirming(true);
-    // Deferred flow me pendingOrder purani company ka companyId carry kar sakta hai —
-    // ise kabhi reuse mat karo (nai company tabhi banegi jab client yahan click kare).
-    const hasDeferredParams = !!(route.params?.signupPayload || route.params?.signupDeferred);
-    let companyId = route.params?.companyId || (hasDeferredParams ? undefined : pendingOrder?.companyId);
+    // FounderDetails replaces pendingOrderData before each new Add Company flow,
+    // so a companyId here belongs to this deferred signup and must be reused on retries.
+    let companyId = route.params?.companyId || pendingOrder?.companyId;
     // ── Deferred backend save (Add Company flow) ─────────────────────────
     // FounderDetails auto-skip me signupUser call NAHI hota — wahan signupPayload
     // params me carry hota hai. Company backend me tabhi save hoti hai jab client
@@ -280,9 +291,45 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
     if (!companyId && deferredPayload) {
       try {
         const res = await dispatch(signupUser(deferredPayload));
-        if (!signupUser.fulfilled.match(res) || !res.payload?.companyId) {
+        if (!signupUser.fulfilled.match(res)) {
           const msg = res.payload?.errors?.email || res.payload?.message || 'Signup failed';
+          if (res.payload?.requestMayHaveCreatedCompany) {
+            const uncertainOrder = {
+              ...(route.params || {}),
+              ...(pendingOrder || {}),
+              signupSubmissionUncertain: true,
+            };
+            dispatch(setPendingOrderData(uncertainOrder));
+            navigation.setParams({ signupSubmissionUncertain: true });
+            Toast.show({
+              type: 'error',
+              text1: 'Company creation status is unknown',
+              text2: 'Please contact support before trying again.',
+            });
+            setConfirming(false);
+            return;
+          }
           Toast.show({ type: 'error', text1: 'Could not create company', text2: msg });
+          confirmingRef.current = false;
+          setConfirming(false);
+          return;
+        }
+        if (!res.payload.companyId) {
+          // The server accepted the create request, but without an ID we cannot
+          // safely retry it: that could create a second company.
+          const uncertainOrder = {
+            ...(route.params || {}),
+            ...(pendingOrder || {}),
+            signupSubmissionUncertain: true,
+          };
+          dispatch(setPendingOrderData(uncertainOrder));
+          navigation.setParams({ signupSubmissionUncertain: true });
+          Toast.show({
+            type: 'error',
+            text1: 'Company may already be created',
+            text2: 'Please contact support before trying again.',
+          });
+          confirmingRef.current = false;
           setConfirming(false);
           return;
         }
@@ -299,15 +346,23 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           isAddCompanyFlow: true,
         };
         dispatch(setPendingOrderData(confirmedPayload));
+        navigation.setParams({
+          companyId,
+          clientId: resolvedClientId,
+          token: resolvedToken,
+          signupDeferred: false,
+        });
         console.log('=== REVIEW deferred signup created company ===', companyId, 'clientId', res.payload?.clientId);
       } catch (e) {
         Toast.show({ type: 'error', text1: 'Could not create company', text2: e?.message || 'Network error' });
+        confirmingRef.current = false;
         setConfirming(false);
         return;
       }
     }
     if (!companyId) {
       Toast.show({ type: 'error', text1: 'Company ID missing' });
+      confirmingRef.current = false;
       setConfirming(false);
       return;
     }
@@ -452,6 +507,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         return;
       }
       Toast.show({ type: 'error', text1: 'Confirm failed', text2: msg });
+      confirmingRef.current = false;
       setConfirming(false);
     }
   };

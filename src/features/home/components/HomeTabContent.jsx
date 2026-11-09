@@ -4,7 +4,6 @@ import AnimatedAppear from '../../../components/AnimatedAppear';
 import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
 import HomeHeroSection from './home/HomeHeroSection';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
-import ActionRequiredSlider from './home/ActionRequiredSlider';
 import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
@@ -18,17 +17,13 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onComp
     </AnimatedAppear>
 
     <AnimatedAppear index={1}>
-      <ActionRequiredSlider />
-    </AnimatedAppear>
-
-    <AnimatedAppear index={2}>
       <ComplianceStatusSection companyId={selectedCompany?.id} dueDatesByTitle={compliance.dueDatesByTitle} rawDueDatesByTitle={compliance.rawDueDatesByTitle} statusesByTitle={compliance.statusesByTitle} isLoadingDueDates={compliance.isLoading} onOpenComplianceHistory={onOpenComplianceHistory} isPaymentLocked={isPaymentLocked} onLockedPress={onLockedCompliancePress} />
     </AnimatedAppear>
 
-    <AnimatedAppear index={3}>
+    <AnimatedAppear index={2}>
       <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} onRegistrationTrackingPress={onRegistrationTrackingPress} selectedCompany={selectedCompany} />
     </AnimatedAppear>
-    <AnimatedAppear index={4}>
+    <AnimatedAppear index={3}>
       <CompanyVistaReferral />
     </AnimatedAppear>
   </View>);

@@ -145,6 +145,37 @@ export async function createAdminClient({ token, payload }) {
   return client;
 }
 
+export async function updateAdminClient({ token, id, payload }) {
+  if (!id) {
+    throw new Error('Client ID is missing.');
+  }
+  const data = await request(
+    {
+      method: 'put',
+      url: `${CLIENTS_URL}/${encodeURIComponent(id)}`,
+      data: payload,
+    },
+    token,
+  );
+  if (!data?.data || typeof data.data !== 'object') {
+    throw new Error('Invalid client update response from the server.');
+  }
+  return data.data;
+}
+
+export async function deleteAdminClient({ token, id }) {
+  if (!id) {
+    throw new Error('Client ID is missing.');
+  }
+  await request(
+    {
+      method: 'delete',
+      url: `${CLIENTS_URL}/${encodeURIComponent(id)}`,
+    },
+    token,
+  );
+}
+
 export async function uploadAdminClientItinLetter({ token, id, file }) {
   if (!id) {
     throw new Error('Client ID is missing.');

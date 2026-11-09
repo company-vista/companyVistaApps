@@ -216,6 +216,7 @@ export const signupUser = createAsyncThunk('auth/signupUser', async (payload, { 
             email: result.email,
             firstName: result.firstName,
             lastName: result.lastName,
+            requestMayHaveCreatedCompany: result.requestMayHaveCreatedCompany || false,
         });
     }
     return {

@@ -10,12 +10,68 @@ import styles from './TabPlaceholder.styles';
 import { formatDate } from '../../../constants/dateFormatter';
 import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 import { useCompanyCompliance, normalizeText } from '../hooks/useCompanyCompliance';
-const STATUS_ORDER = ['Expired', 'Pending', 'Client Managed', 'Active', 'Completed'];
+const STATUS_ORDER = ['Expired', 'Overdue', 'Expiring Soon', 'Pending', 'Client Managed', 'Active', 'Completed'];
+const COUNTRY_LABELS = {
+    usa: { federal: 'Federal Filing', state: 'State Filing', agent: 'Agent & Address' },
+    'united states': { federal: 'Federal Filing', state: 'State Filing', agent: 'Agent & Address' },
+    canada: { federal: 'GST/HST Filing', state: 'Annual Return', agent: 'Registered Agent & Office' },
+    ca: { federal: 'GST/HST Filing', state: 'Annual Return', agent: 'Registered Agent & Office' },
+};
+
+function getCountryLabels(country) {
+    const key = String(country ?? '').trim().toLowerCase();
+    return COUNTRY_LABELS[key] ?? {
+        federal: 'Corporate Tax Filing',
+        state: 'Annual Government Filing',
+        agent: 'Local Compliance Partner & Address',
+    };
+}
+
+function isUnitedKingdom(country) {
+    const value = String(country ?? '').trim().toLowerCase();
+    return value === 'uk' || value === 'united kingdom';
+}
+
+function isExpiringSoon(dueDate) {
+    if (!dueDate) return false;
+    const due = new Date(dueDate);
+    if (Number.isNaN(due.getTime())) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const daysRemaining = Math.ceil((due.getTime() - today.getTime()) / 86400000);
+    return daysRemaining >= 0 && daysRemaining <= 30;
+}
+
+function getComplianceStatus(apiStatus, dueDate, isFiling = false) {
+    const status = normalizeText(apiStatus);
+    if (status === 'client managed' || status === 'managed') return 'Client Managed';
+    if (status === 'completed' || status === 'active' || status === 'done') {
+        return isFiling ? 'Completed' : 'Active';
+    }
+    if (status === 'expired' || status === 'expired soon' || status === 'overdue') return 'Expired';
+    if (status === 'expiring soon') return 'Expiring Soon';
+    if (status === 'inprocess') return 'In Process';
+    if (status === 'pending' && dueDate) {
+        const due = new Date(dueDate);
+        if (!Number.isNaN(due.getTime())) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const daysRemaining = Math.ceil((due.getTime() - today.getTime()) / 86400000);
+            if (daysRemaining < 0) return 'Overdue';
+            if (daysRemaining <= 30) return 'Expiring Soon';
+        }
+    }
+    if (status === 'expiring_soon' || isExpiringSoon(dueDate)) return 'Expiring Soon';
+    return 'Pending';
+}
+
 function formatStatusLabel(value) {
     const status = normalizeText(value);
     if (!status) {
         return 'N/A';
     }
+    if (status === 'expiring soon') return 'Expiring Soon';
+    if (status === 'client managed') return 'Client Managed';
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 function getWorstStatus(...statuses) {
@@ -31,13 +87,18 @@ function getWorstStatus(...statuses) {
     }
     return worst;
 }
-function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Compliance', companyId, selectedCompanyName, onOpenRenewPage, onOpenComplianceHistory, }) {
+function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Compliance', companyId, selectedCompanyName, countryOfIncorporation, onOpenRenewPage, onOpenComplianceHistory, }) {
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const [apiData, setApiData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const effectiveCompanyId = companyId ?? null;
-    const { statusesByTitle } = useCompanyCompliance(effectiveCompanyId);
+    const hasCompany = Boolean(effectiveCompanyId);
+    const isUKCompany = isUnitedKingdom(countryOfIncorporation);
+    const [ukCompliance, setUkCompliance] = useState(null);
+    const { statusesByTitle } = useCompanyCompliance(isUKCompany ? null : effectiveCompanyId);
 
     const avatarPlaceholder = {
         backgroundColor: colors.surface,
@@ -53,32 +114,48 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     }
 
     useEffect(() => {
+        let isMounted = true;
         const fetchComplianceData = async () => {
             if (!token || !effectiveCompanyId) {
                 setApiData(null);
+                setUkCompliance(null);
+                setLoadError(Boolean(effectiveCompanyId && !token));
                 setLoading(false);
                 return;
             }
             setLoading(true);
+            setApiData(null);
+            setUkCompliance(null);
+            setLoadError(false);
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/company-compliance/${effectiveCompanyId}`, {
+                const endpoint = isUKCompany ? 'uk-compliance/core' : 'company-compliance';
+                const response = await axios.get(`${API_BASE_URL}/api/${endpoint}/${effectiveCompanyId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'x-auth-token': token,
                     },
                 });
-                console.log('Compliance API data:', JSON.stringify(response?.data, null, 2));
-                setApiData(response?.data);
+                if (isMounted) {
+                    if (isUKCompany) setUkCompliance(response?.data?.data ?? null);
+                    else setApiData(response?.data);
+                }
             }
-            catch (error) {
-                console.error('Error fetching compliance data:', error);
+            catch {
+                if (isMounted) {
+                    setApiData(null);
+                    setUkCompliance(null);
+                    setLoadError(true);
+                }
             }
             finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
         fetchComplianceData();
-    }, [effectiveCompanyId, token]);
+        return () => {
+            isMounted = false;
+        };
+    }, [effectiveCompanyId, token, isUKCompany, refreshKey]);
     const getStatusTheme = (status) => {
         const isDark = colors.mode === 'dark';
         const key = String(status ?? '').toLowerCase().trim();
@@ -91,44 +168,23 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         if (key === 'active' || key === 'completed') {
             return { text: isDark ? '#6EE7B7' : '#256F46', bg: isDark ? '#15352A' : '#E6F4EA' };
         }
+        if (key === 'in process') {
+            return { text: isDark ? '#93C5FD' : '#1D4ED8', bg: isDark ? '#172554' : '#DBEAFE' };
+        }
         if (key === 'client managed') {
             return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
         }
         return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
     };
-    // 1. Agent aur Address ke liye status mapping
-    const mapAgentAddressStatus = (apiStatus, defaultStatus = 'Pending') => {
-        if (!apiStatus)
-            return defaultStatus;
-        const lower = apiStatus.toLowerCase().trim();
-        if (lower === 'active' || lower === 'done' || lower === 'completed')
-            return 'Active';
-        if (lower === 'expired' || lower === 'expired_soon' || lower === 'expiring_soon' || lower === 'overdue')
-            return 'Expired';
-        if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed')
-            return 'Client Managed';
-        return defaultStatus;
-    };
-    // 2. Federal aur Annual Filing ke liye status mapping
-    const mapFederalAnnualStatus = (apiStatus) => {
-        if (!apiStatus)
-            return 'Pending';
-        const lower = apiStatus.toLowerCase().trim();
-        if (lower === 'completed' || lower === 'active' || lower === 'done')
-            return 'Completed';
-        if (lower === 'expired' || lower === 'expired_soon' || lower === 'expiring_soon' || lower === 'overdue')
-            return 'Expired';
-        if (lower === 'client managed' || lower === 'client_managed' || lower === 'managed')
-            return 'Client Managed';
-        return 'Pending';
-    };
     const federalTaxFilingData = apiData?.data?.federalTaxFiling || {};
     const residentData = apiData?.data?.resident || {};
     const addressData = apiData?.data?.Address || {};
     const annualFilingData = apiData?.data?.annualFiling || {};
+    const labels = getCountryLabels(countryOfIncorporation);
     const derivedActions = [];
     const shouldShowRenewButton = (action) => {
-        return action.status === 'Pending' || action.status === 'Expired';
+        return action.complianceSource !== 'uk' &&
+            ['Pending', 'Expired', 'Overdue', 'Expiring Soon'].includes(action.status);
     };
     const handleRenewPress = (action) => {
         onOpenRenewPage?.({
@@ -152,23 +208,51 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
             date: action.date,
             details: action.details,
             companyId: effectiveCompanyId,
+            complianceSource: action.complianceSource,
             price: action.price,
             years: action.years,
         });
     };
-    const residentStatus = mapAgentAddressStatus(residentData.status);
-    const addressStatus = mapAgentAddressStatus(addressData.status, 'Client Managed');
+    if (isUKCompany) {
+        [
+            { id: 'AnnAccRegOff', title: 'Registered Office', subtitle: 'Registered office address', icon: 'building' },
+            { id: 'AnnualAccounts', title: 'Annual Accounts', subtitle: 'Statutory annual accounts', icon: 'file-text' },
+            { id: 'ConfStatement', title: 'Confirmation Statement', subtitle: 'Annual confirmation statement', icon: 'check-square-o' },
+        ].forEach(item => {
+            const data = ukCompliance?.[item.id] ?? {};
+            derivedActions.push({
+                ...item,
+                complianceSource: 'uk',
+                status: getComplianceStatus(data.status, data.dueDate, true),
+                date: formatDate(data.dueDate),
+                details: [
+                    { label: 'Applicable Year', value: data.applicableYear || 'N/A', icon: 'calendar' },
+                    { label: 'Due Date', value: formatDate(data.dueDate), icon: 'calendar' },
+                    { label: 'Last Filed', value: formatDate(data.lastDate), icon: 'history' },
+                    { label: 'Status', value: formatStatusLabel(data.status), icon: 'check-circle' },
+                ],
+            });
+        });
+    }
+    else {
+    const residentStatus = getComplianceStatus(residentData.status, residentData.dueDate);
+    const addressStatus = getComplianceStatus(addressData.status || 'client_managed', addressData.dueDate);
     // Agent & Address
     derivedActions.push({
         id: 'agent_address',
-        title: 'Agent & Address',
-        subtitle: 'Registered agent & address',
+        title: labels.agent,
+        subtitle: countryOfIncorporation === 'Canada' || countryOfIncorporation === 'CA'
+            ? 'Corporate representative + registered office'
+            : countryOfIncorporation === 'United States' || countryOfIncorporation === 'USA'
+                ? 'Registered agent & address'
+                : 'Local representative + registered address',
         status: statusesByTitle['Agent & Address']
             ? formatStatusLabel(statusesByTitle['Agent & Address'])
             : getWorstStatus(residentStatus, addressStatus),
         date: formatDate(addressData.dueDate || residentData.dueDate),
         icon: 'building',
         details: [
+            { label: 'Applicable Year', value: addressData.dueDate || residentData.dueDate ? String(new Date(addressData.dueDate || residentData.dueDate).getFullYear() - 1) : 'N/A', icon: 'calendar' },
             { label: 'Info', value: residentData.name || 'N/A', icon: 'user' },
             { label: 'Email', value: residentData.email || 'N/A', icon: 'envelope' },
             { label: 'Phone', value: residentData.phone || 'N/A', icon: 'phone' },
@@ -185,14 +269,19 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     // Federal Filing
     derivedActions.push({
         id: 'federal_filing',
-        title: 'Federal Filing Services',
-        subtitle: 'Annual federal tax',
+        title: labels.federal,
+        subtitle: countryOfIncorporation === 'Canada' || countryOfIncorporation === 'CA'
+            ? 'Federal GST/HST'
+            : countryOfIncorporation === 'United States' || countryOfIncorporation === 'USA'
+                ? 'Annual federal tax'
+                : 'Corporate tax filing',
         status: statusesByTitle['Federal Filing']
             ? formatStatusLabel(statusesByTitle['Federal Filing'])
-            : mapFederalAnnualStatus(federalTaxFilingData.status),
+            : getComplianceStatus(federalTaxFilingData.status, federalTaxFilingData.dueDate, true),
         date: formatDate(federalTaxFilingData.dueDate),
         icon: 'exclamation-circle',
         details: [
+            { label: 'Applicable Year', value: federalTaxFilingData.applicableYear || federalTaxFilingData.taxYear || 'N/A', icon: 'calendar' },
             { label: 'Due Date', value: formatDate(federalTaxFilingData.dueDate), icon: 'calendar' },
             { label: 'Last Filed', value: formatDate(federalTaxFilingData.lastDate), icon: 'history' },
         ],
@@ -200,20 +289,26 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     // Annual Filing
     derivedActions.push({
         id: 'annual_filing',
-        title: 'State Filing',
-        subtitle: 'State compliance',
+        title: labels.state,
+        subtitle: countryOfIncorporation === 'Canada' || countryOfIncorporation === 'CA'
+            ? 'Annual corporate return'
+            : countryOfIncorporation === 'United States' || countryOfIncorporation === 'USA'
+                ? 'State compliance'
+                : 'Government filing',
         status: statusesByTitle['State Filing']
             ? formatStatusLabel(statusesByTitle['State Filing'])
-            : mapFederalAnnualStatus(annualFilingData.status),
+            : getComplianceStatus(annualFilingData.status, annualFilingData.dueDate, true),
         date: formatDate(annualFilingData.dueDate),
         icon: 'check-circle',
         details: [
+            { label: 'Applicable Year', value: annualFilingData.applicableYear || annualFilingData.fiscalYear || 'N/A', icon: 'calendar' },
             { label: 'Due Date', value: formatDate(annualFilingData.dueDate), icon: 'calendar' },
             { label: 'Last Filed', value: formatDate(annualFilingData.lastDate), icon: 'history' },
         ],
         price: 149,
         years: 1,
     });
+    }
 
     const doneCount = derivedActions.filter(a => a.status === 'Active' || a.status === 'Completed' || a.status === 'Client Managed').length;
     const totalCount = derivedActions.length;
@@ -239,7 +334,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
             </View>
         </View>
 
-        <AnimatedAppear index={3}>
+        {!loadError && hasCompany && !loading ? (<AnimatedAppear index={3}>
             <View style={[styles.healthCard, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
                 borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
@@ -258,14 +353,26 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                     {doneCount} of {totalCount} Actions Complete
                 </Text>
             </View>
-        </AnimatedAppear>
+        </AnimatedAppear>) : null}
 
-        <View style={styles.sectionHeader}>
+        {!loadError && hasCompany && !loading ? (<View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitleText, { color: colors.text }]}>Compliance Actions</Text>
-        </View>
+        </View>) : null}
 
-        {loading ? (<ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />) : (derivedActions.map((action, idx) => {
+        {loading ? (<ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 20 }} />) : !hasCompany ? (
+            <View style={[styles.mainCard, mainCardStyle]}>
+                <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>Select a company to view its compliance data.</Text>
+            </View>
+        ) : loadError ? (
+            <View style={[styles.mainCard, mainCardStyle]}>
+                <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>Compliance data could not be loaded.</Text>
+                <Pressable onPress={() => setRefreshKey(value => value + 1)} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
+                    <Text style={[styles.renewButtonText, { color: colors.buttonText }]}>Retry</Text>
+                </Pressable>
+            </View>
+        ) : (derivedActions.map((action, idx) => {
             const theme = getStatusTheme(action.status);
+            const year = action.details.find(detail => detail.label === 'Applicable Year')?.value;
             return (<AnimatedAppear key={action.id} index={4 + idx}>
                 <Pressable style={[
                     styles.mainCard,
@@ -277,6 +384,9 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                         </View>
 
                         <View style={styles.headerTextBlock}>
+                            {year && year !== 'N/A'
+                                ? <Text style={[styles.dateText, { color: colors.muted }]} numberOfLines={1}>Year: {year}</Text>
+                                : null}
                             <Text style={[styles.sectionTitle, { color: colors.text }]} numberOfLines={1}>
                                 {action.title}
                             </Text>
@@ -298,7 +408,10 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                         <View style={[styles.badgeWrap, { backgroundColor: colors.mode === 'dark' && action.status === 'Pending' ? 'transparent' : theme.bg }]}>
                             <Text style={[styles.badgeText, { color: theme.text }]}>{action.status}</Text>
                         </View>
-                        {shouldShowRenewButton(action) ? (<Pressable onPress={() => handleRenewPress(action)} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
+                        {shouldShowRenewButton(action) ? (<Pressable onPress={(event) => {
+                            event.stopPropagation();
+                            handleRenewPress(action);
+                        }} style={[styles.renewButton, { backgroundColor: colors.buttonBackground }]}>
                             <Text style={[styles.renewButtonText, { color: colors.buttonText }]}>Renew Now</Text>
                             {/* <FontAwesome name="chevron-right" size={14} color={colors.muted} style={styles.arrowIcon}/> */}
                         </Pressable>) : null}
