@@ -296,7 +296,9 @@ const CompanyManagementScreen = () => {
           <Text style={styles.actionButtonText}>Register Company</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secondaryActionButton}>
+        <TouchableOpacity
+          style={styles.secondaryActionButton}
+          onPress={() => navigation.navigate('AdminCompaniesWithoutDocuments')}>
           <Ionicons name="document-text-outline" size={16} color="#E11D48" />
           <Text style={[styles.actionButtonText, { color: '#E11D48' }]}>Missing Docs</Text>
         </TouchableOpacity>

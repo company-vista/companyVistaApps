@@ -4,7 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
 import MoreTabContent from '../../components/MoreTabContent';
 
-export function MoreTabSheet({ colors, insets, slideAnim, onClose, onFollowUsPress, onHelpFeedbackPress, onSupportPress, onProfilePress, onSettingsPress }) {
+export function MoreTabSheet({ colors, insets, slideAnim, onClose, onCompanyInfoPress, onManagePress, onFollowUsPress, onHelpFeedbackPress, onSupportPress, onProfilePress, onSettingsPress }) {
     return (<View style={styles.moreOverlay}>
         <Pressable onPress={onClose} style={[styles.moreBackdrop, { backgroundColor: colors.backdrop }]} />
         <Animated.View style={[
@@ -27,7 +27,7 @@ export function MoreTabSheet({ colors, insets, slideAnim, onClose, onFollowUsPre
                     <FontAwesome name="close" size={18} color={colors.text} />
                 </Pressable>
             </View>
-            <MoreTabContent onFollowUsPress={onFollowUsPress} onHelpFeedbackPress={onHelpFeedbackPress} onSupportPress={onSupportPress} onProfilePress={onProfilePress} onSettingsPress={onSettingsPress} />
+            <MoreTabContent onCompanyInfoPress={onCompanyInfoPress} onManagePress={onManagePress} onFollowUsPress={onFollowUsPress} onHelpFeedbackPress={onHelpFeedbackPress} onSupportPress={onSupportPress} onProfilePress={onProfilePress} onSettingsPress={onSettingsPress} />
         </Animated.View>
     </View>);
 }

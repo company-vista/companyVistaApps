@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useThemeColors } from '../../../../theme/colors';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 import { font } from '../../../../theme/typography';
@@ -62,11 +62,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                 Compliance Status
             </Text>
         </View>
-        <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.complianceRow}
-        >
+        <View style={styles.complianceGrid}>
             {complianceCards.map(item => (
                 <ComplianceCard
                     key={item.title}
@@ -79,7 +75,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
                     onOpenComplianceHistory={onOpenComplianceHistory}
                 />
             ))}
-        </ScrollView>
+        </View>
     </View>);
 }
 const styles = StyleSheet.create({
@@ -102,10 +98,10 @@ const styles = StyleSheet.create({
         fontSize: font.sm,
         fontWeight: '400',
     },
-    complianceRow: {
+    complianceGrid: {
         flexDirection: 'row',
-        gap: 8,
-        paddingRight: 16,
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
 });
 export default ComplianceStatusSection;

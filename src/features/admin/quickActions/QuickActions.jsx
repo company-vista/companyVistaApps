@@ -6,10 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 export const QUICK_ACTIONS = [
   { key: 'create-invoice', title: 'Create Invoice', icon: '📄' },
   { key: 'add-client', title: 'Clients', icon: '👤' },
+  { key: 'crm', title: 'CRM', icon: '💼' },
   // { key: 'record-payment', title: 'Payment record', icon: '💳' },
   { key: 'add-expense', title: 'Add Expense', icon: '💸' },
-  { key: 'vista-leads', title: 'Vista Leads', icon: '👥' },
-  { key: 'blog', title: 'Blog', icon: '📝' },
 ];
 
 const QuickActions = () => {
@@ -19,12 +18,10 @@ const QuickActions = () => {
       navigation.navigate('AdminCreateInvoice');
     } else if (action.key === 'add-client') {
       navigation.navigate('AdminClients');
+    } else if (action.key === 'crm') {
+      navigation.navigate('AdminCRM');
     } else if (action.key === 'add-expense') {
       navigation.navigate('AdminAddExpense');
-    } else if (action.key === 'vista-leads') {
-      navigation.navigate('CompanyVistaLeads');
-    } else if (action.key === 'blog') {
-      navigation.navigate('AdminBlogs');
     }
   };
 

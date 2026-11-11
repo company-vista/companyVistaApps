@@ -2,6 +2,13 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
+const NAV_ICON_SIZE = 22;
+const navIconContainerStyle = {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+};
 const tabs = [
     { id: 'home', title: 'Home', icon: 'home' },
     { id: 'reports', title: 'Compliance', icon: 'check-square-o' },
@@ -19,9 +26,11 @@ export function BottomNavBar({ activeTab, isMoreOpen, onTabPress, colors, safeAr
         bottomNavStyle,
     ]}>
         {tabs.map(tab => (<Pressable key={tab.title} onPress={() => onTabPress(tab.id)} style={styles.navItem}>
-            <FontAwesome name={tab.icon} size={22} style={{ width: 24, textAlign: 'center' }} color={activeTab === tab.id || (tab.id === 'more' && isMoreOpen)
-                ? colors.accent
-                : colors.muted} />
+            <View style={navIconContainerStyle}>
+                <FontAwesome name={tab.icon} size={NAV_ICON_SIZE} color={activeTab === tab.id || (tab.id === 'more' && isMoreOpen)
+                    ? colors.accent
+                    : colors.muted} />
+            </View>
             <Text numberOfLines={1} adjustsFontSizeToFit style={[
                 styles.navText,
                 { color: activeTab === tab.id || (tab.id === 'more' && isMoreOpen) ? colors.accent : colors.muted },

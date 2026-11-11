@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const cards = [
   { key: 'invoices', title: 'Invoices', icon: '📄' },
   { key: 'estimates', title: 'Estimates', icon: '🧾' },
-  { key: 'payments', title: 'Payment records', icon: '💳' },
+  { key: 'payments', title: 'Payment Records', icon: '💳' },
   // { key: 'expenses', title: 'Expenses', icon: '💸' },
 ];
 

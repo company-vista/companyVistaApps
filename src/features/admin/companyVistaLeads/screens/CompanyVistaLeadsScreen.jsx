@@ -286,9 +286,7 @@ const CompanyVistaLeadsScreen = () => {
                   style={[
                     styles.channelTabCount,
                     channel.key === 'dnf' && styles.dnfTabCountText,
-                    activeChannel === channel.key &&
-                      channel.key === 'dnf' &&
-                      styles.dnfTabCountTextActive,
+                    activeChannel === channel.key && styles.channelTabCountActiveText,
                   ]}>
                   {channelCounts[channel.countKey] ?? 0}
                 </Text>
@@ -523,7 +521,7 @@ const styles = StyleSheet.create({
     gap: s(8),
     height: s(38),
     paddingHorizontal: s(12),
-    borderRadius: s(14),
+    borderRadius: s(20),
     backgroundColor: '#F1F5F9',
   },
   channelTabActive: {
@@ -544,7 +542,7 @@ const styles = StyleSheet.create({
     minWidth: s(22),
     height: s(24),
     paddingHorizontal: s(5),
-    borderRadius: s(10),
+    borderRadius: s(12),
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -556,6 +554,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     includeFontPadding: false,
+  },
+  channelTabCountActiveText: {
+    color: '#FFFFFF',
   },
   channelTabCountActive: {
     backgroundColor: 'rgba(255,255,255,0.2)',

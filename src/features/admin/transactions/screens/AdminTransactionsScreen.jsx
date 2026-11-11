@@ -18,6 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
+import TransactionEditButton from '../components/TransactionEditButton';
 import {
   createAdminTransaction,
   deleteAdminTransaction,
@@ -457,45 +458,46 @@ const AdminTransactionsScreen = () => {
       Boolean(item.razorpayPaymentId || item.razorpayOrderId || item.paymentId);
 
     return (
-      <TouchableOpacity
-        style={styles.transactionCard}
-        onPress={() => openDetails(item)}
-        activeOpacity={0.75}>
-        <View style={styles.transactionTop}>
-          <View style={styles.transactionIcon}>
-            <Ionicons
-              name={
-                String(item.status).toLowerCase() === 'completed'
-                  ? 'checkmark-circle-outline'
-                  : String(item.status).toLowerCase() === 'failed'
-                    ? 'close-circle-outline'
-                    : 'time-outline'
-              }
-              size={22}
-              color={badge.color}
-            />
+      <View style={styles.transactionCard}>
+        <TouchableOpacity
+          onPress={() => openDetails(item)}
+          activeOpacity={0.75}>
+          <View style={styles.transactionTop}>
+            <View style={styles.transactionIcon}>
+              <Ionicons
+                name={
+                  String(item.status).toLowerCase() === 'completed'
+                    ? 'checkmark-circle-outline'
+                    : String(item.status).toLowerCase() === 'failed'
+                      ? 'close-circle-outline'
+                      : 'time-outline'
+                }
+                size={22}
+                color={badge.color}
+              />
+            </View>
+            <View style={styles.transactionMain}>
+              <Text style={styles.transactionAmount}>
+                {currencyText(item.amount, item.currency)}
+              </Text>
+              <Text style={styles.transactionType}>{getTypeLabel(item.type)}</Text>
+            </View>
+            <View style={[styles.statusBadge, { backgroundColor: badge.backgroundColor }]}>
+              <Text style={[styles.statusText, { color: badge.color }]}>
+                {item.status || 'pending'}
+              </Text>
+            </View>
           </View>
-          <View style={styles.transactionMain}>
-            <Text style={styles.transactionAmount}>
-              {currencyText(item.amount, item.currency)}
-            </Text>
-            <Text style={styles.transactionType}>{getTypeLabel(item.type)}</Text>
+          <View style={styles.transactionDivider} />
+          <View style={styles.transactionMetaRow}>
+            <Ionicons name="business-outline" size={14} color="#64748B" />
+            <Text style={styles.transactionMeta} numberOfLines={1}>{companyName}</Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: badge.backgroundColor }]}>
-            <Text style={[styles.statusText, { color: badge.color }]}>
-              {item.status || 'pending'}
-            </Text>
+          <View style={styles.transactionMetaRow}>
+            <Ionicons name="calendar-outline" size={14} color="#64748B" />
+            <Text style={styles.transactionMeta}>{formatDate(item.date || item.createdAt)}</Text>
           </View>
-        </View>
-        <View style={styles.transactionDivider} />
-        <View style={styles.transactionMetaRow}>
-          <Ionicons name="business-outline" size={14} color="#64748B" />
-          <Text style={styles.transactionMeta} numberOfLines={1}>{companyName}</Text>
-        </View>
-        <View style={styles.transactionMetaRow}>
-          <Ionicons name="calendar-outline" size={14} color="#64748B" />
-          <Text style={styles.transactionMeta}>{formatDate(item.date || item.createdAt)}</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.transactionFooter}>
           <Text style={styles.referenceText} numberOfLines={1}>
             Ref: {item.referenceId || item.transactionId || 'No reference'}
@@ -504,16 +506,23 @@ const AdminTransactionsScreen = () => {
             {String(item.paymentMethod || item.gateway || 'Unknown').replaceAll('_', ' ')}
           </Text>
           {!gatewayPayment ? (
-            <TouchableOpacity
-              style={styles.deleteButton}
-              accessibilityRole="button"
-              accessibilityLabel="Delete transaction"
-              onPress={() => confirmDelete(item)}>
-              <Ionicons name="trash-outline" size={16} color="#DC2626" />
-            </TouchableOpacity>
+            <>
+              <TransactionEditButton
+                onPress={() =>
+                  navigation.navigate('AdminEditTransaction', { id: item._id })
+                }
+              />
+              <TouchableOpacity
+                style={styles.deleteButton}
+                accessibilityRole="button"
+                accessibilityLabel="Delete transaction"
+                onPress={() => confirmDelete(item)}>
+                <Ionicons name="trash-outline" size={16} color="#DC2626" />
+              </TouchableOpacity>
+            </>
           ) : null}
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 

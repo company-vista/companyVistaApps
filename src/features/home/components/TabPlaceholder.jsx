@@ -8,7 +8,6 @@ import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
 import styles from './TabPlaceholder.styles';
 import { formatDate } from '../../../constants/dateFormatter';
-import { capitalizeCompanyName } from '../../../constants/convertFirstChar';
 import { useCompanyCompliance, normalizeText } from '../hooks/useCompanyCompliance';
 const STATUS_ORDER = ['Expired', 'Overdue', 'Expiring Soon', 'Pending', 'Client Managed', 'Active', 'Completed'];
 const COUNTRY_LABELS = {
@@ -100,13 +99,6 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const [ukCompliance, setUkCompliance] = useState(null);
     const { statusesByTitle } = useCompanyCompliance(isUKCompany ? null : effectiveCompanyId);
 
-    const avatarPlaceholder = {
-        backgroundColor: colors.surface,
-        borderWidth: 1,
-        borderColor: colors.border,
-        justifyContent: 'center',
-        alignItems: 'center',
-    }
     const mainCardStyle = {
         backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
         borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
@@ -314,26 +306,6 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
     const totalCount = derivedActions.length;
     const healthPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
     return (<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* --- 1. PROFILE HEADER SECTION --- */}
-        <View style={styles.header}>
-            <View style={styles.profileContainer}>
-                <View style={styles.avatarWrapper}>
-                    <View style={[
-                        styles.avatarPlaceholder,
-                        avatarPlaceholder,
-                    ]}>
-                        <FontAwesome name="user" size={20} color={colors.accent} />
-                    </View>
-                    <View style={styles.activeDot} />
-                </View>
-                <View style={styles.userInfo}>
-                    <Text style={[styles.userName, { color: colors.text }]}>
-                        {capitalizeCompanyName(selectedCompanyName) ?? residentData?.name ?? 'Loading...'}
-                    </Text>
-                </View>
-            </View>
-        </View>
-
         {!loadError && hasCompany && !loading ? (<AnimatedAppear index={3}>
             <View style={[styles.healthCard, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,

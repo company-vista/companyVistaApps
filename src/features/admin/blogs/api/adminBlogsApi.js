@@ -38,9 +38,35 @@ export async function fetchAdminBlogPosts(token) {
   return posts;
 }
 
+export async function fetchAdminBlogPost({ token, slug }) {
+  if (!slug) throw new Error('Blog post slug is missing.');
+  const response = await request(
+    { method: 'get', url: `${BLOGS_URL}/${encodeURIComponent(slug)}` },
+    token,
+  );
+  const post = response.data?.data || response.data;
+  if (!post || typeof post !== 'object') {
+    throw new Error('Invalid blog post response from the server.');
+  }
+  return post;
+}
+
 export async function createAdminBlogPost({ token, post }) {
   const response = await request(
     { method: 'post', url: BLOGS_URL, data: post },
+    token,
+  );
+  return response.data;
+}
+
+export async function updateAdminBlogPost({ token, slug, post }) {
+  if (!slug) throw new Error('Blog post slug is missing.');
+  const response = await request(
+    {
+      method: 'put',
+      url: `${BLOGS_URL}/${encodeURIComponent(slug)}`,
+      data: post,
+    },
     token,
   );
   return response.data;

@@ -12,11 +12,11 @@ const AdminBottomTab = () => {
 
   const tabs = [
     { key: 'AdminHome', label: 'Home', icon: '🏠', route: 'AdminHome' },
-    { key: 'AdminCompany', label: 'Registred Com.', icon: '🏢', route: 'AdminCompany' },
+    { key: 'AdminCompany', label: 'Registered Cos', icon: '🏢', route: 'AdminCompany' },
     { key: 'AdminMessages', label: 'Messages', icon: '💬', route: 'AdminChatList' },
     { key: 'AdminDocuments', label: 'Documents', icon: '📄', route: 'AdminDocuments' },
     { key: 'AdminProfile', label: 'Profile', icon: '👤', route: 'AdminProfile' },
-  ];
+  ]
 
   const handlePress = (tab) => {
     if (!tab.route) return;

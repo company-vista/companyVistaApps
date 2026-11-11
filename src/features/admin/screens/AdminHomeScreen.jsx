@@ -27,6 +27,7 @@ import {
 } from '../dashboard/utils/dashboardFormat';
 import QuickActions from '../quickActions/QuickActions';
 import AdminFinanceScreen from '../finance/AdminFinanceScreen';
+import AdminServicesSection from '../services/AdminServicesSection';
 import { ImageBackground } from 'react-native-web';
 
 const NEW_COMPANY_SOURCES = ['client_signup', 'public_link'];
@@ -272,6 +273,8 @@ const AdminDashboard = () => {
           <Text style={styles.sectionTitle}>Finance</Text>
           <AdminFinanceScreen showHeader={false} />
         </View>
+
+        <AdminServicesSection />
 
         <AdminNewCompanies
           companies={mappedCompanies}

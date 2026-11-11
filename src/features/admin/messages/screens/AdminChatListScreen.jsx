@@ -38,6 +38,7 @@ const AdminChatListScreen = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [addNumberVisible, setAddNumberVisible] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -58,6 +59,21 @@ const AdminChatListScreen = () => {
       loadConversations();
     }, [loadConversations]),
   );
+
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+  const filteredConversations = normalizedSearchQuery
+    ? conversations.filter(conversation => {
+        const searchableText = [
+          conversation.clientName,
+          conversation.clientPhone,
+          getLastMessageText(conversation.lastMessage),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return searchableText.includes(normalizedSearchQuery);
+      })
+    : conversations;
 
   const renderItem = ({ item }) => {
     const name = getConversationName(item);
@@ -128,6 +144,26 @@ const AdminChatListScreen = () => {
           <Ionicons name="add" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
+      <View style={styles.searchBox}>
+        <Ionicons name="search-outline" size={18} color="#94A3B8" />
+        <TextInput
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search name, phone, message..."
+          placeholderTextColor="#94A3B8"
+          returnKeyType="search"
+          accessibilityLabel="Search conversations"
+        />
+        {searchQuery ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Clear conversation search"
+            onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={18} color="#94A3B8" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
       {loading ? (
         <View style={styles.state}>
           <ActivityIndicator color="#1E3A8A" />
@@ -142,11 +178,15 @@ const AdminChatListScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={conversations}
+          data={filteredConversations}
           keyExtractor={item => String(item.id)}
           renderItem={renderItem}
-          contentContainerStyle={[styles.list, conversations.length === 0 && styles.emptyList]}
-          ListEmptyComponent={<Text style={styles.emptyText}>No conversations yet.</Text>}
+          contentContainerStyle={[styles.list, filteredConversations.length === 0 && styles.emptyList]}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {normalizedSearchQuery ? 'No conversations match your search.' : 'No conversations yet.'}
+            </Text>
+          }
         />
       )}
       <Modal
@@ -215,6 +255,25 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1E293B',
   },
+  searchBox: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  searchInput: {
+    flex: 1,
+    color: '#1E293B',
+    fontSize: font.bodySmall,
+    paddingVertical: 8,
+    marginLeft: 8,
+  },
   addButton: {
     width: 36,
     height: 36,
@@ -230,10 +289,10 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    // backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderWidth: 0,
+    // borderColor: '#E2E8F0',
     padding: 12,
     marginBottom: 10,
   },

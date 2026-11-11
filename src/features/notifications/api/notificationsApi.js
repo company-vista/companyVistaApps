@@ -124,3 +124,49 @@ export async function fetchNotifications({ token } = {}) {
         };
     }
 }
+
+export async function registerClientDeviceToken({ token, deviceToken, platform = 'android' }) {
+    try {
+        await axios.post(`${NOTIFICATIONS_ROUTE}/device-token`, {
+            token: deviceToken,
+            platform,
+        }, {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: API_REQUEST_TIMEOUT_MS,
+        });
+        return { isSuccess: true };
+    }
+    catch (error) {
+        const axiosError = error;
+        console.log('Register device token error', {
+            message: axiosError.message,
+            status: axiosError.response?.status,
+        });
+        return {
+            isSuccess: false,
+            error: axiosError.response?.data?.message ?? 'Failed to register this device for notifications.',
+        };
+    }
+}
+
+export async function unregisterClientDeviceToken({ token, deviceToken }) {
+    try {
+        await axios.delete(`${NOTIFICATIONS_ROUTE}/device-token`, {
+            data: { token: deviceToken },
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: API_REQUEST_TIMEOUT_MS,
+        });
+        return { isSuccess: true };
+    }
+    catch (error) {
+        const axiosError = error;
+        console.log('Unregister device token error', {
+            message: axiosError.message,
+            status: axiosError.response?.status,
+        });
+        return {
+            isSuccess: false,
+            error: axiosError.response?.data?.message ?? 'Failed to unregister this device for notifications.',
+        };
+    }
+}

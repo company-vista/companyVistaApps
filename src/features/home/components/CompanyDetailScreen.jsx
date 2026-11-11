@@ -96,7 +96,10 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
         {activeSection ? (<View style={styles.sectionContent}>{renderSection()}</View>) : (
         /* Image ke jaisa separated floating card style list */
         <View style={styles.menuCard}>
-            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={styles.menuRow}>
+            {menuItems.map((item) => (<TouchableOpacity key={item.id} activeOpacity={0.7} onPress={() => item.id && handleSectionPress(item.id)} style={[
+                styles.menuRow,
+                colors.mode === 'dark' ? { backgroundColor: colors.cardElevated } : null,
+            ]}>
 
                 {/* Icon bubble */}
                 <View style={[styles.iconBubble, { backgroundColor: colors.mode === 'dark' ? 'rgba(79,70,229,0.15)' : item.iconBg }]}>

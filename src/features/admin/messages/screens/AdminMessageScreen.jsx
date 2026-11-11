@@ -173,9 +173,11 @@ const AdminMessageScreen = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const keyboardOffset = useRef(new Animated.Value(0)).current;
   const threadListRef = useRef(null);
+  const shouldScrollToLatest = useRef(true);
 
   useEffect(() => {
     let isActive = true;
+    shouldScrollToLatest.current = true;
     setLoading(true);
     setError('');
     setMessages([]);
@@ -201,6 +203,11 @@ const AdminMessageScreen = () => {
     } catch (openError) {
       Alert.alert('Unable to open attachment', getAdminMessagesError(openError));
     }
+  };
+
+  const appendMessage = newMessage => {
+    shouldScrollToLatest.current = true;
+    setMessages(prev => [...prev, newMessage]);
   };
 
   useEffect(() => {
@@ -236,13 +243,13 @@ const AdminMessageScreen = () => {
     setSending(true);
     try {
       const sentMessage = await sendAdminMessage({ id: conversationId, text, token });
-      setMessages(prev => [...prev, sentMessage]);
+      appendMessage(sentMessage);
       setMessage('');
       setError('');
     } catch (sendError) {
       const failedMessage = sendError?.response?.data?.data;
       if (failedMessage) {
-        setMessages(prev => [...prev, failedMessage]);
+        appendMessage(failedMessage);
       }
       const errorMessage = getAdminMessagesError(sendError);
       setError(errorMessage);
@@ -288,7 +295,7 @@ const AdminMessageScreen = () => {
       }
       const failedMessage = sendError?.response?.data?.data;
       if (failedMessage) {
-        setMessages(prev => [...prev, failedMessage]);
+        appendMessage(failedMessage);
       }
       const errorMessage = getAdminMessagesError(sendError);
       setError(errorMessage);
@@ -306,20 +313,17 @@ const AdminMessageScreen = () => {
         caption: message,
         token,
       });
-      setMessages(prev => [
-        ...prev,
-        {
-          ...sentMessage,
-          mediaUrl: file.uri,
-          remoteMediaUrl: sentMessage.mediaUrl,
-        },
-      ]);
+      appendMessage({
+        ...sentMessage,
+        mediaUrl: file.uri,
+        remoteMediaUrl: sentMessage.mediaUrl,
+      });
       setMessage('');
       setError('');
     } catch (sendError) {
       const failedMessage = sendError?.response?.data?.data;
       if (failedMessage) {
-        setMessages(prev => [...prev, failedMessage]);
+        appendMessage(failedMessage);
       }
       const errorMessage = getAdminMessagesError(sendError);
       setError(errorMessage);
@@ -423,7 +427,11 @@ const AdminMessageScreen = () => {
             style={styles.messageList}
             contentContainerStyle={styles.chatList}
             keyboardShouldPersistTaps="handled"
-            onContentSizeChange={() => threadListRef.current?.scrollToEnd({ animated: false })}
+            onContentSizeChange={() => {
+              if (!shouldScrollToLatest.current || !threadListRef.current) return;
+              threadListRef.current.scrollToEnd({ animated: false });
+              shouldScrollToLatest.current = false;
+            }}
             ListEmptyComponent={<Text style={styles.emptyText}>No messages yet.</Text>}
           />
         )}
@@ -703,6 +711,7 @@ const styles = StyleSheet.create({
   },
   msgText: {
     fontSize: font.bodySmall,
+    fontWeight: '400',
   },
   msgTextUser: {
     color: '#1E293B',

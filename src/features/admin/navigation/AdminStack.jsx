@@ -1,5 +1,6 @@
 ﻿import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
+import AdminCompaniesWithoutDocumentsScreen from '../screens/AdminCompaniesWithoutDocumentsScreen';
 import AdminProfileScreen from '../profile/screens/AdminProfileScreen';
 import CompanyVistaLeadsScreen from '../companyVistaLeads/screens/CompanyVistaLeadsScreen';
 import DeactivateAccountScreen from '../../settings/screens/DeactivateAccountScreen';
@@ -18,6 +19,7 @@ import AdminNotificationsScreen from '../notifications/screens/AdminNotification
 import AdminCreateInvoiceScreen from '../invoices/screens/AdminCreateInvoiceScreen';
 import AdminInvoicesScreen from '../invoices/screens/AdminInvoicesScreen';
 import AdminTransactionsScreen from '../transactions/screens/AdminTransactionsScreen';
+import AdminEditTransactionScreen from '../transactions/screens/AdminEditTransactionScreen';
 import AdminExpenseListScreen from '../expenses/screens/AdminExpenseListScreen';
 import AdminAddExpenseScreen from '../expenses/screens/AdminAddExpenseScreen';
 import AdminExpenseHeadsScreen from '../expenses/screens/AdminExpenseHeadsScreen';
@@ -29,6 +31,7 @@ import {
 } from '../company/screens/AdminCompanyDetailsScreen';
 import AdminLayout from '../components/AdminLayout';
 import AdminBlogsScreen from '../blogs/AdminBlogsScreen';
+import CRM from '../crm/crm';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +43,12 @@ export default function AdminStack() {
     <Stack.Navigator
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AdminHome" component={AdminHomeScreen} layout={AdminScreenLayout} />
+      <Stack.Screen
+        name="AdminCompaniesWithoutDocuments"
+        component={AdminCompaniesWithoutDocumentsScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen name="AdminCRM" component={CRM} layout={FullScreenLayout} />
       <Stack.Screen
         name="AdminBlogs"
         component={AdminBlogsScreen}
@@ -101,6 +110,11 @@ export default function AdminStack() {
       <Stack.Screen
         name="AdminTransactions"
         component={AdminTransactionsScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminEditTransaction"
+        component={AdminEditTransactionScreen}
         layout={FullScreenLayout}
       />
       <Stack.Screen

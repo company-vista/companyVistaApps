@@ -7,48 +7,6 @@ export default StyleSheet.create({
         paddingTop: 1,
         padding: 2,
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    profileContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    avatarWrapper: {
-        position: 'relative',
-    },
-    avatarPlaceholder: {
-        width: 44,
-        height: 44,
-        borderRadius: 25,
-    },
-    activeDot: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        backgroundColor: '#256F46',
-        borderWidth: 2,
-        borderColor: '#F8F9FA',
-    },
-    userInfo: {
-        marginLeft: 12,
-    },
-    welcomeText: {
-        fontSize: font.sm,
-    },
-    userName: {
-        fontSize: font.xxl,
-        fontWeight: '400',
-    },
-    userEmail: {
-        fontSize: font.sm,
-    },
     themeButton: {
         padding: 10,
         borderRadius: 20,
@@ -96,7 +54,7 @@ export default StyleSheet.create({
         letterSpacing: 0.5,
     },
     mainCard: {
-        borderRadius: 12,
+        borderRadius: 8,
         padding: 14,
         borderWidth: 1,
     },

@@ -18,7 +18,9 @@ import { FixedHomeHeader } from './homeScreenComponent/FixedHomeHeader';
 import { MoreTabSheet } from './homeScreenComponent/MoreTabSheet';
 import { PAYMENT_LOCKED_TABS, companyIdsKey } from './homeScreen/constants';
 import { notifications } from '../../notifications/data/notifications';
-import { fetchNotifications } from '../../notifications/api/notificationsApi';
+import { fetchNotifications, registerClientDeviceToken, unregisterClientDeviceToken } from '../../notifications/api/notificationsApi';
+import { displayPushNotification, initializePushNotifications, getMessaging } from '../../notifications/services/pushNotifications';
+import { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { fetchClientCompanies, fetchClientCompanyDetails, } from '../api/clientProfileApi';
 import { fetchSubscriptionPayments } from '../api/subscriptionPaymentsApi';
 import { getCompanyTotalAmount, getSuccessfulPaymentCompanyIds, isCompanyQuoted, isRegistrationUnpaid } from '../../../utils/companyStatus';
@@ -88,6 +90,9 @@ export default function HomeScreen() {
     // is tarah ye hamesha modal ke lifetime se matched rehta hai.
     const [isAddCompanyFlowActive, setIsAddCompanyFlowActive] = useState(false);
     const prevNotificationCount = useRef(0);
+    const seenPushNotificationIds = useRef(new Set());
+    const selectedCompanyIdRef = useRef(selectedCompany?.id);
+    selectedCompanyIdRef.current = selectedCompany?.id;
     const [companyOptions, setCompanyOptions] = useState([]);
     const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
     const [selectedDocumentForView, setSelectedDocumentForView] = useState(null);
@@ -542,6 +547,90 @@ export default function HomeScreen() {
         [user?.firstName, user?.lastName].filter(Boolean).join(' ') ??
         'User';
     const isDemoToken = typeof token === 'string' && token.startsWith('demo-token');
+    useEffect(() => {
+        if (!token || isDemoToken) {
+            return undefined;
+        }
+
+        let isMounted = true;
+        let registeredDeviceToken = '';
+        let unsubscribeMessage = () => {};
+        let unsubscribeTokenRefresh = () => {};
+
+        const registerToken = async (deviceToken) => {
+            if (!isMounted || !deviceToken) return;
+            const result = await registerClientDeviceToken({ token, deviceToken });
+            if (!result.isSuccess) {
+                console.error('Push notification registration failed:', result.error);
+                return;
+            }
+            if (!isMounted) {
+                const unregisterResult = await unregisterClientDeviceToken({ token, deviceToken });
+                if (!unregisterResult.isSuccess) {
+                    console.error('Push token cleanup failed:', unregisterResult.error);
+                }
+                return;
+            }
+
+            const previousToken = registeredDeviceToken;
+            registeredDeviceToken = deviceToken;
+            if (previousToken && previousToken !== deviceToken) {
+                const unregisterResult = await unregisterClientDeviceToken({ token, deviceToken: previousToken });
+                if (!unregisterResult.isSuccess) {
+                    console.error('Old push token cleanup failed:', unregisterResult.error);
+                }
+            }
+        };
+
+        const setupPushNotifications = async () => {
+            const deviceToken = await initializePushNotifications();
+            if (!isMounted || !deviceToken) return;
+            await registerToken(deviceToken);
+            if (!isMounted) return;
+
+            unsubscribeMessage = onMessage(getMessaging(), async (remoteMessage) => {
+                const notificationId = remoteMessage?.data?.notificationId;
+                if (notificationId && seenPushNotificationIds.current.has(notificationId)) return;
+                if (notificationId) {
+                    seenPushNotificationIds.current.add(notificationId);
+                    if (seenPushNotificationIds.current.size > 100) {
+                        const oldestId = seenPushNotificationIds.current.values().next().value;
+                        seenPushNotificationIds.current.delete(oldestId);
+                    }
+                }
+
+                try {
+                    await displayPushNotification(remoteMessage);
+                    if (remoteMessage?.data?.companyId === selectedCompanyIdRef.current) {
+                        setNotificationCount(count => count + 1);
+                    }
+                } catch (error) {
+                    console.error('Unable to display push notification:', error);
+                }
+            });
+
+            unsubscribeTokenRefresh = onTokenRefresh(getMessaging(), async (refreshedToken) => {
+                await registerToken(refreshedToken);
+            });
+        };
+
+        setupPushNotifications().catch(error => {
+            console.error('Push notification setup failed:', error);
+        });
+
+        return () => {
+            isMounted = false;
+            unsubscribeMessage();
+            unsubscribeTokenRefresh();
+            if (registeredDeviceToken) {
+                unregisterClientDeviceToken({ token, deviceToken: registeredDeviceToken }).then(result => {
+                    if (!result.isSuccess) {
+                        console.error('Push token cleanup failed:', result.error);
+                    }
+                });
+            }
+        };
+    }, [token, isDemoToken]);
     useEffect(() => {
         if (isDemoToken) { setNotificationCount(0); return; }
         if (!selectedCompany?.id) {
@@ -1019,7 +1108,7 @@ export default function HomeScreen() {
             {activeTab === 'home' && unpaidCompany ? (
                 <PendingPaymentBanner colors={colors} companyLabel={unpaidCompanyLabel} amount={unpaidCompanyAmount} onPayPress={handleResumePaymentPress} />
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanyInfoPress={() => setActiveCompanySection('menu')} onCompanySwitcherPress={openCompanySwitcher} onManagePress={() => setIsManageOptionsOpen(true)} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanySwitcherPress={openCompanySwitcher} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -1058,7 +1147,7 @@ export default function HomeScreen() {
 
         <FloatingPlusButtonCard visible={isPlusCardOpen} onClose={() => setIsPlusCardOpen(false)} bottomOffset={safeAreaInsets.bottom + 85} onChatSupportPress={() => { setIsPlusCardOpen(false); navigation.navigate('ChatSupport'); }} />
 
-        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
+        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onCompanyInfoPress={() => closeMoreSheet(() => setActiveCompanySection('menu'))} onManagePress={() => closeMoreSheet(() => setIsManageOptionsOpen(true))} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} onAddCompany={openAddCompanyFlow} addCompanyBlocked={addCompanyBlocked} addCompanyBlockedReason={addCompanyBlockedReason} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);

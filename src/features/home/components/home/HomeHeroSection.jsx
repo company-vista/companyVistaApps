@@ -6,7 +6,7 @@ import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { isCompanyQuoted } from '../../../../utils/companyStatus';
 
-function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
+function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
   // quoted => Your Order, fixed => dashboard. isCompanyQuoted ek hi jagah ka
   // rule hai (backend ke 'quoted' ko priced-country price ke hisaab se theek karta hai).
   const isQuoted = selectedCompany ? isCompanyQuoted(selectedCompany) : false;
@@ -33,9 +33,9 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
   const isActive = String(heroCompanyStatus).trim().toLowerCase() === 'active';
   const cardStyle = {
-    backgroundColor: isLight ? colors.cardHighlight : colors.cardElevated,
+    backgroundColor: isLight ? colors.cardHighlight : '#121E2D',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: isLight ? colors.border : '#1E3048',
     shadowColor: isLight ? '#0D2137' : '#000000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: isLight ? 0.08 : 0.2,
@@ -100,26 +100,14 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanyInfoPress, onCom
     </View>
     <View style={styles.heroStats}>
 
-      <Pressable onPress={onAddToCompanyPress ?? onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
+      <Pressable onPress={onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
         <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#ECFDF5' : 'rgba(52,211,153,0.18)' }]}>
-          <FontAwesome name="plus-circle" size={14} color="#FFFFFF" />
+          <FontAwesome name="plus-circle" size={14} color={isLight ? '#16A34A' : '#FFFFFF'} />
         </View>
         {/* Company already hai to "Create" galat lagta hai — user sochega dobara
             banau. Ab clear hota hai ki nayi company add ho rahi hai. */}
         <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>{hasCompany ? 'Add Company' : 'Create Company'}</Text>
       </Pressable> 
-      <Pressable onPress={onManagePress} style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle]}>
-          <FontAwesome name="cog" size={16} color="#FFFFFF" />
-        </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Manage</Text>
-      </Pressable>
-      <Pressable onPress={onCompanyInfoPress} style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#FEF2F2' : 'rgba(240,149,149,0.15)' }]}>
-          <FontAwesome name="info-circle" size={16} color="#FFFFFF" />
-        </View>
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>Company Info</Text>
-      </Pressable>
     </View>
   </View>);
 }
@@ -152,7 +140,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   heroCompany: {
-    flex: 1,
     color: '#ffffff',
     fontSize: font.heading,
     fontWeight: '400',
@@ -216,15 +203,16 @@ const styles = StyleSheet.create({
   },
   heroTile: {
     flex: 1,
+    flexDirection: 'row',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: s(10),
     backgroundColor: 'rgba(255,255,255,0.07)',
-    paddingHorizontal: s(4),
+    paddingHorizontal: s(12),
     paddingVertical: s(7),
     alignItems: 'center',
     justifyContent: 'center',
-    gap: s(3),
+    gap: s(8),
   },
   heroIconBubble: {
     width: s(22),
@@ -232,7 +220,6 @@ const styles = StyleSheet.create({
     borderRadius: s(7),
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: s(1),
   },
   heroTileNumber: {
     color: '#ffffff',

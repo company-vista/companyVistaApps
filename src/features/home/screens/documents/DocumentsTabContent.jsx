@@ -203,15 +203,6 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
     const unlockedCount = unlockedLockedItems.length;
     return (<View style={styles.container}>
 
-      {/* **************Header ************** */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View>
-            <Text style={styles.headerTitle}>{capitalizeCompanyName(selectedCompany?.name) ?? 'Documents'}</Text>
-          </View>
-        </View>
-      </View>
-
       {/* **************Search ************** */}
       <View style={styles.searchContainer}>
         <FontAwesome name="search" size={16} color={palette.accentText}/>
@@ -336,22 +327,7 @@ const getStyles = (colors) => {
             flex: 1,
             paddingTop: 2,
             paddingHorizontal: s(2),
-        },
-        header: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 10,
-        },
-        headerLeft: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-        },
-        headerTitle: {
-            fontSize: font.heading,
-            fontWeight: '400',
-            color: palette.primaryText,
+            marginHorizontal: s(-8),
         },
         searchContainer: {
             flexDirection: 'row',

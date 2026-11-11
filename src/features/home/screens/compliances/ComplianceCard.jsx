@@ -87,7 +87,6 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
                                 <FontAwesome name="lock" size={13} color={colors.text} />
                             </View>
                         ) : null}
-                        <Text style={[styles.tileNameTop, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
                         <View style={styles.tag}>
                             <Text style={[
                                 styles.tagText,
@@ -98,12 +97,19 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
                         </View>
                     </View>
                 </View>
+                <View style={styles.complianceCopy}>
+                    <Text style={[styles.tileNameTop, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+                    <Text style={[styles.tileSubtitle, { color: colors.muted }]} numberOfLines={1}>{item.subtitle}</Text>
+                </View>
                 <View style={styles.statusPill}>
                     <Text style={[styles.statusPillText, tone.tagText]}>{item.tag}</Text>
                 </View>
-                <Text style={[styles.tileDueDateText, { color: colors.muted }]}>
-                    {item.title === 'Agent & Address' ? 'Renew Date' : 'Due Date'}: <Text style={[styles.tileDueDateValue, { color: colors.muted }]}>{item.dueDate}</Text>
-                </Text>
+                <View>
+                    <Text style={[styles.tileDueDateLabel, { color: colors.muted }]}>
+                        {item.title === 'Agent & Address' ? 'Renewal date' : 'Due date'}
+                    </Text>
+                    <Text style={[styles.tileDueDateValue, { color: colors.text }]} numberOfLines={1}>{item.dueDate}</Text>
+                </View>
             </View>
         </Pressable>
     );
@@ -112,7 +118,8 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
 const styles = StyleSheet.create({
     tileWrapper: {
         position: 'relative',
-        width: s(215),
+        width: '48%',
+        marginBottom: s(8),
     },
     lockBadge: {
         alignItems: 'center',
@@ -122,19 +129,20 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
     },
     complianceTile: {
+        height: s(165),
         borderRadius: 12,
         paddingHorizontal: s(14),
-        paddingVertical: 18,
+        paddingVertical: s(12),
+        justifyContent: 'space-between',
     },
     complianceTileHeader: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 8,
     },
     statusIcon: {
-        width: 38,
-        height: 38,
+        width: s(34),
+        height: s(34),
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
@@ -155,16 +163,20 @@ const styles = StyleSheet.create({
         color: '#B45309',
     },
     headerBadges: {
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 5,
-        marginLeft: s(8),
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: s(6),
+    },
+    complianceCopy: {
+        gap: s(2),
     },
     tileNameTop: {
         fontSize: font.base,
         fontWeight: '600',
-        textAlign: 'right',
+    },
+    tileSubtitle: {
+        fontSize: font.small,
+        lineHeight: s(15),
     },
     statusPill: {
         borderRadius: 20,
@@ -176,9 +188,8 @@ const styles = StyleSheet.create({
         fontSize: font.small,
         fontWeight: '600',
     },
-    tileDueDateText: {
-        fontSize: font.base,
-        marginTop: 7,
+    tileDueDateLabel: {
+        fontSize: font.small,
     },
     tileDueDateValue: {
         fontSize: font.base,

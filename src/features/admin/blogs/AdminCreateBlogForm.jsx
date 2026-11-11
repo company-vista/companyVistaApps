@@ -1,5 +1,5 @@
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -22,6 +22,7 @@ import { useAppSelector } from '../../../store/hooks';
 import {
   createAdminBlogPost,
   parseAdminBlogHtml,
+  updateAdminBlogPost,
   uploadAdminBlogImage,
 } from './api/adminBlogsApi';
 
@@ -107,7 +108,7 @@ const ImageField = ({ label, hint, value, onChange, onUpload, uploading }) => (
   </View>
 );
 
-const AdminCreateBlogForm = ({ onCancel, onCreated }) => {
+const AdminCreateBlogForm = ({ onCancel, onCreated, post = null }) => {
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
   const [saving, setSaving] = useState(false);
@@ -126,6 +127,25 @@ const AdminCreateBlogForm = ({ onCancel, onCreated }) => {
   const [importing, setImporting] = useState(false);
   const [importedFileName, setImportedFileName] = useState('');
   const [uploadingImage, setUploadingImage] = useState('');
+
+  useEffect(() => {
+    if (!post) return;
+    const bodyBlocks = Array.isArray(post.body_blocks) ? post.body_blocks : [];
+    setTitle(post.title || '');
+    setSlug(post.slug || '');
+    setSlugEdited(Boolean(post.slug));
+    setMetaDescription(post.meta_description || '');
+    setKeywords(post.meta_keywords || '');
+    setAuthor(post.author_name || 'CompanyVista Research Team');
+    setHeroImage(post.hero_image || '');
+    setOgImage(post.og_image || '');
+    setStandfirst(post.standfirst || '');
+    if (CATEGORIES.some(item => item.value === post.category)) {
+      setCategory(post.category);
+    }
+    setImportedBodyBlocks(bodyBlocks.length ? bodyBlocks : null);
+    setContent(getBodyText(bodyBlocks));
+  }, [post]);
 
   const handleImportHtml = async () => {
     setImporting(true);
@@ -240,38 +260,46 @@ const AdminCreateBlogForm = ({ onCancel, onCreated }) => {
 
     setSaving(true);
     try {
-      await createAdminBlogPost({
-        token,
-        post: {
-          slug: slug || slugify(title),
-          title: title.trim(),
-          meta_description: metaDescription.trim(),
-          meta_keywords: keywords.trim(),
-          og_image: ogImage.trim(),
-          category,
-          hero_image: heroImage.trim(),
-          standfirst: standfirst.trim(),
-          author_name: author.trim(),
-          status,
-          cta_label: '',
-          cta_url: '',
-          cta_sidebar_title: '',
-          cta_sidebar_sub: '',
-          jurisdiction_tags: [],
-          body_blocks: importedBodyBlocks || [
-            { type: 'heading', text: title.trim() },
-            { type: 'paragraph', html: contentToHtml(content) },
-          ],
-          faq: [],
-          takeaways: [],
-          related_slugs: [],
-        },
-      });
+      const postPayload = {
+        slug: slug || slugify(title),
+        title: title.trim(),
+        meta_description: metaDescription.trim(),
+        meta_keywords: keywords.trim(),
+        og_image: ogImage.trim(),
+        category,
+        hero_image: heroImage.trim(),
+        standfirst: standfirst.trim(),
+        author_name: author.trim(),
+        status,
+        cta_label: post?.cta_label || '',
+        cta_url: post?.cta_url || '',
+        cta_sidebar_title: post?.cta_sidebar_title || '',
+        cta_sidebar_sub: post?.cta_sidebar_sub || '',
+        jurisdiction_tags: post?.jurisdiction_tags || [],
+        body_blocks: importedBodyBlocks || [
+          { type: 'heading', text: title.trim() },
+          { type: 'paragraph', html: contentToHtml(content) },
+        ],
+        faq: post?.faq || [],
+        takeaways: post?.takeaways || [],
+        related_slugs: post?.related_slugs || [],
+      };
+      if (post) {
+        await updateAdminBlogPost({ token, slug: post.slug, post: postPayload });
+      } else {
+        await createAdminBlogPost({ token, post: postPayload });
+      }
       Alert.alert(
-        status === 'published' ? 'Post published' : 'Draft saved',
-        status === 'published'
-          ? 'Your blog post is now published.'
-          : 'Your blog post was saved as a draft.',
+        post
+          ? 'Post updated'
+          : status === 'published'
+            ? 'Post published'
+            : 'Draft saved',
+        post
+          ? 'Your blog post was updated successfully.'
+          : status === 'published'
+            ? 'Your blog post is now published.'
+            : 'Your blog post was saved as a draft.',
       );
       await onCreated();
     } catch (error) {

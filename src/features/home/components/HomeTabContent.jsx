@@ -8,12 +8,12 @@ import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanyInfoPress, onCompanySwitcherPress, onManagePress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOrderPress, onOpenComplianceHistory, selectedCompany, colors, isPaymentLocked = false, onLockedCompliancePress, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOrderPress, onOpenComplianceHistory, selectedCompany, colors, isPaymentLocked = false, onLockedCompliancePress, }) {
   const compliance = useCompanyCompliance(selectedCompany?.id);
 
   return (<View style={styles.container}>
     <AnimatedAppear index={0}>
-      <HomeHeroSection isLoadingCompanies={isLoadingCompanies} onCompanyInfoPress={onCompanyInfoPress} onCompanySwitcherPress={onCompanySwitcherPress} onManagePress={onManagePress} onAddToCompanyPress={onAddToCompanyPress} onOrderPress={onOrderPress ?? onRegistrationTrackingPress} selectedCompany={selectedCompany} />
+      <HomeHeroSection isLoadingCompanies={isLoadingCompanies} onCompanySwitcherPress={onCompanySwitcherPress} onAddToCompanyPress={onAddToCompanyPress} onOrderPress={onOrderPress ?? onRegistrationTrackingPress} selectedCompany={selectedCompany} />
     </AnimatedAppear>
 
     <AnimatedAppear index={1}>

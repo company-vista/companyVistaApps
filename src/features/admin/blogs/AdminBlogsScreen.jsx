@@ -18,6 +18,7 @@ import { useAppSelector } from '../../../store/hooks';
 import AdminCreateBlogForm from './AdminCreateBlogForm';
 import {
   deleteAdminBlogPost,
+  fetchAdminBlogPost,
   fetchAdminBlogPosts,
 } from './api/adminBlogsApi';
 
@@ -41,6 +42,8 @@ const AdminBlogsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [loadingEditSlug, setLoadingEditSlug] = useState('');
 
   const loadPosts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -75,7 +78,24 @@ const AdminBlogsScreen = () => {
     }, [loadPosts]),
   );
 
-  const openCreateForm = () => setShowCreateForm(true);
+  const openCreateForm = () => {
+    setEditingPost(null);
+    setShowCreateForm(true);
+  };
+
+  const openEditForm = async post => {
+    if (!post.slug || loadingEditSlug) return;
+    setLoadingEditSlug(post.slug);
+    try {
+      const fullPost = await fetchAdminBlogPost({ token, slug: post.slug });
+      setEditingPost(fullPost);
+      setShowCreateForm(true);
+    } catch (error) {
+      Alert.alert('Unable to load blog post', error.message);
+    } finally {
+      setLoadingEditSlug('');
+    }
+  };
 
   const confirmDelete = post => {
     Alert.alert('Delete blog post?', `Delete "${post.title}"? This cannot be undone.`, [
@@ -131,6 +151,18 @@ const AdminBlogsScreen = () => {
           </View>
           <TouchableOpacity
             accessibilityRole="button"
+            accessibilityLabel={`Edit ${item.title || 'blog post'}`}
+            onPress={() => openEditForm(item)}
+            disabled={Boolean(loadingEditSlug)}
+            style={styles.editButton}>
+            {loadingEditSlug === item.slug ? (
+              <ActivityIndicator size="small" color="#2563EB" />
+            ) : (
+              <Ionicons name="create-outline" size={18} color="#2563EB" />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            accessibilityRole="button"
             accessibilityLabel={`Delete ${item.title || 'blog post'}`}
             onPress={() => confirmDelete(item)}
             style={styles.deleteButton}>
@@ -157,7 +189,11 @@ const AdminBlogsScreen = () => {
         </TouchableOpacity>
         <View style={styles.headerTextWrap}>
           <Text style={styles.headerTitle}>
-            {showCreateForm ? 'Create blog post' : 'Blog'}
+            {showCreateForm
+              ? editingPost
+                ? 'Edit blog post'
+                : 'Create blog post'
+              : 'Blog'}
           </Text>
           {!showCreateForm && (
             <Text style={styles.headerSubtitle}>
@@ -178,9 +214,11 @@ const AdminBlogsScreen = () => {
 
       {showCreateForm ? (
         <AdminCreateBlogForm
+          post={editingPost}
           onCancel={() => setShowCreateForm(false)}
           onCreated={async () => {
             setShowCreateForm(false);
+            setEditingPost(null);
             await loadPosts();
           }}
         />
@@ -327,9 +365,18 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 12,
   },
-  postMeta: { flex: 1, gap: 4 },
+  postMeta: { flex: 1, gap: 4, marginRight: 8 },
   categoryText: { color: '#334155', fontSize: font.xs, fontWeight: '600' },
   dateText: { color: '#94A3B8', fontSize: font.xs },
+  editButton: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#EFF6FF',
+    marginRight: 8,
+  },
   deleteButton: {
     width: 38,
     height: 38,

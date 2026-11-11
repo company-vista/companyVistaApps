@@ -208,15 +208,6 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
         dispatch(fetchInvoicesForCompany({ companyId: selectedCompany.id, token }));
     }, [dispatch, hasLoadedInvoices, selectedCompany?.id, token]);
     return (<View style={styles.container}>
-        <View style={styles.titleRow}>
-            <View>
-                {/* <Text style={styles.title}>Invoices</Text> */}
-                <Text style={styles.companyName}>
-                    {capitalizeCompanyName(selectedCompany?.name) ?? 'All companies'}
-                </Text>
-            </View>
-        </View>
-
         <View style={styles.searchRow}>
             <View style={[
                 styles.searchBox,
@@ -346,20 +337,7 @@ const getStyles = (colors) => {
     return StyleSheet.create({
         container: {
             paddingTop: 1,
-        },
-        titleRow: {
-            marginBottom: 2,
-        },
-        title: {
-            color: palette.primaryText,
-            fontSize: font.heading,
-            fontWeight: '400',
-            letterSpacing: 0,
-        },
-        companyName: {
-            color: palette.accentText,
-            fontSize: font.xxl,
-            fontWeight: '400',
+            marginHorizontal: s(-8),
         },
         searchRow: {
             flexDirection: 'row',

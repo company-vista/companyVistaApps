@@ -127,6 +127,19 @@ export async function createAdminTransaction({ token, payload }) {
   return response.data?.data || response.data;
 }
 
+export async function updateAdminTransaction({ token, id, payload }) {
+  if (!id) throw new Error('Transaction ID is missing.');
+  const response = await request(
+    {
+      method: 'put',
+      url: `${API_ROOT}/transactions/${encodeURIComponent(id)}`,
+      data: payload,
+    },
+    token,
+  );
+  return response.data?.data || response.data;
+}
+
 export async function deleteAdminTransaction({ token, id }) {
   if (!id) throw new Error('Transaction ID is missing.');
   const response = await request(
