@@ -1,12 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { font } from '../../../../theme/typography';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { isCompanyQuoted } from '../../../../utils/companyStatus';
 
-function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onOrderPress, selectedCompany, }) {
+function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onOrderPress, onRegistrationTrackingPress, onCompanyProfilePress, selectedCompany, }) {
   // quoted => Your Order, fixed => dashboard. isCompanyQuoted ek hi jagah ka
   // rule hai (backend ke 'quoted' ko priced-country price ke hisaab se theek karta hai).
   const isQuoted = selectedCompany ? isCompanyQuoted(selectedCompany) : false;
@@ -33,34 +33,33 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, o
   const heroCompanyDate = selectedCompany?.date ?? 'Not available';
   const isActive = String(heroCompanyStatus).trim().toLowerCase() === 'active';
   const cardStyle = {
-    backgroundColor: isLight ? colors.cardHighlight : '#121E2D',
+    backgroundColor: isLight ? colors.cardHighlight : themePalette.hex_121e2d,
     borderWidth: 1,
-    borderColor: isLight ? colors.border : '#1E3048',
-    shadowColor: isLight ? '#0D2137' : '#000000',
+    borderColor: isLight ? colors.border : themePalette.hex_1e3048,
+    shadowColor: isLight ? themePalette.hex_0d2137 : themePalette.hex_000000,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: isLight ? 0.08 : 0.2,
     shadowRadius: 12,
     elevation: 0,
   };
-  const heroEyebrowStyle = { color: isLight ? colors.accent : '#85B7EB' };
-  const heroCompanySwitcherStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.12)', backgroundColor: isLight ? '#F8FAFC' : 'rgba(255,255,255,0.06)' };
-  const heroCompanyStyle = { color: isLight ? '#0F172A' : '#ffffff' };
-  const heroSwitchIconStyle = { borderColor: isLight ? '#cbd5e1' : 'rgba(255,255,255,0.15)', backgroundColor: isLight ? colors.surfaceAlt : 'rgba(255,255,255,0.12)' };
-  const heroMetaStyle = { color: isLight ? '#94A3B8' : '#85B7EB' };
-  const heroMetaValueStyle = { color: isLight ? '#1E293B' : '#FAC775' };
+  const heroEyebrowStyle = { color: isLight ? colors.accent : themePalette.hex_85b7eb };
+  const heroCompanySwitcherStyle = { borderColor: isLight ? themePalette.hex_cbd5e1 : themePalette.rgba_255_255_255_0_12, backgroundColor: isLight ? themePalette.hex_f8fafc : themePalette.rgba_255_255_255_0_06 };
+  const heroCompanyStyle = { color: isLight ? themePalette.hex_0f172a : themePalette.hex_ffffff };
+  const heroSwitchIconStyle = { borderColor: isLight ? themePalette.hex_cbd5e1 : themePalette.rgba_255_255_255_0_15, backgroundColor: isLight ? colors.surfaceAlt : themePalette.rgba_255_255_255_0_12 };
+  const heroMetaStyle = { color: isLight ? themePalette.hex_94a3b8 : themePalette.hex_85b7eb };
+  const heroMetaValueStyle = { color: isLight ? themePalette.hex_1e293b : themePalette.hex_fac775 };
+  const heroActionStyle = {
+    borderColor: isLight ? themePalette.hex_e2e8f0 : themePalette.rgba_255_255_255_0_12,
+    backgroundColor: isLight ? colors.background : themePalette.rgba_255_255_255_0_07,
+  };
   const heroStatusNumberStyle = {
     color: isActive
-      ? (isLight ? '#047857' : '#34D399')
-      : (isLight ? '#DC2626' : '#F09595'),
-  };
-  const heroTileStyle = { borderColor: isLight ? '#E2E8F0' : 'rgba(255,255,255,0.1)', backgroundColor: isLight ? colors.background : 'rgba(255,255,255,0.07)' };
-  const heroTileLabelStyle = { color: isLight ? '#64748B' : '#85B7EB' };
-  const iconBubbleStyle = {
-    backgroundColor: isLight ? colors.surfaceAlt : 'rgba(255,255,255,0.1)',
+      ? (isLight ? themePalette.hex_047857 : themePalette.hex_34d399)
+      : (isLight ? themePalette.hex_dc2626 : themePalette.hex_f09595),
   };
   return (<View style={[styles.hero, cardStyle]}>
     <View style={styles.heroLocationRow}>
-      <FontAwesome name="map-marker" size={13} color={isLight ? colors.accent : '#85B7EB'} />
+      <FontAwesome name="map-marker" size={13} color={isLight ? colors.accent : themePalette.hex_85b7eb} />
       <Text style={[styles.heroEyebrow, heroEyebrowStyle]}>{heroCompanyCountry}</Text>
       <View style={{ flex: 1 }} />
       <Text style={[styles.heroAdded, heroMetaStyle]}>Created: {heroCompanyDate}</Text>
@@ -72,7 +71,7 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, o
         </Text>
       </Pressable>
       <Pressable onPress={hasCompany ? onCompanySwitcherPress : (onAddToCompanyPress ?? onCompanySwitcherPress)} style={[styles.heroSwitchIcon, heroSwitchIconStyle]} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-        <FontAwesome name={hasCompany || isLoadingCompanies ? "exchange" : "plus"} size={14} color={isLight ? colors.text : '#ffffff'} />
+        <FontAwesome name={hasCompany || isLoadingCompanies ? "exchange" : "plus"} size={14} color={isLight ? colors.text : themePalette.hex_ffffff} />
       </Pressable>
     </View>
 
@@ -83,14 +82,14 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, o
           {heroCompanyEin}
         </Text>
       </View>
-      <View style={[styles.heroMetaDivider, { backgroundColor: isLight ? '#E2E8F0' : 'rgba(255,255,255,0.12)' }]} />
+      <View style={[styles.heroMetaDivider, { backgroundColor: isLight ? themePalette.hex_e2e8f0 : themePalette.rgba_255_255_255_0_12 }]} />
       <View style={styles.heroMetaCol}>
         <Text style={[styles.heroMetaLabel, heroMetaStyle]}>FORMATION DATE</Text>
         <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroMetaValue, heroMetaValueStyle]}>
           {heroCompanyFormationDate}
         </Text>
       </View>
-      <View style={[styles.heroMetaDivider, { backgroundColor: isLight ? '#E2E8F0' : 'rgba(255,255,255,0.12)' }]} />
+      <View style={[styles.heroMetaDivider, { backgroundColor: isLight ? themePalette.hex_e2e8f0 : themePalette.rgba_255_255_255_0_12 }]} />
       <View style={styles.heroMetaCol}>
         <Text style={[styles.heroMetaLabel, heroMetaStyle]}>STATE</Text>
         <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroMetaValue, heroMetaValueStyle]}>
@@ -98,26 +97,26 @@ function HomeHeroSection({ isLoadingCompanies = false, onCompanySwitcherPress, o
         </Text>
       </View>
     </View>
-    <View style={styles.heroStats}>
 
-      <Pressable onPress={onAddToCompanyPress} style={[styles.heroTile, heroTileStyle]}>
-        <View style={[styles.heroIconBubble, iconBubbleStyle, { backgroundColor: isLight ? '#ECFDF5' : 'rgba(52,211,153,0.18)' }]}>
-          <FontAwesome name="plus-circle" size={14} color={isLight ? '#16A34A' : '#FFFFFF'} />
-        </View>
-        {/* Company already hai to "Create" galat lagta hai — user sochega dobara
-            banau. Ab clear hota hai ki nayi company add ho rahi hai. */}
-        <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.heroTileValue, heroCompanyStyle]}>{hasCompany ? 'Add Company' : 'Create Company'}</Text>
-      </Pressable> 
+    <View style={styles.heroActions}>
+      <Pressable onPress={onRegistrationTrackingPress} style={[styles.heroAction, heroActionStyle]}>
+        <FontAwesome name="map-marker" size={14} color={isLight ? colors.accent : themePalette.hex_85b7eb} />
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={[styles.heroActionText, heroCompanyStyle]}>Registration Tracking</Text>
+      </Pressable>
+      <Pressable onPress={onCompanyProfilePress} style={[styles.heroAction, heroActionStyle]}>
+        <FontAwesome name="building-o" size={14} color={isLight ? colors.accent : themePalette.hex_85b7eb} />
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={[styles.heroActionText, heroCompanyStyle]}>Company Profile</Text>
+      </Pressable>
     </View>
   </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   hero: {
     width: '100%',
     alignSelf: 'stretch',
     overflow: 'hidden',
     borderRadius: s(18),
-    backgroundColor: '#0D2137',
+    backgroundColor: themePalette.hex_0d2137,
     paddingHorizontal: s(16),
     paddingTop: s(16),
     paddingBottom: s(14),
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     gap: s(5),
   },
   heroEyebrow: {
-    color: '#85B7EB',
+    color: themePalette.hex_85b7eb,
     fontSize: font.sm,
     fontWeight: '600',
     letterSpacing: 0.7,
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   heroCompany: {
-    color: '#ffffff',
+    color: themePalette.hex_ffffff,
     fontSize: font.heading,
     fontWeight: '400',
     lineHeight: 20,
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
     gap: s(8),
     marginTop: s(14),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: themePalette.rgba_255_255_255_0_12,
     borderRadius: s(14),
     backgroundColor: 'transparent',
     paddingHorizontal: s(12),
@@ -165,9 +164,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: themePalette.rgba_255_255_255_0_15,
     borderRadius: s(15),
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: themePalette.rgba_255_255_255_0_12,
   },
   heroMetaRow: {
     flexDirection: 'row',
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
   heroMetaDivider: {
     width: 1,
     height: s(28),
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: themePalette.rgba_255_255_255_0_15,
   },
   heroMetaLabel: {
     fontSize: font.xs,
@@ -191,56 +190,30 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   heroMetaValue: {
-    color: '#FAC775',
+    color: themePalette.hex_fac775,
     fontSize: font.sm,
     fontWeight: '400',
     marginTop: 3,
   },
-  heroStats: {
+  heroActions: {
     flexDirection: 'row',
-    gap: s(6),
-    marginTop: s(14),
+    gap: s(8),
+    marginTop: s(12),
   },
-  heroTile: {
+  heroAction: {
     flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: s(6),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: s(10),
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    paddingHorizontal: s(12),
-    paddingVertical: s(7),
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: s(8),
+    paddingHorizontal: s(10),
+    paddingVertical: s(9),
   },
-  heroIconBubble: {
-    width: s(22),
-    height: s(22),
-    borderRadius: s(7),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroTileNumber: {
-    color: '#ffffff',
-    fontSize: font.base,
+  heroActionText: {
+    fontSize: font.sm,
     fontWeight: '600',
-    lineHeight: 18,
-    textAlign: 'center',
   },
-  heroTileValue: {
-    color: '#ffffff',
-    fontSize: s(13),
-    fontWeight: '600',
-    lineHeight: s(16),
-    textAlign: 'center',
-  },
-  heroTileLabel: {
-    fontSize: s(10),
-    lineHeight: s(11),
-    textAlign: 'center',
-    flexShrink: 1,
-    marginTop: 0,
-  },
-});
+}));
 export default HomeHeroSection;

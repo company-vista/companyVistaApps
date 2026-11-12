@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { complianceItems, normalizeText } from '../../hooks/useCompanyCompliance';
 import { font } from '../../../../theme/typography';
 import ComplianceCard from './ComplianceCard';
@@ -78,7 +78,7 @@ function ComplianceStatusSection({ companyId, dueDatesByTitle = {}, rawDueDatesB
         </View>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     section: {
         marginTop: 14,
     },
@@ -89,12 +89,12 @@ const styles = StyleSheet.create({
         marginBottom: 9,
     },
     sectionTitle: {
-        color: '#2C2C2A',
+        color: themePalette.hex_2c2c2a,
         fontSize: font.xl,
         fontWeight: '400',
     },
     sectionLink: {
-        color: '#D85A30',
+        color: themePalette.hex_d85a30,
         fontSize: font.sm,
         fontWeight: '400',
     },
@@ -103,5 +103,5 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
     },
-});
+}));
 export default ComplianceStatusSection;

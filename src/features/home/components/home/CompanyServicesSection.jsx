@@ -1,22 +1,22 @@
 import { Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import styles from './CompanyServicesSection.styles';
 const services = [
     {
         title: 'Documents',
         icon: 'file-text-o',
-        color: '#38bdf8',
+        color: themePalette.hex_38bdf8,
     },
     {
         title: 'Compliance',
         icon: 'check-square-o',
-        color: '#22c55e',
+        color: themePalette.hex_22c55e,
     },
     {
         title: 'Invoices',
         icon: 'credit-card',
-        color: '#4f7cff',
+        color: themePalette.hex_4f7cff,
     },
 ];
 function CompanyServicesSection() {

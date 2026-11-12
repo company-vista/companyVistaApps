@@ -1,8 +1,9 @@
 import { StyleSheet } from 'react-native';
 import { s } from '../../../../theme/responsive';
-const styles = StyleSheet.create({
+import { themePalette, makeThemeStyles } from '../../../../theme/colors';
+const styles = makeThemeStyles(() => StyleSheet.create({
     sectionTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: s(18),
         fontWeight: '600',
         marginTop: s(32),
@@ -19,18 +20,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#d8b4fe',
+        borderColor: themePalette.hex_d8b4fe,
         borderRadius: s(12),
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         padding: s(10),
     },
     serviceTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: s(14),
         fontWeight: '800',
         lineHeight: s(19),
         marginTop: s(8),
         textAlign: 'center',
     },
-});
+}));
 export default styles;

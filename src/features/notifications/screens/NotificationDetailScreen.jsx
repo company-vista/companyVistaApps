@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { deleteNotification } from '../api/notificationsApi';
 import { useAppSelector } from '../../../store/hooks';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 function NotificationDetailScreen() {
@@ -63,7 +63,7 @@ function NotificationDetailScreen() {
         </View>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         zIndex: 20,
         elevation: 8,
-        shadowColor: '#000',
+        shadowColor: themePalette.hex_000,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         shadowRadius: 8,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
     headerTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '400',
     },
@@ -126,31 +126,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 28,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     title: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.heading,
         fontWeight: '400',
         lineHeight: 28,
         marginTop: 18,
     },
     time: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
         marginTop: 8,
     },
     divider: {
         height: 1,
-        backgroundColor: '#e5e7eb',
+        backgroundColor: themePalette.hex_e5e7eb,
         marginVertical: 18,
     },
     message: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.lg,
         fontWeight: '400',
         lineHeight: 22,
     },
-});
+}));
 export default NotificationDetailScreen;

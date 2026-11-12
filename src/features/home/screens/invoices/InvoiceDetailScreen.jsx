@@ -14,6 +14,7 @@ import RazorpayOneTimePayment from '../../../../stripe_pament_section/RazorpayOn
 import { buildInvoiceHtml } from './invoiceHtmlTemplate';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { s } from '../../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../../theme/colors';
 function getStringValue(...values) {
     const value = values.find(candidate => typeof candidate === 'string' && candidate.trim().length > 0);
     return typeof value === 'string' ? value.trim() : '';
@@ -158,18 +159,18 @@ function InvoiceDetailScreen() {
             const itemType = getStringValue(item.itemType) || 'ONE-TIME';
             return `
         <tr style="vertical-align: top;">
-          <td style="padding: 15px 10px; text-align: center; color: #94a3b8; border-bottom: 1px solid #f1f5f9;">${i + 1}</td>
-          <td style="padding: 15px 10px; border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 15px 10px; text-align: center; color: ${themePalette.hex_94a3b8}; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">${i + 1}</td>
+          <td style="padding: 15px 10px; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">
             <div style="margin-bottom: 5px;">
-              <span style="background: #14b8a6; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 8px;">${itemType}</span>
-              <span style="font-size: 13px; font-weight: bold; color: #1e1b4b;">${itemName}</span>
+              <span style="background: ${themePalette.hex_14b8a6}; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 8px;">${itemType}</span>
+              <span style="font-size: 13px; font-weight: bold; color: ${themePalette.hex_1e1b4b};">${itemName}</span>
             </div>
-            <div style="font-size: 11px; color: #64748b; line-height: 1.5;">${itemDesc}</div>
+            <div style="font-size: 11px; color: ${themePalette.hex_64748b}; line-height: 1.5;">${itemDesc}</div>
           </td>
-          <td style="padding: 15px 10px; text-align: center; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${itemQty}</td>
-          <td style="padding: 15px 10px; text-align: right; font-weight: 500; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemAmount / itemQty, currency)}</td>
-          <td style="padding: 15px 10px; text-align: right; font-weight: 500; color: #dc2626; border-bottom: 1px solid #f1f5f9;">${itemDiscount > 0 ? '-' + formatAmount(itemDiscount, currency) : '—'}</td>
-          <td style="padding: 15px 10px; text-align: right; font-weight: bold; color: #1e1b4b; border-bottom: 1px solid #f1f5f9;">${formatAmount(itemNetAmount, currency)}</td>
+          <td style="padding: 15px 10px; text-align: center; font-weight: 500; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">${itemQty}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: 500; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">${formatAmount(itemAmount / itemQty, currency)}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: 500; color: ${themePalette.hex_dc2626}; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">${itemDiscount > 0 ? '-' + formatAmount(itemDiscount, currency) : '—'}</td>
+          <td style="padding: 15px 10px; text-align: right; font-weight: bold; color: ${themePalette.hex_1e1b4b}; border-bottom: 1px solid ${themePalette.hex_f1f5f9};">${formatAmount(itemNetAmount, currency)}</td>
         </tr>`;
         })
             .join('');
@@ -260,8 +261,8 @@ function InvoiceDetailScreen() {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <Pressable onPress={handleDownload} style={[styles.topDownloadBtn, { backgroundColor: '#eef2ff' }]}>
-                    <FontAwesome name="download" size={14} color="#4f46e5"/>
+                <Pressable onPress={handleDownload} style={[styles.topDownloadBtn, { backgroundColor: themePalette.hex_eef2ff }]}>
+                    <FontAwesome name="download" size={14} color={themePalette.hex_4f46e5}/>
                 </Pressable>
             ),
         });
@@ -283,7 +284,7 @@ function InvoiceDetailScreen() {
             <Text style={styles.invoiceNumText}>{invoiceNumber}</Text>
             <View style={[
             styles.statusBadge,
-            { backgroundColor: isPaid ? '#22c55e' : isPartial ? '#d97706' : '#ef4444' },
+            { backgroundColor: isPaid ? themePalette.hex_22c55e : isPartial ? themePalette.hex_d97706 : themePalette.hex_ef4444 },
         ]}>
               <Text style={styles.statusBadgeText}>
                 {isPaid ? 'PAID' : isPartial ? 'PARTIAL' : 'UNPAID'}
@@ -429,7 +430,7 @@ function InvoiceDetailScreen() {
             </View>
             {discountAmount > 0 && (<View style={styles.summaryRow}>
               <Text style={styles.summaryLabelText}>{discountLabel}</Text>
-              <Text style={[styles.summaryValueText, { color: '#dc2626' }]}>
+              <Text style={[styles.summaryValueText, { color: themePalette.hex_dc2626 }]}>
                 -{formatAmount(discountAmount, currency)}
               </Text>
             </View>)}
@@ -441,7 +442,7 @@ function InvoiceDetailScreen() {
             </View>)}
             <View style={[
             styles.summaryRow,
-            { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 6 },
+            { borderTopWidth: 1, borderTopColor: themePalette.hex_e2e8f0, paddingTop: 6 },
         ]}>
               <Text style={{ fontWeight: '700', fontSize: font.base }}>Total</Text>
               <Text style={{ fontWeight: '700', fontSize: font.base }}>
@@ -471,14 +472,14 @@ function InvoiceDetailScreen() {
                     company: invoice.company,
                     amount: balanceDue,
                     currency,
-                }} paymentType="invoice" label="Pay with Razorpay" buttonStyle={[styles.payButton, { backgroundColor: '#072654' }]}/>)}
+                }} paymentType="invoice" label="Pay with Razorpay" buttonStyle={[styles.payButton, { backgroundColor: themePalette.hex_072654 }]}/>)}
             <StripeOneTimePayment invoice={{
                 id: invoiceNumber,
                 companyId: getStringValue(invoice.companyId) || undefined,
                 company: invoice.company,
                 amount: balanceDue,
                 currency,
-            }} paymentType="invoice" label="Pay with Stripe" buttonStyle={[styles.payButton, { backgroundColor: '#635BFF' }]}/>
+            }} paymentType="invoice" label="Pay with Stripe" buttonStyle={[styles.payButton, { backgroundColor: themePalette.hex_635bff }]}/>
           </View>)}
 
         <View style={styles.wordsStrip}>
@@ -497,25 +498,25 @@ function InvoiceDetailScreen() {
       </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: { flex: 1 },
-    topDownloadBtn: { paddingLeft: 16, paddingRight: 16, paddingBottom: 10, paddingTop: 10, backgroundColor: '#eef2ff', borderRadius: 8 },
+    topDownloadBtn: { paddingLeft: 16, paddingRight: 16, paddingBottom: 10, paddingTop: 10, backgroundColor: themePalette.hex_eef2ff, borderRadius: 8 },
     corporateHeader: {
-        backgroundColor: '#1e1b4b',
+        backgroundColor: themePalette.hex_1e1b4b,
         padding: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     logoText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.hero,
         fontWeight: '800',
         letterSpacing: 0.5,
     },
-    logoLight: { color: '#eab308', fontWeight: '300' },
+    logoLight: { color: themePalette.hex_eab308, fontWeight: '300' },
     logoSubText: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.xs,
         letterSpacing: 2,
         marginTop: 2,
@@ -526,12 +527,12 @@ const styles = StyleSheet.create({
         height: 45
     },
     invoiceTitleText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.hero,
         fontWeight: '500',
         letterSpacing: 1,
     },
-    invoiceNumText: { color: '#94a3b8', fontSize: font.sm, marginTop: 2 },
+    invoiceNumText: { color: themePalette.hex_94a3b8, fontSize: font.sm, marginTop: 2 },
     statusBadge: {
         borderRadius: 4,
         paddingHorizontal: s(10),
@@ -539,16 +540,16 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     statusBadgeText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.sm,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
-    yellowDivider: { height: 4, backgroundColor: '#eab308' },
-    detailsGrid: { padding: 16, backgroundColor: '#ffffff', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-    gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: s(8), borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 12, backgroundColor: '#fafafa' },
+    yellowDivider: { height: 4, backgroundColor: themePalette.hex_eab308 },
+    detailsGrid: { padding: 16, backgroundColor: themePalette.hex_ffffff, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+    gridColumn: { flex: 1, minWidth: 140, marginBottom: 16, paddingHorizontal: s(8), borderWidth: 1, borderColor: themePalette.hex_e2e8f0, borderRadius: 8, padding: 12, backgroundColor: themePalette.hex_fafafa },
     columnLabel: {
-        color: '#6d28d9',
+        color: themePalette.hex_6d28d9,
         fontSize: font.sm,
         fontWeight: '700',
         letterSpacing: 0.5,
@@ -557,38 +558,38 @@ const styles = StyleSheet.create({
     companyNameText: {
         fontSize: font.lg,
         fontWeight: '700',
-        color: '#1e1b4b',
+        color: themePalette.hex_1e1b4b,
         marginBottom: 4,
     },
-    addressText: { fontSize: font.base, color: '#64748b', lineHeight: 16 },
-    emailText: { fontSize: font.base, color: '#6d28d9', marginTop: 4 },
+    addressText: { fontSize: font.base, color: themePalette.hex_64748b, lineHeight: 16 },
+    emailText: { fontSize: font.base, color: themePalette.hex_6d28d9, marginTop: 4 },
     metaRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 4,
         borderBottomWidth: 1,
-        borderBottomColor: '#f1f5f9',
+        borderBottomColor: themePalette.hex_f1f5f9,
     },
-    metaLabel: { fontSize: font.base, color: '#212325' },
-    metaValue: { fontSize: font.base, fontWeight: '400', color: '#1e1b4b' },
+    metaLabel: { fontSize: font.base, color: themePalette.hex_212325 },
+    metaValue: { fontSize: font.base, fontWeight: '400', color: themePalette.hex_1e1b4b },
     tableInner: {
         minWidth: s(24 + 28 + 150 + 36 + 72 + 60 + 78),
     },
     tableHeaderRow: {
-        backgroundColor: '#231f4f',
+        backgroundColor: themePalette.hex_231f4f,
         paddingVertical: s(10),
         paddingHorizontal: s(12),
         flexDirection: 'row',
         alignItems: 'center',
     },
-    tableHeaderText: { color: '#ffffff', fontSize: font.sm, fontWeight: '700' },
+    tableHeaderText: { color: themePalette.hex_ffffff, fontSize: font.sm, fontWeight: '700' },
     tableBodyRow: {
         flexDirection: 'row',
         paddingVertical: s(12),
         paddingHorizontal: s(12),
         borderBottomWidth: 1,
-        borderBottomColor: '#f1f5f9',
-        backgroundColor: '#ffffff',
+        borderBottomColor: themePalette.hex_f1f5f9,
+        backgroundColor: themePalette.hex_ffffff,
         alignItems: 'flex-start',
     },
     colIndex: { width: s(28), flexShrink: 0, textAlign: 'center' },
@@ -600,7 +601,7 @@ const styles = StyleSheet.create({
     tableRowIndex: {
         width: s(28),
         textAlign: 'center',
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.base,
     },
     serviceDescCol: {
@@ -616,7 +617,7 @@ const styles = StyleSheet.create({
         minWidth: 0,
     },
     itemTypeTag: {
-        backgroundColor: '#14b8a6',
+        backgroundColor: themePalette.hex_14b8a6,
         borderRadius: s(4),
         paddingHorizontal: s(5),
         paddingVertical: 1.5,
@@ -624,11 +625,11 @@ const styles = StyleSheet.create({
         flexShrink: 0,
         maxWidth: s(70),
     },
-    itemTypeTagText: { color: '#ffffff', fontSize: font.xs, fontWeight: '700' },
-    itemNameText: { fontSize: font.base, fontWeight: '700', color: '#1e1b4b', flex: 1, flexShrink: 1, minWidth: 0 },
+    itemTypeTagText: { color: themePalette.hex_ffffff, fontSize: font.xs, fontWeight: '700' },
+    itemNameText: { fontSize: font.base, fontWeight: '700', color: themePalette.hex_1e1b4b, flex: 1, flexShrink: 1, minWidth: 0 },
     itemDescText: {
         fontSize: font.sm,
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         lineHeight: s(15),
         marginTop: s(2),
     },
@@ -636,7 +637,7 @@ const styles = StyleSheet.create({
         width: s(36),
         textAlign: 'center',
         fontSize: font.base,
-        color: '#1e1b4b',
+        color: themePalette.hex_1e1b4b,
         fontWeight: '500',
     },
     tableRowPrice: {
@@ -644,7 +645,7 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         paddingRight: s(10),
         fontSize: font.base,
-        color: '#1e1b4b',
+        color: themePalette.hex_1e1b4b,
         fontWeight: '500',
     },
     tableRowDiscount: {
@@ -652,7 +653,7 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         paddingRight: s(10),
         fontSize: font.base,
-        color: '#dc2626',
+        color: themePalette.hex_dc2626,
         fontWeight: '500',
     },
     tableRowAmount: {
@@ -660,60 +661,60 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         fontSize: font.base,
         fontWeight: '700',
-        color: '#1e1b4b',
+        color: themePalette.hex_1e1b4b,
     },
     splitBox: {
         flexDirection: "column",
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
+        borderTopColor: themePalette.hex_f1f5f9,
     },
     splitLeft: {
         flex: 1,
         padding: 14,
         borderRightWidth: 1,
-        borderRightColor: '#f1f5f9',
+        borderRightColor: themePalette.hex_f1f5f9,
     },
-    splitRight: { flex: 1, padding: 14, backgroundColor: '#fafafa' },
+    splitRight: { flex: 1, padding: 14, backgroundColor: themePalette.hex_fafafa },
     boxTitle: {
-        color: '#6d28d9',
+        color: themePalette.hex_6d28d9,
         fontSize: font.sm,
         fontWeight: '700',
         letterSpacing: 0.5,
         marginBottom: 8,
     },
     bankRow: { flexDirection: 'row', marginBottom: 4, justifyContent: 'space-between', alignItems: 'center' },
-    bankLabel: { width: 95, fontSize: font.sm, color: '#94a3b8' },
-    bankValue: { flex: 1, fontSize: font.sm, fontWeight: '400', color: '#1e1b4b' },
-    termsText: { fontSize: font.sm, color: '#64748b', marginBottom: 2 },
+    bankLabel: { width: 95, fontSize: font.sm, color: themePalette.hex_94a3b8 },
+    bankValue: { flex: 1, fontSize: font.sm, fontWeight: '400', color: themePalette.hex_1e1b4b },
+    termsText: { fontSize: font.sm, color: themePalette.hex_64748b, marginBottom: 2 },
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 6,
     },
-    summaryLabelText: { fontSize: font.sm, color: '#94a3b8' },
-    summaryValueText: { fontSize: font.sm, fontWeight: '600', color: '#1e1b4b' },
+    summaryLabelText: { fontSize: font.sm, color: themePalette.hex_94a3b8 },
+    summaryValueText: { fontSize: font.sm, fontWeight: '600', color: themePalette.hex_1e1b4b },
     balanceStrip: {
-        backgroundColor: '#1e1b4b',
+        backgroundColor: themePalette.hex_1e1b4b,
         paddingVertical: 12,
         paddingHorizontal: s(16),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    balanceStripLabel: { color: '#ffffff', fontSize: font.lg, fontWeight: '500' },
-    balanceStripValue: { color: '#ffffff', fontSize: font.display, fontWeight: '900' },
+    balanceStripLabel: { color: themePalette.hex_ffffff, fontSize: font.lg, fontWeight: '500' },
+    balanceStripValue: { color: themePalette.hex_ffffff, fontSize: font.display, fontWeight: '900' },
     wordsStrip: {
         padding: 12,
-        backgroundColor: '#faf5ff',
+        backgroundColor: themePalette.hex_faf5ff,
         flexDirection: 'row',
         borderBottomWidth: 1,
-        borderBottomColor: '#e2e8f0',
+        borderBottomColor: themePalette.hex_e2e8f0,
     },
-    wordsLabel: { fontSize: font.sm, fontWeight: '700', color: '#4c1d95' },
+    wordsLabel: { fontSize: font.sm, fontWeight: '700', color: themePalette.hex_4c1d95 },
     wordsValue: {
         fontSize: font.sm,
-        color: '#6d28d9',
+        color: themePalette.hex_6d28d9,
         fontStyle: 'italic',
         marginLeft: 4,
         flex: 1,
@@ -722,16 +723,16 @@ const styles = StyleSheet.create({
     footerContainer: {
         padding: 20,
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
     },
-    footerMainText: { fontSize: font.base, fontWeight: '600', color: '#1e1b4b' },
-    footerSubText: { fontSize: font.sm, color: '#64748b', marginTop: 2 },
+    footerMainText: { fontSize: font.base, fontWeight: '600', color: themePalette.hex_1e1b4b },
+    footerSubText: { fontSize: font.sm, color: themePalette.hex_64748b, marginTop: 2 },
     payButtonsRow: {
         flexDirection: 'row',
         gap: 12,
         paddingHorizontal: s(16),
         paddingVertical: 14,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
     },
     payButton: {
         flex: 1,
@@ -743,9 +744,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     payButtonText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.lg,
         fontWeight: '700',
     },
-});
+}));
 export default InvoiceDetailScreen;

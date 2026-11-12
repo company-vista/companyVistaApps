@@ -28,6 +28,7 @@ import { s } from '../../../theme/responsive';
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
 import { fetchReviewApi } from '../api/orderApi';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const ShareholdersScreen = ({ navigation, route }) => {
   // signup ke time jo auth wala naam hai wahi dikhao (Redux user se), fallback route params
@@ -59,9 +60,9 @@ const ShareholdersScreen = ({ navigation, route }) => {
           name: displayName,
           role: 'Principal founder · Managing Member',
           ownership: '', // khali - user Add/Edit se bharega
-          avatarBg: '#3A311A',
-          avatarText: '#D97706',
-          borderColor: '#3A311A',
+          avatarBg: themePalette.hex_3a311a,
+          avatarText: themePalette.hex_d97706,
+          borderColor: themePalette.hex_3a311a,
           country: accountCountry,
           designation: 'Director',
           status: 'incomplete',
@@ -181,8 +182,8 @@ const ShareholdersScreen = ({ navigation, route }) => {
       email: body.email,
       role: newDesignation === 'Director' ? 'Director' : newDesignation === 'Authorized Representative' ? 'Authorized Representative' : 'Shareholder',
       ownership: `${ownershipNum}%`,
-      avatarBg: '#1E293B',
-      avatarText: '#EAB308',
+      avatarBg: themePalette.hex_1e293b,
+      avatarText: themePalette.hex_eab308,
       borderColor: 'transparent',
       country: `🌐 ${newCountry}`,
       countryRaw: newCountry,
@@ -254,7 +255,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070C15" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070c15} />
 
       {/* CompanyNaming jaisa Back + Logo header - top se bahar nahi jayega */}
       <View style={styles.headerRow}>
@@ -281,10 +282,10 @@ const ShareholdersScreen = ({ navigation, route }) => {
         </View>
 
         {/* Allocated Banner - dynamic */}
-        <View style={[styles.allocatedBanner, !isFullyAllocated && { backgroundColor: 'rgba(234,179,8,0.08)', borderColor: 'rgba(234,179,8,0.3)' }]}>
-          {isFullyAllocated ? <CheckCircle2 color="#10B981" size={20} /> : <Info color="#EAB308" size={20} />}
+        <View style={[styles.allocatedBanner, !isFullyAllocated && { backgroundColor: themePalette.rgba_234_179_8_0_08, borderColor: themePalette.rgba_234_179_8_0_3 }]}>
+          {isFullyAllocated ? <CheckCircle2 color={themePalette.hex_10b981} size={20} /> : <Info color={themePalette.hex_eab308} size={20} />}
           <Text style={styles.allocatedText}>
-            <Text style={{ fontWeight: 'bold', color: isFullyAllocated ? '#10B981' : '#EAB308' }}>
+            <Text style={{ fontWeight: 'bold', color: isFullyAllocated ? themePalette.hex_10b981 : themePalette.hex_eab308 }}>
               {totalAllocated}% allocated
             </Text>{' '}
             — {isFullyAllocated ? 'ownership adds up correctly' : `${100 - totalAllocated}% remaining — add/edit shareholders to reach 100%`}
@@ -320,11 +321,11 @@ const ShareholdersScreen = ({ navigation, route }) => {
               </View>
 
               <View style={styles.ownershipGroup}>
-                <Text style={[styles.ownershipValue, !item.ownership && { color: '#EAB308' }]}>{item.ownership || '—'}</Text>
+                <Text style={[styles.ownershipValue, !item.ownership && { color: themePalette.hex_eab308 }]}>{item.ownership || '—'}</Text>
                 <Text style={styles.ownershipLabel}>OWNERSHIP</Text>
               </View>
-              <TouchableOpacity onPress={() => handleEditShareholder(item)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}>
-                <FontAwesome name="pencil" size={12} color="#EAB308" />
+              <TouchableOpacity onPress={() => handleEditShareholder(item)} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: themePalette.rgba_255_255_255_0_06, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08, alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}>
+                <FontAwesome name="pencil" size={12} color={themePalette.hex_eab308} />
               </TouchableOpacity>
             </View>
 
@@ -340,7 +341,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
 
               {item.status === 'complete' ? (
                 <View style={styles.completeBadge}>
-                  <Check color="#10B981" size={14} />
+                  <Check color={themePalette.hex_10b981} size={14} />
                   <Text style={styles.completeBadgeText}>Details complete</Text>
                 </View>
               ) : (
@@ -350,10 +351,10 @@ const ShareholdersScreen = ({ navigation, route }) => {
               )}
             </View>
             {(item.address || item.pincode || item.passportNumber) && (
-              <View style={{ marginTop: 8, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-                {item.address ? <Text style={{ color: '#94A3B8', fontSize: font.small, lineHeight: 14 }} numberOfLines={2}>{item.address}</Text> : null}
-                {item.pincode ? <Text style={{ color: '#64748B', fontSize: font.xs, marginTop: 2 }}>Pincode: {item.pincode}</Text> : null}
-                {item.passportNumber ? <Text style={{ color: '#94A3B8', fontSize: font.small, marginTop: 2 }}>Passport: {item.passportNumber}</Text> : null}
+              <View style={{ marginTop: 8, backgroundColor: themePalette.rgba_255_255_255_0_04, borderRadius: 8, padding: 8, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_06 }}>
+                {item.address ? <Text style={{ color: themePalette.hex_94a3b8, fontSize: font.small, lineHeight: 14 }} numberOfLines={2}>{item.address}</Text> : null}
+                {item.pincode ? <Text style={{ color: themePalette.hex_64748b, fontSize: font.xs, marginTop: 2 }}>Pincode: {item.pincode}</Text> : null}
+                {item.passportNumber ? <Text style={{ color: themePalette.hex_94a3b8, fontSize: font.small, marginTop: 2 }}>Passport: {item.passportNumber}</Text> : null}
               </View>
             )}
           </View>
@@ -361,13 +362,13 @@ const ShareholdersScreen = ({ navigation, route }) => {
 
         {/* Add Another Shareholder Button */}
         <TouchableOpacity style={styles.addButton} activeOpacity={0.8} onPress={() => setShowAddModal(true)}>
-          <Plus color="#EAB308" size={18} />
+          <Plus color={themePalette.hex_eab308} size={18} />
           <Text style={styles.addButtonText}>Add another shareholder</Text>
         </TouchableOpacity>
 
         {/* Info Box */}
         <View style={styles.infoBox}>
-          <Info color="#3B82F6" size={18} style={{ marginTop: 2 }} />
+          <Info color={themePalette.hex_3b82f6} size={18} style={{ marginTop: 2 }} />
           <Text style={styles.infoText}>
             Each shareholder receives an email to upload their own KYC documents securely.
           </Text>
@@ -387,7 +388,7 @@ const ShareholdersScreen = ({ navigation, route }) => {
             navigation?.navigate?.('VerifyIdentity', { ...route?.params, shareholderCompleted: true, shareholders });
           }}>
           <Text style={styles.continueButtonText}>Continue to KYC</Text>
-          <ArrowRight color="#070C15" size={20} />
+          <ArrowRight color={themePalette.hex_070c15} size={20} />
         </TouchableOpacity>
       </ScrollView>
 
@@ -399,49 +400,49 @@ const ShareholdersScreen = ({ navigation, route }) => {
             <Text style={styles.modalTitle}>{editingId ? 'Edit Shareholder' : 'Add Shareholder'}</Text>
             <Text style={styles.modalLabel}>FULL NAME *</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newName} onChangeText={setNewName} placeholder="Enter name" placeholderTextColor="#64748B" />
+              <TextInput style={styles.modalInput} value={newName} onChangeText={setNewName} placeholder="Enter name" placeholderTextColor={themePalette.hex_64748b} />
             </View>
             <Text style={styles.modalLabel}>EMAIL *</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newEmail} onChangeText={setNewEmail} placeholder="shareholder@email.com" placeholderTextColor="#64748B" keyboardType="email-address" autoCapitalize="none" />
+              <TextInput style={styles.modalInput} value={newEmail} onChangeText={setNewEmail} placeholder="shareholder@email.com" placeholderTextColor={themePalette.hex_64748b} keyboardType="email-address" autoCapitalize="none" />
             </View>
             <Text style={styles.modalLabel}>OWNERSHIP % *</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newOwnership} onChangeText={t => setNewOwnership(t.replace(/[^0-9]/g,''))} placeholder="e.g. 10 *" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={3} />
+              <TextInput style={styles.modalInput} value={newOwnership} onChangeText={t => setNewOwnership(t.replace(/[^0-9]/g,''))} placeholder="e.g. 10 *" placeholderTextColor={themePalette.hex_64748b} keyboardType="numeric" maxLength={3} />
             </View>
             <Text style={styles.modalLabel}>PHONE</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newPhone} onChangeText={t => setNewPhone(t.replace(/[^0-9]/g,''))} placeholder="Phone number" placeholderTextColor="#64748B" keyboardType="phone-pad" />
+              <TextInput style={styles.modalInput} value={newPhone} onChangeText={t => setNewPhone(t.replace(/[^0-9]/g,''))} placeholder="Phone number" placeholderTextColor={themePalette.hex_64748b} keyboardType="phone-pad" />
             </View>
             <Text style={styles.modalLabel}>COUNTRY CODE</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newCountryCode} onChangeText={setNewCountryCode} placeholder="+91" placeholderTextColor="#64748B" />
+              <TextInput style={styles.modalInput} value={newCountryCode} onChangeText={setNewCountryCode} placeholder="+91" placeholderTextColor={themePalette.hex_64748b} />
             </View>
             <Text style={styles.modalLabel}>COUNTRY</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newCountry} onChangeText={setNewCountry} placeholder="India" placeholderTextColor="#64748B" />
+              <TextInput style={styles.modalInput} value={newCountry} onChangeText={setNewCountry} placeholder="India" placeholderTextColor={themePalette.hex_64748b} />
             </View>
             <Text style={styles.modalLabel}>DESIGNATION</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 4 }}>
               {['Shareholder','Director','Authorized Representative'].map(d => (
-                <TouchableOpacity key={d} onPress={() => setNewDesignation(d)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: newDesignation===d ? '#EAB308' : 'rgba(255,255,255,0.1)', backgroundColor: newDesignation===d ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.04)', alignItems: 'center' }}>
-                  <Text style={{ color: newDesignation===d ? '#EAB308' : '#94A3B8', fontSize: font.small, fontWeight: '600' }}>{d}</Text>
+                <TouchableOpacity key={d} onPress={() => setNewDesignation(d)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: newDesignation===d ? themePalette.hex_eab308 : themePalette.rgba_255_255_255_0_1, backgroundColor: newDesignation===d ? themePalette.rgba_234_179_8_0_15 : themePalette.rgba_255_255_255_0_04, alignItems: 'center' }}>
+                  <Text style={{ color: newDesignation===d ? themePalette.hex_eab308 : themePalette.hex_94a3b8, fontSize: font.small, fontWeight: '600' }}>{d}</Text>
                 </TouchableOpacity>
               ))}
             </View>
             <Text style={styles.modalLabel}>ADDRESS</Text>
             <View style={[styles.modalInputBox, { height: 60 }]}>
-              <TextInput style={[styles.modalInput, { textAlignVertical: 'top' }]} value={newAddress} onChangeText={setNewAddress} placeholder="Enter full address" placeholderTextColor="#64748B" multiline numberOfLines={2} />
+              <TextInput style={[styles.modalInput, { textAlignVertical: 'top' }]} value={newAddress} onChangeText={setNewAddress} placeholder="Enter full address" placeholderTextColor={themePalette.hex_64748b} multiline numberOfLines={2} />
             </View>
             <Text style={styles.modalLabel}>PINCODE</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newPincode} onChangeText={t => setNewPincode(t.replace(/[^0-9]/g,''))} placeholder="e.g. 110001" placeholderTextColor="#64748B" keyboardType="numeric" maxLength={6} />
+              <TextInput style={styles.modalInput} value={newPincode} onChangeText={t => setNewPincode(t.replace(/[^0-9]/g,''))} placeholder="e.g. 110001" placeholderTextColor={themePalette.hex_64748b} keyboardType="numeric" maxLength={6} />
             </View>
             <Text style={styles.modalLabel}>PASSPORT NUMBER</Text>
             <View style={styles.modalInputBox}>
-              <TextInput style={styles.modalInput} value={newPassport} onChangeText={t => setNewPassport(t.replace(/[^a-zA-Z0-9]/g,'').toUpperCase())} placeholder="e.g. A1234567" placeholderTextColor="#64748B" autoCapitalize="characters" maxLength={12} />
+              <TextInput style={styles.modalInput} value={newPassport} onChangeText={t => setNewPassport(t.replace(/[^a-zA-Z0-9]/g,'').toUpperCase())} placeholder="e.g. A1234567" placeholderTextColor={themePalette.hex_64748b} autoCapitalize="characters" maxLength={12} />
             </View>
-            {!companyId ? <Text style={{ color: '#EF4444', fontSize: font.small, marginTop: 8 }}>Company ID missing — cannot save to backend</Text> : null}
+            {!companyId ? <Text style={{ color: themePalette.hex_ef4444, fontSize: font.small, marginTop: 8 }}>Company ID missing — cannot save to backend</Text> : null}
             <View style={styles.modalBtnRow}>
               <TouchableOpacity style={styles.modalCancelBtn} onPress={handleCloseModal} disabled={saving}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
@@ -460,10 +461,10 @@ const ShareholdersScreen = ({ navigation, route }) => {
 
 export default ShareholdersScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070C15',
+    backgroundColor: themePalette.hex_070c15,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, marginTop: 34 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
@@ -478,9 +479,9 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: themePalette.rgba_255_255_255_0_05,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: themePalette.rgba_255_255_255_0_08,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -488,12 +489,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    color: '#D1D5DB',
+    color: themePalette.hex_d1d5db,
     fontSize: font.lg,
     letterSpacing: 0.5,
   },
   brandSub: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
     fontSize: font.tiny,
     letterSpacing: 1.5,
   },
@@ -501,16 +502,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 3,
     width: '100%',
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     marginVertical: 4,
   },
   stepActive: {
     flex: 1,
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
   },
   stepInactive: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
   },
   scrollContent: {
     paddingHorizontal: s(16),
@@ -521,44 +522,44 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.displayLarge,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '400',
   },
   ampersand: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontStyle: 'normal',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontFamily: 'serif',
   },
   subTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     marginTop: 6,
   },
   allocatedBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    backgroundColor: themePalette.rgba_16_185_129_0_08,
+    borderColor: themePalette.rgba_16_185_129_0_3,
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
   },
   allocatedText: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.bodySmall,
     marginLeft: 10,
     flex: 1,
   },
   shareholderCard: {
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: themePalette.rgba_255_255_255_0_08,
     padding: 16,
     marginBottom: 12,
   },
@@ -586,22 +587,22 @@ const styles = StyleSheet.create({
     fontSize: font.base,
   },
   userName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: '700',
   },
   userRole: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: 2,
   },
   userEmail: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
     marginTop: 3,
   },
   userPhone: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: 1,
   },
@@ -610,12 +611,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   ownershipValue: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.hero,
     fontWeight: '400',
   },
   ownershipLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.caption,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -627,40 +628,40 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tagBadge: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     paddingHorizontal: s(10),
     paddingVertical: 5,
     borderRadius: 8,
   },
   tagText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
     fontWeight: '500',
   },
   completeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    backgroundColor: themePalette.rgba_16_185_129_0_1,
+    borderColor: themePalette.rgba_16_185_129_0_3,
     borderWidth: 1,
     paddingHorizontal: s(10),
     paddingVertical: 4,
     borderRadius: 8,
   },
   completeBadgeText: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.small,
     fontWeight: '600',
     marginLeft: 4,
   },
   kycBadge: {
-    backgroundColor: 'rgba(234, 179, 8, 0.15)',
+    backgroundColor: themePalette.rgba_234_179_8_0_15,
     paddingHorizontal: s(10),
     paddingVertical: 5,
     borderRadius: 8,
   },
   kycBadgeText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.small,
     fontWeight: '600',
   },
@@ -669,15 +670,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: themePalette.hex_334155,
     borderStyle: 'dashed',
     borderRadius: 14,
     paddingVertical: 14,
     marginVertical: 10,
-    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    backgroundColor: themePalette.rgba_15_23_42_0_4,
   },
   addButtonText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontWeight: '700',
     fontSize: font.base,
     marginLeft: 8,
@@ -685,22 +686,22 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#0B132B',
-    borderColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: themePalette.hex_0b132b,
+    borderColor: themePalette.rgba_59_130_246_0_2,
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
     marginVertical: 10,
   },
   infoText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     marginLeft: 10,
     flex: 1,
     lineHeight: 18,
   },
   continueButton: {
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     borderRadius: 24,
     paddingVertical: 14,
     flexDirection: 'row',
@@ -710,20 +711,20 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   continueButtonText: {
-    color: '#070C15',
+    color: themePalette.hex_070c15,
     fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', paddingHorizontal: s(20) },
-  modalCard: { backgroundColor: '#0F172A', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { color: '#FFFFFF', fontSize: font.lg, fontWeight: '700', marginBottom: 12 },
-  modalLabel: { color: '#94A3B8', fontSize: font.xs, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 8 },
-  modalInputBox: { backgroundColor: '#070C15', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
-  modalInput: { color: '#FFFFFF', fontSize: font.base },
+  modalOverlay: { flex: 1, backgroundColor: themePalette.rgba_0_0_0_0_6, justifyContent: 'center', paddingHorizontal: s(20) },
+  modalCard: { backgroundColor: themePalette.hex_0f172a, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08 },
+  modalTitle: { color: themePalette.hex_ffffff, fontSize: font.lg, fontWeight: '700', marginBottom: 12 },
+  modalLabel: { color: themePalette.hex_94a3b8, fontSize: font.xs, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 8 },
+  modalInputBox: { backgroundColor: themePalette.hex_070c15, borderRadius: 10, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_1, paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
+  modalInput: { color: themePalette.hex_ffffff, fontSize: font.base },
   modalBtnRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  modalCancelBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalCancelText: { color: '#94A3B8', fontWeight: '600' },
-  modalSaveBtn: { flex: 1, backgroundColor: '#EAB308', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
-  modalSaveText: { color: '#070C15', fontWeight: '700' },
-});
+  modalCancelBtn: { flex: 1, backgroundColor: themePalette.rgba_255_255_255_0_06, borderRadius: 10, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08 },
+  modalCancelText: { color: themePalette.hex_94a3b8, fontWeight: '600' },
+  modalSaveBtn: { flex: 1, backgroundColor: themePalette.hex_eab308, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  modalSaveText: { color: themePalette.hex_070c15, fontWeight: '700' },
+}));

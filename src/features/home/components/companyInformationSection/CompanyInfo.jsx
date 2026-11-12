@@ -2,13 +2,13 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { styles } from "./CompanyInfoStles";
 const CompanyInfo = ({ companyData }) => {
     const colors = useThemeColors();
-    const iconColor = colors.mode === 'dark' ? '#85B7EB' : '#0D2137';
-    const iconBg = colors.mode === 'dark' ? 'rgba(133,183,235,0.14)' : '#EAF4FF';
-    const iconBorder = colors.mode === 'dark' ? 'rgba(133,183,235,0.35)' : '#C7DFF6';
+    const iconColor = colors.mode === 'dark' ? themePalette.hex_85b7eb : themePalette.hex_0d2137;
+    const iconBg = colors.mode === 'dark' ? themePalette.rgba_133_183_235_0_14 : themePalette.hex_eaf4ff;
+    const iconBorder = colors.mode === 'dark' ? themePalette.rgba_133_183_235_0_35 : themePalette.hex_c7dff6;
     const iconStyle = {
         backgroundColor: iconBg,
         borderColor: iconBorder,

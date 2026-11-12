@@ -19,7 +19,7 @@ import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { getStateData, getEntityTypes, getEntityMeta } from '../../../utils/jurisdictionData';
 import { getCountryData, getCountryEntities } from '../../../constants/countries';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const CompanyNamingScreen = ({ navigation, route }) => {
   const p = route.params || {};
@@ -105,7 +105,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
           </Text>
 
           {/* Jurisdiction Card */}
-          <View style={[styles.jurisdictionCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]}>
+          <View style={[styles.jurisdictionCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
             <Text style={[styles.countryCodeBadge, { color: colors.muted }]}>{selectedCountry}</Text>
             <Text style={[styles.jurisdictionLabel, { color: colors.muted }]}>Jurisdiction</Text>
             <Text style={styles.jurisdictionValue}>{isUS ? `${selectedState}, ${countryName}` : countryName}</Text>
@@ -115,7 +115,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
           <Text style={[styles.inputLabel, { color: colors.muted }]}>
             COMPANY NAME <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
-          <View style={[showAvailable ? styles.successInputContainer : styles.defaultInputContainer, { backgroundColor: isDark ? (showAvailable ? 'rgba(16, 185, 129, 0.03)' : 'rgba(255, 255, 255, 0.02)') : (showAvailable ? 'rgba(16, 185, 129, 0.05)' : colors.inputBackground), borderColor: showAvailable ? '#10B981' : (isDark ? 'rgba(255, 255, 255, 0.1)' : colors.inputBorder) }]}>
+          <View style={[showAvailable ? styles.successInputContainer : styles.defaultInputContainer, { backgroundColor: isDark ? (showAvailable ? themePalette.rgba_16_185_129_0_03 : themePalette.rgba_255_255_255_0_02) : (showAvailable ? themePalette.rgba_16_185_129_0_05 : colors.inputBackground), borderColor: showAvailable ? themePalette.hex_10b981 : (isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder) }]}>
             <Ionicons name="business" size={16} color={colors.subtle} />
             <TextInput
               style={[styles.textInput, { color: colors.text }]}
@@ -136,7 +136,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
                   return (
                     <TouchableOpacity
                       key={option.key}
-                      style={[styles.endingChip, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }, isSelected && styles.endingChipSelected]}
+                      style={[styles.endingChip, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }, isSelected && styles.endingChipSelected]}
                       activeOpacity={0.8}
                       onPress={() => setSelectedEntity(option.key)}
                     >
@@ -167,7 +167,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
 
           {/* Alternate Name */}
           <Text style={[styles.inputLabel, { color: colors.muted }]}>ALTERNATE NAME (OPTIONAL)</Text>
-          <View style={[styles.defaultInputContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.inputBorder }]}>
+          <View style={[styles.defaultInputContainer, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.inputBackground, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder }]}>
             <Ionicons name="add" size={18} color={colors.subtle} />
             <TextInput
               style={[styles.textInput, { color: colors.text }]}
@@ -182,9 +182,9 @@ const CompanyNamingScreen = ({ navigation, route }) => {
           </Text>
 
           {/* Info Box */}
-          <View style={[styles.infoBox, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.04)' : 'rgba(59, 130, 246, 0.06)', borderColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.25)' }]}>
+          <View style={[styles.infoBox, { backgroundColor: isDark ? themePalette.rgba_59_130_246_0_04 : themePalette.rgba_59_130_246_0_06, borderColor: isDark ? themePalette.rgba_59_130_246_0_15 : themePalette.rgba_59_130_246_0_25 }]}>
             <View style={styles.infoIconCircle}>
-              <Ionicons name="information" size={12} color="#60A5FA" />
+              <Ionicons name="information" size={12} color={themePalette.hex_60a5fa} />
             </View>
             <Text style={[styles.infoBoxText, { color: colors.muted }]}>
               Words like <Text style={[styles.boldText, { color: colors.text }]}>Bank, Trust, Insurance, University</Text> need special state approval.
@@ -195,7 +195,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
       </ScrollView>
 
       {/* Bottom Fixed Button */}
-      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
         <TouchableOpacity
           style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }, (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) && styles.continueBtnDisabled]}
           activeOpacity={0.85}
@@ -215,16 +215,16 @@ const CompanyNamingScreen = ({ navigation, route }) => {
 
 export default CompanyNamingScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   progressContainer: { flexDirection: 'row', paddingHorizontal: s(16), paddingTop: s(12), paddingBottom: s(16), gap: 8 },
   progressStep: { flex: 1, height: 3, borderRadius: 2 },
-  progressActive: { backgroundColor: '#C9A84C' },
+  progressActive: { backgroundColor: themePalette.hex_c9a84c },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90), gap: s(2) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(12), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   mainTitle: { fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(10) },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
   subtitle: { fontSize: s(14), lineHeight: s(21), marginBottom: s(24) },
   jurisdictionCard: {
     width: '100%',
@@ -235,13 +235,13 @@ const styles = StyleSheet.create({
   },
   countryCodeBadge: { fontSize: s(13), fontWeight: 'bold', marginRight: s(8) },
   jurisdictionLabel: { fontSize: s(14), flex: 1 },
-  jurisdictionValue: { color: '#C9A84C', fontSize: s(15), fontWeight: 'bold' },
+  jurisdictionValue: { color: themePalette.hex_c9a84c, fontSize: s(15), fontWeight: 'bold' },
   inputLabel: { fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(12) },
-  requiredAsterisk: { color: '#EF4444' },
+  requiredAsterisk: { color: themePalette.hex_ef4444 },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
-    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
+    borderWidth: 1, borderColor: themePalette.hex_10b981, paddingHorizontal: s(14), height: 48,
   },
   defaultInputContainer: {
     flexDirection: 'row', alignItems: 'center',
@@ -251,21 +251,21 @@ const styles = StyleSheet.create({
   },
   textInput: { flex: 1, fontSize: font.bodySmall, fontWeight: '500', marginLeft: s(10) },
   greenCheckBadge: {
-    width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981',
+    width: 20, height: 20, borderRadius: 10, backgroundColor: themePalette.hex_10b981,
     alignItems: 'center', justifyContent: 'center',
   },
   availabilityRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(20), gap: s(6) },
-  availabilityText: { color: '#10B981', fontSize: font.small },
+  availabilityText: { color: themePalette.hex_10b981, fontSize: font.small },
   endingsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: s(8), marginBottom: s(20), marginTop: s(4) },
   endingChip: {
     paddingHorizontal: s(14), paddingVertical: s(8), borderRadius: 16,
     borderWidth: 1,
   },
-  endingChipSelected: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.08)' },
+  endingChipSelected: { borderColor: themePalette.hex_c9a84c, backgroundColor: themePalette.rgba_201_168_76_0_08 },
   endingChipText: { fontSize: font.small, fontWeight: '600' },
-  endingChipTextSelected: { color: '#C9A84C', fontWeight: 'bold' },
+  endingChipTextSelected: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
   fullLegalPreview: { fontSize: s(13), fontWeight: '500', marginBottom: s(12), marginTop: s(4) },
-  fullLegalHighlight: { color: '#C9A84C', fontWeight: 400, fontSize: s(14) },
+  fullLegalHighlight: { color: themePalette.hex_c9a84c, fontWeight: 400, fontSize: s(14) },
   helperText: { fontSize: font.xs, marginTop: s(6), marginBottom: s(10) },
   infoBox: {
     flexDirection: 'row', alignItems: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     padding: s(12), marginTop: s(12), marginBottom: s(4),
   },
   infoIconCircle: {
-    width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#60A5FA',
+    width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: themePalette.hex_60a5fa,
     alignItems: 'center', justifyContent: 'center', marginRight: s(10),
   },
   infoBoxText: { flex: 1, fontSize: font.small, lineHeight: 15 },
@@ -287,4 +287,4 @@ const styles = StyleSheet.create({
   continueBtn: { borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
   continueBtnDisabled: { opacity: 0.4 },
   continueBtnText: { fontSize: font.base, fontWeight: 'bold' },
-});
+}));

@@ -16,7 +16,7 @@ import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
 import { s } from '../../../theme/responsive';
 import { useAppSelector } from '../../../store/hooks';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const RegistrationLandingScreen = ({ navigation }) => {
   // Add-Company flow me user already logged in hota hai.
@@ -86,13 +86,13 @@ const RegistrationLandingScreen = ({ navigation }) => {
           {/* Jurisdictions Grid */}
           <View style={styles.jurisdictionSection}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={[styles.sectionHeader, { color: isDark ? '#475569' : colors.subtle }]}>REGISTER IN 50+ JURISDICTIONS</Text>
+              <Text style={[styles.sectionHeader, { color: isDark ? themePalette.hex_475569 : colors.subtle }]}>REGISTER IN 50+ JURISDICTIONS</Text>
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gridRow}>
               {jurisdictionsRow1.map((item, index) => (
                 <TouchableOpacity key={index} style={styles.countryItem} activeOpacity={0.7} onPress={() => navigation.navigate('RegisterJurisdiction')}>
-                  <View style={[styles.countryBadge, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }]}>
+                  <View style={[styles.countryBadge, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }]}>
                     <Text style={styles.flagEmoji}>{FLAGS[item.code] || item.code}</Text>
                   </View>
                   <Text style={[styles.countryLabel, { color: colors.muted }]} numberOfLines={1}>{item.label}</Text>
@@ -103,7 +103,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gridRow}>
               {jurisdictionsRow2.map((item, index) => (
                 <TouchableOpacity key={index} style={styles.countryItem} activeOpacity={0.7} onPress={() => navigation.navigate('RegisterJurisdiction')}>
-                  <View style={[styles.countryBadge, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }, item.code === '+37' && styles.moreBadge]}>
+                  <View style={[styles.countryBadge, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }, item.code === '+37' && styles.moreBadge]}>
                     {item.code === '+37' ? (
                       <Text style={[styles.countryCode, styles.moreText]}>{item.code}</Text>
                     ) : (
@@ -117,28 +117,28 @@ const RegistrationLandingScreen = ({ navigation }) => {
           </View>
 
           {/* How It Works */}
-          <View style={[styles.howItWorksCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]}>
-            <Text style={[styles.cardHeader, { color: isDark ? '#475569' : colors.subtle }]}>HOW IT WORKS</Text>
+          <View style={[styles.howItWorksCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
+            <Text style={[styles.cardHeader, { color: isDark ? themePalette.hex_475569 : colors.subtle }]}>HOW IT WORKS</Text>
             <View style={styles.stepperRow}>
               <View style={styles.stepItem}>
                 <View style={[styles.stepCircle, styles.goldStep]}>
-                  <Ionicons name="globe" size={14} color="#C9A84C" />
+                  <Ionicons name="globe" size={14} color={themePalette.hex_c9a84c} />
                 </View>
                 <Text style={[styles.stepTitle, { color: colors.text }]}>Pick country</Text>
                 <Text style={[styles.stepSub, { color: colors.muted }]}>& state</Text>
               </View>
-              <View style={[styles.stepLine, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }]} />
+              <View style={[styles.stepLine, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }]} />
               <View style={styles.stepItem}>
                 <View style={[styles.stepCircle, styles.blueStep]}>
-                  <Ionicons name="document-text" size={14} color="#3B82F6" />
+                  <Ionicons name="document-text" size={14} color={themePalette.hex_3b82f6} />
                 </View>
                 <Text style={[styles.stepTitle, { color: colors.text }]}>Add details</Text>
                 <Text style={[styles.stepSub, { color: colors.muted }]}>3 minutes</Text>
               </View>
-              <View style={[styles.stepLine, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }]} />
+              <View style={[styles.stepLine, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }]} />
               <View style={styles.stepItem}>
                 <View style={[styles.stepCircle, styles.tealStep]}>
-                  <Ionicons name="checkmark-circle" size={14} color="#10B981" />
+                  <Ionicons name="checkmark-circle" size={14} color={themePalette.hex_10b981} />
                 </View>
                 <Text style={[styles.stepTitle, { color: colors.text }]}>Incorporated</Text>
                 <Text style={[styles.stepSub, { color: colors.muted }]}>5-7 days</Text>
@@ -147,7 +147,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
           </View>
 
           {/* Live Toast */}
-          <View style={[styles.toastContainer, { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.05)' : 'rgba(16, 185, 129, 0.08)', borderColor: isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.35)' }]}>
+          <View style={[styles.toastContainer, { backgroundColor: isDark ? themePalette.rgba_16_185_129_0_05 : themePalette.rgba_16_185_129_0_08, borderColor: isDark ? themePalette.rgba_16_185_129_0_2 : themePalette.rgba_16_185_129_0_35 }]}>
             <View style={styles.greenDot} />
             <Text style={[styles.toastText, { color: colors.muted }]}>
               <Text style={[styles.toastBold, { color: colors.text }]}>Michael R.</Text> just registered a Delaware LLC
@@ -158,7 +158,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
           {/* Features */}
           <View style={styles.featuresRow}>
             <Text style={[styles.featureItem, { color: colors.muted }]}>✓ No payment now</Text>
-            <Text style={[styles.featureDivider, { color: isDark ? '#334155' : colors.border }]}>|</Text>
+            <Text style={[styles.featureDivider, { color: isDark ? themePalette.hex_334155 : colors.border }]}>|</Text>
             <Text style={[styles.featureItem, { color: colors.muted }]}>🕒 Takes 3 minutes</Text>
           </View>
 
@@ -174,7 +174,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
               CTA yahan bekaar tha (Login route RegistrationStack me registered
               nahi hai), is liye logged-in state me chhupa diya. */}
           {!isAuthenticated && (
-            <TouchableOpacity style={[styles.loginBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border }]} activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity style={[styles.loginBtn, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.border }]} activeOpacity={0.8} onPress={() => navigation.navigate('Login')}>
               <Text style={[styles.loginBtnText, { color: colors.text }]}>
                 Existing Client? <Text style={styles.goldText}>Log in</Text>
               </Text>
@@ -189,7 +189,7 @@ const RegistrationLandingScreen = ({ navigation }) => {
 
 export default RegistrationLandingScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: s(16), marginTop: s(38) },
@@ -201,12 +201,12 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     marginBottom: s(10),
   },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
   subtitle: { fontSize: font.sm, lineHeight: 18 },
   jurisdictionSection: { marginBottom: s(16) },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(10) },
   sectionHeader: { fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1.2 },
-  viewAllText: { color: '#C9A84C', fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1 },
+  viewAllText: { color: themePalette.hex_c9a84c, fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1 },
   gridRow: { marginBottom: s(10) },
   countryItem: { alignItems: 'center', marginRight: s(10), width: 44 },
   countryBadge: {
@@ -214,8 +214,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center', marginBottom: s(4),
   },
-  moreBadge: { borderColor: 'rgba(201, 168, 76, 0.4)' },
-  moreText: { color: '#C9A84C', fontWeight: 'bold' },
+  moreBadge: { borderColor: themePalette.rgba_201_168_76_0_4 },
+  moreText: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
   countryCode: { fontSize: font.bodySmall, fontWeight: '600' },
   flagEmoji: { fontSize: font.displayXXL },
   countryLabel: { fontSize: font.xs, textAlign: 'center' },
@@ -234,9 +234,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1, marginBottom: s(6),
   },
-  goldStep: { borderColor: '#C9A84C', backgroundColor: 'rgba(201, 168, 76, 0.1)' },
-  blueStep: { borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)' },
-  tealStep: { borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)' },
+  goldStep: { borderColor: themePalette.hex_c9a84c, backgroundColor: themePalette.rgba_201_168_76_0_1 },
+  blueStep: { borderColor: themePalette.hex_3b82f6, backgroundColor: themePalette.rgba_59_130_246_0_1 },
+  tealStep: { borderColor: themePalette.hex_10b981, backgroundColor: themePalette.rgba_16_185_129_0_1 },
   stepTitle: { fontSize: font.sm, fontWeight: '500' },
   stepSub: { fontSize: font.xs },
   stepLine: { width: 20, height: 1, marginTop: -14 },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: s(12),
   },
-  greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981', marginRight: s(8) },
+  greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_10b981, marginRight: s(8) },
   toastText: { flex: 1, fontSize: font.xs },
   toastBold: { fontWeight: 'bold' },
   toastTime: { fontSize: font.caption },
@@ -265,5 +265,5 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   loginBtnText: { fontSize: font.bodySmall, fontWeight: '600' },
-  goldText: { color: '#C9A84C' },
-});
+  goldText: { color: themePalette.hex_c9a84c },
+}));

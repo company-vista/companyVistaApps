@@ -24,7 +24,7 @@ import { fetchClientCompanyDetails } from '../../../features/home/api/clientProf
 import { resolvePricingType, hasRealPrice } from '../../../utils/priceCalculator';
 import { getCountryData } from '../../../constants/countries';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 
 export default function ReviewAndConfirmScreen({ navigation, route }) {
   const dispatch = useAppDispatch();
@@ -549,7 +549,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         {/* GET /review/:companyId ka data — signup ke baad backend se */}
         {loadingTotal && !reviewData ? (
           <View style={[styles.companyCard, { alignItems: 'center', paddingVertical: 20 }]}>
-            <ActivityIndicator size="small" color="#D4AF37" />
+            <ActivityIndicator size="small" color={themePalette.hex_d4af37} />
             <Text style={{ color: colors.muted, fontSize: font.sm, marginTop: 8 }}>Loading review from backend...</Text>
           </View>
         ) : null}
@@ -559,7 +559,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             <View style={styles.summaryHeader}>
               <View style={styles.summaryHeaderLeft}>
                 <View style={styles.summaryIconBox}>
-                  <Feather name="briefcase" size={12} color="#D4AF37" />
+                  <Feather name="briefcase" size={12} color={themePalette.hex_d4af37} />
                 </View>
                 <Text style={styles.summaryHeaderTitle}>COMPANY {reviewData ? `· ${String(reviewData.companyId).slice(-6).toUpperCase()}` : ''}</Text>
               </View>
@@ -594,7 +594,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
             {reviewData?.registrationStatus ? (
               <View style={styles.summaryRowSmall}>
                 <Text style={styles.summaryLabel}>Status</Text>
-                <Text style={[styles.summaryValue, { color: '#10B981' }]}>{reviewData.registrationStatus}</Text>
+                <Text style={[styles.summaryValue, { color: themePalette.hex_10b981 }]}>{reviewData.registrationStatus}</Text>
               </View>
             ) : null}
             {pricingType ? (
@@ -608,8 +608,8 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           <View style={styles.companyCard}>
             <View style={styles.summaryHeader}>
               <View style={styles.summaryHeaderLeft}>
-                <View style={[styles.summaryIconBox, { backgroundColor: 'rgba(100,181,246,0.12)', borderColor: 'rgba(100,181,246,0.25)' }]}>
-                  <Feather name="user" size={12} color="#64B5F6" />
+                <View style={[styles.summaryIconBox, { backgroundColor: themePalette.rgba_100_181_246_0_12, borderColor: themePalette.rgba_100_181_246_0_25 }]}>
+                  <Feather name="user" size={12} color={themePalette.hex_64b5f6} />
                 </View>
                 <Text style={styles.summaryHeaderTitle}>PRINCIPAL FOUNDER</Text>
               </View>
@@ -641,15 +641,15 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         <View style={styles.includedCard}>
           <View style={styles.checkGrid}>
             <View style={styles.checkItem}>
-              <Ionicons name="checkmark" size={14} color="#00E676" />
+              <Ionicons name="checkmark" size={14} color={themePalette.hex_00e676} />
               <Text style={styles.checkItemText}>Registered agent</Text>
             </View>
             <View style={styles.checkItem}>
-              <Ionicons name="checkmark" size={14} color="#00E676" />
+              <Ionicons name="checkmark" size={14} color={themePalette.hex_00e676} />
               <Text style={styles.checkItemText}>EIN application</Text>
             </View>
             <View style={styles.checkItem}>
-              <Ionicons name="checkmark" size={14} color="#00E676" />
+              <Ionicons name="checkmark" size={14} color={themePalette.hex_00e676} />
               <Text style={styles.checkItemText}>Bank assistance</Text>
             </View>
           </View>
@@ -660,11 +660,11 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
           <View style={styles.addOnsCard}>
             <View style={styles.addOnsHeader}>
               <View style={styles.addOnsTitleRow}>
-                <Feather name="zap" size={16} color="#D4AF37" />
+                <Feather name="zap" size={16} color={themePalette.hex_d4af37} />
                 <Text style={styles.addOnsHeaderText}>ADD-ONS SELECTED</Text>
               </View>
               <TouchableOpacity activeOpacity={0.7} style={styles.changeButton} onPress={() => navigation.navigate('OptionalAddOns', route.params)}>
-                <Feather name="edit-2" size={12} color="#D4AF37" />
+                <Feather name="edit-2" size={12} color={themePalette.hex_d4af37} />
                 <Text style={styles.changeText}>Change</Text>
               </TouchableOpacity>
             </View>
@@ -682,7 +682,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                       <Text style={styles.addOnPrice}>${item.price}</Text>
                       <TouchableOpacity onPress={() => handleRemoveAddOn(item.title)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                        <Ionicons name="close-circle" size={18} color="#EF4444" />
+                        <Ionicons name="close-circle" size={18} color={themePalette.hex_ef4444} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -694,7 +694,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         )}
 
         {route.params?.advisorFlow && route.params?.bestState ? (
-          <View style={[styles.summaryCard, { borderColor: 'rgba(16,185,129,0.3)' }]}>
+          <View style={[styles.summaryCard, { borderColor: themePalette.rgba_16_185_129_0_3 }]}>
             <View style={styles.summaryRow}>
               <View>
                 <Text style={styles.summaryTitle}>Recommended jurisdiction</Text>
@@ -702,7 +702,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
               </View>
               <Text style={styles.summaryPrice}>${route.params.bestStatePrice}</Text>
             </View>
-            <Text style={{ color: '#10B981', fontSize: font.sm, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
+            <Text style={{ color: themePalette.hex_10b981, fontSize: font.sm, marginTop: 6 }}>★ Best Match for you · {route.params.bestStateTimeframe || ''}</Text>
           </View>
         ) : null}
 
@@ -736,7 +736,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
                 <Text style={styles.summaryTitle}>Add-ons ({addOnList.length})</Text>
                 <Text style={styles.summarySubtext}>{addOnList.map(a => a.title.split(' ')[0]).join(' · ') || 'None'}</Text>
               </View>
-              {loadingTotal && <ActivityIndicator size="small" color="#D4AF37" />}
+              {loadingTotal && <ActivityIndicator size="small" color={themePalette.hex_d4af37} />}
             </View>
           )}
 
@@ -758,7 +758,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
         </View>
 
         <View style={styles.timelineBanner}>
-          <Ionicons name="checkmark-circle" size={20} color="#00E676" style={styles.timelineIcon} />
+          <Ionicons name="checkmark-circle" size={20} color={themePalette.hex_00e676} style={styles.timelineIcon} />
           <Text style={styles.timelineText}>
             <Text style={styles.timelineBold}>Ready in 2–3 days</Text> with your add-ons, instead of 5–7
           </Text>
@@ -766,7 +766,7 @@ export default function ReviewAndConfirmScreen({ navigation, route }) {
 
         <TouchableOpacity style={styles.checkboxContainer} activeOpacity={0.8} onPress={() => setIsChecked(!isChecked)}>
           <View style={[styles.checkbox, isChecked && styles.checkboxActive]}>
-            {isChecked && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+            {isChecked && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
           </View>
           <Text style={styles.checkboxLabel}>I confirm these details match my passport and are accurate.</Text>
         </TouchableOpacity>
@@ -792,44 +792,44 @@ const makeStyles = (colors, isDark) => StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(34), marginBottom: s(8), paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   progressContainer: { flexDirection: 'row', paddingHorizontal: s(20), marginTop: s(6), marginBottom: s(10), gap: 8 },
-  progressStepActive: { flex: 1, height: 3, backgroundColor: '#D4AF37', borderRadius: 2 },
+  progressStepActive: { flex: 1, height: 3, backgroundColor: themePalette.hex_d4af37, borderRadius: 2 },
   scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   summarySection: { gap: 12, marginBottom: s(12) },
-  companyCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: s(14), borderTopWidth: 1, borderTopColor: 'rgba(212,175,55,0.15)' },
+  companyCard: { backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: s(14), borderTopWidth: 1, borderTopColor: themePalette.rgba_212_175_55_0_15 },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  summaryIconBox: { width: 26, height: 26, borderRadius: 7, backgroundColor: 'rgba(212,175,55,0.12)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.25)', justifyContent: 'center', alignItems: 'center' },
+  summaryIconBox: { width: 26, height: 26, borderRadius: 7, backgroundColor: themePalette.rgba_212_175_55_0_12, borderWidth: 1, borderColor: themePalette.rgba_212_175_55_0_25, justifyContent: 'center', alignItems: 'center' },
   summaryHeaderTitle: { color: colors.muted, fontSize: font.small, fontWeight: '700', letterSpacing: 0.8 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  editText: { color: '#D4AF37', fontSize: font.sm, fontWeight: '600' },
+  editText: { color: themePalette.hex_d4af37, fontSize: font.sm, fontWeight: '600' },
   summaryRowSmall: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
   summaryLabel: { color: colors.subtle, fontSize: font.bodySmall },
   summaryValue: { color: colors.text, fontSize: font.bodySmall, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
-  summaryValueGold: { color: '#D4AF37', fontSize: font.bodySmall, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
-  summaryValueSmall: { color: colors.muted, fontSize: font.small, fontWeight: '700', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surfaceAlt, paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
+  summaryValueGold: { color: themePalette.hex_d4af37, fontSize: font.bodySmall, fontWeight: '700', maxWidth: '60%', textAlign: 'right' },
+  summaryValueSmall: { color: colors.muted, fontSize: font.small, fontWeight: '700', backgroundColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.surfaceAlt, paddingHorizontal: s(4), paddingVertical: s(1), borderRadius: 3, overflow: 'hidden' },
   residenceValue: { flexDirection: 'row', alignItems: 'center' },
   titleContainer: { marginVertical: s(10) },
   mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: colors.text, marginBottom: s(4) },
-  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: themePalette.hex_d4af37 },
   subtitle: { color: colors.muted, fontSize: font.md },
-  includedCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
+  includedCard: { backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: themePalette.rgba_0_230_118_0_2, paddingVertical: s(12), paddingHorizontal: s(14), marginVertical: s(10) },
   checkGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 8, columnGap: 16 },
   checkItem: { flexDirection: 'row', alignItems: 'center' },
   checkItemText: { color: colors.muted, fontSize: font.bodySmall, marginLeft: s(6) },
-  addOnsCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 14, borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
+  addOnsCard: { backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: 14, borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
   addOnsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   addOnsTitleRow: { flexDirection: 'row', alignItems: 'center' },
   addOnsHeaderText: { color: colors.muted, fontSize: font.sm, fontWeight: '700', letterSpacing: 0.5, marginLeft: s(6) },
   changeButton: { flexDirection: 'row', alignItems: 'center' },
-  changeText: { color: '#D4AF37', fontSize: font.bodySmall, fontWeight: '600', marginLeft: s(4) },
+  changeText: { color: themePalette.hex_d4af37, fontSize: font.bodySmall, fontWeight: '600', marginLeft: s(4) },
   addOnItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: s(4) },
   addOnTextGroup: { flex: 1, paddingRight: s(10) },
   addOnTitle: { color: colors.text, fontSize: font.md, fontWeight: '600' },
   addOnSubtext: { color: colors.subtle, fontSize: font.sm, marginTop: s(2) },
   addOnPrice: { color: colors.text, fontSize: font.md, fontWeight: '700' },
   itemSeparator: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
-  summaryCard: { backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginBottom: s(12) },
+  summaryCard: { backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: 16, borderWidth: 1, borderColor: themePalette.rgba_212_175_55_0_3, padding: s(16), marginBottom: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(12) },
   summaryTitle: { color: colors.text, fontSize: font.base, fontWeight: '600' },
   summarySubtext: { color: colors.subtle, fontSize: font.sm, marginTop: s(2) },
@@ -837,18 +837,18 @@ const makeStyles = (colors, isDark) => StyleSheet.create({
   summaryDivider: { height: 1, backgroundColor: colors.border, marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(4) },
   totalLabel: { color: colors.muted, fontSize: font.bodySmall, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
-  timelineBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: s(12), flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
+  totalAmount: { color: themePalette.hex_d4af37, fontSize: font.displayXL, fontWeight: '700' },
+  timelineBanner: { backgroundColor: themePalette.rgba_0_230_118_0_05, borderRadius: 12, borderWidth: 1, borderColor: themePalette.rgba_0_230_118_0_2, padding: s(12), flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
   timelineIcon: { marginRight: s(10) },
   timelineText: { color: colors.muted, fontSize: font.bodySmall, flex: 1 },
-  timelineBold: { color: '#00E676', fontWeight: '700' },
+  timelineBold: { color: themePalette.hex_00e676, fontWeight: '700' },
   checkboxContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
-  checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: colors.border, backgroundColor: isDark ? '#0C1622' : colors.surface, justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
-  checkboxActive: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
+  checkbox: { width: 20, height: 20, borderRadius: 5, borderWidth: 1, borderColor: colors.border, backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, justifyContent: 'center', alignItems: 'center', marginRight: s(10) },
+  checkboxActive: { backgroundColor: themePalette.hex_d4af37, borderColor: themePalette.hex_d4af37 },
   checkboxLabel: { color: colors.muted, fontSize: font.bodySmall, flex: 1, lineHeight: 18 },
   footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: colors.background },
   confirmButton: { backgroundColor: colors.buttonBackground, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   confirmButtonText: { color: colors.buttonText, fontSize: font.lg, fontWeight: '700', marginRight: s(8) },
   footerSubtext: { color: colors.subtle, fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
-  footerSubtextBold: { color: '#D4AF37', fontWeight: '600' },
+  footerSubtextBold: { color: themePalette.hex_d4af37, fontWeight: '600' },
 });

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { quickAccessItems } from '../../data/quickAccessItems';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 function QuickAccessSection({ onItemPress, onViewAllPress, }) {
@@ -26,7 +26,7 @@ function QuickAccessSection({ onItemPress, onViewAllPress, }) {
       </View>
     </>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         marginBottom: 18,
     },
     sectionTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.heading,
         fontWeight: '600',
     },
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: s(4),
     },
     viewAllText: {
-        color: '#dc2626',
+        color: themePalette.hex_dc2626,
         fontSize: font.lg,
         fontWeight: '900',
     },
@@ -79,5 +79,5 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: 'center',
     },
-});
+}));
 export default QuickAccessSection;

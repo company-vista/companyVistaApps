@@ -2,16 +2,16 @@ import React from 'react';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { font } from '../../../../theme/typography';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 
 const STATUS_META = {
-  pending: { label: 'Pending Review', icon: 'time-outline', color: '#f59f0bb6', bg: 'rgba(245, 158, 11, 0.12)', border: '#B45309' },
-  quoted: { label: 'Quote Ready', icon: 'document-text-outline', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
-  paid: { label: 'Paid', icon: 'checkmark-circle', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)', border: '#059669' },
-  'in-progress': { label: 'In Progress', icon: 'refresh', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.12)', border: '#2563EB' },
-  completed: { label: 'Completed', icon: 'checkmark-circle', color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)', border: '#059669' },
-  rejected: { label: 'Rejected', icon: 'close-circle', color: '#F43F5E', bg: 'rgba(244, 63, 94, 0.12)', border: '#BE123C' },
+  pending: { label: 'Pending Review', icon: 'time-outline', color: themePalette.hex_f59f0bb6, bg: themePalette.rgba_245_158_11_0_12, border: themePalette.hex_b45309 },
+  quoted: { label: 'Quote Ready', icon: 'document-text-outline', color: themePalette.hex_3b82f6, bg: themePalette.rgba_59_130_246_0_12, border: themePalette.hex_2563eb },
+  paid: { label: 'Paid', icon: 'checkmark-circle', color: themePalette.hex_10b981, bg: themePalette.rgba_16_185_129_0_12, border: themePalette.hex_059669 },
+  'in-progress': { label: 'In Progress', icon: 'refresh', color: themePalette.hex_3b82f6, bg: themePalette.rgba_59_130_246_0_12, border: themePalette.hex_2563eb },
+  completed: { label: 'Completed', icon: 'checkmark-circle', color: themePalette.hex_10b981, bg: themePalette.rgba_16_185_129_0_12, border: themePalette.hex_059669 },
+  rejected: { label: 'Rejected', icon: 'close-circle', color: themePalette.hex_f43f5e, bg: themePalette.rgba_244_63_94_0_12, border: themePalette.hex_be123c },
 };
 
 function ServiceCard({
@@ -57,7 +57,7 @@ function ServiceCard({
 
       <View style={styles.bottomRow}>
         <View style={[styles.typeBadge, isLight ? styles.typeBadgeLight : styles.typeBadgeDark]}>
-          <Ionicons name="card-outline" size={18} color={isLight ? '#475569' : '#94A3B8'} />
+          <Ionicons name="card-outline" size={18} color={isLight ? themePalette.hex_475569 : themePalette.hex_94a3b8} />
           <Text style={[styles.typeBadgeText, isLight ? styles.typeBadgeTextLight : styles.typeBadgeTextDark]}>
             {paymentType}
           </Text>
@@ -69,7 +69,7 @@ function ServiceCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   card: {
     borderRadius: 16,
     borderWidth: 1,
@@ -77,19 +77,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginHorizontal: s(12),
     marginVertical: 6,
-    shadowColor: '#000',
+    shadowColor: themePalette.hex_000,
     shadowOpacity: 0.06,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
   cardDark: {
-    backgroundColor: '#0B0E17',
-    borderColor: '#1F2937',
+    backgroundColor: themePalette.hex_0b0e17,
+    borderColor: themePalette.hex_1f2937,
   },
   cardLight: {
-    backgroundColor: '#ffffff',
-    borderColor: '#E5E7EB',
+    backgroundColor: themePalette.hex_ffffff,
+    borderColor: themePalette.hex_e5e7eb,
   },
   topRow: {
     flexDirection: 'row',
@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconBoxDark: {
-    backgroundColor: 'rgba(245, 158, 11, 0.14)',
+    backgroundColor: themePalette.rgba_245_158_11_0_14,
   },
   iconBoxLight: {
-    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    backgroundColor: themePalette.rgba_245_158_11_0_12,
   },
   titleWrap: {
     flex: 1,
@@ -122,26 +122,26 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   textDark: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
   },
   textLight: {
-    color: '#111827',
+    color: themePalette.hex_111827,
   },
   subInfo: {
     fontSize: font.sm,
   },
   subDark: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
   },
   subLight: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
   },
   dateText: {
     fontSize: font.sm,
     fontWeight: '500',
   },
   amount: {
-    color: '#F59E0B',
+    color: themePalette.hex_f59e0b,
     fontSize: font.xl,
     fontWeight: '700',
   },
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(148, 163, 184, 0.2)',
+    borderTopColor: themePalette.rgba_148_163_184_0_2,
   },
   typeBadge: {
     flexDirection: 'row',
@@ -177,22 +177,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   typeBadgeDark: {
-    backgroundColor: '#1E293B',
-    borderColor: '#334155',
+    backgroundColor: themePalette.hex_1e293b,
+    borderColor: themePalette.hex_334155,
   },
   typeBadgeLight: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#CBD5E1',
+    backgroundColor: themePalette.hex_f1f5f9,
+    borderColor: themePalette.hex_cbd5e1,
   },
   typeBadgeText: {
     fontSize: font.xs,
     fontWeight: '500',
   },
   typeBadgeTextDark: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
   },
   typeBadgeTextLight: {
-    color: '#475569',
+    color: themePalette.hex_475569,
   },
-});
+}));
 export default ServiceCard;

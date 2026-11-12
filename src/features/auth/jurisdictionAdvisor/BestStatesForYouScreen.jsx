@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const FILTER_TAGS = [
   { id: '1', label: '🌐 Fully remote' },
@@ -109,7 +110,7 @@ export default function BestStatesForYouScreen({ navigation, route }) {
   const stateFeeLabel = `$${stateFee}`;
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -253,10 +254,10 @@ export default function BestStatesForYouScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
@@ -272,12 +273,12 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#161B29',
+    backgroundColor: themePalette.hex_161b29,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
@@ -285,12 +286,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
@@ -302,17 +303,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: font.display,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '300',
   },
   subtitle: {
     fontSize: font.bodySmall,
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     marginTop: s(6),
     marginBottom: s(16),
   },
@@ -323,34 +324,34 @@ const styles = StyleSheet.create({
     marginBottom: s(20),
   },
   tagPill: {
-    backgroundColor: '#151329',
+    backgroundColor: themePalette.hex_151329,
     paddingHorizontal: s(12),
     paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#2D264A',
+    borderColor: themePalette.hex_2d264a,
   },
   actionTagPill: {
-    backgroundColor: '#121724',
-    borderColor: '#1E2638',
+    backgroundColor: themePalette.hex_121724,
+    borderColor: themePalette.hex_1e2638,
   },
   tagText: {
-    color: '#A5B4FC',
+    color: themePalette.hex_a5b4fc,
     fontSize: font.sm,
     fontWeight: '500',
   },
   matchCard: {
-    backgroundColor: '#121622',
+    backgroundColor: themePalette.hex_121622,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(16),
     marginBottom: s(24),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#262013',
-    borderColor: '#D1A253',
+    backgroundColor: themePalette.hex_262013,
+    borderColor: themePalette.hex_d1a253,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: s(10),
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   badgeText: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.xs,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -379,12 +380,12 @@ const styles = StyleSheet.create({
     marginRight: s(12),
   },
   stateName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.xxl,
     fontWeight: 'bold',
   },
   stateSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: s(2),
   },
@@ -392,19 +393,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   matchPercentage: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.displayMedium,
     fontWeight: '300',
   },
   matchLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.caption,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
   featuresList: {
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(16),
     marginBottom: s(16),
   },
@@ -414,27 +415,27 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   checkIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.base,
     marginRight: s(10),
     marginTop: s(1),
   },
   featureText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     lineHeight: 18,
     flex: 1,
   },
   featureBold: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: 'bold',
   },
   warningCard: {
     flexDirection: 'row',
-    backgroundColor: '#1E1B18',
+    backgroundColor: themePalette.hex_1e1b18,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(12),
     marginBottom: s(16),
   },
@@ -443,13 +444,13 @@ const styles = StyleSheet.create({
     marginRight: s(8),
   },
   warningText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     lineHeight: 16,
     flex: 1,
   },
   warningBold: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: 'bold',
   },
   cardFooter: {
@@ -458,7 +459,7 @@ const styles = StyleSheet.create({
     gap: s(8),
     alignItems: 'flex-end',
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(14),
   },
   priceContainer: {
@@ -466,17 +467,17 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   priceAmount: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.hero,
     fontWeight: 'bold',
     marginRight: s(8),
   },
   priceNote: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
   },
   timeframeText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   sectionHeader: {
@@ -484,7 +485,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 1.2,
@@ -493,16 +494,16 @@ const styles = StyleSheet.create({
   sectionDivider: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
   },
   altCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#121622',
+    backgroundColor: themePalette.hex_121622,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingHorizontal: s(14),
     paddingVertical: s(12),
     marginTop: s(10),
@@ -520,12 +521,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   altName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
   },
   altDesc: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: s(2),
   },
@@ -534,35 +535,35 @@ const styles = StyleSheet.create({
     marginLeft: s(8),
   },
   altMatch: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.lg,
     fontWeight: '700',
   },
   altMatchLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.tiny,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   savingCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(16,185,129,0.08)',
+    backgroundColor: themePalette.rgba_16_185_129_0_08,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.2)',
+    borderColor: themePalette.rgba_16_185_129_0_2,
     padding: s(12),
     marginTop: s(14),
     alignItems: 'flex-start',
     gap: s(8),
   },
   savingIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.sm,
     marginTop: s(1),
   },
   savingText: {
     flex: 1,
-    color: '#A7F3D0',
+    color: themePalette.hex_a7f3d0,
     fontSize: font.small,
     lineHeight: 15,
   },
@@ -570,17 +571,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(16),
     paddingTop: s(12),
     paddingBottom: s(20),
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   actionButton: {
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
     borderRadius: 24,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionButtonText: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.md,
     fontWeight: '700',
   },
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
     marginTop: s(12),
   },
   browseText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
-});
+}));

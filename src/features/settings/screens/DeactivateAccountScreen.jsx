@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { deactivateAccountThunk } from '../../../store/slices/authSlice';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 
@@ -97,7 +97,7 @@ function DeactivateAccountScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     container: {
         padding: s(14),
         paddingBottom: s(40),
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         paddingVertical: s(13),
     },
     deactivateBtnText: {
-        color: '#fff',
+        color: themePalette.hex_fff,
         fontSize: font.md,
         fontWeight: '400',
     },
@@ -168,6 +168,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingVertical: s(4),
     },
-});
+}));
 
 export default DeactivateAccountScreen;

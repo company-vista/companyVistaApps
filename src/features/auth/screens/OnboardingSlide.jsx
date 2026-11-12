@@ -7,7 +7,7 @@ import logoR from '../../../assets/images/logoR.png';
 import globeLogo from '../../../assets/images/companyvista_globe_320.gif';
 import globeLogoLight from '../../../assets/images/company-vista-icon-gold-512.png';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SLIDES_DATA = [
@@ -17,8 +17,8 @@ const SLIDES_DATA = [
     title: 'Register your company in',
     titleItalic: ' any country,',
     body: 'No travel. No local lawyers. Start your global business from anywhere — in days, not months.',
-    artGradient: ['#122548', '#0a1428', '#060b16'],
-    artGradientLight: ['#E0F2FE', '#F0F9FF', '#FFFFFF'],
+    artGradient: [themePalette.hex_122548, themePalette.hex_0a1428, themePalette.hex_060b16],
+    artGradientLight: [themePalette.hex_e0f2fe, themePalette.hex_f0f9ff, themePalette.hex_ffffff],
     icon: null,
     showStepper: true,
     showBadges: true,
@@ -29,8 +29,8 @@ const SLIDES_DATA = [
     title: 'Hold & Exchange ',
     titleItalic: '40+ Currencies',
     body: 'Convert currencies instantly with low exchange markup and manage local bank accounts worldwide.',
-    artGradient: ['#0e1728', '#0a1020', '#060a14'],
-    artGradientLight: ['#E6FFFA', '#F0FDFA', '#FFFFFF'],
+    artGradient: [themePalette.hex_0e1728, themePalette.hex_0a1020, themePalette.hex_060a14],
+    artGradientLight: [themePalette.hex_e6fffa, themePalette.hex_f0fdfa, themePalette.hex_ffffff],
     icon: '🌍',
     showStepper: false,
   },
@@ -40,8 +40,8 @@ const SLIDES_DATA = [
     title: 'Bank-Grade Protection for ',
     titleItalic: 'Your Wealth',
     body: 'Multi-factor authentication, biometric logins, and instant card locking keep your assets secure.',
-    artGradient: ['#151126', '#0d0a18', '#07050e'],
-    artGradientLight: ['#F3E8FF', '#FAF5FF', '#FFFFFF'],
+    artGradient: [themePalette.hex_151126, themePalette.hex_0d0a18, themePalette.hex_07050e],
+    artGradientLight: [themePalette.hex_f3e8ff, themePalette.hex_faf5ff, themePalette.hex_ffffff],
     icon: '🛡️',
     showStepper: false,
   },
@@ -106,7 +106,7 @@ const OnboardingSlide = ({ navigation }) => {
       </LinearGradient>
 
       <LinearGradient
-        colors={isDark ? ['#0a0f1e', '#070b16'] : ['#FFFFFF', '#F3F4F6']}
+        colors={isDark ? [themePalette.hex_0a0f1e, themePalette.hex_070b16] : [themePalette.hex_ffffff, themePalette.hex_f3f4f6]}
         style={[styles.contentSection, { paddingBottom: s(4) + insets.bottom }]}
       >
         <View style={styles.goldLine} />
@@ -133,22 +133,22 @@ const OnboardingSlide = ({ navigation }) => {
             <View style={styles.stepperContainer}>
               <View style={styles.stepperRow}>
                 <View style={styles.stepperStep}>
-                  <View style={[styles.stepperCircle, { borderColor: '#c9a84c', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                    <Text style={[styles.stepperNumber, { color: '#c9a84c' }]}>1</Text>
+                  <View style={[styles.stepperCircle, { borderColor: themePalette.hex_c9a84c, backgroundColor: isDark ? themePalette.rgba_11_17_32_0_85 : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: themePalette.hex_c9a84c }]}>1</Text>
                   </View>
                   <Text style={[styles.stepperLabel, { color: colors.muted }]}>Choose</Text>
                 </View>
                 <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
                 <View style={styles.stepperStep}>
-                  <View style={[styles.stepperCircle, { borderColor: '#3b82f6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                    <Text style={[styles.stepperNumber, { color: '#3b82f6' }]}>2</Text>
+                  <View style={[styles.stepperCircle, { borderColor: themePalette.hex_3b82f6, backgroundColor: isDark ? themePalette.rgba_11_17_32_0_85 : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: themePalette.hex_3b82f6 }]}>2</Text>
                   </View>
                   <Text style={[styles.stepperLabel, { color: colors.muted }]}>Submit</Text>
                 </View>
                 <View style={[styles.stepperLine, { backgroundColor: colors.border }]} />
                 <View style={styles.stepperStep}>
-                  <View style={[styles.stepperCircle, { borderColor: '#14b8a6', backgroundColor: isDark ? 'rgba(11, 17, 32, 0.85)' : colors.surface }]}>
-                    <Text style={[styles.stepperNumber, { color: '#14b8a6' }]}>3</Text>
+                  <View style={[styles.stepperCircle, { borderColor: themePalette.hex_14b8a6, backgroundColor: isDark ? themePalette.rgba_11_17_32_0_85 : colors.surface }]}>
+                    <Text style={[styles.stepperNumber, { color: themePalette.hex_14b8a6 }]}>3</Text>
                   </View>
                   <Text style={[styles.stepperLabel, { color: colors.muted }]}>Incorporated</Text>
                 </View>
@@ -161,7 +161,7 @@ const OnboardingSlide = ({ navigation }) => {
           {SLIDES_DATA.map((_, idx) => (
             <View
               key={idx}
-              style={[styles.dot, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : colors.border }, idx === currentIndex ? styles.activeDot : null]}
+              style={[styles.dot, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_15 : colors.border }, idx === currentIndex ? styles.activeDot : null]}
             />
           ))}
         </View>
@@ -187,19 +187,19 @@ const OnboardingSlide = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   topLogo: { position: 'absolute', top: 50, left: 12, width: 180, height: 38, resizeMode: 'contain', zIndex: 10 },
-  remoteButton: { position: 'absolute', top: 98, left: 20, backgroundColor: 'rgba(201, 168, 76, 0.15)', borderWidth: 1, borderColor: 'rgba(201, 168, 76, 0.3)', borderRadius: 20, paddingHorizontal: s(14), paddingVertical: s(6), zIndex: 10 },
-  remoteButtonText: { fontSize: font.sm, fontWeight: '600', color: '#c9a84c', letterSpacing: 0.5 },
+  remoteButton: { position: 'absolute', top: 98, left: 20, backgroundColor: themePalette.rgba_201_168_76_0_15, borderWidth: 1, borderColor: themePalette.rgba_201_168_76_0_3, borderRadius: 20, paddingHorizontal: s(14), paddingVertical: s(6), zIndex: 10 },
+  remoteButtonText: { fontSize: font.sm, fontWeight: '600', color: themePalette.hex_c9a84c, letterSpacing: 0.5 },
   artSection: { height: '50%', alignItems: 'center', justifyContent: 'center' },
   artBadge: {
     width: 120,
     height: 120,
     borderRadius: 30,
-    backgroundColor: 'rgba(11, 17, 32, 0.85)',
+    backgroundColor: themePalette.rgba_11_17_32_0_85,
     borderWidth: 1,
-    borderColor: 'rgba(201, 168, 76, 0.3)',
+    borderColor: themePalette.rgba_201_168_76_0_3,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   globeContainerLight: {
-    backgroundColor: 'rgba(8, 9, 10, 0.8)',
+    backgroundColor: themePalette.rgba_8_9_10_0_8,
     borderRadius: 130,
   },
   globeImage: {
@@ -221,39 +221,39 @@ const styles = StyleSheet.create({
   },
   badgesRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: s(16), position: 'absolute', bottom: 26 },
   badgeLeft: {
-    backgroundColor: 'rgba(11, 17, 32, 0.85)',
+    backgroundColor: themePalette.rgba_11_17_32_0_85,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.3)',
+    borderColor: themePalette.rgba_59_130_246_0_3,
     borderRadius: 12,
     paddingHorizontal: s(16),
     paddingVertical: s(12),
-    shadowColor: '#3b82f6',
+    shadowColor: themePalette.hex_3b82f6,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
   },
-  badgeLeftLight: { backgroundColor: 'rgba(255, 255, 255, 0.92)', borderColor: 'rgba(59, 130, 246, 0.45)' },
-  badgeLive: { fontSize: font.sm, fontWeight: '700', color: '#3b82f6', letterSpacing: 1, marginBottom: s(4) },
-  badgeLeftSub: { fontSize: font.sm, color: 'rgba(255, 255, 255, 0.4)' },
-  badgeSubLight: { color: 'rgba(15, 23, 42, 0.5)' },
+  badgeLeftLight: { backgroundColor: themePalette.rgba_255_255_255_0_92, borderColor: themePalette.rgba_59_130_246_0_45 },
+  badgeLive: { fontSize: font.sm, fontWeight: '700', color: themePalette.hex_3b82f6, letterSpacing: 1, marginBottom: s(4) },
+  badgeLeftSub: { fontSize: font.sm, color: themePalette.rgba_255_255_255_0_4 },
+  badgeSubLight: { color: themePalette.rgba_15_23_42_0_5 },
   badgeRight: {
-    backgroundColor: 'rgba(11, 17, 32, 0.85)',
+    backgroundColor: themePalette.rgba_11_17_32_0_85,
     borderWidth: 1,
-    borderColor: 'rgba(201, 168, 76, 0.35)',
+    borderColor: themePalette.rgba_201_168_76_0_35,
     borderRadius: 12,
     paddingHorizontal: s(14),
     paddingVertical: s(10),
     alignItems: 'center',
     marginTop: -20,
-    shadowColor: '#c9a84c',
+    shadowColor: themePalette.hex_c9a84c,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
   },
-  badgeRightLight: { backgroundColor: 'rgba(255, 255, 255, 0.92)', borderColor: 'rgba(201, 168, 76, 0.5)' },
-  badgeAvailable: { fontSize: font.xs, fontWeight: '700', color: '#c9a84c', letterSpacing: 1, marginBottom: s(2) },
-  badgeNumber: { fontSize: font.displayXL, fontWeight: '600', color: '#c9a84c', marginBottom: s(2) },
-  badgeCountries: { fontSize: font.sm, color: 'rgba(255, 255, 255, 0.4)' },
+  badgeRightLight: { backgroundColor: themePalette.rgba_255_255_255_0_92, borderColor: themePalette.rgba_201_168_76_0_5 },
+  badgeAvailable: { fontSize: font.xs, fontWeight: '700', color: themePalette.hex_c9a84c, letterSpacing: 1, marginBottom: s(2) },
+  badgeNumber: { fontSize: font.displayXL, fontWeight: '600', color: themePalette.hex_c9a84c, marginBottom: s(2) },
+  badgeCountries: { fontSize: font.sm, color: themePalette.rgba_255_255_255_0_4 },
   stepperContainer: { alignItems: 'center', justifyContent: 'center', width: '100%', paddingHorizontal: s(30), marginTop: -8, marginBottom: s(10) },
   stepperRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   stepperStep: { alignItems: 'center', width: 64 },
@@ -286,25 +286,25 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 120,
     height: 1,
-    backgroundColor: 'rgba(201, 168, 76, 0.35)',
+    backgroundColor: themePalette.rgba_201_168_76_0_35,
     marginBottom: s(16),
   },
   eyebrowContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
-  eyebrowDash: { width: 18, height: 1, backgroundColor: '#c9a84c', marginRight: s(8) },
-  eyebrowText: { fontSize: font.sm, fontWeight: '700', letterSpacing: 1.5, color: '#c9a84c' },
+  eyebrowDash: { width: 18, height: 1, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
+  eyebrowText: { fontSize: font.sm, fontWeight: '700', letterSpacing: 1.5, color: themePalette.hex_c9a84c },
   title: { fontSize: font.displayMedium, fontWeight: '300', lineHeight: 30, marginBottom: s(12) },
-  titleItalic: { fontStyle: 'italic', color: '#c9a84c' },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_c9a84c },
   body: { fontSize: font.base, lineHeight: 20, marginBottom: 4 },
   dotsContainer: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: s(16) },
   dot: { width: 6, height: 6, borderRadius: 3 },
-  activeDot: { width: 22, backgroundColor: '#c9a84c', borderRadius: 4 },
+  activeDot: { width: 22, backgroundColor: themePalette.hex_c9a84c, borderRadius: 4 },
   nextButton: { borderRadius: 24, overflow: 'hidden', marginBottom: s(8) },
   gradientButton: { height: 50, alignItems: 'center', justifyContent: 'center' },
-  nextButtonText: { fontSize: font.lg, fontWeight: '700', color: '#0a0f1e' },
+  nextButtonText: { fontSize: font.lg, fontWeight: '700', color: themePalette.hex_0a0f1e },
   skipButton: { height: 34, alignItems: 'center', justifyContent: 'center', marginBottom: s(4) },
   skipText: { fontSize: font.sm, fontWeight: '500' },
   scrollBody: { flex: 1 },
   scrollContent: { paddingBottom: s(8) },
-});
+}));
 
 export default OnboardingSlide;

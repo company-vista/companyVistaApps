@@ -9,7 +9,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
-import { useThemeColors } from '../../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
 
 const SuccessScreen = ({ onTrackPress }) => {
@@ -28,7 +28,7 @@ const SuccessScreen = ({ onTrackPress }) => {
         {/* Success Icon Graphic */}
         <View style={styles.iconWrapper}>
           <View style={styles.outerCircle}>
-            <View style={[styles.iconBox, { backgroundColor: isLight ? '#FFFFFF' : '#0F172A', borderColor: '#EAB308' }]}>
+            <View style={[styles.iconBox, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f172a, borderColor: themePalette.hex_eab308 }]}>
               <Text style={styles.documentIcon}>📄✓</Text>
             </View>
           </View>
@@ -75,7 +75,7 @@ const SuccessScreen = ({ onTrackPress }) => {
         </View>
 
         {/* Item 3: Estimated Completion */}
-        <View style={[styles.infoCard, { backgroundColor: isLight ? '#FFFFFF' : '#0F172A', borderColor: colors.border }]}>
+        <View style={[styles.infoCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f172a, borderColor: colors.border }]}>
           <View style={styles.clockCircle}>
             <Text style={styles.clockIcon}>🕒</Text>
           </View>
@@ -99,10 +99,10 @@ const SuccessScreen = ({ onTrackPress }) => {
 
 export default SuccessScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070C16',
+    backgroundColor: themePalette.hex_070c16,
   },
   scrollContainer: {
     paddingHorizontal: s(20),
@@ -115,12 +115,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoText: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.xxl,
     fontWeight: 'bold',
   },
   goldText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
   },
   iconWrapper: {
     alignItems: 'center',
@@ -132,24 +132,24 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 90,
     borderWidth: 1,
-    borderColor: 'rgba(234, 179, 8, 0.2)',
+    borderColor: themePalette.rgba_234_179_8_0_2,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(234, 179, 8, 0.02)',
+    backgroundColor: themePalette.rgba_234_179_8_0_02,
   },
   iconBox: {
     width: 80,
     height: 90,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#EAB308',
-    backgroundColor: '#0F172A',
+    borderColor: themePalette.hex_eab308,
+    backgroundColor: themePalette.hex_0f172a,
     justifyContent: 'center',
     alignItems: 'center',
   },
   documentIcon: {
     fontSize: font.displayXXL,
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
   },
   titleContainer: {
     alignItems: 'center',
@@ -158,15 +158,15 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.displayXL,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     textAlign: 'center',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
   },
   subTitle: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.base,
     textAlign: 'center',
     marginTop: s(8),
@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+    backgroundColor: themePalette.rgba_234_179_8_0_1,
     borderWidth: 1,
-    borderColor: '#EAB308',
+    borderColor: themePalette.hex_eab308,
     paddingHorizontal: s(16),
     paddingVertical: s(8),
     borderRadius: 20,
@@ -190,11 +190,11 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     marginRight: s(8),
   },
   statusText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.bodySmall,
     fontWeight: 'bold',
   },
@@ -202,9 +202,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    backgroundColor: themePalette.rgba_16_185_129_0_05,
     borderWidth: 1,
-    borderColor: '#059669',
+    borderColor: themePalette.hex_059669,
     borderRadius: 12,
     padding: s(14),
     marginBottom: s(12),
@@ -213,13 +213,13 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#059669',
+    backgroundColor: themePalette.hex_059669,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: s(12),
   },
   checkIcon: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: 'bold',
   },
@@ -227,9 +227,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     borderRadius: 12,
     padding: s(14),
     marginBottom: s(24),
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: s(12),
@@ -250,18 +250,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   cardSubText: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.sm,
     marginTop: s(2),
   },
   trackButton: {
     width: '100%',
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     borderRadius: 25,
     height: 50,
     justifyContent: 'center',
@@ -269,13 +269,13 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   trackButtonText: {
-    color: '#000000',
+    color: themePalette.hex_000000,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   footerText: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
     fontSize: font.sm,
     textAlign: 'center',
   },
-});
+}));

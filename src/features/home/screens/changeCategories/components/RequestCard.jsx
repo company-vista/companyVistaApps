@@ -3,24 +3,25 @@ import { View, Text, StyleSheet } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { s } from '../../../../../theme/responsive';
 import { font } from '../../../../../theme/typography';
+import { themePalette } from '../../../../../theme/colors';
 const STAGE_COLORS = {
     submitted: {
-        done: { bg: '#3b82f6', text: '#dbeafe' },
-        current: { bg: '#60a5fa', text: '#1e3a5f' },
-        line: '#3b82f6',
-        label: '#60a5fa',
+        done: { bg: themePalette.hex_3b82f6, text: themePalette.hex_dbeafe },
+        current: { bg: themePalette.hex_60a5fa, text: themePalette.hex_1e3a5f },
+        line: themePalette.hex_3b82f6,
+        label: themePalette.hex_60a5fa,
     },
     in_review: {
-        done: { bg: '#8b5cf6', text: '#ede9fe' },
-        current: { bg: '#d9a94e', text: '#3a2a08' },
-        line: '#8b5cf6',
-        label: '#a78bfa',
+        done: { bg: themePalette.hex_8b5cf6, text: themePalette.hex_ede9fe },
+        current: { bg: themePalette.hex_d9a94e, text: themePalette.hex_3a2a08 },
+        line: themePalette.hex_8b5cf6,
+        label: themePalette.hex_a78bfa,
     },
     resolved: {
-        done: { bg: '#22c55e', text: '#dcfce7' },
-        current: { bg: '#4ade80', text: '#14532d' },
-        line: '#22c55e',
-        label: '#4ade80',
+        done: { bg: themePalette.hex_22c55e, text: themePalette.hex_dcfce7 },
+        current: { bg: themePalette.hex_4ade80, text: themePalette.hex_14532d },
+        line: themePalette.hex_22c55e,
+        label: themePalette.hex_4ade80,
     },
 };
 const STAGE_LABEL = {

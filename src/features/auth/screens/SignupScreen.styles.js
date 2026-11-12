@@ -1,10 +1,11 @@
 import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
-const styles = StyleSheet.create({
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
-        backgroundColor: '#0f172a',
+        backgroundColor: themePalette.hex_0f172a,
     },
     scrollContent: {
         flexGrow: 1,
@@ -38,13 +39,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     title: {
-        color: '#f8fafc',
+        color: themePalette.hex_f8fafc,
         fontSize: font.displayXXL,
         fontWeight: '500',
         textAlign: 'center',
     },
     subtitle: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.lg,
         lineHeight: 24,
         marginTop: 8,
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        color: '#1b1e22a9',
+        color: themePalette.hex_1b1e22a9,
         fontSize: font.base,
         fontWeight: '700',
     },
@@ -76,14 +77,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: s(12),
         paddingVertical: 7,
         borderRadius: 10,
-        backgroundColor: '#187269',
+        backgroundColor: themePalette.hex_187269,
         justifyContent: 'center',
         alignItems: 'center',
     },
     verifyLabel: {
         fontSize: font.bodySmall,
         fontWeight: '700',
-        color: '#f59e0b',
+        color: themePalette.hex_f59e0b,
     },
     inputWrap: {
         height: 48,
@@ -91,16 +92,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
         borderWidth: 1,
-        borderColor: '#080808',
+        borderColor: themePalette.hex_080808,
         borderRadius: 12,
-        backgroundColor: '#111827',
+        backgroundColor: themePalette.hex_111827,
         paddingHorizontal: s(16),
     },
     input: {
         flex: 1,
         height: '100%',
         padding: 0,
-        color: '#f8fafc',
+        color: themePalette.hex_f8fafc,
         fontSize: font.lg,
     },
     passwordToggle: {
@@ -111,10 +112,10 @@ const styles = StyleSheet.create({
         marginRight: -6,
     },
     inputError: {
-        borderColor: '#f87171',
+        borderColor: themePalette.hex_f87171,
     },
     errorText: {
-        color: '#fca5a5',
+        color: themePalette.hex_fca5a5,
         fontSize: font.sm,
         fontWeight: '700',
     },
@@ -133,13 +134,13 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     authLinkText: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.lg,
         fontWeight: '500',
         textAlign: 'center',
     },
     authLink: {
-        color: '#5eead4',
+        color: themePalette.hex_5eead4,
         fontWeight: '600',
     },
     socialSection: {
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     socialTitle: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.bodySmall,
         fontWeight: '700',
     },
@@ -164,13 +165,13 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     facebookButton: {
-        backgroundColor: '#1877f2',
+        backgroundColor: themePalette.hex_1877f2,
     },
     instagramButton: {
-        backgroundColor: '#e1306c',
+        backgroundColor: themePalette.hex_e1306c,
     },
     linkedinButton: {
-        backgroundColor: '#0a66c2',
+        backgroundColor: themePalette.hex_0a66c2,
     },
-});
+}));
 export default styles;

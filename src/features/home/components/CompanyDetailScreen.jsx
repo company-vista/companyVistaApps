@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from "./CompanyDetailScreenStyle";
 // Vector icons badal kar image ke style se match kiya
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import BackButton from '../../../components/buttons/BackButton';
 import CompanyInfo from './companyInformationSection/CompanyInfo';
 import ShareHolders from './companyInformationSection/ShareHolders';
@@ -12,8 +12,8 @@ import OrderDetailsScreen from './companyInformationSection/yourOrder/OrderDetai
 import DocumentNotFound from '../../../components/emptyState/DocumentNotFound';
 import { useNavigation } from '@react-navigation/native';
 const menuItems = [
-    { id: 'companyInfo', label: 'Company Info', icon: 'building', iconBg: '#EEF2FF', iconColor: '#4F46E5' },
-    { id: 'shareholders', label: 'Shareholders', icon: 'users', iconBg: '#E6F4EA', iconColor: '#137333' },
+    { id: 'companyInfo', label: 'Company Info', icon: 'building', iconBg: themePalette.hex_eef2ff, iconColor: themePalette.hex_4f46e5 },
+    { id: 'shareholders', label: 'Shareholders', icon: 'users', iconBg: themePalette.hex_e6f4ea, iconColor: themePalette.hex_137333 },
 ];
 const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPress, onSectionPress, selectedCompany, isLoading, }) => {
     const colors = useThemeColors();
@@ -48,15 +48,15 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
           </View>
         </View>
         <View style={styles.emptyState}>
-          {isLoading ? (<ActivityIndicator size="large" color={colors.mode === 'dark' ? '#93C5FD' : '#4F46E5'}/>) : (<DocumentNotFound />)}
+          {isLoading ? (<ActivityIndicator size="large" color={colors.mode === 'dark' ? themePalette.hex_93c5fd : themePalette.hex_4f46e5}/>) : (<DocumentNotFound />)}
         </View>
       </View>);
     }
     // TypeScript Error Fixed: Case-insensitive dynamic comparison strictly using String wrapper
     const isCompanyActive = String(companyData.status).toUpperCase() === 'ACTIVE';
     const statusColor = isCompanyActive
-        ? { bg: '#E6F4EA', text: '#0F9D58', dot: '#0F9D58' }
-        : { bg: '#FCE8E6', text: '#C5221F', dot: '#D93025' };
+        ? { bg: themePalette.hex_e6f4ea, text: themePalette.hex_0f9d58, dot: themePalette.hex_0f9d58 }
+        : { bg: themePalette.hex_fce8e6, text: themePalette.hex_c5221f, dot: themePalette.hex_d93025 };
     /* ── sub-section view ────────────────────────────────────────── */
     const renderSection = () => {
         switch (activeSection) {
@@ -102,8 +102,8 @@ const CompanyDetailScreen = ({ activeSection: controlledActiveSection, onBackPre
             ]}>
 
                 {/* Icon bubble */}
-                <View style={[styles.iconBubble, { backgroundColor: colors.mode === 'dark' ? 'rgba(79,70,229,0.15)' : item.iconBg }]}>
-                  <FontAwesome name={item.icon} size={16} color={colors.mode === 'dark' ? '#93C5FD' : item.iconColor}/>
+                <View style={[styles.iconBubble, { backgroundColor: colors.mode === 'dark' ? themePalette.rgba_79_70_229_0_15 : item.iconBg }]}>
+                  <FontAwesome name={item.icon} size={16} color={colors.mode === 'dark' ? themePalette.hex_93c5fd : item.iconColor}/>
                 </View>
 
                 {/* Label */}

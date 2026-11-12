@@ -21,7 +21,7 @@ import { getStructurePrice } from '../../../utils/priceCalculator';
 import { getStateData, getPackageIncludes } from '../../../utils/jurisdictionData';
 import { getCountryPrice } from '../../../constants/countries';
 import { allCountries } from '../jurisdictionAdvisor/RegisterJurisdictionScreen';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 export default function WhatsIncludedScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -80,11 +80,11 @@ export default function WhatsIncludedScreen({ navigation, route }) {
         </View>
 
         {/* Package Card */}
-        <View style={[styles.card, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(0, 230, 118, 0.2)' : 'rgba(0, 230, 118, 0.35)' }]}>
+        <View style={[styles.card, { backgroundColor: isDark ? themePalette.hex_0c1622 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_0_230_118_0_2 : themePalette.rgba_0_230_118_0_35 }]}>
           {/* Main Package Header */}
           <View style={styles.packageHeader}>
             <View style={styles.iconContainerGreen}>
-              <Feather name="shield" size={22} color="#00E676" />
+              <Feather name="shield" size={22} color={themePalette.hex_00e676} />
             </View>
             <View style={styles.packageTextContainer}>
               <Text style={[styles.packageTitle, { color: colors.text }]}>Complete formation package</Text>
@@ -107,15 +107,15 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             </View>
           </View>
 
-          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]} />
+          <View style={[styles.divider, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]} />
 
           {packageItems.map((item, index) => (
             <View key={item.label || index} style={styles.itemRow}>
-              <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.surfaceAlt }]}>
+              <View style={[styles.iconContainer, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.surfaceAlt }]}>
                 {item.iconLib === 'FontAwesome5' ? (
-                  <FontAwesome5 name={item.icon} size={16} color="#00E676" />
+                  <FontAwesome5 name={item.icon} size={16} color={themePalette.hex_00e676} />
                 ) : (
-                  <Feather name={item.icon} size={18} color="#00E676" />
+                  <Feather name={item.icon} size={18} color={themePalette.hex_00e676} />
                 )}
               </View>
               <View style={styles.itemTextContainer}>
@@ -140,12 +140,12 @@ export default function WhatsIncludedScreen({ navigation, route }) {
             </View>
           ))}
 
-          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]} />
+          <View style={[styles.divider, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]} />
 
           {/* Guarantee Footer inside card */}
           <View style={styles.guaranteeRow}>
             <View style={styles.checkIconContainer}>
-              <Ionicons name="checkmark-circle" size={24} color="#00E676" />
+              <Ionicons name="checkmark-circle" size={24} color={themePalette.hex_00e676} />
             </View>
             <Text style={[styles.guaranteeText, { color: colors.muted }]}>
               <Text style={styles.guaranteeBold}>100% refund guarantee</Text> — if we cannot form your company, you pay nothing.
@@ -155,11 +155,11 @@ export default function WhatsIncludedScreen({ navigation, route }) {
 
         {/* Stats Row */}
         <View style={styles.statsContainer}>
-          <View style={[styles.statBox, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
+          <View style={[styles.statBox, { backgroundColor: isDark ? themePalette.hex_0c1622 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
             <Text style={styles.statNumber}>2,400+</Text>
             <Text style={[styles.statLabel, { color: colors.muted }]}>COMPANIES FORMED</Text>
           </View>
-          <View style={[styles.statBox, { backgroundColor: isDark ? '#0C1622' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
+          <View style={[styles.statBox, { backgroundColor: isDark ? themePalette.hex_0c1622 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
             <Text style={styles.statNumber}>98%</Text>
             <Text style={[styles.statLabel, { color: colors.muted }]}>FIRST-TIME APPROVAL</Text>
           </View>
@@ -206,7 +206,7 @@ export default function WhatsIncludedScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   italicTitle: {
     fontStyle: 'italic',
     fontWeight: '400',
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
   },
   subtitle: {
     fontSize: font.base,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: 'rgba(0, 230, 118, 0.1)',
+    backgroundColor: themePalette.rgba_0_230_118_0_1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   valueAmount: {
-    color: '#00E676',
+    color: themePalette.hex_00e676,
     fontSize: font.xxl,
     fontWeight: '700',
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: font.bodySmall,
   },
   valueLabel: {
-    color: '#00E676',
+    color: themePalette.hex_00e676,
     fontSize: font.xs,
     opacity: 0.8,
   },
@@ -318,8 +318,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badge: {
-    backgroundColor: 'rgba(21, 101, 192, 0.3)',
-    borderColor: '#1E88E5',
+    backgroundColor: themePalette.rgba_21_101_192_0_3,
+    borderColor: themePalette.hex_1e88e5,
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: s(6),
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     marginLeft: s(6),
   },
   badgeText: {
-    color: '#64B5F6',
+    color: themePalette.hex_64b5f6,
     fontSize: font.caption,
     fontWeight: '700',
   },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   freeBadge: {
-    color: '#00E676',
+    color: themePalette.hex_00e676,
     fontSize: font.sm,
     fontWeight: '700',
     marginTop: s(1),
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
   guaranteeBold: {
-    color: '#00E676',
+    color: themePalette.hex_00e676,
     fontWeight: '700',
   },
   statsContainer: {
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   statNumber: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.display,
     fontWeight: '700',
   },
@@ -410,4 +410,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: s(10),
   },
-});
+}));

@@ -6,7 +6,7 @@ import { generatePDF } from 'react-native-html-to-pdf';
 import RNFetchBlob from 'react-native-blob-util';
 import Toast from 'react-native-toast-message';
 import { BackButton } from '../../../../components/buttons';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import { styles } from './TransactionDetailScreenStyles';
 // Transaction ka asli status derive karo - list screen ke normalized status ('success'/'pending'/'failed')
@@ -32,18 +32,18 @@ function getDisplayStatus(txn) {
 }
 function getStatusColor(status) {
     switch (status) {
-        case 'Success': return '#16a34a';
-        case 'Pending': return '#ca8a04';
-        case 'Active': return '#2563eb';
-        default: return '#dc2626';
+        case 'Success': return themePalette.hex_16a34a;
+        case 'Pending': return themePalette.hex_ca8a04;
+        case 'Active': return themePalette.hex_2563eb;
+        default: return themePalette.hex_dc2626;
     }
 }
 function getStatusTagStyle(status) {
     switch (status) {
-        case 'Success': return { color: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.1)' };
-        case 'Pending': return { color: '#ca8a04', backgroundColor: 'rgba(202, 138, 4, 0.1)' };
-        case 'Active': return { color: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)' };
-        default: return { color: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.1)' };
+        case 'Success': return { color: themePalette.hex_16a34a, backgroundColor: themePalette.rgba_22_163_74_0_1 };
+        case 'Pending': return { color: themePalette.hex_ca8a04, backgroundColor: themePalette.rgba_202_138_4_0_1 };
+        case 'Active': return { color: themePalette.hex_2563eb, backgroundColor: themePalette.rgba_37_99_235_0_1 };
+        default: return { color: themePalette.hex_dc2626, backgroundColor: themePalette.rgba_220_38_38_0_1 };
     }
 }
 export default function TransactionDetailScreen({ transaction, companyTotalAmount = 0, companyCurrency, onBackPress, }) {
@@ -107,33 +107,33 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
 <meta charset="utf-8"/>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: sans-serif; }
-  body { background:#fff; padding:20px; color:#334155; }
-  .header { background:#1e1b4b; color:white; padding:25px; display:flex; justify-content:space-between; align-items:center; border-bottom:5px solid #eab308; }
+  body { background:${themePalette.hex_fff}; padding:20px; color:${themePalette.hex_334155}; }
+  .header { background:${themePalette.hex_1e1b4b}; color:white; padding:25px; display:flex; justify-content:space-between; align-items:center; border-bottom:5px solid ${themePalette.hex_eab308}; }
   .logo { font-size:22px; font-weight:bold; letter-spacing:0.5px; }
-  .logo span { color:#eab308; font-weight:300; }
+  .logo span { color:${themePalette.hex_eab308}; font-weight:300; }
   .receipt-title { font-size:26px; font-weight:900; letter-spacing:1px; }
-  .receipt-id { font-size:12px; color:#cbd5e1; margin-top:2px; }
+  .receipt-id { font-size:12px; color:${themePalette.hex_cbd5e1}; margin-top:2px; }
   .status-badge { color:white; font-size:11px; font-weight:bold; padding:4px 14px; border-radius:4px; text-transform:uppercase; margin-top:8px; display:inline-block; background:${statusColor}; }
-  .amount-section { text-align:center; padding:30px; background:#fafafa; border-bottom:1px solid #e2e8f0; }
-  .amount-label { font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-  .amount-value { font-size:36px; font-weight:900; color:#1e1b4b; }
+  .amount-section { text-align:center; padding:30px; background:${themePalette.hex_fafafa}; border-bottom:1px solid ${themePalette.hex_e2e8f0}; }
+  .amount-label { font-size:11px; color:${themePalette.hex_94a3b8}; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .amount-value { font-size:36px; font-weight:900; color:${themePalette.hex_1e1b4b}; }
   .breakdown { display:flex; justify-content:center; gap:30px; margin-top:16px; }
   .breakdown-item { text-align:center; }
-  .breakdown-label { font-size:10px; color:#94a3b8; text-transform:uppercase; }
+  .breakdown-label { font-size:10px; color:${themePalette.hex_94a3b8}; text-transform:uppercase; }
   .breakdown-value { font-size:16px; font-weight:700; margin-top:2px; }
   .details { padding:20px 25px; }
-  .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f5f9; }
-  .detail-label { color:#94a3b8; font-size:12px; font-weight:600; }
-  .detail-value { color:#1e1b4b; font-size:12px; font-weight:600; text-align:right; }
-  .footer { background:#16143c; color:#94a3b8; padding:20px; text-align:center; font-size:10px; }
+  .detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid ${themePalette.hex_f1f5f9}; }
+  .detail-label { color:${themePalette.hex_94a3b8}; font-size:12px; font-weight:600; }
+  .detail-value { color:${themePalette.hex_1e1b4b}; font-size:12px; font-weight:600; text-align:right; }
+  .footer { background:${themePalette.hex_16143c}; color:${themePalette.hex_94a3b8}; padding:20px; text-align:center; font-size:10px; }
 </style>
 </head>
 <body>
-  <div style="border:1px solid #e2e8f0; max-width:600px; margin:0 auto; overflow:hidden;">
+  <div style="border:1px solid ${themePalette.hex_e2e8f0}; max-width:600px; margin:0 auto; overflow:hidden;">
     <div class="header">
       <div>
         <div class="logo">Company<span>Vista</span></div>
-        <div style="font-size:9px; color:#94a3b8; letter-spacing:2px; margin-top:3px;">BY KOSHIKA</div>
+        <div style="font-size:9px; color:${themePalette.hex_94a3b8}; letter-spacing:2px; margin-top:3px;">BY KOSHIKA</div>
       </div>
       <div style="text-align:right;">
         <div class="receipt-title">PAYMENT RECEIPT</div>
@@ -150,12 +150,12 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
         <div class="breakdown-item">
           <div class="breakdown-label">Online</div>
           <div class="breakdown-label" style="font-size:8px; letter-spacing:0.5px;">${transaction.paymentMethod.charAt(0).toUpperCase() + transaction.paymentMethod.slice(1)}</div>
-          <div class="breakdown-value" style="color:#2563eb;">${formatCurrency(displayAmount, displayCurrency)}</div>
+          <div class="breakdown-value" style="color:${themePalette.hex_2563eb};">${formatCurrency(displayAmount, displayCurrency)}</div>
         </div>` : ''}
         ${transaction.paymentMethod === 'cash' ? `
         <div class="breakdown-item">
           <div class="breakdown-label">Cash</div>
-          <div class="breakdown-value" style="color:#059669;">${formatCurrency(displayAmount, displayCurrency)}</div>
+          <div class="breakdown-value" style="color:${themePalette.hex_059669};">${formatCurrency(displayAmount, displayCurrency)}</div>
         </div>` : ''}
       </div>
     </div>
@@ -204,7 +204,7 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
 
     <div class="footer">
       <p style="margin-bottom:4px;">This is a system-generated payment receipt. No signature required.</p>
-      <p style="color:#64748b; font-size:9px;">Downloaded on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+      <p style="color:${themePalette.hex_64748b}; font-size:9px;">Downloaded on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
     </div>
   </div>
 </body>
@@ -246,7 +246,7 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
       <View style={[styles.header, { paddingTop: safeAreaInsets.top + s(8), backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }]}>
         <BackButton onPress={onBackPress}/>
         <Text style={[styles.title, { color: colors.text }]}>Transaction Details</Text>
-        <Pressable style={[styles.downloadButton, { backgroundColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#eef2ff', borderWidth: 1, borderColor: colors.border }]} onPress={handleDownload}>
+        <Pressable style={[styles.downloadButton, { backgroundColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : themePalette.hex_eef2ff, borderWidth: 1, borderColor: colors.border }]} onPress={handleDownload}>
           <FontAwesome name="download" size={18} color={colors.text}/>
         </Pressable>
       </View>
@@ -262,10 +262,10 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
             <Text style={[styles.amountValue, { color: colors.text }]}>
               {formatCurrency(displayAmount, displayCurrency)}
             </Text>
-            {(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') && (<Text style={[styles.amountBracket, { color: '#2563eb' }]}>
+            {(transaction.paymentMethod === 'stripe' || transaction.paymentMethod === 'razorpay') && (<Text style={[styles.amountBracket, { color: themePalette.hex_2563eb }]}>
                 (Online)
               </Text>)}
-            {transaction.paymentMethod === 'cash' && (<Text style={[styles.amountBracket, { color: '#059669' }]}>
+            {transaction.paymentMethod === 'cash' && (<Text style={[styles.amountBracket, { color: themePalette.hex_059669 }]}>
                 (Cash)
               </Text>)}
           </View>
@@ -277,7 +277,7 @@ export default function TransactionDetailScreen({ transaction, companyTotalAmoun
               </Text>)}
           {transaction.paymentMethod === 'cash' && (<Text style={[
                 styles.amountModeTag,
-                { color: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.1)' },
+                { color: themePalette.hex_059669, backgroundColor: themePalette.rgba_5_150_105_0_1 },
             ]}>
                 Cash
               </Text>)}

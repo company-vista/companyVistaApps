@@ -48,6 +48,7 @@ import BestMatchesScreen from '../jurisdictionAdvisor/BestMatchesScreen';
 import USStatePhysicalPresenceScreen from '../jurisdictionAdvisor/USStatePhysicalPresenceScreen';
 import USStatePriorityScreen from '../jurisdictionAdvisor/USStatePriorityScreen';
 import BestStatesForYouScreen from '../jurisdictionAdvisor/BestStatesForYouScreen';
+import { themePalette } from '../../../theme/colors';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,7 +58,7 @@ export default function RegistrationStack() {
             initialRouteName="RegistrationLanding"
             screenOptions={{
                 headerShown: false,
-                contentStyle: { backgroundColor: '#0a0f1e' },
+                contentStyle: { backgroundColor: themePalette.hex_0a0f1e },
             }}
         >
             {/* Entry */}

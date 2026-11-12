@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 const STEPS = [
@@ -23,7 +23,7 @@ export default function AnnualStateFilingScreen() {
     const colors = useThemeColors();
     const cardBgStyle = {
         backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
-        borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+        borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         borderWidth: 1,
     };
     const token = useAppSelector(state => state.auth.token);
@@ -464,7 +464,7 @@ function StepBullet({ status, number, colors }) {
 }
 
 // STYLING SECTION
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     safeArea: {
         flex: 1,
         paddingTop: 0,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     choiceButtonActive: {
-        backgroundColor: 'rgba(59,130,246,0.12)',
+        backgroundColor: themePalette.rgba_59_130_246_0_12,
     },
     choiceButtonText: {
         fontSize: font.sm,
@@ -682,4 +682,4 @@ const styles = StyleSheet.create({
         rotation: '45deg',
         transform: [{ rotate: '20deg' }],
     },
-});
+}));

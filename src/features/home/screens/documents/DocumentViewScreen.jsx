@@ -2,7 +2,7 @@ import { ScrollView, StatusBar, StyleSheet, Text, View, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
@@ -58,8 +58,8 @@ function getStyles(colors) {
             borderRadius: 12,
             padding: 16,
             borderWidth: 1,
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border,
-            shadowColor: '#000',
+            borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border,
+            shadowColor: themePalette.hex_000,
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
             shadowRadius: 4,
@@ -73,7 +73,7 @@ function getStyles(colors) {
             width: 64,
             height: 64,
             borderRadius: 16,
-            backgroundColor: isDark ? 'rgba(255, 107, 129, 0.15)' : '#FFF0F3',
+            backgroundColor: isDark ? themePalette.rgba_255_107_129_0_15 : themePalette.hex_fff0f3,
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 16,
@@ -93,7 +93,7 @@ function getStyles(colors) {
         sectionTitle: {
             fontSize: font.sm,
             fontWeight: '500',
-            color: isDark ? colors.muted : '#164066',
+            color: isDark ? colors.muted : themePalette.hex_164066,
             textTransform: 'uppercase',
             letterSpacing: 0.5,
             marginBottom: 16,
@@ -154,7 +154,7 @@ function DocumentViewScreen({ documentItem, onBackPress }) {
             {/* Top Card */}
             <View style={[styles.card, styles.topCard]}>
                 <View style={styles.iconContainer}>
-                    <FontAwesome name="file-text-o" size={32} color="#FF4D6D" />
+                    <FontAwesome name="file-text-o" size={32} color={themePalette.hex_ff4d6d} />
                 </View>
                 <Text style={styles.filename}>{documentItem.originalFileName ?? documentItem.fileName ?? 'Document'}</Text>
                 <Text style={styles.metaText}>

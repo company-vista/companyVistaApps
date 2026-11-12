@@ -8,7 +8,7 @@ import { SaveButton } from '../../../components/buttons';
 import BackButton from '../../../components/buttons/BackButton';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { updateProfileUser } from '../../../store/slices/authSlice';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import ProfileDatePickerModal from '../components/ProfileDatePickerModal';
 import { uploadClientAvatar } from '../api/clientProfileAvatarApi';
@@ -187,7 +187,7 @@ function EditProfileScreen() {
                         styles.cameraButton,
                         { backgroundColor: colors.accent, borderColor: colors.surface },
                     ]}>
-                        {isUploadingAvatar ? (<ActivityIndicator size="small" color="#f0e8e8" />) : (<FontAwesome name="camera" size={22} color="#f8f2f2" />)}
+                        {isUploadingAvatar ? (<ActivityIndicator size="small" color={themePalette.hex_f0e8e8} />) : (<FontAwesome name="camera" size={22} color={themePalette.hex_f8f2f2} />)}
                     </Pressable>
                 </View>
             </View>

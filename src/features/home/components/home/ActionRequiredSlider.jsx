@@ -3,7 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import { font } from '../../../../theme/typography';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 
 const AUTO_SLIDE_MS = 4000;
@@ -54,28 +54,28 @@ function ActionRequiredSlider() {
 
     const toneStyles = {
         danger: {
-            bg: isDark ? '#3b1515' : '#FCEBEB',
-            border: isDark ? '#5c2222' : '#F7C1C1',
-            text: isDark ? '#fca5a5' : '#501313',
-            title: isDark ? '#fca5a5' : '#791F1F',
-            action: isDark ? '#fca5a5' : '#A32D2D',
-            icon: isDark ? '#f87171' : '#A32D2D',
+            bg: isDark ? themePalette.hex_3b1515 : themePalette.hex_fcebeb,
+            border: isDark ? themePalette.hex_5c2222 : themePalette.hex_f7c1c1,
+            text: isDark ? themePalette.hex_fca5a5 : themePalette.hex_501313,
+            title: isDark ? themePalette.hex_fca5a5 : themePalette.hex_791f1f,
+            action: isDark ? themePalette.hex_fca5a5 : themePalette.hex_a32d2d,
+            icon: isDark ? themePalette.hex_f87171 : themePalette.hex_a32d2d,
         },
         warning: {
-            bg: isDark ? '#3b2f0f' : '#FEF6E7',
-            border: isDark ? '#5c4a1e' : '#F7DEB2',
-            text: isDark ? '#fde68a' : '#6b4a0a',
-            title: isDark ? '#fde68a' : '#8a5a00',
-            action: isDark ? '#fde68a' : '#B47700',
-            icon: isDark ? '#fbbf24' : '#B47700',
+            bg: isDark ? themePalette.hex_3b2f0f : themePalette.hex_fef6e7,
+            border: isDark ? themePalette.hex_5c4a1e : themePalette.hex_f7deb2,
+            text: isDark ? themePalette.hex_fde68a : themePalette.hex_6b4a0a,
+            title: isDark ? themePalette.hex_fde68a : themePalette.hex_8a5a00,
+            action: isDark ? themePalette.hex_fde68a : themePalette.hex_b47700,
+            icon: isDark ? themePalette.hex_fbbf24 : themePalette.hex_b47700,
         },
         info: {
-            bg: isDark ? '#12333f' : '#E7F6FB',
-            border: isDark ? '#1f4e5e' : '#BCE4F0',
-            text: isDark ? '#a5e8f7' : '#175a73',
-            title: isDark ? '#a5e8f7' : '#0c5a73',
-            action: isDark ? '#a5e8f7' : '#0F6B8C',
-            icon: isDark ? '#38bdf8' : '#0F6B8C',
+            bg: isDark ? themePalette.hex_12333f : themePalette.hex_e7f6fb,
+            border: isDark ? themePalette.hex_1f4e5e : themePalette.hex_bce4f0,
+            text: isDark ? themePalette.hex_a5e8f7 : themePalette.hex_175a73,
+            title: isDark ? themePalette.hex_a5e8f7 : themePalette.hex_0c5a73,
+            action: isDark ? themePalette.hex_a5e8f7 : themePalette.hex_0f6b8c,
+            icon: isDark ? themePalette.hex_38bdf8 : themePalette.hex_0f6b8c,
         },
     };
 
@@ -226,7 +226,7 @@ function ActionRequiredSlider() {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     wrapper: {
         marginTop: 10,
     },
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     alertActionText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.sm,
         fontWeight: '600',
     },
@@ -276,6 +276,6 @@ const styles = StyleSheet.create({
         height: 6,
         borderRadius: 3,
     },
-});
+}));
 
 export default ActionRequiredSlider;

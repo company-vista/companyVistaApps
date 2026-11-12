@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 import { createServiceRequest } from './api/serviceRequestsApi';
@@ -16,10 +16,10 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
     const [submitting, setSubmitting] = useState(false);
 
     //***********INNER STYLE***************** */
-    const sendButtonStyle = { backgroundColor: isDark ? '#1E293B' : '#F1F5F9', borderColor: colors.border }
-    const sendButtonTextStyle = { color: isDark ? '#F1F5F9' : colors.text }
-    const StripeOneTimePaymentStyle = { backgroundColor: isDark ? '#FF9500' : colors.buttonBackground }
-    const payNowButtonTextStyle = { color: isDark ? '#000000' : colors.buttonText }
+    const sendButtonStyle = { backgroundColor: isDark ? themePalette.hex_1e293b : themePalette.hex_f1f5f9, borderColor: colors.border }
+    const sendButtonTextStyle = { color: isDark ? themePalette.hex_f1f5f9 : colors.text }
+    const StripeOneTimePaymentStyle = { backgroundColor: isDark ? themePalette.hex_ff9500 : colors.buttonBackground }
+    const payNowButtonTextStyle = { color: isDark ? themePalette.hex_000000 : colors.buttonText }
     //***********INNER STYLE***************** */
 
 
@@ -75,7 +75,7 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
         <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.outlineButton, sendButtonStyle]} activeOpacity={0.7} onPress={handleRequestQuote} disabled={submitting}>
                 <Text style={[styles.outlineButtonText, sendButtonTextStyle]}>{submitting ? 'Sending...' : 'Send Request'}</Text>
-                <FontAwesome name="send" size={12} color={isDark ? '#F1F5F9' : colors.text} />
+                <FontAwesome name="send" size={12} color={isDark ? themePalette.hex_f1f5f9 : colors.text} />
             </TouchableOpacity>
 
             {typeof amount === 'number' ? (<StripeOneTimePayment invoice={{
@@ -96,7 +96,7 @@ export const ServiceCard = ({ title, price, amount, companyId, description, serv
 
 
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     card: {
         borderRadius: 16,
         padding: 18,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: font.xl,
         fontWeight: '500',
-        color: '#FFA500',
+        color: themePalette.hex_ffa500,
     },
     description: {
         fontSize: font.bodySmall,
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
         fontSize: font.base,
         fontWeight: '500',
     },
-});
+}));

@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { getServiceCategories } from '../../../../constants/exploreServicesData';
 import { s } from '../../../../theme/responsive';
@@ -36,17 +36,17 @@ const screenMap = {
     'Company Updates & Documents': 'CorporateChanges',
 };
 const toneStyles = {
-    amber: { iconBg: '#FEF3C7', iconColor: '#B45309' },
-    blue: { iconBg: '#DBEAFE', iconColor: '#1D4ED8' },
-    purple: { iconBg: '#EDE9FE', iconColor: '#7C3AED' },
-    red: { iconBg: '#FEE2E2', iconColor: '#DC2626' },
+    amber: { iconBg: themePalette.hex_fef3c7, iconColor: themePalette.hex_b45309 },
+    blue: { iconBg: themePalette.hex_dbeafe, iconColor: themePalette.hex_1d4ed8 },
+    purple: { iconBg: themePalette.hex_ede9fe, iconColor: themePalette.hex_7c3aed },
+    red: { iconBg: themePalette.hex_fee2e2, iconColor: themePalette.hex_dc2626 },
 };
 function ExploreServicesScreen({ onBackPress, selectedCompany }) {
     const navigation = useNavigation();
     const colors = useThemeColors();
     const safeAreaInsets = useSafeAreaInsets();
     const categories = getServiceCategories();
-    const headerBg = colors.mode === 'light' ? '#ffffff' : colors.background;
+    const headerBg = colors.mode === 'light' ? themePalette.hex_ffffff : colors.background;
     return (<View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: headerBg, paddingTop: safeAreaInsets.top + 12 }]}>
         <BackButton onPress={onBackPress}/>

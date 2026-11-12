@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { logoutUser, setRedirectToLogin, updateProfileUser } from '../../../store/slices/authSlice';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import BackButton from '../../../components/buttons/BackButton';
 import { fetchClientProfile } from '../api/clientProfileDetailsApi';
@@ -90,7 +90,7 @@ function ProfileScreen() {
   const totalCount = completionFields.length;
   const completionPercent = Math.round((filledCount / totalCount) * 100);
   const missingLabels = completionFields.filter(f => !f.filled).map(f => f.label);
-  const switchSheetBackground = colors.mode === 'dark' ? '#1f1f22' : colors.surface;
+  const switchSheetBackground = colors.mode === 'dark' ? themePalette.hex_1f1f22 : colors.surface;
   function handleSwitchAccountPress() {
     setIsSwitchSheetVisible(true);
   }
@@ -130,8 +130,8 @@ function ProfileScreen() {
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(8), marginTop: s(16) }}>
         <Text style={[styles.name, { color: colors.text, marginTop: 0, lineHeight: 30 }]}>{user?.name ?? 'N/A'}</Text>
         {filledCount === totalCount && (
-          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#10B981', alignItems: 'center', justifyContent: 'center', marginTop: s(1) }}>
-            <FontAwesome name="check" size={10} color="#FFF" />
+          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: themePalette.hex_10b981, alignItems: 'center', justifyContent: 'center', marginTop: s(1) }}>
+            <FontAwesome name="check" size={10} color={themePalette.hex_fff} />
           </View>
         )}
       </View>
@@ -160,8 +160,8 @@ function ProfileScreen() {
         <View style={styles.progressFieldsRow}>
           {completionFields.map(f => (
             <View key={f.key} style={styles.progressFieldItem}>
-              <View style={[styles.progressDot, { backgroundColor: f.filled ? '#10B981' : colors.border }]}>
-                {f.filled && <FontAwesome name="check" size={7} color="#FFF" />}
+              <View style={[styles.progressDot, { backgroundColor: f.filled ? themePalette.hex_10b981 : colors.border }]}>
+                {f.filled && <FontAwesome name="check" size={7} color={themePalette.hex_fff} />}
               </View>
               <Text style={[styles.progressFieldLabel, { color: f.filled ? colors.text : colors.muted }]}>{f.label}</Text>
             </View>
@@ -323,7 +323,7 @@ function ProfileScreen() {
 
             <Pressable onPress={handleAddAccountPress} style={styles.switchSheetAddRow}>
               <View style={styles.switchSheetAddIcon}>
-                <FontAwesome name="plus" size={18} color="#ffffff" />
+                <FontAwesome name="plus" size={18} color={themePalette.hex_ffffff} />
               </View>
               <Text style={[styles.switchSheetAddText, { color: colors.text }]}>
                 Add another account

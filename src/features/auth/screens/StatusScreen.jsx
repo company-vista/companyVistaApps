@@ -22,6 +22,7 @@ import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setAuthSession, setPendingOpenRegistrationProgress, setPendingCloseAddCompany } from '../../../store/slices/authSlice';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const StatusScreen = ({ navigation, route }) => {
   const params = route?.params || {};
@@ -100,7 +101,7 @@ const StatusScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070C15" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070c15} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* CompanyNaming jaisa Back + Logo header - top se bahar nahi jayega */}
         <View style={styles.headerRow}>
@@ -110,9 +111,9 @@ const StatusScreen = ({ navigation, route }) => {
 
         {/* Main Status Icon Circle */}
         <View style={styles.iconWrapper}>
-          <View style={[styles.outerCircle, { borderColor: 'rgba(34, 197, 94, 0.2)' }]}>
+          <View style={[styles.outerCircle, { borderColor: themePalette.rgba_34_197_94_0_2 }]}>
             <View style={[styles.innerSquare, styles.greenSquare]}>
-              <CheckCircle color="#22c55e" size={36} />
+              <CheckCircle color={themePalette.hex_22c55e} size={36} />
             </View>
           </View>
         </View>
@@ -125,7 +126,7 @@ const StatusScreen = ({ navigation, route }) => {
           <Text style={styles.subTitle}>{amountPaid} paid · Receipt sent to your email</Text>
           <View style={styles.orderBadge}>
             <Text style={styles.orderBadgeText}>
-              Order <Text style={{ color: '#eab308' }}>{orderId}</Text>
+              Order <Text style={{ color: themePalette.hex_eab308 }}>{orderId}</Text>
             </Text>
           </View>
         </View>
@@ -136,7 +137,7 @@ const StatusScreen = ({ navigation, route }) => {
           <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('Shareholders', { ...downstreamParams, companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
             {isShareholderDone ? (
               <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
-                <Check color="#fff" size={16} strokeWidth={3} />
+                <Check color={themePalette.hex_fff} size={16} strokeWidth={3} />
               </View>
             ) : (
               <View style={styles.stepNumberBox}>
@@ -147,12 +148,12 @@ const StatusScreen = ({ navigation, route }) => {
               <Text style={styles.cardTitle}>Shareholders & ownership</Text>
               <Text style={styles.cardDesc}>Who owns what — about 2 minutes</Text>
             </View>
-            {isShareholderDone ? <Check color="#10B981" size={18} /> : <ChevronRight color="#64748b" size={20} />}
+            {isShareholderDone ? <Check color={themePalette.hex_10b981} size={18} /> : <ChevronRight color={themePalette.hex_64748b} size={20} />}
           </TouchableOpacity>
           <TouchableOpacity style={styles.cardAction} activeOpacity={0.8} onPress={() => navigation?.navigate?.('VerifyIdentity', { ...downstreamParams, companyName, country, userEmail, orderId, amountPaid, fullName: params.fullName || params.email?.split('@')[0] || '', email: params.email || userEmail, countryOfResidence: params.countryOfResidence, shareholderCompleted: isShareholderDone, kycCompleted: isKycDone })}>
             {isKycDone ? (
               <View style={[styles.stepNumberBox, styles.stepCompletedBox]}>
-                <Check color="#fff" size={16} strokeWidth={3} />
+                <Check color={themePalette.hex_fff} size={16} strokeWidth={3} />
               </View>
             ) : (
               <View style={styles.stepNumberBox}>
@@ -163,14 +164,14 @@ const StatusScreen = ({ navigation, route }) => {
               <Text style={styles.cardTitle}>KYC documents</Text>
               <Text style={styles.cardDesc}>Passport & address proof per shareholder</Text>
             </View>
-            {isKycDone ? <Check color="#10B981" size={18} /> : <ChevronRight color="#64748b" size={20} />}
+            {isKycDone ? <Check color={themePalette.hex_10b981} size={18} /> : <ChevronRight color={themePalette.hex_64748b} size={20} />}
           </TouchableOpacity>
         </View>
 
         {!isContinueEnabled && (
-          <View style={{ backgroundColor: 'rgba(234,179,8,0.08)', borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
-            <CheckCircle size={16} color="#EAB308" style={{ marginRight: 8 }} />
-            <Text style={{ color: '#EAB308', fontSize: font.small, flex: 1 }}>
+          <View style={{ backgroundColor: themePalette.rgba_234_179_8_0_08, borderWidth: 1, borderColor: themePalette.rgba_234_179_8_0_2, borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
+            <CheckCircle size={16} color={themePalette.hex_eab308} style={{ marginRight: 8 }} />
+            <Text style={{ color: themePalette.hex_eab308, fontSize: font.small, flex: 1 }}>
               {!isShareholderDone ? 'Complete shareholders & ownership first' : 'Complete KYC documents first'} — then Continue will be enabled
             </Text>
           </View>
@@ -179,13 +180,13 @@ const StatusScreen = ({ navigation, route }) => {
         <View style={styles.bottomSection}>
           <TouchableOpacity style={[styles.primaryButton, !isContinueEnabled && { opacity: 0.5 }]} activeOpacity={0.85} onPress={handlePrimaryPress} disabled={!isContinueEnabled}>
             <Text style={styles.primaryButtonText}>{isContinueEnabled ? 'Continue' : 'Complete steps to continue'}</Text>
-            <ArrowRight color="#070C15" size={18} />
+            <ArrowRight color={themePalette.hex_070c15} size={18} />
           </TouchableOpacity>
           <Text style={styles.footerNote}>{isContinueEnabled ? 'Filing begins — redirecting to progress' : 'Filing begins once both steps are complete'}</Text>
           {!isContinueEnabled && (
             <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 10 }}>
-              {!isShareholderDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: font.xs }}>Shareholders pending</Text></View>}
-              {!isKycDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' }} /><Text style={{ color: '#64748B', fontSize: font.xs }}>KYC pending</Text></View>}
+              {!isShareholderDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_eab308 }} /><Text style={{ color: themePalette.hex_64748b, fontSize: font.xs }}>Shareholders pending</Text></View>}
+              {!isKycDone && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_eab308 }} /><Text style={{ color: themePalette.hex_64748b, fontSize: font.xs }}>KYC pending</Text></View>}
             </View>
           )}
         </View>
@@ -196,10 +197,10 @@ const StatusScreen = ({ navigation, route }) => {
 
 export default StatusScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070C15',
+    backgroundColor: themePalette.hex_070c15,
   },
   scrollContent: {
     paddingHorizontal: s(20),
@@ -213,25 +214,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   brandTitle: {
-    color: '#D1D5DB',
+    color: themePalette.hex_d1d5db,
     fontSize: font.xxl,
     letterSpacing: 1,
   },
   brandSub: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
     fontSize: font.tiny,
     letterSpacing: 1.5,
     marginTop: 2,
   },
   toggleBtn: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     paddingVertical: 6,
     paddingHorizontal: s(12),
     borderRadius: 20,
     marginBottom: 20,
   },
   toggleText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
   },
   iconWrapper: {
@@ -244,10 +245,10 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 80,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.2)',
+    borderColor: themePalette.rgba_59_130_246_0_2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    backgroundColor: themePalette.rgba_15_23_42_0_5,
   },
   innerSquare: {
     width: 100,
@@ -258,12 +259,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   blueSquare: {
-    borderColor: '#2563EB',
-    backgroundColor: '#0B1528',
+    borderColor: themePalette.hex_2563eb,
+    backgroundColor: themePalette.hex_0b1528,
   },
   greenSquare: {
-    borderColor: '#16A34A',
-    backgroundColor: '#071F15',
+    borderColor: themePalette.hex_16a34a,
+    backgroundColor: themePalette.hex_071f15,
   },
   titleSection: {
     alignItems: 'center',
@@ -271,21 +272,21 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.displayXL,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '400',
   },
   italicBlue: {
     fontStyle: 'italic',
-    color: '#60A5FA',
+    color: themePalette.hex_60a5fa,
     fontFamily: 'serif',
   },
   italicGreen: {
     fontStyle: 'italic',
-    color: '#4ADE80',
+    color: themePalette.hex_4ade80,
     fontFamily: 'serif',
   },
   subTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.base,
     textAlign: 'center',
     marginTop: 8,
@@ -293,20 +294,20 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   boldText: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '600',
   },
   orderBadge: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: themePalette.rgba_255_255_255_0_05,
     paddingHorizontal: s(14),
     paddingVertical: 6,
     borderRadius: 16,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: themePalette.rgba_255_255_255_0_1,
   },
   orderBadgeText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     fontWeight: '500',
   },
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   sectionHeader: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
@@ -324,8 +325,8 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_255_255_255_0_08,
     borderWidth: 1,
     borderRadius: 14,
     padding: 14,
@@ -334,8 +335,8 @@ const styles = StyleSheet.create({
   cardAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_255_255_255_0_08,
     borderWidth: 1,
     borderRadius: 14,
     padding: 14,
@@ -353,32 +354,32 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: themePalette.hex_334155,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   stepNumberText: {
-    color: '#E2E8F0',
+    color: themePalette.hex_e2e8f0,
     fontWeight: 'bold',
     fontSize: font.base,
   },
   stepCompletedBox: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: themePalette.hex_10b981,
+    borderColor: themePalette.hex_10b981,
   },
   cardTextContainer: {
     flex: 1,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
   },
   cardDesc: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: 2,
   },
@@ -389,28 +390,28 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     paddingVertical: 16,
     borderRadius: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#EAB308',
+    shadowColor: themePalette.hex_eab308,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 3,
   },
   primaryButtonText: {
-    color: '#070C15',
+    color: themePalette.hex_070c15,
     fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
   secondaryButton: {
     width: '100%',
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_255_255_255_0_1,
     borderWidth: 1,
     paddingVertical: 14,
     borderRadius: 24,
@@ -420,14 +421,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   secondaryButtonText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.base,
     fontWeight: '600',
     marginLeft: 8,
   },
   footerNote: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: 12,
   },
-});
+}));

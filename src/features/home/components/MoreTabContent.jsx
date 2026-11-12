@@ -1,12 +1,12 @@
 import { Pressable, Text, View, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import styles from './MoreTabContent.styles';
-function MoreTabContent({ onCompanyInfoPress, onManagePress, onFollowUsPress, onHelpFeedbackPress, onSupportPress, onProfilePress, onSettingsPress, }) {
+function MoreTabContent({ onManagePress, onFollowUsPress, onHelpFeedbackPress, onSupportPress, onProfilePress, onSettingsPress, }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     return (<View style={styles.container}>
-      <Pressable onPress={onProfilePress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+      <Pressable onPress={onProfilePress} style={[styles.menuItem, { backgroundColor: isLight ? themePalette.rgba_229_231_235_0_5 : themePalette.rgba_255_255_255_0_07 }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="user-circle" size={17} color={colors.accent}/>
         </View>
@@ -21,7 +21,7 @@ function MoreTabContent({ onCompanyInfoPress, onManagePress, onFollowUsPress, on
         <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
       </Pressable>
 
-      <Pressable onPress={onSettingsPress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+      <Pressable onPress={onSettingsPress} style={[styles.menuItem, { backgroundColor: isLight ? themePalette.rgba_229_231_235_0_5 : themePalette.rgba_255_255_255_0_07 }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="cog" size={17} color={colors.accent}/>
         </View>
@@ -36,22 +36,7 @@ function MoreTabContent({ onCompanyInfoPress, onManagePress, onFollowUsPress, on
         <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
       </Pressable>
 
-      <Pressable onPress={onCompanyInfoPress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
-        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-          <FontAwesome name="info-circle" size={17} color={colors.accent}/>
-        </View>
-
-        <View style={styles.copy}>
-          <Text style={[styles.title, { color: colors.text }]}>Company Info</Text>
-          <Text style={[styles.subtitle, { color: colors.muted }]}>
-            View your company information
-          </Text>
-        </View>
-
-        <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
-      </Pressable>
-
-      <Pressable onPress={onManagePress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+      <Pressable onPress={onManagePress} style={[styles.menuItem, { backgroundColor: isLight ? themePalette.rgba_229_231_235_0_5 : themePalette.rgba_255_255_255_0_07 }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="cog" size={17} color={colors.accent}/>
         </View>
@@ -66,7 +51,7 @@ function MoreTabContent({ onCompanyInfoPress, onManagePress, onFollowUsPress, on
         <FontAwesome name="angle-right" size={22} color={colors.subtle}/>
       </Pressable>
 
-      <Pressable onPress={onFollowUsPress} style={[styles.menuItem, { backgroundColor: isLight ? 'rgba(229,231,235,0.5)' : 'rgba(255,255,255,0.07)' }]}>
+      <Pressable onPress={onFollowUsPress} style={[styles.menuItem, { backgroundColor: isLight ? themePalette.rgba_229_231_235_0_5 : themePalette.rgba_255_255_255_0_07 }]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
           <FontAwesome name="share-alt" size={17} color={colors.accent}/>
         </View>
@@ -79,9 +64,9 @@ function MoreTabContent({ onCompanyInfoPress, onManagePress, onFollowUsPress, on
         </View>
 
         <View style={styles.socialIcons}>
-          <FontAwesome name="instagram" size={18} color="#e11d48"/>
-          <FontAwesome name="facebook" size={18} color="#2563eb"/>
-          <FontAwesome name="linkedin" size={18} color="#0f766e"/>
+          <FontAwesome name="instagram" size={18} color={themePalette.hex_e11d48}/>
+          <FontAwesome name="facebook" size={18} color={themePalette.hex_2563eb}/>
+          <FontAwesome name="linkedin" size={18} color={themePalette.hex_0f766e}/>
         </View>
       </Pressable>
     </View>);

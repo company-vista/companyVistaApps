@@ -16,7 +16,7 @@ import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { loginVerifyOtp } from '../../../store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const VerifyNumberScreen = ({ navigation, route }) => {
   const phoneParam = route?.params?.phone ?? '+91 98765 43210';
@@ -111,10 +111,10 @@ const VerifyNumberScreen = ({ navigation, route }) => {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack()}>
-          <Ionicons name="chevron-back" size={22} color="#C9A84C" />
+          <Ionicons name="chevron-back" size={22} color={themePalette.hex_c9a84c} />
         </TouchableOpacity>
         <Image source={logoR} style={styles.headerLogo} resizeMode="contain" />
-        <TouchableOpacity style={[styles.iconButton, { backgroundColor: isDark ? '#161928' : colors.surface }]}>
+        <TouchableOpacity style={[styles.iconButton, { backgroundColor: isDark ? themePalette.hex_161928 : colors.surface }]}>
           <Ionicons name="help-circle-outline" size={22} color={colors.subtle} />
         </TouchableOpacity>
       </View>
@@ -122,8 +122,8 @@ const VerifyNumberScreen = ({ navigation, route }) => {
       <View style={styles.content}>
         <View style={styles.logoContainer}>
           <View style={[styles.logoCircleOuter, { borderColor: colors.border }]}>
-            <View style={[styles.phoneIconBox, { backgroundColor: isDark ? '#17142E' : colors.accentSoft, borderColor: isDark ? '#392B68' : colors.border }]}>
-              <Ionicons name="phone-portrait-outline" size={20} color={isDark ? '#A88BFA' : colors.primary} />
+            <View style={[styles.phoneIconBox, { backgroundColor: isDark ? themePalette.hex_17142e : colors.accentSoft, borderColor: isDark ? themePalette.hex_392b68 : colors.border }]}>
+              <Ionicons name="phone-portrait-outline" size={20} color={isDark ? themePalette.hex_a88bfa : colors.primary} />
             </View>
           </View>
           {/* <Text style={styles.logoText}>
@@ -136,7 +136,7 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         </Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>Enter the 6–digit code sent via SMS.</Text>
 
-        <View style={[styles.phonePill, { backgroundColor: isDark ? '#141629' : colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.phonePill, { backgroundColor: isDark ? themePalette.hex_141629 : colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.countryCode, { color: colors.subtle }]}>IN</Text>
           <Text style={styles.phoneNumber}>{phoneParam}</Text>
         </View>
@@ -146,7 +146,7 @@ const VerifyNumberScreen = ({ navigation, route }) => {
             <TextInput
               key={index}
               ref={(ref) => (inputRefs.current[index] = ref)}
-              style={[styles.otpBox, { borderColor: colors.inputBorder, backgroundColor: colors.inputBackground, color: isDark ? '#D0A85C' : colors.primary }, isLocked && { opacity: 0.4, borderColor: colors.border }]}
+              style={[styles.otpBox, { borderColor: colors.inputBorder, backgroundColor: colors.inputBackground, color: isDark ? themePalette.hex_d0a85c : colors.primary }, isLocked && { opacity: 0.4, borderColor: colors.border }]}
               value={digit}
               onChangeText={(text) => handleChangeText(text, index)}
               onKeyPress={(e) => handleKeyPress(e, index)}
@@ -159,15 +159,15 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         </View>
 
         {errorMsg ? (
-          <View style={[styles.errorBadge, { backgroundColor: isDark ? '#271318' : 'rgba(220, 38, 38, 0.08)', borderColor: isDark ? '#4A1922' : 'rgba(220, 38, 38, 0.25)' }, isLocked && { backgroundColor: isDark ? '#2A1210' : 'rgba(220, 38, 38, 0.12)', borderColor: isDark ? '#5A1A1A' : 'rgba(220, 38, 38, 0.3)' }]}>
+          <View style={[styles.errorBadge, { backgroundColor: isDark ? themePalette.hex_271318 : themePalette.rgba_220_38_38_0_08, borderColor: isDark ? themePalette.hex_4a1922 : themePalette.rgba_220_38_38_0_25 }, isLocked && { backgroundColor: isDark ? themePalette.hex_2a1210 : themePalette.rgba_220_38_38_0_12, borderColor: isDark ? themePalette.hex_5a1a1a : themePalette.rgba_220_38_38_0_3 }]}>
             <Ionicons name={isLocked ? 'lock-closed' : 'close'} size={14} color={colors.danger} style={{ marginRight: s(4) }} />
             <Text style={[styles.errorText, { color: colors.danger }]}>{errorMsg}</Text>
           </View>
         ) : null}
         {isLocked ? (
-          <View style={[styles.warningCard, { borderColor: isDark ? '#4A1922' : 'rgba(220, 38, 38, 0.3)', backgroundColor: isDark ? '#271318' : 'rgba(220, 38, 38, 0.08)' }]}>
+          <View style={[styles.warningCard, { borderColor: isDark ? themePalette.hex_4a1922 : themePalette.rgba_220_38_38_0_3, backgroundColor: isDark ? themePalette.hex_271318 : themePalette.rgba_220_38_38_0_08 }]}>
             <Ionicons name="time-outline" size={18} color={colors.danger} style={{ marginRight: s(10) }} />
-            <Text style={[styles.warningText, { color: isDark ? '#FF9A9A' : colors.danger }]}>Locked for {formatRemaining(remainingSec)} — please try after 30 minutes.</Text>
+            <Text style={[styles.warningText, { color: isDark ? themePalette.hex_ff9a9a : colors.danger }]}>Locked for {formatRemaining(remainingSec)} — please try after 30 minutes.</Text>
           </View>
         ) : null}
 
@@ -178,19 +178,19 @@ const VerifyNumberScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={[styles.callButton, { backgroundColor: isDark ? '#131728' : colors.surface, borderColor: colors.border }]}>
+        <TouchableOpacity style={[styles.callButton, { backgroundColor: isDark ? themePalette.hex_131728 : colors.surface, borderColor: colors.border }]}>
           <Ionicons name="call-outline" size={16} color={colors.subtle} style={{ marginRight: s(8) }} />
           <Text style={[styles.callButtonText, { color: colors.muted }]}>Get code via call instead</Text>
         </TouchableOpacity>
 
-        <View style={[styles.warningCard, { backgroundColor: isDark ? '#131522' : colors.surface, borderColor: colors.border }]}>
-          <Ionicons name="warning-outline" size={18} color="#D8A23B" style={{ marginRight: s(10) }} />
+        <View style={[styles.warningCard, { backgroundColor: isDark ? themePalette.hex_131522 : colors.surface, borderColor: colors.border }]}>
+          <Ionicons name="warning-outline" size={18} color={themePalette.hex_d8a23b} style={{ marginRight: s(10) }} />
           <Text style={[styles.warningText, { color: colors.muted }]}>
             After 3 failed attempts your account will be locked for 30 minutes.
           </Text>
         </View>
 
-        <TouchableOpacity style={[styles.changePhoneButton, { backgroundColor: isDark ? '#101322' : colors.surface, borderColor: colors.border }]} onPress={() => navigation?.goBack()}>
+        <TouchableOpacity style={[styles.changePhoneButton, { backgroundColor: isDark ? themePalette.hex_101322 : colors.surface, borderColor: colors.border }]} onPress={() => navigation?.goBack()}>
           <Ionicons name="create-outline" size={16} color={colors.subtle} style={{ marginRight: s(8) }} />
           <Text style={[styles.changePhoneText, { color: colors.muted }]}>Change phone number</Text>
         </TouchableOpacity>
@@ -210,42 +210,42 @@ const VerifyNumberScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0C16' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_0a0c16 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(16), paddingTop: s(28), marginTop: s(12) },
-  iconButton: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#161928', justifyContent: 'center', alignItems: 'center' },
-  backBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(201, 168, 76, 0.15)', justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
+  iconButton: { width: 38, height: 38, borderRadius: 12, backgroundColor: themePalette.hex_161928, justifyContent: 'center', alignItems: 'center' },
+  backBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: themePalette.rgba_201_168_76_0_15, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   headerLogo: { width: 130, height: 32, resizeMode: 'contain' },
   content: { flex: 1, alignItems: 'center', paddingHorizontal: s(20), paddingTop: s(10) },
   logoContainer: { alignItems: 'center', marginBottom: s(16) },
-  logoCircleOuter: { width: 60, height: 60, borderRadius: 45, borderWidth: 1, borderColor: '#1D1E3A', justifyContent: 'center', alignItems: 'center', marginBottom: s(8) },
-  phoneIconBox: { width: 36, height: 36, borderRadius: 16, backgroundColor: '#17142E', borderWidth: 1, borderColor: '#392B68', justifyContent: 'center', alignItems: 'center' },
-  logoText: { color: '#D0A85C', fontSize: font.base, fontWeight: 'bold', letterSpacing: 0.5 },
-  logoHighlight: { color: '#D0A85C', fontWeight: 'normal' },
-  title: { fontSize: font.displayMedium, fontWeight: '600', color: '#FFFFFF', marginBottom: s(6) },
-  titleItalic: { fontStyle: 'italic', color: '#D0A85C', fontWeight: '400' },
-  subtitle: { fontSize: font.bodySmall, color: '#8E93A6', marginBottom: s(16) },
-  phonePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#141629', borderRadius: 20, paddingVertical: s(8), paddingHorizontal: s(16), borderWidth: 1, borderColor: '#262942', marginBottom: s(20) },
-  countryCode: { color: '#555C77', fontSize: font.sm, fontWeight: 'bold', marginRight: s(10) },
-  phoneNumber: { color: '#B69BF8', fontSize: font.base, fontWeight: '600' },
+  logoCircleOuter: { width: 60, height: 60, borderRadius: 45, borderWidth: 1, borderColor: themePalette.hex_1d1e3a, justifyContent: 'center', alignItems: 'center', marginBottom: s(8) },
+  phoneIconBox: { width: 36, height: 36, borderRadius: 16, backgroundColor: themePalette.hex_17142e, borderWidth: 1, borderColor: themePalette.hex_392b68, justifyContent: 'center', alignItems: 'center' },
+  logoText: { color: themePalette.hex_d0a85c, fontSize: font.base, fontWeight: 'bold', letterSpacing: 0.5 },
+  logoHighlight: { color: themePalette.hex_d0a85c, fontWeight: 'normal' },
+  title: { fontSize: font.displayMedium, fontWeight: '600', color: themePalette.hex_ffffff, marginBottom: s(6) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d0a85c, fontWeight: '400' },
+  subtitle: { fontSize: font.bodySmall, color: themePalette.hex_8e93a6, marginBottom: s(16) },
+  phonePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.hex_141629, borderRadius: 20, paddingVertical: s(8), paddingHorizontal: s(16), borderWidth: 1, borderColor: themePalette.hex_262942, marginBottom: s(20) },
+  countryCode: { color: themePalette.hex_555c77, fontSize: font.sm, fontWeight: 'bold', marginRight: s(10) },
+  phoneNumber: { color: themePalette.hex_b69bf8, fontSize: font.base, fontWeight: '600' },
   otpContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: s(16) },
-  otpBox: { width: 46, height: 56, borderRadius: 12, borderWidth: 1, borderColor: '#3A202A', backgroundColor: '#12111A', textAlign: 'center', fontSize: font.hero, color: '#D0A85C', fontWeight: '500' },
-  errorBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#271318', borderRadius: 16, paddingVertical: s(6), paddingHorizontal: s(14), borderWidth: 1, borderColor: '#4A1922', marginBottom: s(18) },
-  errorText: { color: '#FF5252', fontSize: font.sm, fontWeight: '500' },
+  otpBox: { width: 46, height: 56, borderRadius: 12, borderWidth: 1, borderColor: themePalette.hex_3a202a, backgroundColor: themePalette.hex_12111a, textAlign: 'center', fontSize: font.hero, color: themePalette.hex_d0a85c, fontWeight: '500' },
+  errorBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.hex_271318, borderRadius: 16, paddingVertical: s(6), paddingHorizontal: s(14), borderWidth: 1, borderColor: themePalette.hex_4a1922, marginBottom: s(18) },
+  errorText: { color: themePalette.hex_ff5252, fontSize: font.sm, fontWeight: '500' },
   resendContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
-  didnotReceiveText: { color: '#7B8CB2', fontSize: font.bodySmall },
-  resendText: { color: '#E5C06F', fontSize: font.bodySmall, fontWeight: 'bold' },
-  callButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#131728', borderRadius: 20, paddingVertical: s(8), paddingHorizontal: s(16), borderWidth: 1, borderColor: '#22293F', marginBottom: s(20) },
-  callButtonText: { color: '#9FAECB', fontSize: font.bodySmall },
-  warningCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#131522', borderRadius: 12, padding: s(12), borderWidth: 1, borderColor: '#2B2724', marginBottom: s(12), width: '100%' },
-  warningText: { color: '#9FAECB', fontSize: font.small, flex: 1, lineHeight: 16 },
-  changePhoneButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#101322', borderRadius: 12, paddingVertical: s(12), borderWidth: 1, borderColor: '#1D2338', width: '100%' },
-  changePhoneText: { color: '#9FAECB', fontSize: font.bodySmall, fontWeight: '500' },
+  didnotReceiveText: { color: themePalette.hex_7b8cb2, fontSize: font.bodySmall },
+  resendText: { color: themePalette.hex_e5c06f, fontSize: font.bodySmall, fontWeight: 'bold' },
+  callButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.hex_131728, borderRadius: 20, paddingVertical: s(8), paddingHorizontal: s(16), borderWidth: 1, borderColor: themePalette.hex_22293f, marginBottom: s(20) },
+  callButtonText: { color: themePalette.hex_9faecb, fontSize: font.bodySmall },
+  warningCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.hex_131522, borderRadius: 12, padding: s(12), borderWidth: 1, borderColor: themePalette.hex_2b2724, marginBottom: s(12), width: '100%' },
+  warningText: { color: themePalette.hex_9faecb, fontSize: font.small, flex: 1, lineHeight: 16 },
+  changePhoneButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: themePalette.hex_101322, borderRadius: 12, paddingVertical: s(12), borderWidth: 1, borderColor: themePalette.hex_1d2338, width: '100%' },
+  changePhoneText: { color: themePalette.hex_9faecb, fontSize: font.bodySmall, fontWeight: '500' },
   verifyButtonInline: { borderRadius: 24, paddingVertical: s(14), alignItems: 'center', width: '100%', marginTop: s(28) },
   verifyButtonDisabled: { opacity: 0.4 },
   footer: { paddingHorizontal: s(20), paddingBottom: s(20) },
-  verifyButton: { backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
-  verifyButtonText: { color: '#060913', fontSize: font.md, fontWeight: 'bold' },
-});
+  verifyButton: { backgroundColor: themePalette.hex_d4af37, borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
+  verifyButtonText: { color: themePalette.hex_060913, fontSize: font.md, fontWeight: 'bold' },
+}));
 
 export default VerifyNumberScreen;

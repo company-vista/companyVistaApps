@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
-import { useThemeColors } from '../../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
 
 const RegistrationProgressScreen = ({ onBackPress }) => {
@@ -38,7 +38,7 @@ const RegistrationProgressScreen = ({ onBackPress }) => {
           <Text style={styles.subTitle}>Meridian Global Ventures LLC · Delaware</Text>
         </View>
 
-        <View style={[styles.overallCard, { backgroundColor: isLight ? '#FFFFFF' : '#0F172A', borderColor: colors.border }]}>
+        <View style={[styles.overallCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f172a, borderColor: colors.border }]}>
           <View style={styles.overallHeader}>
             <View>
               <Text style={styles.overallLabel}>OVERALL</Text>
@@ -139,7 +139,7 @@ const RegistrationProgressScreen = ({ onBackPress }) => {
           <View style={styles.line} />
         </View>
 
-        <View style={[styles.documentCard, { backgroundColor: isLight ? '#FFFFFF' : '#0F172A', borderColor: colors.border }]}>
+        <View style={[styles.documentCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f172a, borderColor: colors.border }]}>
           <View style={styles.docIconBox}>
             <Text style={styles.docIcon}>📄</Text>
           </View>
@@ -150,7 +150,7 @@ const RegistrationProgressScreen = ({ onBackPress }) => {
           <Text style={[styles.pendingStatus, { color: colors.muted }]}>Pending</Text>
         </View>
 
-        <View style={[styles.documentCard, { backgroundColor: isLight ? '#FFFFFF' : '#0F172A', borderColor: colors.border }]}>
+        <View style={[styles.documentCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f172a, borderColor: colors.border }]}>
           <View style={styles.docIconBox}>
             <Text style={styles.docIcon}>📑</Text>
           </View>
@@ -167,61 +167,61 @@ const RegistrationProgressScreen = ({ onBackPress }) => {
 
 export default RegistrationProgressScreen;
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#070C16' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_070c16 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(16), paddingBottom: s(8) },
-  iconButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#111827', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#1F2937' },
-  iconText: { color: '#9CA3AF', fontSize: font.lg, fontWeight: 'bold' },
+  iconButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: themePalette.hex_111827, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: themePalette.hex_1f2937 },
+  iconText: { color: themePalette.hex_9ca3af, fontSize: font.lg, fontWeight: 'bold' },
   logoImage: { width: 130, height: 32 },
   scrollContainer: { paddingHorizontal: s(16), paddingTop: s(20), paddingBottom: s(40) },
   titleContainer: { marginBottom: s(20) },
-  mainTitle: { fontSize: font.displayLarge, color: '#FFFFFF' },
-  italicTitle: { fontStyle: 'italic', color: '#EAB308' },
-  subTitle: { color: '#9CA3AF', fontSize: font.bodySmall, marginTop: s(4) },
-  overallCard: { backgroundColor: '#0F172A', borderRadius: 14, borderWidth: 1, borderColor: '#1E293B', padding: s(16), marginBottom: s(24) },
+  mainTitle: { fontSize: font.displayLarge, color: themePalette.hex_ffffff },
+  italicTitle: { fontStyle: 'italic', color: themePalette.hex_eab308 },
+  subTitle: { color: themePalette.hex_9ca3af, fontSize: font.bodySmall, marginTop: s(4) },
+  overallCard: { backgroundColor: themePalette.hex_0f172a, borderRadius: 14, borderWidth: 1, borderColor: themePalette.hex_1e293b, padding: s(16), marginBottom: s(24) },
   overallHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: s(12) },
-  overallLabel: { color: '#6B7280', fontSize: font.small, fontWeight: 'bold', letterSpacing: 0.5 },
-  overallPercentage: { color: '#EAB308', fontSize: font.displayMedium, marginTop: s(2) },
-  estLabel: { color: '#6B7280', fontSize: font.sm },
-  estDate: { color: '#FFFFFF', fontSize: font.md, fontWeight: 'bold', marginTop: s(2) },
-  progressBarBackground: { height: 4, backgroundColor: '#1E293B', borderRadius: 2, marginBottom: s(12) },
-  progressBarFill: { height: '100%', backgroundColor: '#EAB308', borderRadius: 2 },
+  overallLabel: { color: themePalette.hex_6b7280, fontSize: font.small, fontWeight: 'bold', letterSpacing: 0.5 },
+  overallPercentage: { color: themePalette.hex_eab308, fontSize: font.displayMedium, marginTop: s(2) },
+  estLabel: { color: themePalette.hex_6b7280, fontSize: font.sm },
+  estDate: { color: themePalette.hex_ffffff, fontSize: font.md, fontWeight: 'bold', marginTop: s(2) },
+  progressBarBackground: { height: 4, backgroundColor: themePalette.hex_1e293b, borderRadius: 2, marginBottom: s(12) },
+  progressBarFill: { height: '100%', backgroundColor: themePalette.hex_eab308, borderRadius: 2 },
   overallFooter: { flexDirection: 'row', justifyContent: 'space-between' },
-  stepText: { color: '#9CA3AF', fontSize: font.bodySmall },
-  scheduleText: { color: '#10B981', fontSize: font.bodySmall, fontWeight: '600' },
+  stepText: { color: themePalette.hex_9ca3af, fontSize: font.bodySmall },
+  scheduleText: { color: themePalette.hex_10b981, fontSize: font.bodySmall, fontWeight: '600' },
   timelineContainer: { paddingLeft: s(4), marginBottom: s(10) },
   timelineItem: { flexDirection: 'row', marginBottom: s(24) },
   leftColumn: { alignItems: 'center', marginRight: s(14), width: 24 },
   statusCircle: { width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
-  completedCircle: { backgroundColor: '#059669' },
-  completedCheck: { color: '#FFFFFF', fontSize: font.sm, fontWeight: 'bold' },
-  inProgressCircle: { borderWidth: 1.5, borderColor: '#EAB308', backgroundColor: '#070C16' },
-  goldDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EAB308' },
-  pendingCircle: { borderWidth: 1, borderColor: '#374151', backgroundColor: '#070C16' },
-  grayDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#374151' },
+  completedCircle: { backgroundColor: themePalette.hex_059669 },
+  completedCheck: { color: themePalette.hex_ffffff, fontSize: font.sm, fontWeight: 'bold' },
+  inProgressCircle: { borderWidth: 1.5, borderColor: themePalette.hex_eab308, backgroundColor: themePalette.hex_070c16 },
+  goldDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: themePalette.hex_eab308 },
+  pendingCircle: { borderWidth: 1, borderColor: themePalette.hex_374151, backgroundColor: themePalette.hex_070c16 },
+  grayDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_374151 },
   timelineLine: { width: 2, position: 'absolute', top: 24, bottom: -24 },
-  activeLine: { backgroundColor: '#059669' },
-  inactiveLine: { backgroundColor: '#1E293B' },
+  activeLine: { backgroundColor: themePalette.hex_059669 },
+  inactiveLine: { backgroundColor: themePalette.hex_1e293b },
   rightColumn: { flex: 1, paddingTop: s(2) },
-  stepTitle: { color: '#FFFFFF', fontSize: font.md, fontWeight: 'bold' },
-  stepTitleActive: { color: '#FFFFFF', fontSize: font.lg, fontWeight: 'bold' },
-  stepTitlePending: { color: '#9CA3AF', fontSize: font.md, fontWeight: '600' },
-  stepDesc: { color: '#9CA3AF', fontSize: font.bodySmall, lineHeight: 18, marginTop: s(4) },
-  stepDescPending: { color: '#6B7280', fontSize: font.bodySmall, lineHeight: 18, marginTop: s(4) },
-  timestamp: { color: '#6B7280', fontSize: font.sm, marginTop: s(6) },
-  stepNotePending: { color: '#4B5563', fontSize: font.sm, marginTop: s(6) },
+  stepTitle: { color: themePalette.hex_ffffff, fontSize: font.md, fontWeight: 'bold' },
+  stepTitleActive: { color: themePalette.hex_ffffff, fontSize: font.lg, fontWeight: 'bold' },
+  stepTitlePending: { color: themePalette.hex_9ca3af, fontSize: font.md, fontWeight: '600' },
+  stepDesc: { color: themePalette.hex_9ca3af, fontSize: font.bodySmall, lineHeight: 18, marginTop: s(4) },
+  stepDescPending: { color: themePalette.hex_6b7280, fontSize: font.bodySmall, lineHeight: 18, marginTop: s(4) },
+  timestamp: { color: themePalette.hex_6b7280, fontSize: font.sm, marginTop: s(6) },
+  stepNotePending: { color: themePalette.hex_4b5563, fontSize: font.sm, marginTop: s(6) },
   badgeContainer: { flexDirection: 'row', marginTop: s(10) },
-  badge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderWidth: 1, borderColor: 'rgba(234, 179, 8, 0.4)', paddingHorizontal: s(12), paddingVertical: s(6), borderRadius: 16 },
-  badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308', marginRight: s(8) },
-  badgeText: { color: '#EAB308', fontSize: font.sm, fontWeight: 'bold' },
+  badge: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.rgba_234_179_8_0_1, borderWidth: 1, borderColor: themePalette.rgba_234_179_8_0_4, paddingHorizontal: s(12), paddingVertical: s(6), borderRadius: 16 },
+  badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_eab308, marginRight: s(8) },
+  badgeText: { color: themePalette.hex_eab308, fontSize: font.sm, fontWeight: 'bold' },
   sectionHeaderContainer: { flexDirection: 'row', alignItems: 'center', marginTop: s(10), marginBottom: s(16) },
-  line: { flex: 1, height: 1, backgroundColor: '#1E293B' },
-  sectionHeader: { color: '#6B7280', fontSize: font.sm, fontWeight: 'bold', marginRight: s(12), letterSpacing: 1 },
-  documentCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0F172A', borderRadius: 14, borderWidth: 1, borderColor: '#1E293B', padding: s(14), marginBottom: s(12) },
-  docIconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: '#1E293B', justifyContent: 'center', alignItems: 'center', marginRight: s(12) },
+  line: { flex: 1, height: 1, backgroundColor: themePalette.hex_1e293b },
+  sectionHeader: { color: themePalette.hex_6b7280, fontSize: font.sm, fontWeight: 'bold', marginRight: s(12), letterSpacing: 1 },
+  documentCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: themePalette.hex_0f172a, borderRadius: 14, borderWidth: 1, borderColor: themePalette.hex_1e293b, padding: s(14), marginBottom: s(12) },
+  docIconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: themePalette.hex_1e293b, justifyContent: 'center', alignItems: 'center', marginRight: s(12) },
   docIcon: { fontSize: font.xxl },
   docInfo: { flex: 1 },
-  docTitle: { color: '#FFFFFF', fontSize: font.md, fontWeight: 'bold' },
-  docSubText: { color: '#6B7280', fontSize: font.sm, marginTop: s(2) },
-  pendingStatus: { color: '#6B7280', fontSize: font.bodySmall, fontWeight: '500' },
-});
+  docTitle: { color: themePalette.hex_ffffff, fontSize: font.md, fontWeight: 'bold' },
+  docSubText: { color: themePalette.hex_6b7280, fontSize: font.sm, marginTop: s(2) },
+  pendingStatus: { color: themePalette.hex_6b7280, fontSize: font.bodySmall, fontWeight: '500' },
+}));

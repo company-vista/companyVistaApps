@@ -2,7 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BackButton from '../../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 const serviceItems = [
@@ -46,11 +46,11 @@ const serviceItems = [
     // },
 ];
 const toneStyles = {
-    red: { iconBg: '#FEE2E2', iconColor: '#DC2626', tagBg: '#FEE2E2', tagText: '#DC2626' },
-    amber: { iconBg: '#FEF3C7', iconColor: '#B45309', tagBg: '#FEF3C7', tagText: '#B45309' },
-    blue: { iconBg: '#DBEAFE', iconColor: '#1D4ED8', tagBg: '#DBEAFE', tagText: '#1D4ED8' },
-    purple: { iconBg: '#EDE9FE', iconColor: '#7C3AED', tagBg: '#EDE9FE', tagText: '#7C3AED' },
-    green: { iconBg: '#D1FAE5', iconColor: '#059669', tagBg: '#D1FAE5', tagText: '#059669' },
+    red: { iconBg: themePalette.hex_fee2e2, iconColor: themePalette.hex_dc2626, tagBg: themePalette.hex_fee2e2, tagText: themePalette.hex_dc2626 },
+    amber: { iconBg: themePalette.hex_fef3c7, iconColor: themePalette.hex_b45309, tagBg: themePalette.hex_fef3c7, tagText: themePalette.hex_b45309 },
+    blue: { iconBg: themePalette.hex_dbeafe, iconColor: themePalette.hex_1d4ed8, tagBg: themePalette.hex_dbeafe, tagText: themePalette.hex_1d4ed8 },
+    purple: { iconBg: themePalette.hex_ede9fe, iconColor: themePalette.hex_7c3aed, tagBg: themePalette.hex_ede9fe, tagText: themePalette.hex_7c3aed },
+    green: { iconBg: themePalette.hex_d1fae5, iconColor: themePalette.hex_059669, tagBg: themePalette.hex_d1fae5, tagText: themePalette.hex_059669 },
 };
 export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExploreServicesPress, onServicesHistoryPress }) {
     const safeAreaInsets = useSafeAreaInsets();
@@ -70,7 +70,7 @@ export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExp
     return (<View style={styles.screen}>
       <View style={[
             styles.headerArea,
-            { backgroundColor: isLight ? '#ffffff' : undefined, paddingTop: safeAreaInsets.top + 12 },
+            { backgroundColor: isLight ? themePalette.hex_ffffff : undefined, paddingTop: safeAreaInsets.top + 12 },
         ]}>
         <View style={styles.header}>
           <BackButton onPress={onBackPress}/>

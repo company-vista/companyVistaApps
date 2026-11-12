@@ -19,7 +19,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { s } from '../../../theme/responsive';
 import { getStructurePrice } from '../../../utils/priceCalculator';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 
 export default function OptionalAddOnsScreen({ navigation, route }) {
   const { selectedStructure = 'LLC', companyName = '', selectedEnding = '', selectedState = 'Delaware', selectedCountry = 'US' } = route.params || {};
@@ -143,7 +143,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('expeditedFiling')} style={[styles.card, selectedAddOns.expeditedFiling && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <Feather name="zap" size={18} color="#D4AF37" />
+              <Feather name="zap" size={18} color={themePalette.hex_d4af37} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -155,7 +155,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Delaware processes your filing in 24 hours instead of 5–7 business days.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.expeditedFiling && styles.checkboxSelected]}>
-              {selectedAddOns.expeditedFiling && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.expeditedFiling && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -173,7 +173,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('expressEin')} style={[styles.card, selectedAddOns.expressEin && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <Feather name="file-text" size={18} color="#64B5F6" />
+              <Feather name="file-text" size={18} color={themePalette.hex_64b5f6} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -183,7 +183,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Your Federal Tax ID in 3–5 days. The standard route takes 4–6 weeks for non-residents.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.expressEin && styles.checkboxSelected]}>
-              {selectedAddOns.expressEin && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.expressEin && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -206,7 +206,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('bankAssurance')} style={[styles.card, selectedAddOns.bankAssurance && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <FontAwesome5 name="university" size={16} color="#00E676" />
+              <FontAwesome5 name="university" size={16} color={themePalette.hex_00e676} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -216,7 +216,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>We guarantee approval with at least one partner bank for permitted activities — or your money back.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.bankAssurance && styles.checkboxSelected]}>
-              {selectedAddOns.bankAssurance && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.bankAssurance && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -234,7 +234,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('stripePaypal')} style={[styles.card, selectedAddOns.stripePaypal && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="credit-card-outline" size={18} color="#00E676" />
+              <MaterialCommunityIcons name="credit-card-outline" size={18} color={themePalette.hex_00e676} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -243,7 +243,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>We handle the paperwork to get your payment processors approved and ready to accept payments.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.stripePaypal && styles.checkboxSelected]}>
-              {selectedAddOns.stripePaypal && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.stripePaypal && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -266,7 +266,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('boiFiling')} style={[styles.card, selectedAddOns.boiFiling && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <Feather name="shield" size={18} color="#D4AF37" />
+              <Feather name="shield" size={18} color={themePalette.hex_d4af37} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -276,7 +276,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Beneficial Ownership Information filing with FinCEN.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.boiFiling && styles.checkboxSelected]}>
-              {selectedAddOns.boiFiling && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.boiFiling && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -294,7 +294,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('operatingAgreement')} style={[styles.card, selectedAddOns.operatingAgreement && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <Feather name="edit-3" size={18} color="#64B5F6" />
+              <Feather name="edit-3" size={18} color={themePalette.hex_64b5f6} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -303,7 +303,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Drafted around your actual ownership split and voting rights.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.operatingAgreement && styles.checkboxSelected]}>
-              {selectedAddOns.operatingAgreement && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.operatingAgreement && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -326,7 +326,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('apostille')} style={[styles.card, selectedAddOns.apostille && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="certificate" size={18} color="#A78BFA" />
+              <MaterialCommunityIcons name="certificate" size={18} color={themePalette.hex_a78bfa} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -335,7 +335,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Legalised formation documents for banking outside the US.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.apostille && styles.checkboxSelected]}>
-              {selectedAddOns.apostille && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.apostille && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -353,7 +353,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('itin')} style={[styles.card, selectedAddOns.itin && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <FontAwesome5 name="id-card" size={16} color="#00E676" />
+              <FontAwesome5 name="id-card" size={16} color={themePalette.hex_00e676} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -362,7 +362,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>Personal US tax ID for non-residents.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.itin && styles.checkboxSelected]}>
-              {selectedAddOns.itin && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.itin && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -385,7 +385,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
         <TouchableOpacity activeOpacity={0.8} onPress={() => toggleAddOn('usPhone')} style={[styles.card, selectedAddOns.usPhone && styles.selectedCard]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconContainer}>
-              <Feather name="phone" size={18} color="#64B5F6" />
+              <Feather name="phone" size={18} color={themePalette.hex_64b5f6} />
             </View>
             <View style={styles.cardTextContainer}>
               <View style={styles.titleRow}>
@@ -394,7 +394,7 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
               <Text style={styles.cardDescription}>A real US business line with voicemail-to-email.</Text>
             </View>
             <View style={[styles.checkbox, selectedAddOns.usPhone && styles.checkboxSelected]}>
-              {selectedAddOns.usPhone && <Ionicons name="checkmark" size={14} color="#0A111D" />}
+              {selectedAddOns.usPhone && <Ionicons name="checkmark" size={14} color={themePalette.hex_0a111d} />}
             </View>
           </View>
           <View style={styles.cardFooter}>
@@ -428,43 +428,43 @@ const makeStyles = (colors, isDark) => StyleSheet.create({
   scrollContent: { paddingHorizontal: s(16), paddingBottom: 20 },
   titleContainer: { marginVertical: 15 },
   mainTitle: { fontSize: s(24), fontWeight: '700', color: colors.text, marginBottom: s(8) },
-  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: themePalette.hex_d4af37 },
   subtitle: { color: colors.muted, fontSize: font.base, lineHeight: 20 },
-  totalBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: isDark ? 'rgba(212,175,55,0.2)' : 'rgba(212,175,55,0.4)', padding: 16, marginTop: 10, marginBottom: 16 },
+  totalBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: 12, borderWidth: 1, borderColor: isDark ? themePalette.rgba_212_175_55_0_2 : themePalette.rgba_212_175_55_0_4, padding: 16, marginTop: 10, marginBottom: 16 },
   runningTotalLabel: { color: colors.muted, fontSize: font.small, letterSpacing: 0.5, textTransform: 'uppercase' },
-  runningTotalAmount: { color: '#D4AF37', fontSize: font.display, fontWeight: '700', marginTop: 2 },
+  runningTotalAmount: { color: themePalette.hex_d4af37, fontSize: font.display, fontWeight: '700', marginTop: 2 },
   runningTotalRight: { alignItems: 'flex-end' },
   basePriceText: { color: colors.muted, fontSize: font.sm },
-  addOnsCountText: { color: '#00E676', fontSize: font.sm, fontWeight: '600', marginTop: 2 },
+  addOnsCountText: { color: themePalette.hex_00e676, fontSize: font.sm, fontWeight: '600', marginTop: 2 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16, marginBottom: 10 },
   sectionTitle: { color: colors.subtle, fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
   sectionLine: { flex: 1, height: 1, backgroundColor: colors.border },
-  card: { width: '100%', backgroundColor: isDark ? '#0C1622' : colors.surface, borderRadius: s(12), borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
-  selectedCard: { borderColor: '#D4AF37', backgroundColor: isDark ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.12)' },
+  card: { width: '100%', backgroundColor: isDark ? themePalette.hex_0c1622 : colors.surface, borderRadius: s(12), borderWidth: 1, borderColor: colors.border, padding: s(14), marginBottom: s(12) },
+  selectedCard: { borderColor: themePalette.hex_d4af37, backgroundColor: isDark ? themePalette.rgba_212_175_55_0_06 : themePalette.rgba_212_175_55_0_12 },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  iconContainer: { width: 36, height: 36, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.surfaceAlt, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
+  iconContainer: { width: 36, height: 36, borderRadius: 8, backgroundColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.surfaceAlt, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
   cardTextContainer: { flex: 1, marginLeft: 12, marginRight: 8 },
   titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
   cardTitle: { color: colors.text, fontSize: s(13), fontWeight: '600' },
-  popularBadge: { backgroundColor: 'rgba(212,175,55,0.15)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
-  popularBadgeText: { color: '#D4AF37', fontSize: font.tiny, fontWeight: '700' },
-  purpleBadge: { backgroundColor: 'rgba(100,80,255,0.15)', borderWidth: 1, borderColor: 'rgba(100,80,255,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
-  purpleBadgeText: { color: '#A78BFA', fontSize: font.tiny, fontWeight: '700' },
-  guaranteeBadge: { backgroundColor: 'rgba(0,230,118,0.12)', borderWidth: 1, borderColor: 'rgba(0,230,118,0.3)', borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 4 },
-  guaranteeBadgeText: { color: '#00E676', fontSize: font.tiny, fontWeight: '700' },
+  popularBadge: { backgroundColor: themePalette.rgba_212_175_55_0_15, borderWidth: 1, borderColor: themePalette.rgba_212_175_55_0_3, borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
+  popularBadgeText: { color: themePalette.hex_d4af37, fontSize: font.tiny, fontWeight: '700' },
+  purpleBadge: { backgroundColor: themePalette.rgba_100_80_255_0_15, borderWidth: 1, borderColor: themePalette.rgba_100_80_255_0_3, borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2 },
+  purpleBadgeText: { color: themePalette.hex_a78bfa, fontSize: font.tiny, fontWeight: '700' },
+  guaranteeBadge: { backgroundColor: themePalette.rgba_0_230_118_0_12, borderWidth: 1, borderColor: themePalette.rgba_0_230_118_0_3, borderRadius: 4, paddingHorizontal: s(6), paddingVertical: 2, alignSelf: 'flex-start', marginTop: 4 },
+  guaranteeBadgeText: { color: themePalette.hex_00e676, fontSize: font.tiny, fontWeight: '700' },
   cardDescription: { color: colors.muted, fontSize: font.sm, marginTop: 4, lineHeight: 16 },
-  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.2)' : colors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.surface, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
-  checkboxSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
+  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1, borderColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border, backgroundColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.surface, justifyContent: 'center', alignItems: 'center', marginTop: 2 },
+  checkboxSelected: { backgroundColor: themePalette.hex_d4af37, borderColor: themePalette.hex_d4af37 },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 12 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, flex: 1, marginRight: 10 },
-  tagGreen: { backgroundColor: 'rgba(0,230,118,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(0,230,118,0.2)' },
-  tagGreenText: { color: '#00E676', fontSize: font.xs, fontWeight: '500' },
-  tagGray: { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : colors.surfaceAlt, borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border },
+  tagGreen: { backgroundColor: themePalette.rgba_0_230_118_0_1, borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: themePalette.rgba_0_230_118_0_2 },
+  tagGreenText: { color: themePalette.hex_00e676, fontSize: font.xs, fontWeight: '500' },
+  tagGray: { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.surfaceAlt, borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.border },
   tagGrayText: { color: colors.muted, fontSize: font.xs },
-  tagBlue: { backgroundColor: 'rgba(100,149,237,0.1)', borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(100,149,237,0.2)' },
-  tagBlueText: { color: '#64B5F6', fontSize: font.xs },
+  tagBlue: { backgroundColor: themePalette.rgba_100_149_237_0_1, borderRadius: 12, paddingHorizontal: s(8), paddingVertical: 4, borderWidth: 1, borderColor: themePalette.rgba_100_149_237_0_2 },
+  tagBlueText: { color: themePalette.hex_64b5f6, fontSize: font.xs },
   priceContainer: { alignItems: 'flex-end' },
-  priceText: { color: '#D4AF37', fontSize: font.base, fontWeight: '700' },
+  priceText: { color: themePalette.hex_d4af37, fontSize: font.base, fontWeight: '700' },
   priceSubtext: { color: colors.subtle, fontSize: font.xs },
   footerContainer: { paddingHorizontal: s(16), paddingTop: 10, paddingBottom: 16, backgroundColor: colors.background, borderTopWidth: 1, borderTopColor: colors.border },
   continueButton: { backgroundColor: colors.buttonBackground, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },

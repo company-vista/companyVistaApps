@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, Linking, StyleSheet, Text, TextInput, View, Pressable, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppSelector } from '../../../../store/hooks';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
@@ -15,10 +15,10 @@ import UnlockDocumentModal from './UnlockDocumentModal';
 import ManageSubscriptionModal from './ManageSubscriptionModal';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 const HOME_HERO_COLORS = {
-    panel: '#0D2137',
-    accentBlue: '#85B7EB',
-    accentYellow: '#FAC775',
-    white: '#ffffff',
+    panel: themePalette.hex_0d2137,
+    accentBlue: themePalette.hex_85b7eb,
+    accentYellow: themePalette.hex_fac775,
+    white: themePalette.hex_ffffff,
 };
 const SINGLE_DOCUMENT_UNLOCK_PRICE = 30;
 const SORT_OPTIONS = [
@@ -32,15 +32,15 @@ function getDocumentPalette(colors) {
     const isDark = colors.mode === 'dark';
     return {
         primaryText: isDark ? colors.text : HOME_HERO_COLORS.panel,
-        accentText: isDark ? HOME_HERO_COLORS.accentBlue : '#303b47',
-        panelButton: isDark ? '#183A5C' : HOME_HERO_COLORS.panel,
-        actionSurface: isDark ? '#183A5C' : '#EAF4FF',
-        actionBorder: isDark ? 'rgba(133,183,235,0.35)' : '#C7DFF6',
-        documentTypeText: isDark ? colors.muted : '#164066',
-        iconSurface: isDark ? 'rgba(133,183,235,0.14)' : '#EAF4FF',
+        accentText: isDark ? HOME_HERO_COLORS.accentBlue : themePalette.hex_303b47,
+        panelButton: isDark ? themePalette.hex_183a5c : HOME_HERO_COLORS.panel,
+        actionSurface: isDark ? themePalette.hex_183a5c : themePalette.hex_eaf4ff,
+        actionBorder: isDark ? themePalette.rgba_133_183_235_0_35 : themePalette.hex_c7dff6,
+        documentTypeText: isDark ? colors.muted : themePalette.hex_164066,
+        iconSurface: isDark ? themePalette.rgba_133_183_235_0_14 : themePalette.hex_eaf4ff,
         iconColor: isDark ? HOME_HERO_COLORS.accentBlue : HOME_HERO_COLORS.panel,
         fileIconColor: isDark ? HOME_HERO_COLORS.accentBlue : HOME_HERO_COLORS.panel,
-        link: isDark ? HOME_HERO_COLORS.accentYellow : '#9A640F',
+        link: isDark ? HOME_HERO_COLORS.accentYellow : themePalette.hex_9a640f,
         activeText: HOME_HERO_COLORS.white,
     };
 }
@@ -56,10 +56,10 @@ function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress 
     const formattedDate = formatDate(createdAt);
     const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
     return (<AnimatedAppear key={item._id ?? idx} index={idx}>
-      <View style={[getStyles(colors).lockedCard, isUnlocked && { borderColor: 'rgba(74, 222, 128, 0.3)' }]}>
+      <View style={[getStyles(colors).lockedCard, isUnlocked && { borderColor: themePalette.rgba_74_222_128_0_3 }]}>
         <View style={getStyles(colors).lockedCardTop}>
-          <View style={[getStyles(colors).lockedIconWrap, { backgroundColor: isUnlocked ? '#F0FDF4' : '#FEF2F2' }]}>
-            <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={14} color={isUnlocked ? '#22C55E' : '#DC2626'}/>
+          <View style={[getStyles(colors).lockedIconWrap, { backgroundColor: isUnlocked ? themePalette.hex_f0fdf4 : themePalette.hex_fef2f2 }]}>
+            <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={14} color={isUnlocked ? themePalette.hex_22c55e : themePalette.hex_dc2626}/>
           </View>
           <View style={getStyles(colors).cardInfo}>
             <Text style={getStyles(colors).cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
@@ -79,12 +79,12 @@ function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress 
         <View style={[getStyles(colors).lockedDivider, { backgroundColor: colors.border }]}/>
 
         {isUnlocked ? (<View style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 8, padding: 6 }}>
-            <FontAwesome name="clock-o" size={12} color="#22C55E" style={{ marginRight: 6 }}/>
-            <Text style={{ flex: 1, fontSize: font.sm, color: '#22C55E', lineHeight: 16 }}>
-              We will deliver the document within <Text style={{ color: '#22C55E', fontWeight: '600' }}>24–72 hours.</Text>
+            <FontAwesome name="clock-o" size={12} color={themePalette.hex_22c55e} style={{ marginRight: 6 }}/>
+            <Text style={{ flex: 1, fontSize: font.sm, color: themePalette.hex_22c55e, lineHeight: 16 }}>
+              We will deliver the document within <Text style={{ color: themePalette.hex_22c55e, fontWeight: '600' }}>24–72 hours.</Text>
             </Text>
-          </View>) : (<Pressable style={[getStyles(colors).lockedBtn, { backgroundColor: '#16a34a' }]} onPress={onUnlockPress}>
-            <FontAwesome name="eye" size={12} color="#fff" style={{ marginRight: 6 }}/>
+          </View>) : (<Pressable style={[getStyles(colors).lockedBtn, { backgroundColor: themePalette.hex_16a34a }]} onPress={onUnlockPress}>
+            <FontAwesome name="eye" size={12} color={themePalette.hex_fff} style={{ marginRight: 6 }}/>
             <Text style={getStyles(colors).lockedBtnText}>Pay to View Document</Text>
           </Pressable>)}
       </View>
@@ -301,8 +301,8 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                 </AnimatedAppear>))}
 
             {hasLocked && (<>
-                {activeTab === 'locked' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: '#dc2626a6', alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
-                    <FontAwesome name="unlock-alt" size={12} color="#fff" style={{ marginRight: 6 }}/>
+                {activeTab === 'locked' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: themePalette.hex_dc2626a6, alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
+                    <FontAwesome name="unlock-alt" size={12} color={themePalette.hex_fff} style={{ marginRight: 6 }}/>
                     <Text style={styles.unlockAllBtnText}>Unlock All</Text>
                   </Pressable>)}
                 {lockedToShow.map((item, idx) => (<LockedDocumentCard key={item._id ?? `locked-${idx}`} item={item} idx={idx} selectedCompany={selectedCompany} colors={colors} onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}/>))}
@@ -338,7 +338,7 @@ const getStyles = (colors) => {
             height: 50,
             marginBottom: 20,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         },
         searchInput: {
             flex: 1,
@@ -399,7 +399,7 @@ const getStyles = (colors) => {
             gap: 4,
             marginBottom: 18,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         },
         tab: {
             flex: 1,
@@ -413,19 +413,19 @@ const getStyles = (colors) => {
             minWidth: 0,
         },
         tabActive: {
-            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#FFFFFF',
-            shadowColor: '#000',
+            backgroundColor: colors.mode === 'dark' ? themePalette.hex_1e293b : themePalette.hex_ffffff,
+            shadowColor: themePalette.hex_000,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.06,
             shadowRadius: 6,
             elevation: 2,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? '#334155' : '#FFFFFF',
+            borderColor: colors.mode === 'dark' ? themePalette.hex_334155 : themePalette.hex_ffffff,
         },
         tabText: {
             fontSize: font.sm,
             fontWeight: '600',
-            color: colors.mode === 'dark' ? '#94A3B8' : '#475569',
+            color: colors.mode === 'dark' ? themePalette.hex_94a3b8 : themePalette.hex_475569,
             letterSpacing: -0.1,
             flexShrink: 1,
         },
@@ -440,11 +440,11 @@ const getStyles = (colors) => {
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            backgroundColor: colors.mode === 'dark' ? '#1E293B' : '#E2E8F0',
+            backgroundColor: colors.mode === 'dark' ? themePalette.hex_1e293b : themePalette.hex_e2e8f0,
             borderWidth: 0,
         },
         tabCountActive: {
-            backgroundColor: colors.mode === 'dark' ? 'rgba(250,199,117,0.18)' : '#0F172A',
+            backgroundColor: colors.mode === 'dark' ? themePalette.rgba_250_199_117_0_18 : themePalette.hex_0f172a,
         },
         tabCountText: {
             fontSize: font.xs,
@@ -452,10 +452,10 @@ const getStyles = (colors) => {
             color: colors.muted,
         },
         tabCountTextActive: {
-            color: '#FFFFFF',
+            color: themePalette.hex_ffffff,
         },
         tabTextActive: {
-            color: colors.mode === 'dark' ? '#F8FAFC' : '#0F172A',
+            color: colors.mode === 'dark' ? themePalette.hex_f8fafc : themePalette.hex_0f172a,
             fontWeight: '700',
         },
         unlockAllBtn: {
@@ -467,7 +467,7 @@ const getStyles = (colors) => {
             borderRadius: 20,
         },
         unlockAllBtnText: {
-            color: '#ffffff',
+            color: themePalette.hex_ffffff,
             fontSize: font.base,
             fontWeight: '700',
         },
@@ -479,7 +479,7 @@ const getStyles = (colors) => {
             borderRadius: 14,
             padding: 12,
             borderWidth: 1,
-            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+            borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         },
         cardTop: {
             flexDirection: 'row',
@@ -558,7 +558,7 @@ const getStyles = (colors) => {
             borderRadius: 10,
             padding: 6,
             borderWidth: 1,
-            borderColor: 'rgba(252, 165, 165, 0.3)',
+            borderColor: themePalette.rgba_252_165_165_0_3,
         },
         lockedCardTop: {
             flexDirection: 'row',
@@ -585,7 +585,7 @@ const getStyles = (colors) => {
             borderRadius: 16,
         },
         lockedBtnText: {
-            color: '#ffffff',
+            color: themePalette.hex_ffffff,
             fontSize: font.sm,
             fontWeight: '600',
         },

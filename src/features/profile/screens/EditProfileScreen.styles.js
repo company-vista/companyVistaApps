@@ -1,7 +1,8 @@
 import { font } from '../../../theme/typography';
 import { StyleSheet } from 'react-native';
 import { s } from '../../../theme/responsive';
-const styles = StyleSheet.create({
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
         gap: s(12),
     },
     title: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '400',
     },
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
     avatarCard: {
         alignItems: 'center',
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         padding: s(24),
         marginTop: s(28),
     },
@@ -43,9 +44,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 3,
-        borderColor: '#7dd3fc',
+        borderColor: themePalette.hex_7dd3fc,
         borderRadius: 100,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
         overflow: 'hidden',
     },
     avatarImage: {
@@ -62,11 +63,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 3,
         borderRadius: 21,
-        backgroundColor: '#121414',
+        backgroundColor: themePalette.hex_121414,
     },
     formCard: {
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(18),
         padding: s(16),
         gap: s(14),
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
         gap: s(7),
     },
     inputLabel: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
     },
@@ -85,14 +86,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(12),
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 14,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
         paddingHorizontal: s(14),
     },
     input: {
         flex: 1,
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.md,
         fontWeight: '400',
         paddingVertical: 0,
@@ -104,17 +105,17 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(15, 23, 42, 0.42)',
+        backgroundColor: themePalette.rgba_15_23_42_0_42,
         paddingHorizontal: s(24),
     },
     modalCard: {
         width: '100%',
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         padding: s(18),
     },
     modalTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.xxl,
         fontWeight: '400',
         textAlign: 'center',
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
         gap: s(10),
     },
     dateLabel: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
     },
@@ -140,11 +141,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 12,
     },
     dateValue: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.xl,
         fontWeight: '400',
     },
@@ -159,18 +160,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 12,
     },
     modalButtonText: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.base,
         fontWeight: '400',
     },
     modalDoneText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.base,
         fontWeight: '900',
     },
-});
+}));
 export default styles;

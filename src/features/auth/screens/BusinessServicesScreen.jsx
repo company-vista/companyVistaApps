@@ -14,7 +14,7 @@ import logoR from '../../../assets/images/logoR.png';
 import BackButton from '../../../components/buttons/BackButton';
 import { Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 
 const BusinessServicesScreen = ({ navigation }) => {
@@ -70,12 +70,12 @@ const BusinessServicesScreen = ({ navigation }) => {
         <Animated.View style={[styles.cardsContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
 
           {/* Card 1 */}
-          <Animated.View style={[styles.card, styles.goldCardBorder, { backgroundColor: isDark ? 'rgba(201, 168, 76, 0.08)' : '#FFFFFF', transform: [{ translateY: float1 }] }]}>
+          <Animated.View style={[styles.card, styles.goldCardBorder, { backgroundColor: isDark ? themePalette.rgba_201_168_76_0_08 : themePalette.hex_ffffff, transform: [{ translateY: float1 }] }]}>
               <View style={[styles.iconContainer, styles.goldIconBg]}>
-                <Ionicons name="business" size={20} color="#C9A84C" />
+                <Ionicons name="business" size={20} color={themePalette.hex_c9a84c} />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: isDark ? '#C9A84C' : '#B8942F' }]}>Company Registration</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? themePalette.hex_c9a84c : themePalette.hex_b8942f }]}>Company Registration</Text>
                 <Text style={[styles.cardSubtitle, { color: colors.muted }]}>50+ jurisdictions · from $299</Text>
               </View>
             <View style={styles.greenBadge}>
@@ -84,12 +84,12 @@ const BusinessServicesScreen = ({ navigation }) => {
           </Animated.View>
 
           {/* Card 2 */}
-          <Animated.View style={[styles.card, styles.blueCardBorder, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.08)' : '#FFFFFF', transform: [{ translateY: float2 }] }]}>
+          <Animated.View style={[styles.card, styles.blueCardBorder, { backgroundColor: isDark ? themePalette.rgba_59_130_246_0_08 : themePalette.hex_ffffff, transform: [{ translateY: float2 }] }]}>
               <View style={[styles.iconContainer, styles.blueIconBg]}>
-                <Ionicons name="shield-checkmark" size={20} color="#60A5FA" />
+                <Ionicons name="shield-checkmark" size={20} color={themePalette.hex_60a5fa} />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: isDark ? '#60A5FA' : '#2563EB' }]}>Compliance & Filings</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? themePalette.hex_60a5fa : themePalette.hex_2563eb }]}>Compliance & Filings</Text>
                 <Text style={[styles.cardSubtitle, { color: colors.muted }]}>Annual reports · registered agent</Text>
               </View>
             <View style={styles.blueBadge}>
@@ -98,12 +98,12 @@ const BusinessServicesScreen = ({ navigation }) => {
           </Animated.View>
 
           {/* Card 3 */}
-          <Animated.View style={[styles.card, styles.tealCardBorder, { backgroundColor: isDark ? 'rgba(20, 184, 166, 0.08)' : '#FFFFFF', transform: [{ translateY: float3 }] }]}>
+          <Animated.View style={[styles.card, styles.tealCardBorder, { backgroundColor: isDark ? themePalette.rgba_20_184_166_0_08 : themePalette.hex_ffffff, transform: [{ translateY: float3 }] }]}>
               <View style={[styles.iconContainer, styles.tealIconBg]}>
-                <Ionicons name="landmark" size={20} color="#34D399" />
+                <Ionicons name="landmark" size={20} color={themePalette.hex_34d399} />
               </View>
               <View style={styles.cardTextContent}>
-                <Text style={[styles.cardTitle, { color: isDark ? '#34D399' : '#0D9488' }]}>Business Banking</Text>
+                <Text style={[styles.cardTitle, { color: isDark ? themePalette.hex_34d399 : themePalette.hex_0d9488 }]}>Business Banking</Text>
                 <Text style={[styles.cardSubtitle, { color: colors.muted }]}>Multi-currency · remote setup</Text>
               </View>
             <View style={styles.tealBadge}>
@@ -113,24 +113,24 @@ const BusinessServicesScreen = ({ navigation }) => {
 
           {/* Pills */}
           <View style={styles.pillsRow}>
-            <View style={[styles.pill, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderColor: 'rgba(139, 92, 246, 0.3)' }]}>
-              <Ionicons name="location" size={11} color="#A78BFA" />
-              <Text style={[styles.pillText, { color: '#A78BFA' }]}> Virtual Office</Text>
+            <View style={[styles.pill, { backgroundColor: themePalette.rgba_139_92_246_0_15, borderColor: themePalette.rgba_139_92_246_0_3 }]}>
+              <Ionicons name="location" size={11} color={themePalette.hex_a78bfa} />
+              <Text style={[styles.pillText, { color: themePalette.hex_a78bfa }]}> Virtual Office</Text>
             </View>
-            <View style={[styles.pill, { backgroundColor: 'rgba(201, 168, 76, 0.15)', borderColor: 'rgba(201, 168, 76, 0.3)' }]}>
-              <Ionicons name="document-text" size={11} color="#C9A84C" />
-              <Text style={[styles.pillText, { color: '#C9A84C' }]}> Tax Filing</Text>
+            <View style={[styles.pill, { backgroundColor: themePalette.rgba_201_168_76_0_15, borderColor: themePalette.rgba_201_168_76_0_3 }]}>
+              <Ionicons name="document-text" size={11} color={themePalette.hex_c9a84c} />
+              <Text style={[styles.pillText, { color: themePalette.hex_c9a84c }]}> Tax Filing</Text>
             </View>
-            <View style={[styles.pill, { backgroundColor: 'rgba(59, 130, 246, 0.15)', borderColor: 'rgba(59, 130, 246, 0.3)' }]}>
-              <Ionicons name="ribbon" size={11} color="#60A5FA" />
-              <Text style={[styles.pillText, { color: '#60A5FA' }]}> Trademark</Text>
+            <View style={[styles.pill, { backgroundColor: themePalette.rgba_59_130_246_0_15, borderColor: themePalette.rgba_59_130_246_0_3 }]}>
+              <Ionicons name="ribbon" size={11} color={themePalette.hex_60a5fa} />
+              <Text style={[styles.pillText, { color: themePalette.hex_60a5fa }]}> Trademark</Text>
             </View>
           </View>
 
           {/* Banner */}
           <View style={[styles.banner, !isDark && styles.bannerLight]}>
-            <Ionicons name="checkmark-circle" size={14} color="#C9A84C" />
-            <Text style={[styles.bannerText, { color: isDark ? '#CBD5E1' : colors.muted }]}>  One platform · One dashboard · Zero hassle</Text>
+            <Ionicons name="checkmark-circle" size={14} color={themePalette.hex_c9a84c} />
+            <Text style={[styles.bannerText, { color: isDark ? themePalette.hex_cbd5e1 : colors.muted }]}>  One platform · One dashboard · Zero hassle</Text>
           </View>
         </Animated.View>
 
@@ -152,9 +152,9 @@ const BusinessServicesScreen = ({ navigation }) => {
           </Text>
 
           <View style={styles.paginationRow}>
-            <View style={[styles.dotInactive, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border }]} />
+            <View style={[styles.dotInactive, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border }]} />
             <View style={styles.dashActive} />
-            <View style={[styles.dotInactive, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border }]} />
+            <View style={[styles.dotInactive, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border }]} />
           </View>
 
           <TouchableOpacity style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
@@ -172,7 +172,7 @@ const BusinessServicesScreen = ({ navigation }) => {
 
 export default BusinessServicesScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -199,24 +199,24 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   goldCardBorder: {
-    borderColor: 'rgba(201, 168, 76, 0.2)',
-    shadowColor: '#C9A84C',
+    borderColor: themePalette.rgba_201_168_76_0_2,
+    shadowColor: themePalette.hex_c9a84c,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     // elevation: 3,
   },
   blueCardBorder: {
-    borderColor: 'rgba(59, 130, 246, 0.2)',
-    shadowColor: '#3B82F6',
+    borderColor: themePalette.rgba_59_130_246_0_2,
+    shadowColor: themePalette.hex_3b82f6,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10, 
     // elevation: 3,
   },
   tealCardBorder: {
-    borderColor: 'rgba(20, 184, 166, 0.2)',
-    shadowColor: '#14B8A6',
+    borderColor: themePalette.rgba_20_184_166_0_2,
+    shadowColor: themePalette.hex_14b8a6,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -230,36 +230,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: s(12),
   },
-  goldIconBg: { backgroundColor: 'rgba(201, 168, 76, 0.15)' },
-  blueIconBg: { backgroundColor: 'rgba(59, 130, 246, 0.15)' },
-  tealIconBg: { backgroundColor: 'rgba(20, 184, 166, 0.15)' },
+  goldIconBg: { backgroundColor: themePalette.rgba_201_168_76_0_15 },
+  blueIconBg: { backgroundColor: themePalette.rgba_59_130_246_0_15 },
+  tealIconBg: { backgroundColor: themePalette.rgba_20_184_166_0_15 },
   cardTextContent: { flex: 1 },
   cardTitle: { fontSize: font.md, fontWeight: '600' },
   cardSubtitle: { fontSize: font.small, marginTop: s(3) },
   greenBadge: {
-    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+    backgroundColor: themePalette.rgba_34_197_94_0_2,
     paddingHorizontal: s(10),
     paddingVertical: s(5),
     borderRadius: 12,
     marginRight: s(8),
   },
-  greenBadgeText: { color: '#4ADE80', fontSize: font.small, fontWeight: '600' },
+  greenBadgeText: { color: themePalette.hex_4ade80, fontSize: font.small, fontWeight: '600' },
   blueBadge: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: themePalette.rgba_59_130_246_0_2,
     paddingHorizontal: s(10),
     paddingVertical: s(5),
     borderRadius: 12,
     marginRight: s(8),
   },
-  blueBadgeText: { color: '#60A5FA', fontSize: font.small, fontWeight: '600' },
+  blueBadgeText: { color: themePalette.hex_60a5fa, fontSize: font.small, fontWeight: '600' },
   tealBadge: {
-    backgroundColor: 'rgba(20, 184, 166, 0.2)',
+    backgroundColor: themePalette.rgba_20_184_166_0_2,
     paddingHorizontal: s(10),
     paddingVertical: s(5),
     borderRadius: 12,
     marginRight: s(8),
   },
-  tealBadgeText: { color: '#2DD4BF', fontSize: font.small, fontWeight: '600' },
+  tealBadgeText: { color: themePalette.hex_2dd4bf, fontSize: font.small, fontWeight: '600' },
   pillsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -278,26 +278,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(201, 168, 76, 0.08)',
+    backgroundColor: themePalette.rgba_201_168_76_0_08,
     borderRadius: 12,
     paddingVertical: s(10),
     borderWidth: 1,
-    borderColor: 'rgba(201, 168, 76, 0.3)',
+    borderColor: themePalette.rgba_201_168_76_0_3,
     marginTop: s(8)
   },
   bannerText: { fontSize: font.sm, fontWeight: '500' },
-  bannerLight: { backgroundColor: 'rgba(201, 168, 76, 0.12)', borderColor: 'rgba(201, 168, 76, 0.4)' },
+  bannerLight: { backgroundColor: themePalette.rgba_201_168_76_0_12, borderColor: themePalette.rgba_201_168_76_0_4 },
   contentSection: { marginTop: s(24) },
   sectionTagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
-  goldLine: { width: 16, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
-  sectionTag: { color: '#C9A84C', fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
+  goldLine: { width: 16, height: 2, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
+  sectionTag: { color: themePalette.hex_c9a84c, fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
     fontSize: font.xl,
     fontWeight: '600',
     lineHeight: 32,
     marginBottom: s(12),
   },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic' },
   description: {
     fontSize: font.sm,
     lineHeight: 22,
@@ -312,25 +312,25 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: themePalette.rgba_255_255_255_0_2,
     marginRight: s(6),
   },
   dashActive: {
     width: 24,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#C9A84C',
+    backgroundColor: themePalette.hex_c9a84c,
     marginRight: s(6),
   },
   continueBtn: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: themePalette.hex_d4af37,
     borderRadius: 25,
     paddingVertical: s(14),
     alignItems: 'center',
     marginBottom: s(16),
     marginTop: s(16),
   },
-  continueBtnText: { color: '#060913', fontSize: font.lg, fontWeight: 'bold' },
+  continueBtnText: { color: themePalette.hex_060913, fontSize: font.lg, fontWeight: 'bold' },
   skipBtn: { alignItems: 'center', paddingVertical: s(8), marginBottom: s(16) },
-  skipText: { color: '#64748B', fontSize: font.bodySmall },
-});
+  skipText: { color: themePalette.hex_64748b, fontSize: font.bodySmall },
+}));

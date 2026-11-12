@@ -27,6 +27,7 @@ import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
 import axios from 'axios';
 import { API_BASE_URL } from '../../../config/api';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const DocUploadButton = ({ filled, onPress }) => (
   <TouchableOpacity
@@ -34,7 +35,7 @@ const DocUploadButton = ({ filled, onPress }) => (
     onPress={onPress}
     style={[styles.uploadBtn, filled && styles.uploadBtnFilled]}
   >
-    {filled ? <Check color="#10B981" size={14} /> : <Camera color="#EAB308" size={14} />}
+    {filled ? <Check color={themePalette.hex_10b981} size={14} /> : <Camera color={themePalette.hex_eab308} size={14} />}
     <Text style={[styles.uploadBtnText, filled && styles.uploadBtnTextFilled]}>
       {filled ? 'Change' : 'Upload'}
     </Text>
@@ -270,7 +271,7 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070C15" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070c15} />
 
       {/* CompanyNaming jaisa Back + Logo header */}
       <View style={styles.headerRow}>
@@ -307,8 +308,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
         <View style={styles.documentsContainer}>
           {/* Passport */}
           <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('passport')} style={[styles.docCard, isPassportFilled && styles.verifiedCard]}>
-            <View style={[styles.docIconBox, { backgroundColor: isPassportFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
-              <CreditCard color={isPassportFilled ? '#10B981' : '#94A3B8'} size={20} />
+            <View style={[styles.docIconBox, { backgroundColor: isPassportFilled ? themePalette.rgba_16_185_129_0_12 : themePalette.rgba_148_163_184_0_12 }]}>
+              <CreditCard color={isPassportFilled ? themePalette.hex_10b981 : themePalette.hex_94a3b8} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Passport</Text>
@@ -319,8 +320,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
           {/* Proof of address */}
           <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('address')} style={[styles.docCard, isAddressFilled && styles.verifiedCard]}>
-            <View style={[styles.docIconBox, { backgroundColor: isAddressFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
-              <FileText color={isAddressFilled ? '#10B981' : '#94A3B8'} size={20} />
+            <View style={[styles.docIconBox, { backgroundColor: isAddressFilled ? themePalette.rgba_16_185_129_0_12 : themePalette.rgba_148_163_184_0_12 }]}>
+              <FileText color={isAddressFilled ? themePalette.hex_10b981 : themePalette.hex_94a3b8} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Proof of address</Text>
@@ -331,8 +332,8 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
           {/* Selfie verification */}
           <TouchableOpacity activeOpacity={0.8} onPress={() => openPicker('selfie')} style={[styles.docCard, isSelfieFilled && styles.verifiedCard]}>
-            <View style={[styles.docIconBox, { backgroundColor: isSelfieFilled ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }]}>
-              <Camera color={isSelfieFilled ? '#10B981' : '#94A3B8'} size={20} />
+            <View style={[styles.docIconBox, { backgroundColor: isSelfieFilled ? themePalette.rgba_16_185_129_0_12 : themePalette.rgba_148_163_184_0_12 }]}>
+              <Camera color={isSelfieFilled ? themePalette.hex_10b981 : themePalette.hex_94a3b8} size={20} />
             </View>
             <View style={styles.docInfo}>
               <Text style={styles.docTitle}>Selfie verification</Text>
@@ -346,7 +347,7 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
         {/* Security Banner */}
         <View style={styles.securityBanner}>
-          <ShieldCheck color="#10B981" size={20} style={{ marginTop: 2 }} />
+          <ShieldCheck color={themePalette.hex_10b981} size={20} style={{ marginTop: 2 }} />
           <Text style={styles.securityText}>
             Bank-grade encryption. Documents are used solely for filing and deleted after 90 days.
           </Text>
@@ -354,15 +355,15 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
         {/* Upload KYC Button — POST /kyc/:companyId/:clientId */}
         <TouchableOpacity
-          style={[styles.continueButton, { backgroundColor: '#0F172A', borderWidth: 1, borderColor: 'rgba(234,179,8,0.3)' }, uploading && { opacity: 0.6 }]}
+          style={[styles.continueButton, { backgroundColor: themePalette.hex_0f172a, borderWidth: 1, borderColor: themePalette.rgba_234_179_8_0_3 }, uploading && { opacity: 0.6 }]}
           activeOpacity={0.85}
           onPress={handleUploadKyc}
           disabled={uploading || (!passportUri && !addressUri && !selfieUri)}
         >
-          <Text style={[styles.continueButtonText, { color: '#EAB308' }]}>{uploading ? 'Uploading...' : kycStatus === 'complete' ? 'KYC Complete — Re-upload?' : 'Upload KYC Documents'}</Text>
+          <Text style={[styles.continueButtonText, { color: themePalette.hex_eab308 }]}>{uploading ? 'Uploading...' : kycStatus === 'complete' ? 'KYC Complete — Re-upload?' : 'Upload KYC Documents'}</Text>
         </TouchableOpacity>
-        {kycStatus ? <Text style={{ color: kycStatus === 'complete' ? '#10B981' : '#EAB308', fontSize: font.small, textAlign: 'center', marginTop: 6 }}>KYC Status: {kycStatus}{fetchingKyc ? ' (refreshing...)' : ''}</Text> : null}
-        {!companyId || !clientId ? <Text style={{ color: '#EF4444', fontSize: font.small, textAlign: 'center', marginTop: 6 }}>Missing companyId/clientId — upload will fail</Text> : null}
+        {kycStatus ? <Text style={{ color: kycStatus === 'complete' ? themePalette.hex_10b981 : themePalette.hex_eab308, fontSize: font.small, textAlign: 'center', marginTop: 6 }}>KYC Status: {kycStatus}{fetchingKyc ? ' (refreshing...)' : ''}</Text> : null}
+        {!companyId || !clientId ? <Text style={{ color: themePalette.hex_ef4444, fontSize: font.small, textAlign: 'center', marginTop: 6 }}>Missing companyId/clientId — upload will fail</Text> : null}
 
         {/* Bottom Button - KYC complete -> direct RegistrationTracking */}
         <TouchableOpacity style={[styles.continueButton, kycStatus !== 'complete' && { opacity: 0.7 }]} activeOpacity={0.85} onPress={handleContinue}>
@@ -377,10 +378,10 @@ const VerifyIdentityScreen = ({ navigation, route }) => {
 
 export default VerifyIdentityScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070C15',
+    backgroundColor: themePalette.hex_070c15,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, marginTop: 34 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
@@ -388,12 +389,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 3,
     width: '100%',
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     marginVertical: 4,
   },
   stepActive: {
     flex: 1,
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
   },
   scrollContent: {
     paddingHorizontal: s(16),
@@ -404,16 +405,16 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.displayLarge,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '400',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontFamily: 'serif',
   },
   subTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     marginTop: 6,
     lineHeight: 18,
@@ -422,8 +423,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(234, 179, 8, 0.05)',
-    borderColor: 'rgba(234, 179, 8, 0.2)',
+    backgroundColor: themePalette.rgba_234_179_8_0_05,
+    borderColor: themePalette.rgba_234_179_8_0_2,
     borderWidth: 1,
     borderRadius: 14,
     padding: 14,
@@ -438,28 +439,28 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#3A311A',
+    backgroundColor: themePalette.hex_3a311a,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   avatarGoldText: {
-    color: '#D97706',
+    color: themePalette.hex_d97706,
     fontWeight: '700',
     fontSize: font.bodySmall,
   },
   userName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '700',
   },
   userRole: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: 2,
   },
   progressText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.sm,
     fontWeight: '700',
   },
@@ -475,12 +476,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   verifiedCard: {
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_16_185_129_0_3,
   },
   uploadingCard: {
-    backgroundColor: '#0F172A',
-    borderColor: '#3A311A',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.hex_3a311a,
     borderStyle: 'dashed',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -498,26 +499,26 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   verifiedIconBox: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: themePalette.rgba_16_185_129_0_12,
   },
   uploadingIconBox: {
-    backgroundColor: 'rgba(234, 179, 8, 0.12)',
+    backgroundColor: themePalette.rgba_234_179_8_0_12,
   },
   docInfo: {
     flex: 1,
   },
   docTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
   },
   docSub: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: 2,
   },
   docSubYellow: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.sm,
     marginTop: 2,
   },
@@ -530,31 +531,31 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(234, 179, 8, 0.35)',
-    backgroundColor: 'rgba(234, 179, 8, 0.08)',
+    borderColor: themePalette.rgba_234_179_8_0_35,
+    backgroundColor: themePalette.rgba_234_179_8_0_08,
   },
   uploadBtnFilled: {
-    borderColor: 'rgba(16, 185, 129, 0.35)',
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    borderColor: themePalette.rgba_16_185_129_0_35,
+    backgroundColor: themePalette.rgba_16_185_129_0_08,
   },
   uploadBtnText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.sm,
     fontWeight: '700',
   },
   uploadBtnTextFilled: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
   },
   progressTrack: {
     height: 3,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     borderRadius: 2,
     marginTop: 14,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
   },
   dividerRow: {
     flexDirection: 'row',
@@ -562,7 +563,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionHeader: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
@@ -571,34 +572,34 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
   },
   otherShareholderCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_255_255_255_0_08,
     borderWidth: 1,
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
   },
   errorShareholderCard: {
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-    backgroundColor: 'rgba(239, 68, 68, 0.03)',
+    borderColor: themePalette.rgba_239_68_68_0_3,
+    backgroundColor: themePalette.rgba_239_68_68_0_03,
   },
   avatarBlue: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   avatarBlueText: {
-    color: '#38BDF8',
+    color: themePalette.hex_38bdf8,
     fontWeight: '700',
     fontSize: font.sm,
   },
@@ -606,76 +607,76 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#3B1219',
+    backgroundColor: themePalette.hex_3b1219,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   avatarRedText: {
-    color: '#F87171',
+    color: themePalette.hex_f87171,
     fontWeight: '700',
     fontSize: font.sm,
   },
   otherUserName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
   },
   otherUserSub: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: 2,
   },
   errorText: {
-    color: '#F87171',
+    color: themePalette.hex_f87171,
     fontSize: font.small,
     marginTop: 2,
   },
   resendBtn: {
-    backgroundColor: 'rgba(234, 179, 8, 0.1)',
-    borderColor: 'rgba(234, 179, 8, 0.3)',
+    backgroundColor: themePalette.rgba_234_179_8_0_1,
+    borderColor: themePalette.rgba_234_179_8_0_3,
     borderWidth: 1,
     paddingHorizontal: s(12),
     paddingVertical: 6,
     borderRadius: 8,
   },
   resendBtnText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.sm,
     fontWeight: '600',
   },
   notifyBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    backgroundColor: themePalette.rgba_239_68_68_0_15,
+    borderColor: themePalette.rgba_239_68_68_0_3,
     borderWidth: 1,
     paddingHorizontal: s(12),
     paddingVertical: 6,
     borderRadius: 8,
   },
   notifyBtnText: {
-    color: '#F87171',
+    color: themePalette.hex_f87171,
     fontSize: font.sm,
     fontWeight: '600',
   },
   securityBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: 'rgba(16, 185, 129, 0.05)',
-    borderColor: 'rgba(16, 185, 129, 0.2)',
+    backgroundColor: themePalette.rgba_16_185_129_0_05,
+    borderColor: themePalette.rgba_16_185_129_0_2,
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
     marginVertical: 14,
   },
   securityText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginLeft: 10,
     flex: 1,
     lineHeight: 16,
   },
   disabledButton: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
@@ -683,12 +684,12 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   disabledButtonText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.md,
     fontWeight: '700',
   },
   continueButton: {
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     borderRadius: 24,
     paddingVertical: 14,
     alignItems: 'center',
@@ -696,15 +697,15 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   continueButtonText: {
-    color: '#070C15',
+    color: themePalette.hex_070c15,
     fontSize: font.lg,
     fontWeight: '700',
   },
   footerNote: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.small,
     textAlign: 'center',
     marginTop: 12,
     marginBottom: 20,
   },
-});
+}));

@@ -21,6 +21,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { forgotPassword } from '../api/forgotPasswordApi';
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 export default function OtpVerifyScreen() {
   const navigation = useNavigation();
@@ -107,7 +108,7 @@ export default function OtpVerifyScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
@@ -163,7 +164,7 @@ export default function OtpVerifyScreen() {
                       onKeyPress={e => handleKeyPress(e, index)}
                       keyboardType="number-pad"
                       maxLength={1}
-                      selectionColor="#D4AF37"
+                      selectionColor={themePalette.hex_d4af37}
                       autoFocus={index === 0}
                     />
                   </View>
@@ -215,13 +216,13 @@ export default function OtpVerifyScreen() {
               onPress={handleVerify}
               disabled={loading || !isOtpComplete}>
               {loading ? (
-                <ActivityIndicator color="#070A12" />
+                <ActivityIndicator color={themePalette.hex_070a12} />
               ) : (
                 <>
-                  <Text style={[styles.submitButtonText, !isOtpComplete && { color: '#6B7280' }]}>
+                  <Text style={[styles.submitButtonText, !isOtpComplete && { color: themePalette.hex_6b7280 }]}>
                     Verify Code
                   </Text>
-                  <Text style={[styles.arrowIcon, !isOtpComplete && { color: '#6B7280' }]}>→</Text>
+                  <Text style={[styles.arrowIcon, !isOtpComplete && { color: themePalette.hex_6b7280 }]}>→</Text>
                 </>
               )}
             </Pressable>
@@ -232,8 +233,8 @@ export default function OtpVerifyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#070A12' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_070a12 },
   keyboardView: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     height: s(120),
     borderRadius: s(60),
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
     height: s(92),
     borderRadius: s(46),
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: themePalette.hex_334155,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -273,13 +274,13 @@ const styles = StyleSheet.create({
     height: s(52),
     borderRadius: s(26),
     borderWidth: 1,
-    borderColor: '#22D3EE',
+    borderColor: themePalette.hex_22d3ee,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     position: 'relative',
   },
-  mailIcon: { fontSize: font.displayXXL, marginBottom: s(6), color: '#22D3EE' },
+  mailIcon: { fontSize: font.displayXXL, marginBottom: s(6), color: themePalette.hex_22d3ee },
   checkBadge: {
     position: 'absolute',
     top: -4,
@@ -287,47 +288,47 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#10B981',
+    backgroundColor: themePalette.hex_10b981,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkText: { color: '#070A12', fontSize: font.sm, fontWeight: 'bold' },
+  checkText: { color: themePalette.hex_070a12, fontSize: font.sm, fontWeight: 'bold' },
   textSection: { alignItems: 'center', marginVertical: s(15) },
-  title: { color: '#FFFFFF', fontSize: font.displayMedium, fontWeight: '600', textAlign: 'center' },
-  italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
-  description: { color: '#94A3B8', textAlign: 'center', marginTop: s(6), fontSize: font.base },
+  title: { color: themePalette.hex_ffffff, fontSize: font.displayMedium, fontWeight: '600', textAlign: 'center' },
+  italicTitle: { fontStyle: 'italic', color: themePalette.hex_d4af37, fontWeight: '400' },
+  description: { color: themePalette.hex_94a3b8, textAlign: 'center', marginTop: s(6), fontSize: font.base },
   emailChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderWidth: 1,
-    borderColor: '#D4AF37',
+    borderColor: themePalette.hex_d4af37,
     borderRadius: 12,
     paddingHorizontal: s(16),
     paddingVertical: s(10),
     marginTop: s(12),
   },
-  chipIcon: { color: '#D4AF37', marginRight: s(8), fontSize: font.base },
-  chipText: { color: '#D4AF37', fontSize: font.base, fontWeight: '600' },
+  chipIcon: { color: themePalette.hex_d4af37, marginRight: s(8), fontSize: font.base },
+  chipText: { color: themePalette.hex_d4af37, fontSize: font.base, fontWeight: '600' },
   otpSection: { width: '100%', marginVertical: s(10) },
   dividerContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(16) },
-  label: { color: '#64748B', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
-  line: { flex: 1, height: 1, backgroundColor: '#1E293B' },
+  label: { color: themePalette.hex_64748b, fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
+  line: { flex: 1, height: 1, backgroundColor: themePalette.hex_1e293b },
   codeContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
   codeBox: {
     width: s(44),
     height: s(54),
     borderRadius: s(12),
     borderWidth: 1,
-    borderColor: '#1E293B',
-    backgroundColor: '#0B1120',
+    borderColor: themePalette.hex_1e293b,
+    backgroundColor: themePalette.hex_0b1120,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  codeBoxFilled: { borderColor: '#334155' },
-  codeBoxActive: { borderColor: '#D4AF37' },
+  codeBoxFilled: { borderColor: themePalette.hex_334155 },
+  codeBoxActive: { borderColor: themePalette.hex_d4af37 },
   codeText: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.display,
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     textAlign: 'center',
@@ -335,50 +336,50 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   resendContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: s(20) },
-  resendLabel: { color: '#64748B', fontSize: font.bodySmall, marginRight: s(10) },
+  resendLabel: { color: themePalette.hex_64748b, fontSize: font.bodySmall, marginRight: s(10) },
   resendButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     borderRadius: 20,
     paddingHorizontal: s(12),
     paddingVertical: s(6),
   },
-  resendButtonActive: { borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.1)' },
-  timerIcon: { color: '#64748B', fontSize: font.sm, marginRight: s(6) },
-  resendText: { color: '#94A3B8', fontSize: font.sm, fontWeight: '600' },
-  resendTextActive: { color: '#D4AF37', fontSize: font.sm, fontWeight: '700' },
+  resendButtonActive: { borderColor: themePalette.hex_d4af37, backgroundColor: themePalette.rgba_212_175_55_0_1 },
+  timerIcon: { color: themePalette.hex_64748b, fontSize: font.sm, marginRight: s(6) },
+  resendText: { color: themePalette.hex_94a3b8, fontSize: font.sm, fontWeight: '600' },
+  resendTextActive: { color: themePalette.hex_d4af37, fontSize: font.sm, fontWeight: '700' },
   warningCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0B1120',
+    backgroundColor: themePalette.hex_0b1120,
     borderWidth: 1,
-    borderColor: '#854D0E',
+    borderColor: themePalette.hex_854d0e,
     borderRadius: 12,
     padding: s(12),
     marginVertical: s(10),
   },
   warningIcon: { fontSize: font.base, marginRight: s(10) },
-  warningText: { color: '#94A3B8', fontSize: font.sm, flex: 1, lineHeight: 16 },
-  boldText: { color: '#FFFFFF', fontWeight: '700' },
+  warningText: { color: themePalette.hex_94a3b8, fontSize: font.sm, flex: 1, lineHeight: 16 },
+  boldText: { color: themePalette.hex_ffffff, fontWeight: '700' },
   changeEmailButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     borderRadius: 12,
     paddingVertical: s(14),
-    backgroundColor: '#070A12',
+    backgroundColor: themePalette.hex_070a12,
     marginTop: s(4),
   },
-  editIcon: { color: '#94A3B8', marginRight: s(8), fontSize: font.base },
-  changeEmailText: { color: '#E2E8F0', fontSize: font.base, fontWeight: '600' },
+  editIcon: { color: themePalette.hex_94a3b8, marginRight: s(8), fontSize: font.base },
+  changeEmailText: { color: themePalette.hex_e2e8f0, fontSize: font.base, fontWeight: '600' },
   footer: { marginTop: s(20) },
   submitButton: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: themePalette.hex_d4af37,
     width: '100%',
     height: 52,
     borderRadius: 24,
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  submitButtonDisabled: { backgroundColor: '#1E293B', opacity: 0.8 },
-  submitButtonText: { color: '#070A12', fontSize: font.lg, fontWeight: '700', marginRight: s(8) },
-  arrowIcon: { color: '#070A12', fontSize: font.xxl, fontWeight: 'bold' },
-});
+  submitButtonDisabled: { backgroundColor: themePalette.hex_1e293b, opacity: 0.8 },
+  submitButtonText: { color: themePalette.hex_070a12, fontSize: font.lg, fontWeight: '700', marginRight: s(8) },
+  arrowIcon: { color: themePalette.hex_070a12, fontSize: font.xxl, fontWeight: 'bold' },
+}));

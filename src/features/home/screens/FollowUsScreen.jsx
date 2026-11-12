@@ -2,34 +2,34 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 const socialItems = [
     {
         icon: 'youtube-play',
-        iconColor: '#ff0000',
+        iconColor: themePalette.hex_ff0000,
         title: 'Watch our Youtube channel',
     },
     {
         icon: 'instagram',
-        iconColor: '#c13584',
+        iconColor: themePalette.hex_c13584,
         title: 'Follow us on Instagram',
     },
     {
         icon: 'facebook-square',
-        iconColor: '#3154a4',
+        iconColor: themePalette.hex_3154a4,
         title: 'Follow us on Facebook',
         url: 'https://www.facebook.com/companyvista',
     },
     {
         icon: 'linkedin-square',
-        iconColor: '#0a66c2',
+        iconColor: themePalette.hex_0a66c2,
         title: 'Follow us on LinkedIn',
         url: 'https://www.linkedin.com/company/companyvista/about',
     },
     {
         icon: 'x',
-        iconColor: '#111827',
+        iconColor: themePalette.hex_111827,
         title: 'Follow us on X',
     },
 ];
@@ -66,7 +66,7 @@ function FollowUsScreen() {
       </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -76,11 +76,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         paddingHorizontal: s(20),
     },
     headerTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '500',
     },
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         paddingTop: 25,
     },
     heading: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.xxl,
         fontWeight: '400',
         marginBottom: 28,
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 14,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         paddingHorizontal: s(14),
         paddingVertical: 12,
     },
     socialTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.lg,
         fontWeight: '400',
         lineHeight: 20,
@@ -125,20 +125,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 4,
-        backgroundColor: '#111827',
+        backgroundColor: themePalette.hex_111827,
     },
     xIconText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.xl,
         fontWeight: '800',
     },
     infoText: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.base,
         fontWeight: '400',
         lineHeight: 22,
         marginTop: 46,
         textAlign: 'center',
     },
-});
+}));
 export default FollowUsScreen;

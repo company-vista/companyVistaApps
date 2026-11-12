@@ -14,7 +14,7 @@ import { Clock, Check, RefreshCw } from 'lucide-react-native';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
-import { useThemeColors } from '../../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
 import { useAppSelector } from '../../../../../store/hooks';
 import { fetchQuote, isQuoteReady, formatCurrency } from './api/quoteApi';
@@ -178,9 +178,9 @@ const OrderDetailsScreen = ({
         </View>
 
         {/* Preparing Quote Banner - changes when admin quote ready */}
-        <View style={[styles.statusBanner, { backgroundColor: isLight ? '#FFFFFF' : '#0F1A30', borderColor: hasAmount ? 'rgba(16,185,129,0.3)' : colors.border }]}>
-          <View style={[styles.bannerIconContainer, hasAmount && { backgroundColor: 'rgba(16,185,129,0.15)' }]}>
-            {hasAmount ? <Check color="#10B981" size={22} /> : loadingQuote ? <ActivityIndicator size="small" color="#3B82F6" /> : <Clock color="#3B82F6" size={22} />}
+        <View style={[styles.statusBanner, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f1a30, borderColor: hasAmount ? themePalette.rgba_16_185_129_0_3 : colors.border }]}>
+          <View style={[styles.bannerIconContainer, hasAmount && { backgroundColor: themePalette.rgba_16_185_129_0_15 }]}>
+            {hasAmount ? <Check color={themePalette.hex_10b981} size={22} /> : loadingQuote ? <ActivityIndicator size="small" color={themePalette.hex_3b82f6} /> : <Clock color={themePalette.hex_3b82f6} size={22} />}
           </View>
           <View style={styles.bannerTextContainer}>
             <Text style={[styles.bannerTitle, { color: colors.text }]}>{hasAmount ? 'Quote ready!' : 'Preparing your quote'}</Text>
@@ -192,9 +192,9 @@ const OrderDetailsScreen = ({
 
         {/* Status Time Info */}
         <View style={styles.timeInfoContainer}>
-          <View style={[styles.blueDot, hasAmount && { backgroundColor: '#10B981' }]} />
+          <View style={[styles.blueDot, hasAmount && { backgroundColor: themePalette.hex_10b981 }]} />
           <Text style={[styles.timeInfoText, { color: colors.muted }]}>
-            {hasAmount ? <><Text style={[styles.boldTimeText, { color: '#10B981' }]}>Ready to review</Text> · tap View Quote below</> : <>Typically ready within <Text style={styles.boldTimeText}>2 hours</Text> · submitted 47 min ago</>}
+            {hasAmount ? <><Text style={[styles.boldTimeText, { color: themePalette.hex_10b981 }]}>Ready to review</Text> · tap View Quote below</> : <>Typically ready within <Text style={styles.boldTimeText}>2 hours</Text> · submitted 47 min ago</>}
           </Text>
         </View>
 
@@ -205,15 +205,15 @@ const OrderDetailsScreen = ({
           <TouchableOpacity
             onPress={refreshQuote}
             disabled={refreshing || loadingQuote}
-            style={[styles.smallRefreshBtn, { borderColor: colors.border, backgroundColor: isLight ? '#FFFFFF' : '#1E293B', opacity: refreshing || loadingQuote ? 0.6 : 1 }]}
+            style={[styles.smallRefreshBtn, { borderColor: colors.border, backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_1e293b, opacity: refreshing || loadingQuote ? 0.6 : 1 }]}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            {refreshing ? <ActivityIndicator size="small" color="#EAB308" /> : <RefreshCw size={16} color="#EAB308" />}
+            {refreshing ? <ActivityIndicator size="small" color={themePalette.hex_eab308} /> : <RefreshCw size={16} color={themePalette.hex_eab308} />}
           </TouchableOpacity>
         </View>
 
         {/* Submission Details Card */}
-        <View style={[styles.card, { backgroundColor: isLight ? '#FFFFFF' : '#0F1A30', borderColor: colors.border }]}>
+        <View style={[styles.card, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_0f1a30, borderColor: colors.border }]}>
           <View style={[styles.row, { borderBottomColor: colors.border }]}>
             <Text style={[styles.label, { color: colors.muted }]}>Company</Text>
             <Text style={[styles.value, { color: colors.text }, companyVal === '—' ? styles.emptyValue : styles.goldText]}>{companyVal}</Text>
@@ -242,7 +242,7 @@ const OrderDetailsScreen = ({
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.stepCircle, isStep1Done ? styles.stepCircleCompleted : styles.stepCirclePending, !isStep1Done ? { borderColor: colors.border } : null]}>
-                <Check color={isStep1Done ? '#10B981' : isLight ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)'} size={isStep1Done ? 14 : 12} />
+                <Check color={isStep1Done ? themePalette.hex_10b981 : isLight ? themePalette.rgba_0_0_0_0_25 : themePalette.rgba_255_255_255_0_25} size={isStep1Done ? 14 : 12} />
               </View>
               <View style={[styles.timelineLine, isStep1Done ? styles.timelineLineCompleted : styles.timelineLinePending, !isStep1Done ? { backgroundColor: colors.border } : null]} />
             </View>
@@ -257,7 +257,7 @@ const OrderDetailsScreen = ({
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.stepCircle, isStep2Active ? styles.stepCircleActive : isStep2Done ? styles.stepCircleCompleted : styles.stepCirclePending, !isStep2Active && !isStep2Done ? { borderColor: colors.border } : null]}>
-                {isStep2Active ? <View style={styles.activeDot} /> : isStep2Done ? <Check color="#10B981" size={14} /> : null}
+                {isStep2Active ? <View style={styles.activeDot} /> : isStep2Done ? <Check color={themePalette.hex_10b981} size={14} /> : null}
               </View>
               <View style={[styles.timelineLine, isStep2Done ? styles.timelineLineCompleted : styles.timelineLinePending, !isStep2Done ? { backgroundColor: colors.border } : null]} />
             </View>
@@ -272,7 +272,7 @@ const OrderDetailsScreen = ({
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.stepCircle, isStep3Active ? styles.stepCircleActive : isStep3Done ? styles.stepCircleCompleted : styles.stepCirclePending, !isStep3Active && !isStep3Done ? { borderColor: colors.border } : null]}>
-                {isStep3Active ? <View style={styles.activeDot} /> : isStep3Done ? <Check color="#10B981" size={14} /> : <Check color={isLight ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)'} size={12} />}
+                {isStep3Active ? <View style={styles.activeDot} /> : isStep3Done ? <Check color={themePalette.hex_10b981} size={14} /> : <Check color={isLight ? themePalette.rgba_0_0_0_0_35 : themePalette.rgba_255_255_255_0_35} size={12} />}
               </View>
               <View style={[styles.timelineLine, isStep3Done ? styles.timelineLineCompleted : styles.timelineLinePending, !isStep3Done ? { backgroundColor: colors.border } : null]} />
             </View>
@@ -287,7 +287,7 @@ const OrderDetailsScreen = ({
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.stepCircle, isStep4Active ? styles.stepCircleActive : isStep4Done ? styles.stepCircleCompleted : styles.stepCirclePending, !isStep4Active && !isStep4Done ? { borderColor: colors.border } : null]}>
-                {isStep4Active ? <View style={styles.activeDot} /> : isStep4Done ? <Check color="#10B981" size={14} /> : null}
+                {isStep4Active ? <View style={styles.activeDot} /> : isStep4Done ? <Check color={themePalette.hex_10b981} size={14} /> : null}
               </View>
             </View>
             <View style={styles.timelineContent}>
@@ -324,10 +324,10 @@ const OrderDetailsScreen = ({
   );
 };
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070D1E',
+    backgroundColor: themePalette.hex_070d1e,
   },
   scrollContent: {
     paddingHorizontal: s(20),
@@ -344,9 +344,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: themePalette.rgba_255_255_255_0_05,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: themePalette.rgba_255_255_255_0_1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     marginBottom: s(20),
   },
   mainTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.display,
     fontWeight: '600',
   },
@@ -367,24 +367,24 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   subTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.base,
     marginTop: s(6),
   },
   statusBanner: {
     flexDirection: 'row',
-    backgroundColor: '#0F1A30',
+    backgroundColor: themePalette.hex_0f1a30,
     borderRadius: 14,
     padding: s(16),
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.2)',
+    borderColor: themePalette.rgba_59_130_246_0_2,
     marginBottom: s(16),
   },
   bannerIconContainer: {
     width: 42,
     height: 42,
     borderRadius: 10,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    backgroundColor: themePalette.rgba_59_130_246_0_15,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: s(14),
@@ -393,13 +393,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bannerTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.lg,
     fontWeight: 'bold',
     marginBottom: s(4),
   },
   bannerDescription: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     lineHeight: 18,
   },
@@ -412,15 +412,15 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#3B82F6',
+    backgroundColor: themePalette.hex_3b82f6,
     marginRight: s(10),
   },
   timeInfoText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
   },
   boldTimeText: {
-    color: '#3B82F6',
+    color: themePalette.hex_3b82f6,
     fontWeight: 'bold',
   },
   sectionHeaderContainer: {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     marginBottom: s(15),
   },
   sectionTitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   sectionHeaderLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: themePalette.rgba_255_255_255_0_08,
   },
   smallRefreshBtn: {
     width: 34,
@@ -450,12 +450,12 @@ const styles = StyleSheet.create({
     marginLeft: s(8),
   },
   card: {
-    backgroundColor: '#0F1A30',
+    backgroundColor: themePalette.hex_0f1a30,
     borderRadius: 16,
     paddingHorizontal: s(18),
     paddingVertical: s(8),
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: themePalette.rgba_255_255_255_0_08,
     marginBottom: s(25),
   },
   row: {
@@ -464,22 +464,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: s(12),
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: themePalette.rgba_255_255_255_0_05,
   },
   label: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.base,
   },
   value: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
   },
   goldText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
   },
   emptyValue: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontStyle: 'italic',
   },
   timelineContainer: {
@@ -501,20 +501,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepCircleCompleted: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: themePalette.rgba_16_185_129_0_15,
     borderWidth: 1,
-    borderColor: '#10B981',
+    borderColor: themePalette.hex_10b981,
   },
   stepCircleActive: {
-    backgroundColor: 'rgba(234, 179, 8, 0.15)',
+    backgroundColor: themePalette.rgba_234_179_8_0_15,
     borderWidth: 1,
-    borderColor: '#EAB308',
+    borderColor: themePalette.hex_eab308,
   },
   activeDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#3B82F6',
+    backgroundColor: themePalette.hex_3b82f6,
   },
   inProgressBadge: {
     alignSelf: 'flex-start',
@@ -522,12 +522,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(10),
     paddingVertical: s(4),
     borderRadius: 20,
-    backgroundColor: 'rgba(59,130,246,0.15)',
+    backgroundColor: themePalette.rgba_59_130_246_0_15,
     borderWidth: 1,
-    borderColor: 'rgba(59,130,246,0.3)',
+    borderColor: themePalette.rgba_59_130_246_0_3,
   },
   inProgressText: {
-    color: '#3B82F6',
+    color: themePalette.hex_3b82f6,
     fontSize: font.small,
     fontWeight: '600',
   },
@@ -536,42 +536,42 @@ const styles = StyleSheet.create({
     height: 45,
   },
   timelineLineCompleted: {
-    backgroundColor: '#10B981',
+    backgroundColor: themePalette.hex_10b981,
   },
   timelineLinePending: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: themePalette.rgba_255_255_255_0_12,
   },
   stepCirclePending: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: themePalette.rgba_255_255_255_0_2,
   },
   stepTitlePending: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
   },
   timelineContent: {
     flex: 1,
     paddingBottom: s(20),
   },
   stepTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: 'bold',
     marginBottom: s(4),
   },
   stepDescription: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     lineHeight: 18,
     marginBottom: s(4),
   },
   stepDate: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   nextButton: {
     flexDirection: 'row',
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     borderRadius: 24,
     paddingVertical: s(14),
     alignItems: 'center',
@@ -580,21 +580,21 @@ const styles = StyleSheet.create({
     marginBottom: s(15),
   },
   nextButtonText: {
-    color: '#0A0A0A',
+    color: themePalette.hex_0a0a0a,
     fontSize: font.md,
     fontWeight: '700',
   },
   nextArrow: {
-    color: '#0A0A0A',
+    color: themePalette.hex_0a0a0a,
     fontSize: font.xxl,
     fontWeight: '700',
     marginTop: -2,
   },
   footerText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.bodySmall,
     textAlign: 'center',
   },
-});
+}));
 
 export default OrderDetailsScreen;

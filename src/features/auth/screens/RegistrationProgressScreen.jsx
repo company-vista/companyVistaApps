@@ -24,6 +24,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { BackHandler } from 'react-native';
 import { API_BASE_URL } from '../../../config/api';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
   const pendingOrder = useAppSelector(s => s.auth.pendingOrderData);
@@ -101,7 +102,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070C15" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070c15} />
 
       {/* CompanyNaming jaisa Back + Logo - pending me lock */}
       <View style={styles.headerRow}>
@@ -110,10 +111,10 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
         </View>
         <Image source={logoR} style={styles.topLogo} />
         <View style={{ width: 38, alignItems: 'center' }}>
-          {isLockedPending ? <Clock size={14} color="#EAB308" /> : null}
+          {isLockedPending ? <Clock size={14} color={themePalette.hex_eab308} /> : null}
         </View>
       </View>
-      {isLockedPending ? <Text style={{ color: '#EAB308', fontSize: font.small, textAlign: 'center', marginBottom: 8 }}>Status: pending — waiting for active</Text> : null}
+      {isLockedPending ? <Text style={{ color: themePalette.hex_eab308, fontSize: font.small, textAlign: 'center', marginBottom: 8 }}>Status: pending — waiting for active</Text> : null}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Title Section */}
@@ -186,7 +187,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.iconCircle, styles.completedCircle]}>
-                <Check color="#10B981" size={16} />
+                <Check color={themePalette.hex_10b981} size={16} />
               </View>
               <View style={[styles.timelineLine, styles.activeLine]} />
             </View>
@@ -196,7 +197,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
                 Payment of {amount} confirmed. Order {orderRef} created.
               </Text>
               <View style={styles.timeStampRow}>
-                <Clock color="#64748B" size={12} />
+                <Clock color={themePalette.hex_64748b} size={12} />
                 <Text style={styles.timeStampText}>6 Jun, 5:42 PM</Text>
               </View>
             </View>
@@ -205,7 +206,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
           <View style={styles.timelineItem}>
             <View style={styles.timelineLeftColumn}>
               <View style={[styles.iconCircle, styles.completedCircle]}>
-                <Check color="#10B981" size={16} />
+                <Check color={themePalette.hex_10b981} size={16} />
               </View>
               <View style={[styles.timelineLine, styles.activeLine]} />
             </View>
@@ -215,7 +216,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
                 All 3 shareholders passed KYC. Passports and address proofs approved.
               </Text>
               <View style={styles.timeStampRow}>
-                <Clock color="#64748B" size={12} />
+                <Clock color={themePalette.hex_64748b} size={12} />
                 <Text style={styles.timeStampText}>7 Jun, 11:20 AM</Text>
               </View>
             </View>
@@ -279,7 +280,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
 
         <View style={styles.docCard}>
           <View style={styles.docIconBox}>
-            <FileText color="#64748B" size={20} />
+            <FileText color={themePalette.hex_64748b} size={20} />
           </View>
           <View style={styles.docInfo}>
             <Text style={styles.docCardTitle}>Certificate of Formation</Text>
@@ -290,7 +291,7 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
 
         <View style={styles.docCard}>
           <View style={styles.docIconBox}>
-            <FileCheck color="#64748B" size={20} />
+            <FileCheck color={themePalette.hex_64748b} size={20} />
           </View>
           <View style={styles.docInfo}>
             <Text style={styles.docCardTitle}>EIN confirmation letter</Text>
@@ -305,10 +306,10 @@ const RegistrationProgressScreen = ({ navigation, route, onActive }) => {
 
 export default RegistrationProgressScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070C15',
+    backgroundColor: themePalette.hex_070c15,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, marginTop: 34 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
@@ -321,24 +322,24 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.displayLarge,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '400',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontFamily: 'serif',
   },
   subTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     marginTop: 6,
   },
   progressCard: {
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: themePalette.rgba_255_255_255_0_08,
     padding: 16,
     marginBottom: 24,
   },
@@ -348,37 +349,37 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   progressCardLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.xs,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   progressCardValue: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.display,
     fontWeight: '500',
     marginTop: 4,
   },
   progressCardEstLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
   },
   progressCardEstDate: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '700',
     marginTop: 4,
   },
   progressTrack: {
     height: 4,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     borderRadius: 2,
     marginVertical: 14,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
   },
   progressCardFooter: {
     flexDirection: 'row',
@@ -386,11 +387,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepCountText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   onScheduleText: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.sm,
     fontWeight: '600',
   },
@@ -415,31 +416,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   completedCircle: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: themePalette.rgba_16_185_129_0_15,
     borderWidth: 1,
-    borderColor: '#10B981',
+    borderColor: themePalette.hex_10b981,
   },
   inProgressCircle: {
-    backgroundColor: 'rgba(234, 179, 8, 0.15)',
+    backgroundColor: themePalette.rgba_234_179_8_0_15,
     borderWidth: 1.5,
-    borderColor: '#EAB308',
+    borderColor: themePalette.hex_eab308,
   },
   pendingCircle: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: themePalette.hex_334155,
   },
   innerDotGold: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
   },
   innerDotGrey: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#64748B',
+    backgroundColor: themePalette.hex_64748b,
   },
   timelineLine: {
     width: 2,
@@ -447,38 +448,38 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   activeLine: {
-    backgroundColor: '#10B981',
+    backgroundColor: themePalette.hex_10b981,
   },
   inactiveLine: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
   },
   timelineRightContent: {
     flex: 1,
     paddingTop: 2,
   },
   stepTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: '700',
   },
   stepTitleActive: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: '700',
   },
   stepTitlePending: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.md,
     fontWeight: '600',
   },
   stepDesc: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     marginTop: 4,
     lineHeight: 18,
   },
   stepDescPending: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.sm,
     marginTop: 4,
     lineHeight: 18,
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   timeStampText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginLeft: 6,
   },
@@ -497,8 +498,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(234, 179, 8, 0.1)',
-    borderColor: 'rgba(234, 179, 8, 0.3)',
+    backgroundColor: themePalette.rgba_234_179_8_0_1,
+    borderColor: themePalette.rgba_234_179_8_0_3,
     borderWidth: 1,
     paddingHorizontal: s(10),
     paddingVertical: 5,
@@ -509,16 +510,16 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     marginRight: 6,
   },
   inProgressBadgeText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.small,
     fontWeight: '600',
   },
   subNotePending: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.small,
     marginTop: 6,
   },
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   sectionHeader: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
@@ -537,13 +538,13 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
   },
   submissionCard: {
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: themePalette.rgba_255_255_255_0_08,
     paddingHorizontal: s(14),
     paddingVertical: 4,
     marginBottom: 20,
@@ -554,25 +555,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
+    borderBottomColor: themePalette.hex_1e293b,
   },
   rowLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.bodySmall,
   },
   rowValue: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.bodySmall,
     fontWeight: '600',
   },
   goldText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
   },
   docCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: themePalette.hex_0f172a,
+    borderColor: themePalette.rgba_255_255_255_0_08,
     borderWidth: 1,
     borderRadius: 14,
     padding: 14,
@@ -582,7 +583,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 10,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -591,18 +592,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   docCardTitle: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.base,
     fontWeight: '600',
   },
   docCardSub: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.small,
     marginTop: 2,
   },
   pendingBadgeText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     fontWeight: '600',
   },
-});
+}));

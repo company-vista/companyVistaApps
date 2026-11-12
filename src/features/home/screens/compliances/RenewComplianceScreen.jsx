@@ -6,7 +6,7 @@ import { Linking } from "react-native";
 import axios from "axios";
 import { API_BASE_URL } from "../../../../config/api";
 import { useAppSelector } from "../../../../store/hooks";
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const API_REQUEST_TIMEOUT_MS = 10000;
@@ -112,7 +112,7 @@ const RenewCompliance = () => {
         <View style={styles.yearHeader}>
           <View style={styles.yearLabel}>
             <View style={[styles.yearIconBox, { backgroundColor: colors.surface }]}>
-              <Text style={styles.yearIconText}>📅</Text>
+              <Text style={styles.yearIconText}>ðŸ“…</Text>
             </View>
             <View>
               <Text style={[styles.yearTitle, { color: colors.text }]}>{selectedAction?.date ?? "2026"}</Text>
@@ -145,22 +145,22 @@ const RenewCompliance = () => {
                     borderColor: colors.border,
                 },
             ]} onPress={() => toggleService(service.id)}>
-                {service.isSelected && (<Text style={styles.checkboxTick}>✓</Text>)}
+                {service.isSelected && (<Text style={styles.checkboxTick}>âœ“</Text>)}
               </TouchableOpacity>
 
               {/* Card Icon */}
               <View style={[styles.cardIcon, { backgroundColor: colors.surfaceAlt }]}>
-                <Text style={styles.cardIconText}>🏠</Text>
+                <Text style={styles.cardIconText}>ðŸ </Text>
               </View>
 
               {/* Card Info */}
               <View style={styles.cardInfo}>
                 <Text style={[styles.cardName, { color: colors.text }]}>{service.name}</Text>
                 {service.isExpired && (<View style={[styles.expiredBadge, { backgroundColor: colors.danger + '26' }]}>
-                    <Text style={[styles.expiredBadgeText, { color: colors.danger }]}>⚠ {selectedAction?.status ?? "Expired"}</Text>
+                    <Text style={[styles.expiredBadgeText, { color: colors.danger }]}>âš  {selectedAction?.status ?? "Expired"}</Text>
                   </View>)}
                 <Text style={[styles.cardDates, { color: colors.muted }]}>
-                  Last: {service.lastDate} ·{" "}
+                  Last: {service.lastDate} Â·{" "}
                   <Text style={[styles.dueDateText, { color: colors.danger }]}>Due: {service.dueDate}</Text>
                 </Text>
               </View>
@@ -209,11 +209,11 @@ const RenewCompliance = () => {
 
             {selectedServices.length > 0 ? (selectedServices.map((s) => (<View key={s.id} style={styles.ssItem}>
                   <View style={[styles.ssItemIcon, { backgroundColor: colors.surfaceAlt }]}>
-                    <Text style={styles.ssItemIconText}>🏠</Text>
+                    <Text style={styles.ssItemIconText}>ðŸ </Text>
                   </View>
                   <View style={styles.ssItemInfo}>
                     <Text style={[styles.ssItemName, { color: colors.text }]}>{s.name}</Text>
-                    <Text style={[styles.ssItemMeta, { color: colors.muted }]}>2026 · {s.years} year</Text>
+                    <Text style={[styles.ssItemMeta, { color: colors.muted }]}>2026 Â· {s.years} year</Text>
                   </View>
                   <View style={styles.ssItemPriceBox}>
                     <Text style={[styles.ssItemPrice, { color: colors.text }]}>${s.price.toFixed(2)}</Text>
@@ -248,10 +248,10 @@ const RenewCompliance = () => {
             styles.payBtn,
             { backgroundColor: selectedServices.length === 0 ? colors.muted : colors.buttonBackground, opacity: selectedServices.length === 0 ? 0.8 : 1 },
         ]} onPress={handlePay} activeOpacity={0.85} disabled={selectedServices.length === 0}>
-            <Text style={styles.payBtnText}>🔒  Pay ${totalDue.toFixed(2)} with Stripe  →</Text>
+            <Text style={styles.payBtnText}>ðŸ”’  Pay ${totalDue.toFixed(2)} with Stripe  â†’</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe · Card and wallet checkout</Text>
+          <Text style={[styles.secureNote, { color: colors.muted }]}>Secured by Stripe Â· Card and wallet checkout</Text>
         </View>
       </ScrollView>
     </View>);
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
         marginTop: 1,
     },
     checkboxTick: {
-        color: "white",
+        color: themePalette.hex_ffffff,
         fontSize: font.sm,
     },
     cardIcon: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     payBtnText: {
-        color: "white",
+        color: themePalette.hex_ffffff,
         fontSize: font.base,
         fontWeight: "500",
     },

@@ -22,7 +22,7 @@ import logoR from '../../../assets/images/logoR.png';
 import BackButton from '../../../components/buttons/BackButton';
 import Toast from 'react-native-toast-message';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 GoogleSignin.configure({
   webClientId: '1080172574320-193qhf74d29aa4b7fuf2f01h70ahjsic.apps.googleusercontent.com',
@@ -158,13 +158,13 @@ const LoginScreen = ({ navigation, route }) => {
         </Text>
 
         {/* Account Type Toggle */}
-        <View style={[styles.tabContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : colors.surface, borderColor: colors.border, marginBottom: s(12) }]}>
+        <View style={[styles.tabContainer, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : colors.surface, borderColor: colors.border, marginBottom: s(12) }]}>
           <TouchableOpacity
             style={[styles.tabButton, accountType === 'client' && (isDark ? styles.activeTabButton : { backgroundColor: colors.accentSoft })]}
             onPress={() => setAccountType('client')}
             activeOpacity={0.8}
           >
-            <Ionicons name="person-outline" size={14} color={accountType === 'client' ? '#C9A84C' : colors.subtle} />
+            <Ionicons name="person-outline" size={14} color={accountType === 'client' ? themePalette.hex_c9a84c : colors.subtle} />
             <Text style={[styles.tabText, { color: colors.muted }, accountType === 'client' && styles.activeTabText]}>
               Client
             </Text>
@@ -177,7 +177,7 @@ const LoginScreen = ({ navigation, route }) => {
             }}
             activeOpacity={0.8}
           >
-            <Ionicons name="shield-checkmark-outline" size={14} color={accountType === 'admin' ? '#C9A84C' : colors.subtle} />
+            <Ionicons name="shield-checkmark-outline" size={14} color={accountType === 'admin' ? themePalette.hex_c9a84c : colors.subtle} />
             <Text style={[styles.tabText, { color: colors.muted }, accountType === 'admin' && styles.activeTabText]}>
               Admin
             </Text>
@@ -199,7 +199,7 @@ const LoginScreen = ({ navigation, route }) => {
                 placeholder="Enter your email"
                 placeholderTextColor={colors.inputPlaceholder}
               />
-              {email.length > 0 && <Ionicons name="checkmark-circle" size={16} color="#10B981" />}
+              {email.length > 0 && <Ionicons name="checkmark-circle" size={16} color={themePalette.hex_10b981} />}
             </View>
             {errors.email ? <Text style={[styles.errorText, { color: colors.danger }]}>{errors.email}</Text> : null}
           </>
@@ -248,7 +248,7 @@ const LoginScreen = ({ navigation, route }) => {
         {/* Remember Me & Forgot Password */}
         <View style={styles.optionsRow}>
           <TouchableOpacity style={styles.checkboxRow} activeOpacity={0.8} onPress={() => setRememberMe(!rememberMe)}>
-            <View style={[styles.checkbox, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.surface, borderColor: colors.border }, rememberMe && styles.checkboxChecked]}>
+            <View style={[styles.checkbox, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.surface, borderColor: colors.border }, rememberMe && styles.checkboxChecked]}>
               {rememberMe && <Ionicons name="checkmark" size={10} color={colors.buttonText} />}
             </View>
             <Text style={[styles.rememberText, { color: colors.muted }]}>Remember me</Text>
@@ -296,12 +296,12 @@ const LoginScreen = ({ navigation, route }) => {
 
             {/* Social Login */}
             <View style={styles.socialGrid}>
-              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8} onPress={handleGoogleSignIn}>
-                <FontAwesome name="google" size={14} color="#ea4335" />
+              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.surface, borderColor: colors.border }]} activeOpacity={0.8} onPress={handleGoogleSignIn}>
+                <FontAwesome name="google" size={14} color={themePalette.hex_ea4335} />
                 <Text style={[styles.socialBtnText, { color: colors.text }]}>Google</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
-                <Ionicons name="logo-apple" size={16} color={isDark ? '#FFFFFF' : '#000000'} />
+              <TouchableOpacity style={[styles.socialBtn, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
+                <Ionicons name="logo-apple" size={16} color={isDark ? themePalette.hex_ffffff : themePalette.hex_000000} />
                 <Text style={[styles.socialBtnText, { color: colors.text }]}>Apple</Text>
               </TouchableOpacity>
 
@@ -319,7 +319,7 @@ const LoginScreen = ({ navigation, route }) => {
 
         {/* Contact Support */}
         <View style={styles.supportContainer}>
-          <TouchableOpacity style={[styles.supportBtn, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.supportBtn, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : colors.surface, borderColor: colors.border }]} activeOpacity={0.8}>
             <Ionicons name="headset" size={14} color={colors.subtle} />
             <Text style={[styles.supportBtnText, { color: colors.subtle }]}>Contact Support</Text>
           </TouchableOpacity>
@@ -354,8 +354,8 @@ const LoginScreen = ({ navigation, route }) => {
                     <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
                     <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
                     <Text style={[styles.countryOptionCode, { color: colors.subtle }]}>{item.code}</Text>
-                    <View style={[styles.checkCircle, { borderColor: selected ? '#C9A84C' : colors.border }, selected && styles.checkCircleSelected]}>
-                      {selected && <Ionicons name="checkmark" size={12} color="#060913" />}
+                    <View style={[styles.checkCircle, { borderColor: selected ? themePalette.hex_c9a84c : colors.border }, selected && styles.checkCircleSelected]}>
+                      {selected && <Ionicons name="checkmark" size={12} color={themePalette.hex_060913} />}
                     </View>
                   </TouchableOpacity>
                 );
@@ -370,97 +370,97 @@ const LoginScreen = ({ navigation, route }) => {
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#060913' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_060913 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10.4) },
-  mainTitle: { color: '#FFFFFF', fontSize: s(26), fontWeight: '500', lineHeight: s(34), marginBottom: s(6), marginTop: s(10), marginLeft: s(2) },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: '#94A3B8', fontSize: font.sm, lineHeight: 18, marginBottom: s(20) },
+  mainTitle: { color: themePalette.hex_ffffff, fontSize: s(26), fontWeight: '500', lineHeight: s(34), marginBottom: s(6), marginTop: s(10), marginLeft: s(2) },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
+  subtitle: { color: themePalette.hex_94a3b8, fontSize: font.sm, lineHeight: 18, marginBottom: s(20) },
   tabContainer: {
-    flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 12, padding: s(3), borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)',
+    flexDirection: 'row', backgroundColor: themePalette.rgba_255_255_255_0_03,
+    borderRadius: 12, padding: s(3), borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08,
     marginBottom: s(20),
   },
   tabButton: { flex: 1, paddingVertical: s(10), alignItems: 'center', borderRadius: 9, flexDirection: 'row', justifyContent: 'center', gap: 6 },
-  activeTabButton: { backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  tabText: { color: '#64748B', fontSize: font.sm, fontWeight: '600' },
-  activeTabText: { color: '#C9A84C', fontWeight: 'bold' },
-  inputLabel: { color: '#64748B', fontSize: font.base, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
+  activeTabButton: { backgroundColor: themePalette.rgba_255_255_255_0_08 },
+  tabText: { color: themePalette.hex_64748b, fontSize: font.sm, fontWeight: '600' },
+  activeTabText: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
+  inputLabel: { color: themePalette.hex_64748b, fontSize: font.base, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
   inputContainer: {
     width: '100%',
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(12),
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: themePalette.rgba_255_255_255_0_02, borderRadius: s(12),
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_1,
     paddingHorizontal: s(14), height: s(48), marginBottom: s(16),
   },
-  inputContainerError: { borderColor: '#EF4444' },
-  textInput: { flex: 1, color: '#FFFFFF', fontSize: font.lg, fontWeight: '500', marginLeft: s(10) },
-  errorText: { color: '#EF4444', fontSize: font.base, marginTop: -12, marginBottom: s(12) },
+  inputContainerError: { borderColor: themePalette.hex_ef4444 },
+  textInput: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.lg, fontWeight: '500', marginLeft: s(10) },
+  errorText: { color: themePalette.hex_ef4444, fontSize: font.base, marginTop: -12, marginBottom: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10, marginBottom: s(16) },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: themePalette.rgba_255_255_255_0_02, borderRadius: 12,
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_1,
     paddingHorizontal: s(12), height: 48, gap: 6,
   },
-  flagText: { color: '#64748B', fontSize: font.xs, fontWeight: 'bold' },
-  codeText: { color: '#FFFFFF', fontSize: font.bodySmall, fontWeight: 'bold' },
+  flagText: { color: themePalette.hex_64748b, fontSize: font.xs, fontWeight: 'bold' },
+  codeText: { color: themePalette.hex_ffffff, fontSize: font.bodySmall, fontWeight: 'bold' },
   phoneInputContainer: {
-    flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    flex: 1, backgroundColor: themePalette.rgba_255_255_255_0_02, borderRadius: 12,
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_1,
     paddingHorizontal: s(14), height: 48, justifyContent: 'center',
   },
   optionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(20) },
   checkboxRow: { flexDirection: 'row', alignItems: 'center' },
   checkbox: {
-    width: 16, height: 16, borderRadius: 4, backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 16, height: 16, borderRadius: 4, backgroundColor: themePalette.rgba_255_255_255_0_1,
     alignItems: 'center', justifyContent: 'center', marginRight: s(8),
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_2,
   },
-  checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-  rememberText: { color: '#64748B', fontSize: font.small },
-  forgotText: { color: '#C9A84C', fontSize: font.small, fontWeight: '500' },
+  checkboxChecked: { backgroundColor: themePalette.hex_c9a84c, borderColor: themePalette.hex_c9a84c },
+  rememberText: { color: themePalette.hex_64748b, fontSize: font.small },
+  forgotText: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: '500' },
   loginBtn: {
-    backgroundColor: '#D4AF37', borderRadius: 24, paddingVertical: s(14),
+    backgroundColor: themePalette.hex_d4af37, borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(10),
   },
   loginBtnDisabled: { opacity: 0.4 },
-  loginBtnText: { color: '#060913', fontSize: font.base, fontWeight: 'bold' },
+  loginBtnText: { color: themePalette.hex_060913, fontSize: font.base, fontWeight: 'bold' },
   loginMethodLink: { alignItems: 'center', marginBottom: s(20) },
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(20) },
-  dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  dividerText: { color: '#475569', fontSize: font.xs, paddingHorizontal: s(12) },
+  dividerLine: { flex: 1, height: 1, backgroundColor: themePalette.rgba_255_255_255_0_08 },
+  dividerText: { color: themePalette.hex_475569, fontSize: font.xs, paddingHorizontal: s(12) },
   socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: s(24) },
   socialBtn: {
     width: '48%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: s(12),
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', paddingVertical: s(12), gap: s(8),
+    backgroundColor: themePalette.rgba_255_255_255_0_02, borderRadius: s(12),
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08, paddingVertical: s(12), gap: s(8),
   },
-  socialBtnText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: 'bold' },
-  signupText: { color: '#64748B', fontSize: font.base, textAlign: 'center', marginBottom: s(20) },
-  createAccountLink: { color: '#C9A84C', fontWeight: 'bold', fontSize: font.md },
+  socialBtnText: { color: themePalette.hex_ffffff, fontSize: font.sm, fontWeight: 'bold' },
+  signupText: { color: themePalette.hex_64748b, fontSize: font.base, textAlign: 'center', marginBottom: s(20) },
+  createAccountLink: { color: themePalette.hex_c9a84c, fontWeight: 'bold', fontSize: font.md },
   supportContainer: { alignItems: 'center' },
   supportBtn: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: themePalette.rgba_255_255_255_0_03, borderRadius: 20,
+    borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_1,
     paddingHorizontal: s(16), paddingVertical: s(8), gap: 6,
   },
-  supportBtnText: { color: '#94A3B8', fontSize: font.small, fontWeight: '500' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  supportBtnText: { color: themePalette.hex_94a3b8, fontSize: font.small, fontWeight: '500' },
+  modalOverlay: { flex: 1, backgroundColor: themePalette.rgba_0_0_0_0_6, justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject },
-  modalContent: { backgroundColor: '#111827', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
-  modalTitle: { color: '#FFFFFF', fontSize: font.base, fontWeight: 'bold' },
-  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
-  countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
-  countryOptionName: { flex: 1, color: '#FFFFFF', fontSize: font.bodySmall },
-  countryOptionCode: { color: '#94A3B8', fontSize: font.sm, marginRight: s(6) },
+  modalContent: { backgroundColor: themePalette.hex_111827, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1, borderBottomColor: themePalette.rgba_255_255_255_0_08 },
+  modalTitle: { color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: 'bold' },
+  countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1, borderBottomColor: themePalette.rgba_255_255_255_0_04 },
+  countryOptionSelected: { backgroundColor: themePalette.rgba_201_168_76_0_08 },
+  countryOptionName: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.bodySmall },
+  countryOptionCode: { color: themePalette.hex_94a3b8, fontSize: font.sm, marginRight: s(6) },
   checkCircle: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 1.5,
     alignItems: 'center', justifyContent: 'center',
   },
-  checkCircleSelected: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
-});
+  checkCircleSelected: { backgroundColor: themePalette.hex_c9a84c, borderColor: themePalette.hex_c9a84c },
+}));

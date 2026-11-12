@@ -1,51 +1,38 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
 import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import { fetchInvoicesForCompany, selectHasLoadedInvoicesForCompany, selectInvoicesForCompany, } from '../../../../store/slices/invoicesSlice';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { computeInvoiceGrandTotal, filterInvoicesForCompany, formatCurrency, getInvoicePaymentStatus, isInvoiceOverdue, } from '../../utils/dashboardInvoices';
 const HOME_HERO_COLORS = {
-    panel: '#0D2137',
-    accentBlue: '#85B7EB',
-    accentYellow: '#FAC775',
-    white: '#ffffff',
+    panel: themePalette.hex_0d2137,
+    accentBlue: themePalette.hex_85b7eb,
+    accentYellow: themePalette.hex_fac775,
+    white: themePalette.hex_ffffff,
 };
 function getInvoicePalette(colors) {
     const isDark = colors.mode === 'dark';
     return {
         primaryText: isDark ? colors.text : HOME_HERO_COLORS.panel,
-        accentText: isDark ? HOME_HERO_COLORS.accentBlue : '#2F6FAE',
-        dateText: isDark ? HOME_HERO_COLORS.accentBlue : '#303b47',
-        actionSurface: isDark ? '#183A5C' : '#EAF4FF',
-        actionBorder: isDark ? 'rgba(133,183,235,0.35)' : '#C7DFF6',
-        iconSurface: isDark ? 'rgba(133,183,235,0.14)' : '#EAF4FF',
+        accentText: isDark ? HOME_HERO_COLORS.accentBlue : themePalette.hex_2f6fae,
+        dateText: isDark ? HOME_HERO_COLORS.accentBlue : themePalette.hex_303b47,
+        actionSurface: isDark ? themePalette.hex_183a5c : themePalette.hex_eaf4ff,
+        actionBorder: isDark ? themePalette.rgba_133_183_235_0_35 : themePalette.hex_c7dff6,
+        iconSurface: isDark ? themePalette.rgba_133_183_235_0_14 : themePalette.hex_eaf4ff,
         iconColor: isDark ? HOME_HERO_COLORS.accentBlue : HOME_HERO_COLORS.panel,
         buttonText: isDark ? HOME_HERO_COLORS.accentBlue : HOME_HERO_COLORS.panel,
-        link: isDark ? HOME_HERO_COLORS.accentYellow : '#9A640F',
+        link: isDark ? HOME_HERO_COLORS.accentYellow : themePalette.hex_9a640f,
     };
 }
 function getStringValue(...values) {
     const value = values.find(candidate => (typeof candidate === 'string' && candidate.trim().length > 0));
     return typeof value === 'string' ? value.trim() : '';
-}
-function getNumberValue(...values) {
-    for (const value of values) {
-        if (typeof value === 'number' && Number.isFinite(value)) {
-            return value;
-        }
-        if (typeof value === 'string') {
-            const parsed = Number(value.replace(/[^0-9.-]/g, ''));
-            if (Number.isFinite(parsed)) {
-                return parsed;
-            }
-        }
-    }
-    return 0;
 }
 function getNestedRecord(value) {
     return value && typeof value === 'object' && !Array.isArray(value)
@@ -67,12 +54,6 @@ function formatDate(value) {
         year: 'numeric',
     });
 }
-function formatAmount(value, currency = 'USD') {
-    return new Intl.NumberFormat('en-US', {
-        currency,
-        style: 'currency',
-    }).format(value);
-}
 function normalizeCompanyId(value) {
     if (typeof value === 'string' || typeof value === 'number') {
         return String(value).trim();
@@ -91,12 +72,15 @@ function getInvoiceCompany(invoice) {
     };
 }
 function getInvoiceAmount(invoice) {
-    return getNumberValue(invoice.totalAmount, invoice.amount, invoice.grandTotal, invoice.total, invoice.balance);
+    return computeInvoiceGrandTotal(invoice);
 }
 function getInvoiceStatus(invoice) {
-    const paymentStatus = getStringValue(invoice.paymentStatus).toLowerCase();
+    const paymentStatus = getInvoicePaymentStatus(invoice);
     if (paymentStatus === 'paid') {
         return 'paid';
+    }
+    if (isInvoiceOverdue(invoice)) {
+        return 'overdue';
     }
     if (paymentStatus === 'partial') {
         return 'partial';
@@ -106,13 +90,13 @@ function getInvoiceStatus(invoice) {
 function mapInvoice(invoice) {
     const invoiceCompany = getInvoiceCompany(invoice);
     const status = getInvoiceStatus(invoice);
-    const currency = getStringValue(invoice.currency, invoice.currencyCode) || 'USD';
+    const currency = (getStringValue(invoice.currency, invoice.currencyCode) || 'USD').toUpperCase();
     const amountValue = getInvoiceAmount(invoice);
     const rawDate = getStringValue(invoice.createdAt ?? invoice.created_at ?? invoice.invoiceDate);
     const parsedDate = new Date(rawDate);
     const createdTs = Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
     return {
-        amount: formatAmount(amountValue, currency),
+        amount: formatCurrency(amountValue, currency),
         amountValue,
         company: invoiceCompany.name || 'Company',
         created: formatDate(rawDate),
@@ -121,20 +105,8 @@ function mapInvoice(invoice) {
         id: getStringValue(invoice.invoiceNumber, invoice.invoiceNo, invoice.number, invoice._id, invoice.id) || 'Invoice',
         raw: invoice,
         status,
-        statusText: status === 'paid' ? 'Fully Paid' : status === 'partial' ? 'Partially Paid' : 'Pay Now',
+        statusText: status === 'paid' ? 'Fully Paid' : status === 'partial' ? 'Partially Paid' : status === 'overdue' ? 'Overdue' : 'Pay Now',
     };
-}
-function invoiceMatchesCompany(invoice, selectedCompany) {
-    if (!selectedCompany?.id) {
-        return false;
-    }
-    const companyObj = getNestedRecord(invoice.company);
-    if (companyObj) {
-        const companyId = getStringValue(companyObj._id, companyObj.id);
-        return companyId === selectedCompany.id;
-    }
-    const flatCompanyId = getStringValue(invoice.companyId, invoice.clientCompanyId, invoice.clientId);
-    return flatCompanyId === selectedCompany.id;
 }
 const SORT_OPTIONS = [
     { label: 'Newest', value: 'newest' },
@@ -155,21 +127,10 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOption, setSortOption] = useState('newest');
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const visibleApiInvoices = useMemo(() => {
-        if (!selectedCompany?.id) {
-            return apiInvoices;
-        }
-        const cid = selectedCompany.id;
-        return apiInvoices.filter(invoice => {
-            const { id } = getInvoiceCompany(invoice);
-            if (id !== cid)
-                return false;
-            const status = getStringValue(invoice.status, invoice.paymentStatus, invoice.invoiceStatus).toLowerCase();
-            if (status === 'draft')
-                return false;
-            return true;
-        });
-    }, [apiInvoices, selectedCompany?.id]);
+    const visibleApiInvoices = useMemo(
+        () => filterInvoicesForCompany(apiInvoices, selectedCompany?.id),
+        [apiInvoices, selectedCompany?.id]
+    );
     const invoices = useMemo(() => {
         const mapped = visibleApiInvoices.map(mapInvoice);
         const query = searchQuery.trim();
@@ -213,7 +174,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                 styles.searchBox,
                 {
                     backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-                    borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                    borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
                 },
             ]}>
                 <FontAwesome name="search" size={17} color={palette.accentText} />
@@ -243,7 +204,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                             setSortOption(option.value);
                             setIsSortOpen(false);
                         }} style={styles.sortDropdownItem}>
-                            <Text style={[styles.sortDropdownItemText, sortOption === option.value && { color: palette.accentText, fontWeight: '600' }]}>
+                            <Text style={[styles.sortDropdownItemText, sortOption === option.value ? styles.sortDropdownItemTextSelected : null]}>
                                 {option.label}
                             </Text>
                             {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText} /> : null}
@@ -263,15 +224,15 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                 <DocumentNotFound subtitle="No invoices found for this company." />
             </View>) : null}
             {!isLoading && invoices.map((invoice, index) => {
-                const statusColor = invoice.status === 'paid' ? '#16a34a' :
-                    invoice.status === 'partial' ? '#d97706' :
-                        '#dc2626';
+                const statusColor = invoice.status === 'paid' ? themePalette.hex_16a34a :
+                    invoice.status === 'partial' ? themePalette.hex_d97706 :
+                        themePalette.hex_dc2626;
                 return (<AnimatedAppear key={invoice.id} index={index}>
                     <View style={[
                         styles.invoiceCard,
                         {
                             backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-                            borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                            borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
                         },
                     ]}>
                         <View style={styles.invoiceTopRow}>
@@ -305,7 +266,7 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                                     <FontAwesome name="calendar" size={13} color={palette.accentText} />
                                     <Text style={[
                                         styles.metaText,
-                                        invoice.status === 'unpaid' ? styles.overdueDueText : styles.paidDueText,
+                                        invoice.status === 'unpaid' || invoice.status === 'overdue' ? styles.overdueDueText : styles.paidDueText,
                                     ]}>
                                         Due Date: {invoice.due}
                                     </Text>
@@ -315,8 +276,8 @@ function BillingTabContent({ onInvoicePress, selectedCompany }) {
                                 <Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={styles.actionButton}>
                                     <FontAwesome name="eye" size={15} color={palette.iconColor} />
                                 </Pressable>
-                                {invoice.status === 'unpaid' ? (<Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={[styles.statusPill, { backgroundColor: '#16a34a' }]}>
-                                    <Text style={[styles.statusText, { color: '#ffffff' }]}>
+                                {invoice.status === 'unpaid' || invoice.status === 'overdue' ? (<Pressable onPress={() => onInvoicePress?.(invoice.raw)} style={[styles.statusPill, { backgroundColor: invoice.status === 'overdue' ? themePalette.hex_dc2626 : themePalette.hex_16a34a }]}>
+                                    <Text style={[styles.statusText, { color: themePalette.hex_ffffff }]}>
                                         Pay Now
                                     </Text>
                                 </Pressable>) : (<View style={styles.statusPill}>
@@ -416,6 +377,10 @@ const getStyles = (colors) => {
             color: palette.primaryText,
             fontSize: font.lg,
             fontWeight: '400',
+        },
+        sortDropdownItemTextSelected: {
+            color: palette.accentText,
+            fontWeight: '600',
         },
         stateText: {
             fontSize: font.md,

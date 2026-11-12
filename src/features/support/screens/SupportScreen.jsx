@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { pick, types } from '@react-native-documents/picker';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { BackButton } from '../../../components/buttons';
 import { useAppSelector } from '../../../store/hooks';
 import { API_BASE_URL } from '../../../config/api';
@@ -16,23 +16,23 @@ const infoCards = [
         icon: '\u{1F4AC}',
         label: 'Live Chat',
         value: 'Available 24/7',
-        iconBg: 'rgba(90,110,230,0.15)',
-        iconColor: '#7c8cf0',
+        iconBg: themePalette.rgba_90_110_230_0_15,
+        iconColor: themePalette.hex_7c8cf0,
     },
     {
         icon: '\u2709',
         label: 'Email',
         value: 'info@companyvista.com',
-        iconBg: 'rgba(63,191,127,0.15)',
-        iconColor: '#3fbf7f',
-        valueColor: '#3fbf7f',
+        iconBg: themePalette.rgba_63_191_127_0_15,
+        iconColor: themePalette.hex_3fbf7f,
+        valueColor: themePalette.hex_3fbf7f,
     },
     {
         icon: '\u260E',
         label: 'Phone',
         value: '+1 (800) 123-4567',
-        iconBg: 'rgba(168,130,230,0.15)',
-        iconColor: '#a882e6',
+        iconBg: themePalette.rgba_168_130_230_0_15,
+        iconColor: themePalette.hex_a882e6,
     },
 ];
 const categoryOptions = ['General Inquiry', 'Billing', 'Technical Support', 'Feedback'];
@@ -220,7 +220,7 @@ export default function ContactSupport({ onBackPress }) {
     </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     formTitle: {
         fontSize: font.xl,
         fontWeight: '600',
-        color: '#e6a82a',
+        color: themePalette.hex_e6a82a,
         marginBottom: 4,
     },
     formSubtitle: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     required: {
-        color: '#e6a82a',
+        color: themePalette.hex_e6a82a,
     },
     inputWrapper: {
         flexDirection: 'row',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: themePalette.rgba_0_0_0_0_5,
         justifyContent: 'center',
         padding: 30,
     },
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     uploadTitle: {
         fontSize: font.base,
         fontWeight: '500',
-        color: '#e6a82a',
+        color: themePalette.hex_e6a82a,
         marginBottom: 2,
     },
     uploadHint: {
@@ -393,4 +393,4 @@ const styles = StyleSheet.create({
         fontSize: font.md,
         fontWeight: '600',
     },
-});
+}));

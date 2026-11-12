@@ -5,34 +5,26 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import { ScreenWrapper } from '../../../components/ScreenWrapper';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 const quickActions = [
-    { id: 'companyInfo', label: 'Company Information', icon: 'building-o', color: '#4F46E5' },
-    { id: 'shareholders', label: 'Shareholders', icon: 'users', color: '#137333' },
-    { id: 'manageCompany', label: 'Manage Company', icon: 'briefcase', color: '#7C3AED' },
-    { id: 'transactions', label: 'Transactions', icon: 'exchange', color: '#0891b2' },
-    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
+    { id: 'transactions', label: 'Transactions', icon: 'exchange', color: themePalette.hex_0891b2 },
+    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: themePalette.hex_16a34a },
 ];
 const serviceActions = [
-    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: '#16a34a' },
-    { id: 'requestService', label: 'Request a Services', icon: 'plus-circle', color: '#0891b2' },
-    { id: 'servicesHistory', label: 'Services History', icon: 'history', color: '#7C3AED' },
-];
-const complianceActions = [
-    { id: 'agentAddress', label: 'Agent & Address', icon: 'building', color: '#ea580c' },
-    { id: 'federalFiling', label: 'Federal Filing', icon: 'file-text', color: '#B45309' },
-    { id: 'annualFiling', label: 'Annual Filing', icon: 'calendar', color: '#0891b2' },
+    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: themePalette.hex_16a34a },
+    { id: 'requestService', label: 'Request a Services', icon: 'plus-circle', color: themePalette.hex_0891b2 },
+    { id: 'servicesHistory', label: 'Services History', icon: 'history', color: themePalette.hex_7c3aed },
 ];
 const trackingActions = [
-    { id: 'registrationTracking', label: 'Registration Tracking', icon: 'map-marker', color: '#0891b2' },
+    { id: 'registrationTracking', label: 'Registration Tracking', icon: 'map-marker', color: themePalette.hex_0891b2 },
 ];
 const helpAndSupport = [
-    { id: 'support', label: 'Support', icon: 'headphones', color: '#0f766e' },
-    { id: 'inviteFriends', label: 'Invite Friends', icon: 'share-alt', color: '#7c3aed' },
-    { id: 'followUs', label: 'Follow Us', icon: 'globe', color: '#2563eb' },
-    { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: '#ca8a04' },
+    { id: 'support', label: 'Support', icon: 'headphones', color: themePalette.hex_0f766e },
+    { id: 'inviteFriends', label: 'Invite Friends', icon: 'share-alt', color: themePalette.hex_7c3aed },
+    { id: 'followUs', label: 'Follow Us', icon: 'globe', color: themePalette.hex_2563eb },
+    { id: 'helpFeedback', label: 'Help & Feedback', icon: 'commenting-o', color: themePalette.hex_ca8a04 },
 ];
 export default function SearchScreen({ route }) {
     const navigation = useNavigation();
@@ -41,15 +33,6 @@ export default function SearchScreen({ route }) {
     const [isRegistrationTrackingOpen, setIsRegistrationTrackingOpen] = useState(false);
     function handleQuickAction(actionId) {
         switch (actionId) {
-            case 'companyInfo':
-                navigation.navigate('Home', { pendingCompanySection: 'companyInfo' });
-                break;
-            case 'shareholders':
-                navigation.navigate('Home', { pendingCompanySection: 'shareholders' });
-                break;
-            case 'manageCompany':
-                navigation.navigate('Home', { pendingHomeAction: 'manageOptions' });
-                break;
             case 'transactions':
                 navigation.navigate('Transactions', { companyId: route.params?.companyId });
                 break;
@@ -68,21 +51,6 @@ export default function SearchScreen({ route }) {
                 break;
             case 'servicesHistory':
                 navigation.navigate('Home', { pendingHomeAction: 'servicesHistory' });
-                break;
-        }
-    }
-    function handleCompliancePress(actionId) {
-        switch (actionId) {
-            case 'agentAddress':
-                navigation.navigate('ComplianceHistory', {
-                    selectedAction: { id: 'agent_address', title: 'Agent & Address', subtitle: '', status: '', date: '', details: [], companyId: route.params?.companyId },
-                });
-                break;
-            case 'federalFiling':
-                navigation.navigate('FederalFiling');
-                break;
-            case 'annualFiling':
-                navigation.navigate('AnnualFiling');
                 break;
         }
     }
@@ -113,12 +81,6 @@ export default function SearchScreen({ route }) {
             return serviceActions;
         const q = query.toLowerCase();
         return serviceActions.filter(s => s.label.toLowerCase().includes(q));
-    }, [query]);
-    const filteredComplianceActions = useMemo(() => {
-        if (!query.trim())
-            return complianceActions;
-        const q = query.toLowerCase();
-        return complianceActions.filter(c => c.label.toLowerCase().includes(q));
     }, [query]);
     const filteredTrackingActions = useMemo(() => {
         if (!query.trim())
@@ -176,19 +138,6 @@ export default function SearchScreen({ route }) {
           </AnimatedAppear>
 
           <AnimatedAppear index={3}>
-            {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>COMPLIANCE ACTIONS</Text>}
-            <View style={styles.settingsList}>
-              {filteredComplianceActions.map((item) => (<TouchableOpacity key={item.id} style={styles.settingsRow} onPress={() => handleCompliancePress(item.id)}>
-                  <View style={[styles.settingsIcon, { backgroundColor: `${item.color}15` }]}>
-                    <FontAwesome name={item.icon} size={18} color={item.color}/>
-                  </View>
-                  <Text style={[styles.settingsLabel, { color: colors.text }]}>{item.label}</Text>
-                  <FontAwesome name="angle-right" size={18} color={colors.subtle}/>
-                </TouchableOpacity>))}
-            </View>
-          </AnimatedAppear>
-
-          <AnimatedAppear index={4}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>TRACKING</Text>}
             <View style={styles.settingsList}>
               {filteredTrackingActions.map((item) => (<TouchableOpacity key={item.id} style={styles.settingsRow} onPress={() => {
@@ -204,7 +153,7 @@ export default function SearchScreen({ route }) {
             </View>
           </AnimatedAppear>
 
-          <AnimatedAppear index={5}>
+          <AnimatedAppear index={4}>
             {!query.trim() && <Text style={[styles.sectionTitle, { color: colors.muted }]}>HELP & SUPPORT</Text>}
             <View style={styles.settingsList}>
               {filteredHelpAndSupport.map((item) => (<TouchableOpacity key={item.id} style={styles.settingsRow} onPress={() => handleHelpPress(item.id)}>

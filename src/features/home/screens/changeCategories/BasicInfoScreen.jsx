@@ -15,7 +15,7 @@ import {
 import axios from 'axios'; // Ensure axios is installed
 import { BackButton } from '../../../../components/buttons';
 import { s as responsiveS } from '../../../../theme/responsive';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
@@ -204,7 +204,7 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
     };
     if (submitted) {
         return (<SafeAreaView style={styles(colors).safe}>
-        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
+        <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : themePalette.hex_fff}/>
         <View style={styles(colors).successContainer}>
           <Text style={styles(colors).successIcon}>✓</Text>
           <Text style={styles(colors).successTitle}>Update submitted</Text>
@@ -221,7 +221,7 @@ const BasicInfoScreen = ({ onBackPress, companyId, clientId, urgency, selectedCa
       </SafeAreaView>);
     }
     return (<SafeAreaView style={styles(colors).safe}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : themePalette.hex_fff}/>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header - fixed at top */}
         <View style={styles(colors).header}>
@@ -352,7 +352,7 @@ const styles = (colors) => StyleSheet.create({
         paddingHorizontal: responsiveS(14),
         paddingTop: 50,
         paddingBottom: 12,
-        backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
+        backgroundColor: colors.mode === 'dark' ? colors.background : themePalette.hex_ffffff,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: colors.border,
         zIndex: 10,
@@ -396,7 +396,7 @@ const styles = (colors) => StyleSheet.create({
         paddingHorizontal: responsiveS(8),
         borderRadius: 12,
         borderWidth: 1.5,
-        borderColor: colors.mode === 'dark' ? '#475569' : colors.border,
+        borderColor: colors.mode === 'dark' ? themePalette.hex_475569 : colors.border,
         backgroundColor: colors.surface,
         shadowColor: colors.text,
         shadowOffset: { width: 0, height: 1 },
@@ -503,7 +503,7 @@ const styles = (colors) => StyleSheet.create({
         overflow: 'hidden',
     },
     submitBtnText: {
-        color: '#FFFFFF',
+        color: themePalette.hex_ffffff,
         fontSize: font.xxl,
         fontWeight: '700',
         letterSpacing: 0.3,
@@ -518,7 +518,7 @@ const styles = (colors) => StyleSheet.create({
     },
     successIcon: {
         fontSize: font.display4XL,
-        color: '#22C55E',
+        color: themePalette.hex_22c55e,
     },
     successTitle: {
         fontSize: font.hero,
@@ -544,7 +544,7 @@ const styles = (colors) => StyleSheet.create({
         elevation: 6,
     },
     successBtnText: {
-        color: '#FFFFFF',
+        color: themePalette.hex_ffffff,
         fontSize: font.xxl,
         fontWeight: '700',
         letterSpacing: 0.3,

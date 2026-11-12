@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../../components/buttons/BackButton';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { findServiceBySlugOrName, formatPrice } from '../../../../constants/exploreServicesData';
@@ -89,8 +89,8 @@ export default function ServicesHistoryScreen({ onBackPress, selectedCompany }) 
   }, [loadServiceHistory]);
 
   return (
-    <View style={[styles.screen, { backgroundColor: isLight ? '#F1F5F9' : undefined }]}>
-      <View style={[styles.headerArea, { backgroundColor: isLight ? '#ffffff' : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
+    <View style={[styles.screen, { backgroundColor: isLight ? themePalette.hex_f1f5f9 : undefined }]}>
+      <View style={[styles.headerArea, { backgroundColor: isLight ? themePalette.hex_ffffff : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
         <View style={styles.header}>
           <BackButton onPress={onBackPress} />
           <Text style={[styles.title, { color: colors.text }]}>Services History</Text>

@@ -1,6 +1,7 @@
 import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 // Dynamic responsive styles - use with useResponsive() from responsive.js
 // Example: const { rs, rvs, rms, width, height, isLandscape } = useResponsive(); const styles = createStyles({ rs, rvs, rms, width, height });
@@ -194,7 +195,7 @@ export function createStyles({ rs, rvs, rms, width, height }) {
         appInfoCard: {
             alignItems: 'center',
             borderRadius: rs(18),
-            backgroundColor: '#ffffff',
+            backgroundColor: themePalette.hex_ffffff,
             paddingHorizontal: cardHPad, // dynamic horizontal padding
             paddingVertical: rvs(28),
             flex: isLargeLandscape ? 0.9 : undefined,
@@ -205,7 +206,7 @@ export function createStyles({ rs, rvs, rms, width, height }) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: rs(33),
-            backgroundColor: '#ccfbf1',
+            backgroundColor: themePalette.hex_ccfbf1,
             overflow: 'hidden',
         },
         appInfoLogo: {
@@ -213,20 +214,20 @@ export function createStyles({ rs, rvs, rms, width, height }) {
             height: '100%',
         },
         appInfoTitle: {
-            color: '#111827',
+            color: themePalette.hex_111827,
             fontSize: rms(21),
             fontWeight: '500',
             marginTop: rvs(16),
         },
         appInfoSubtitle: {
-            color: '#64748b',
+            color: themePalette.hex_64748b,
             fontSize: rms(13),
             fontWeight: '400',
             marginTop: rvs(5),
         },
         appInfoList: {
             borderRadius: rs(18),
-            backgroundColor: '#ffffff',
+            backgroundColor: themePalette.hex_ffffff,
             marginTop: isLargeLandscape ? 0 : rvs(18),
             paddingHorizontal: rs(16), // dynamic horizontal padding
             flex: isLargeLandscape ? 1.1 : undefined,
@@ -238,16 +239,16 @@ export function createStyles({ rs, rvs, rms, width, height }) {
             justifyContent: 'space-between',
             gap: rs(14),
             borderBottomWidth: 1,
-            borderBottomColor: '#e5e7eb',
+            borderBottomColor: themePalette.hex_e5e7eb,
         },
         appInfoLabel: {
-            color: '#64748b',
+            color: themePalette.hex_64748b,
             fontSize: rms(13),
             fontWeight: '500',
         },
         appInfoValue: {
             flex: 1,
-            color: '#111827',
+            color: themePalette.hex_111827,
             fontSize: rms(14),
             fontWeight: '400',
             textAlign: 'right',
@@ -256,7 +257,7 @@ export function createStyles({ rs, rvs, rms, width, height }) {
 }
 
 // Fallback static styles for non-responsive usage (portrait default)
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: { flex: 1 },
     header: { minHeight: 65, flexDirection: 'row', alignItems: 'center', gap: 10, borderBottomWidth: 1, paddingHorizontal: s(14) },
     headerTitle: { flex: 1, fontSize: font.hero, fontWeight: '400' },
@@ -286,15 +287,15 @@ const styles = StyleSheet.create({
     sendButton: { minHeight: 43, alignItems: 'center', justifyContent: 'center', borderRadius: 29, marginTop: 20 },
     sendButtonText: { fontSize: font.xxl, fontWeight: '700' },
     appInfoContent: { paddingHorizontal: s(22), paddingTop: 22 },
-    appInfoCard: { alignItems: 'center', borderRadius: 18, backgroundColor: '#ffffff', paddingHorizontal: s(20), paddingVertical: 28 },
-    appInfoIcon: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: '#ccfbf1', overflow: 'hidden' },
+    appInfoCard: { alignItems: 'center', borderRadius: 18, backgroundColor: themePalette.hex_ffffff, paddingHorizontal: s(20), paddingVertical: 28 },
+    appInfoIcon: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: themePalette.hex_ccfbf1, overflow: 'hidden' },
     appInfoLogo: { width: '100%', height: '100%' },
-    appInfoTitle: { color: '#111827', fontSize: font.large, fontWeight: '500', marginTop: 16 },
-    appInfoSubtitle: { color: '#64748b', fontSize: font.bodySmall, fontWeight: '400', marginTop: 5 },
-    appInfoList: { borderRadius: 18, backgroundColor: '#ffffff', marginTop: 18, paddingHorizontal: s(16) },
-    appInfoRow: { minHeight: 62, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-    appInfoLabel: { color: '#64748b', fontSize: font.bodySmall, fontWeight: '500' },
-    appInfoValue: { flex: 1, color: '#111827', fontSize: font.base, fontWeight: '400', textAlign: 'right' },
-});
+    appInfoTitle: { color: themePalette.hex_111827, fontSize: font.large, fontWeight: '500', marginTop: 16 },
+    appInfoSubtitle: { color: themePalette.hex_64748b, fontSize: font.bodySmall, fontWeight: '400', marginTop: 5 },
+    appInfoList: { borderRadius: 18, backgroundColor: themePalette.hex_ffffff, marginTop: 18, paddingHorizontal: s(16) },
+    appInfoRow: { minHeight: 62, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14, borderBottomWidth: 1, borderBottomColor: themePalette.hex_e5e7eb },
+    appInfoLabel: { color: themePalette.hex_64748b, fontSize: font.bodySmall, fontWeight: '500' },
+    appInfoValue: { flex: 1, color: themePalette.hex_111827, fontSize: font.base, fontWeight: '400', textAlign: 'right' },
+}));
 
 export default styles;

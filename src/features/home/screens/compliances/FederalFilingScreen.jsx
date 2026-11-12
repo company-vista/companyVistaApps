@@ -9,7 +9,7 @@ import Toast from 'react-native-toast-message';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanies } from '../../api/clientProfileApi';
 import { API_BASE_URL } from '../../../../config/api';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 export default function FederalTaxFiling() {
     const route = useRoute();
@@ -17,7 +17,7 @@ export default function FederalTaxFiling() {
     const colors = useThemeColors();
     const cardBgStyle = {
         backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
-        borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+        borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         borderWidth: 1,
     };
     const userCompanies = useAppSelector(state => state.auth.user?.companies ?? []);
@@ -398,7 +398,7 @@ export default function FederalTaxFiling() {
     </View>);
 }
 // Mobile Responsive Styling
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 0
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 14,
         marginTop: 4,
-        shadowColor: '#000',
+        shadowColor: themePalette.hex_000,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 3,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     supportButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: themePalette.rgba_255_255_255_0_2,
         borderRadius: 8,
         paddingVertical: 10,
         alignItems: 'center',
@@ -608,4 +608,4 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontWeight: '600',
     },
-});
+}));

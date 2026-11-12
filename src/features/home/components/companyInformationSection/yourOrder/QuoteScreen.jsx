@@ -20,7 +20,7 @@ import {
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { font } from '../../../../../theme/typography';
-import { useThemeColors } from '../../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../../theme/colors';
 import { s } from '../../../../../theme/responsive';
 import { useAppSelector } from '../../../../../store/hooks';
 import { fetchQuote, isQuoteReady, formatCurrency, formatConverted } from './api/quoteApi';
@@ -106,7 +106,7 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
           <BackButton onPress={onBackPress} />
           <Image source={logoR} style={styles.logoImage} resizeMode="contain" />
           <TouchableOpacity style={styles.iconButton}>
-            <HelpCircle color="#9CA3AF" size={20} />
+            <HelpCircle color={themePalette.hex_9ca3af} size={20} />
           </TouchableOpacity>
         </View>
 
@@ -118,9 +118,9 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
         </View>
 
         {/* Quote Info Card */}
-        <View style={[styles.quoteCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
+        <View style={[styles.quoteCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121a2c, borderColor: colors.border }]}>
           <View style={styles.fileIconContainer}>
-            <FileText color="#EAB308" size={24} />
+            <FileText color={themePalette.hex_eab308} size={24} />
           </View>
           <View style={styles.quoteDetails}>
             <Text style={[styles.quoteHeader, { color: colors.text }]}>Quote #{effectiveQuote?.quoteId || '—'}</Text>
@@ -132,7 +132,7 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
         </View>
 
         {/* Breakdown Card - amounts admin API se - currency auto */}
-        <View style={[styles.breakdownCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
+        <View style={[styles.breakdownCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121a2c, borderColor: colors.border }]}>
           <View style={styles.row}>
             <Text style={[styles.label, { color: colors.muted }]}>CompanyVista service</Text>
             <Text style={[styles.value, { color: colors.text }]}>{hasAmount ? formatCurrency(companyVistaTotal, quoteCurrency) : formatCurrency(0, quoteCurrency)}</Text>
@@ -159,8 +159,8 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
         </View>
 
         {/* Validity Banner - formatted validUntil + days left */}
-        <View style={[styles.validityCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
-          <Clock color="#EAB308" size={18} style={{ marginRight: s(8) }} />
+        <View style={[styles.validityCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121a2c, borderColor: colors.border }]}>
+          <Clock color={themePalette.hex_eab308} size={18} style={{ marginRight: s(8) }} />
           <Text style={[styles.validityText, { color: colors.muted }]}>
             Valid until <Text style={styles.boldText}>{formattedValidUntil}</Text> · {daysRemaining != null ? `${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining` : '— days remaining'}
           </Text>
@@ -176,37 +176,37 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
         <View style={styles.grid}>
           <View style={styles.gridColumn}>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Name reservation</Text>
             </View>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Registered address</Text>
             </View>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Tax registration</Text>
             </View>
           </View>
 
           <View style={styles.gridColumn}>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Notary coordination</Text>
             </View>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Commercial register</Text>
             </View>
             <View style={styles.checkItem}>
-              <Check color="#22C55E" size={16} />
+              <Check color={themePalette.hex_22c55e} size={16} />
               <Text style={[styles.checkText, { color: colors.text }]}>Bank introduction</Text>
             </View>
           </View>
         </View>
 
         {/* Note Box - signup user */}
-        <View style={[styles.noteCard, { backgroundColor: isLight ? '#FFFFFF' : '#121A2C', borderColor: colors.border }]}>
+        <View style={[styles.noteCard, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121a2c, borderColor: colors.border }]}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{signupInitials}</Text>
           </View>
@@ -227,7 +227,7 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
         >
           {loadingQuote ? <ActivityIndicator size="small" color={colors.muted} /> : null}
           <Text style={[styles.buttonText, (!hasAmount || loadingQuote) && { color: colors.muted }]}>{loadingQuote ? 'Loading quote...' : hasAmount ? 'View Full Breakdown' : 'Awaiting Quote Amount'}</Text>
-          {!loadingQuote && <ArrowRight color={hasAmount ? '#000000' : colors.muted} size={18} style={{ marginLeft: s(8) }} />}
+          {!loadingQuote && <ArrowRight color={hasAmount ? themePalette.hex_000000 : colors.muted} size={18} style={{ marginLeft: s(8) }} />}
         </TouchableOpacity>
 
       </ScrollView>
@@ -237,10 +237,10 @@ const QuoteScreen = ({ onBackPress, onViewBreakdown, amount = 0, selectedCompany
 
 export default QuoteScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B101D',
+    backgroundColor: themePalette.hex_0b101d,
   },
   scrollContainer: {
     paddingHorizontal: s(20),
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#161F33',
+    backgroundColor: themePalette.hex_161f33,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#26334D',
+    borderColor: themePalette.hex_26334d,
   },
   logoImage: {
     width: 130,
@@ -271,59 +271,59 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: font.display,
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '300',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontWeight: 'normal',
   },
   subTitle: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.base,
     marginTop: s(4),
   },
   quoteCard: {
     flexDirection: 'row',
-    backgroundColor: '#121A2C',
+    backgroundColor: themePalette.hex_121a2c,
     borderRadius: 12,
     padding: s(16),
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#26334D',
+    borderColor: themePalette.hex_26334d,
     marginBottom: s(16),
   },
   fileIconContainer: {
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+    backgroundColor: themePalette.rgba_234_179_8_0_1,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(234, 179, 8, 0.3)',
+    borderColor: themePalette.rgba_234_179_8_0_3,
     marginRight: s(12),
   },
   quoteDetails: {
     flex: 1,
   },
   quoteHeader: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: 'bold',
     fontSize: font.lg,
   },
   quoteSubText: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.sm,
     marginTop: s(2),
   },
   breakdownCard: {
-    backgroundColor: '#121A2C',
+    backgroundColor: themePalette.hex_121a2c,
     borderRadius: 12,
     padding: s(16),
     borderWidth: 1,
-    borderColor: '#26334D',
+    borderColor: themePalette.hex_26334d,
     marginBottom: s(16),
   },
   row: {
@@ -332,17 +332,17 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   label: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.base,
   },
   value: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: '600',
     fontSize: font.md,
   },
   divider: {
     height: 1,
-    backgroundColor: '#26334D',
+    backgroundColor: themePalette.hex_26334d,
     marginVertical: s(12),
   },
   totalRow: {
@@ -351,38 +351,38 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   totalLabel: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontWeight: 'bold',
     fontSize: font.sm,
     marginTop: s(6),
   },
   totalAmount: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontSize: font.displayXL,
     fontWeight: '500',
   },
   convertedAmount: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
     fontSize: font.sm,
     marginTop: s(2),
   },
   validityCard: {
     flexDirection: 'row',
-    backgroundColor: '#121A2C',
+    backgroundColor: themePalette.hex_121a2c,
     borderRadius: 20,
     paddingVertical: s(12),
     paddingHorizontal: s(16),
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#26334D',
+    borderColor: themePalette.hex_26334d,
     marginBottom: s(24),
   },
   validityText: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.bodySmall,
   },
   boldText: {
-    color: '#EAB308',
+    color: themePalette.hex_eab308,
     fontWeight: 'bold',
   },
   sectionHeaderContainer: {
@@ -393,10 +393,10 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#26334D',
+    backgroundColor: themePalette.hex_26334d,
   },
   sectionHeader: {
-    color: '#6B7280',
+    color: themePalette.hex_6b7280,
     fontSize: font.sm,
     fontWeight: 'bold',
     marginHorizontal: s(10),
@@ -416,46 +416,46 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   checkText: {
-    color: '#D1D5DB',
+    color: themePalette.hex_d1d5db,
     fontSize: font.bodySmall,
     marginLeft: s(8),
   },
   noteCard: {
     flexDirection: 'row',
-    backgroundColor: '#121A2C',
+    backgroundColor: themePalette.hex_121a2c,
     borderRadius: 12,
     padding: s(16),
     borderWidth: 1,
-    borderColor: '#26334D',
+    borderColor: themePalette.hex_26334d,
     marginBottom: s(24),
   },
   avatar: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#3B82F6',
+    backgroundColor: themePalette.hex_3b82f6,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: s(12),
   },
   avatarText: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: 'bold',
     fontSize: font.sm,
   },
   noteTitle: {
-    color: '#60A5FA',
+    color: themePalette.hex_60a5fa,
     fontWeight: 'bold',
     fontSize: font.base,
     marginBottom: s(4),
   },
   noteDescription: {
-    color: '#9CA3AF',
+    color: themePalette.hex_9ca3af,
     fontSize: font.sm,
     lineHeight: 18,
   },
   button: {
-    backgroundColor: '#EAB308',
+    backgroundColor: themePalette.hex_eab308,
     borderRadius: 24,
     height: 50,
     flexDirection: 'row',
@@ -464,8 +464,8 @@ const styles = StyleSheet.create({
     marginBottom: s(20),
   },
   buttonText: {
-    color: '#000000',
+    color: themePalette.hex_000000,
     fontSize: font.md,
     fontWeight: 'bold',
   },
-});
+}));

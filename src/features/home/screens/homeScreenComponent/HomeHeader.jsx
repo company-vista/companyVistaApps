@@ -5,17 +5,18 @@ import logoImage from '../../../../assets/images/company-vista-icon-gold-512.png
 import styles from '../HomeScreen.styles';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { s } from '../../../../theme/responsive';
+import { themePalette } from '../../../../theme/colors';
 
 export function HomeHeader({ displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress, colors, }) {
     return (<View style={[styles.header, { backgroundColor: colors.surface, paddingHorizontal: s(18) }]}>
-      <Image source={logoImage} style={[styles.avatar, { backgroundColor: '#000' }]}/>
+      <Image source={logoImage} style={[styles.avatar, { backgroundColor: themePalette.hex_000 }]}/>
       <Text numberOfLines={1} style={[styles.greeting, { color: colors.text }]}>
         Hi, {capitalizeCompanyName(displayName) || 'User'}
       </Text>
-      <Pressable accessibilityRole="button" accessibilityLabel="Open search" onPress={onSearchPress} style={[styles.headerIcon, { backgroundColor: colors.mode === 'light' ? '#ffffff' : 'rgba(255,255,255,0.1)', borderRadius: 99 }]}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Open search" onPress={onSearchPress} style={[styles.headerIcon, { backgroundColor: colors.mode === 'light' ? themePalette.hex_ffffff : themePalette.rgba_255_255_255_0_1, borderRadius: 99 }]}>
          <FontAwesome name="search" size={20} color={colors.text}/>
        </Pressable>
-      <Pressable onPress={onNotificationPress} style={[styles.headerIcon, styles.notificationButton, { backgroundColor: colors.mode === 'light' ? '#ffffff' : 'rgba(255,255,255,0.1)', borderRadius: 99 }]}>
+      <Pressable onPress={onNotificationPress} style={[styles.headerIcon, styles.notificationButton, { backgroundColor: colors.mode === 'light' ? themePalette.hex_ffffff : themePalette.rgba_255_255_255_0_1, borderRadius: 99 }]}>
         <Animated.View style={{ transform: [{ rotate: bellRotation }] }}>
           <FontAwesome name="bell-o" size={21} color={colors.text}/>
         </Animated.View>

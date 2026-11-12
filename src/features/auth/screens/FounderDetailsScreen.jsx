@@ -25,7 +25,7 @@ import { signupUser, setPendingOrderData } from '../../../store/slices/authSlice
 import { fetchClientProfile } from '../../profile/api/clientProfileDetailsApi';
 import { s } from '../../../theme/responsive';
 import { getCountryData } from '../../../constants/countries';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const COUNTRIES = [
   { code: '+91', iso: 'IN', name: 'India' },
@@ -394,7 +394,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#D4AF37" />
+          <ActivityIndicator size="large" color={themePalette.hex_d4af37} />
           <Text style={{ color: colors.muted, marginTop: 12, fontSize: font.base }}>Using your saved profile — setting up your company…</Text>
         </View>
       </SafeAreaView>
@@ -427,12 +427,12 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           </Text>
 
           {/* Summary Card */}
-          <View style={[styles.summaryCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+          <View style={[styles.summaryCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
             <View style={styles.summaryField}>
               <Text style={[styles.summaryFieldLabel, { color: colors.muted }]}>COMPANY NAME</Text>
               <Text style={styles.companyNameText} numberOfLines={1}>{displayCompanyName}</Text>
             </View>
-            <View style={[styles.summaryDivider, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]} />
+            <View style={[styles.summaryDivider, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]} />
             <View style={styles.summaryRowBottom}>
               <View style={styles.summaryFieldHalf}>
                 <Text style={[styles.summaryFieldLabel, { color: colors.muted }]}>JURISDICTION</Text>
@@ -453,7 +453,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             </Text>
             <Text style={[styles.passportHint, { color: colors.muted }]}>as per passport</Text>
           </View>
-          <View style={[styles.inputContainerActive, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : colors.inputBackground }]}>
+          <View style={[styles.inputContainerActive, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : colors.inputBackground }]}>
             <Ionicons name="person" size={16} color={colors.muted} />
             <TextInput
               style={[styles.textInput, { color: colors.text }]}
@@ -464,7 +464,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             />
           </View>
           <View style={styles.warningRow}>
-            <Ionicons name="warning" size={12} color="#D97706" />
+            <Ionicons name="warning" size={12} color={themePalette.hex_d97706} />
             <Text style={styles.warningText}>
               Must match passport exactly — appears on all state filings
             </Text>
@@ -474,8 +474,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           <Text style={[styles.inputLabel, { color: colors.muted }]}>
             EMAIL ADDRESS <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
-          <View style={emailVerified ? styles.successInputContainer : [styles.inputContainerDefault, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]}>
-            <Ionicons name="mail" size={16} color={emailVerified ? '#10B981' : colors.muted} />
+          <View style={emailVerified ? styles.successInputContainer : [styles.inputContainerDefault, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.inputBackground, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder }]}>
+            <Ionicons name="mail" size={16} color={emailVerified ? themePalette.hex_10b981 : colors.muted} />
             <TextInput
               style={[styles.textInput, { color: colors.text }]}
               value={email}
@@ -485,13 +485,13 @@ const FounderDetailsScreen = ({ navigation, route }) => {
               placeholder="Enter email address"
               placeholderTextColor={colors.subtle}
             />
-            {emailVerified && <Ionicons name="checkmark-circle" size={16} color="#10B981" />}
+            {emailVerified && <Ionicons name="checkmark-circle" size={16} color={themePalette.hex_10b981} />}
           </View>
 
           {/* Verified status */}
           {emailVerified && (
             <View style={styles.verifiedRow}>
-              <Ionicons name="checkmark-circle" size={12} color="#10B981" />
+              <Ionicons name="checkmark-circle" size={12} color={themePalette.hex_10b981} />
               <Text style={styles.verifiedText}>Email verified</Text>
               <TouchableOpacity onPress={() => setEmailVerified(false)}>
                 <Text style={styles.changeEmailText}>Change</Text>
@@ -504,12 +504,12 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             PHONE NUMBER <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
           <View style={styles.phoneRow}>
-            <TouchableOpacity style={[styles.countryCodePicker, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowCodePicker(true)}>
+            <TouchableOpacity style={[styles.countryCodePicker, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.inputBackground, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowCodePicker(true)}>
               {countryIso ? <Text style={[styles.flagText, { color: colors.subtle }]}>{countryIso}</Text> : null}
               <Text style={[styles.codeText, { color: colors.text }, !countryCode && { color: colors.subtle }]}>{countryCode || 'Select'}</Text>
               <Ionicons name="chevron-down" size={12} color={colors.subtle} />
             </TouchableOpacity>
-            <View style={[styles.phoneInputContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]}>
+            <View style={[styles.phoneInputContainer, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.inputBackground, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder }]}>
               <TextInput
                 style={[styles.textInput, { color: colors.text }]}
                 value={phone}
@@ -528,13 +528,13 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           <Text style={[styles.inputLabel, { color: colors.muted }]}>
             COUNTRY OF RESIDENCE <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
-          <TouchableOpacity style={[styles.dropdownInputContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : colors.inputBackground, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowResidencePicker(true)}>
+          <TouchableOpacity style={[styles.dropdownInputContainer, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : colors.inputBackground, borderColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.inputBorder }]} activeOpacity={0.8} onPress={() => setShowResidencePicker(true)}>
             {residenceIso ? <Text style={[styles.flagText, { color: colors.subtle }]}>{residenceIso}</Text> : null}
             <Text style={[styles.dropdownValueText, { color: colors.text }, !countryOfResidence && { color: colors.subtle }]}>{countryOfResidence || 'Select'}</Text>
             <Ionicons name="chevron-down" size={12} color={colors.subtle} />
           </TouchableOpacity>
           <View style={styles.successRow}>
-            <Ionicons name="checkmark-circle" size={12} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={12} color={themePalette.hex_10b981} />
             <Text style={styles.successText}>
               {ownershipNote}
             </Text>
@@ -546,8 +546,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
             activeOpacity={0.8}
             onPress={() => setIsChecked(!isChecked)}
           >
-            <View style={[styles.checkbox, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255,255,255,0.2)' : colors.border }, isChecked && styles.checkboxChecked]}>
-              {isChecked && <Ionicons name="checkmark" size={11} color={isDark ? '#060913' : '#FFFFFF'} />}
+            <View style={[styles.checkbox, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_1 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border }, isChecked && styles.checkboxChecked]}>
+              {isChecked && <Ionicons name="checkmark" size={11} color={isDark ? themePalette.hex_060913 : themePalette.hex_ffffff} />}
             </View>
             <Text style={[styles.checkboxText, { color: colors.muted }]}>
               I agree to the <Text style={styles.linkText}>Terms of Service</Text> and{' '}
@@ -600,8 +600,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       <Modal visible={showCodePicker} transparent animationType="fade" onRequestClose={() => setShowCodePicker(false)}>
         <View style={styles.modalOverlay}>
           <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setShowCodePicker(false)} />
-          <View style={[styles.modalContent, { backgroundColor: isDark ? '#111827' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
-            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+          <View style={[styles.modalContent, { backgroundColor: isDark ? themePalette.hex_111827 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Select Country Code</Text>
               <TouchableOpacity onPress={() => setShowCodePicker(false)}>
                 <Ionicons name="close" size={20} color={colors.muted} />
@@ -612,7 +612,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
               keyExtractor={(item) => item.iso}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.countryOption, { borderBottomColor: isDark ? 'rgba(255,255,255,0.04)' : colors.border }, countryCode === item.code && styles.countryOptionSelected]}
+                  style={[styles.countryOption, { borderBottomColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.border }, countryCode === item.code && styles.countryOptionSelected]}
                   onPress={() => {
                     setCountryCode(item.code);
                     setCountryIso(item.iso);
@@ -622,7 +622,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
                   <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
                   <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
                   <Text style={[styles.countryOptionCode, { color: colors.muted }]}>{item.code}</Text>
-                  {countryCode === item.code && <Ionicons name="checkmark" size={16} color="#C9A84C" />}
+                  {countryCode === item.code && <Ionicons name="checkmark" size={16} color={themePalette.hex_c9a84c} />}
                 </TouchableOpacity>
               )}
             />
@@ -634,8 +634,8 @@ const FounderDetailsScreen = ({ navigation, route }) => {
       <Modal visible={showResidencePicker} transparent animationType="fade" onRequestClose={() => setShowResidencePicker(false)}>
         <View style={styles.modalOverlay}>
           <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setShowResidencePicker(false)} />
-          <View style={[styles.modalContent, { backgroundColor: isDark ? '#111827' : '#FFFFFF', borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
-            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
+          <View style={[styles.modalContent, { backgroundColor: isDark ? themePalette.hex_111827 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Select Country of Residence</Text>
               <TouchableOpacity onPress={() => setShowResidencePicker(false)}>
                 <Ionicons name="close" size={20} color={colors.muted} />
@@ -646,7 +646,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
               keyExtractor={(item) => item.iso}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[styles.countryOption, { borderBottomColor: isDark ? 'rgba(255,255,255,0.04)' : colors.border }, countryOfResidence === item.name && styles.countryOptionSelected]}
+                  style={[styles.countryOption, { borderBottomColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.border }, countryOfResidence === item.name && styles.countryOptionSelected]}
                   onPress={() => {
                     setCountryOfResidence(item.name);
                     setResidenceIso(item.iso);
@@ -655,7 +655,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
                 >
                   <Text style={[styles.flagText, { color: colors.subtle }]}>{item.iso}</Text>
                   <Text style={[styles.countryOptionName, { color: colors.text }]}>{item.name}</Text>
-                  {countryOfResidence === item.name && <Ionicons name="checkmark" size={16} color="#C9A84C" />}
+                  {countryOfResidence === item.name && <Ionicons name="checkmark" size={16} color={themePalette.hex_c9a84c} />}
                 </TouchableOpacity>
               )}
             />
@@ -668,14 +668,14 @@ const FounderDetailsScreen = ({ navigation, route }) => {
 
 export default FounderDetailsScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   mainTitle: { fontSize: font.hero, fontWeight: '500', lineHeight: 34, marginBottom: s(6) },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
   subtitle: { fontSize: font.sm, lineHeight: 18, marginBottom: s(16) },
   summaryCard: {
     width: '100%',
@@ -687,17 +687,17 @@ const styles = StyleSheet.create({
   summaryFieldLabel: { fontSize: font.xs, fontWeight: '700', letterSpacing: 0.8, marginBottom: s(4) },
   summaryDivider: { height: 1, marginVertical: s(8) },
   summaryFieldHalf: { flex: 1 },
-  companyNameText: { color: '#C9A84C', fontSize: font.lg, fontWeight: 'bold' },
+  companyNameText: { color: themePalette.hex_c9a84c, fontSize: font.lg, fontWeight: 'bold' },
   summaryRowBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: s(12) },
   stateSubtitle: { fontSize: s(15), fontWeight: '600' },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: s(14), marginBottom: s(8) },
   inputLabel: { fontSize: s(11), fontWeight: 'bold', letterSpacing: 1.2, marginTop: s(14), marginBottom: s(8) },
-  requiredAsterisk: { color: '#EF4444' },
+  requiredAsterisk: { color: themePalette.hex_ef4444 },
   passportHint: { fontSize: font.xs },
   inputContainerActive: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
-    borderWidth: 1, borderColor: '#C9A84C', paddingHorizontal: s(14), height: 48,
+    borderWidth: 1, borderColor: themePalette.hex_c9a84c, paddingHorizontal: s(14), height: 48,
   },
   inputContainerDefault: {
     flexDirection: 'row', alignItems: 'center',
@@ -706,13 +706,13 @@ const styles = StyleSheet.create({
   },
   successInputContainer: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: 12,
-    borderWidth: 1, borderColor: '#10B981', paddingHorizontal: s(14), height: 48,
+    backgroundColor: themePalette.rgba_16_185_129_0_06, borderRadius: 12,
+    borderWidth: 1, borderColor: themePalette.hex_10b981, paddingHorizontal: s(14), height: 48,
   },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(8), marginBottom: s(12) },
-  verifiedText: { color: '#10B981', fontSize: font.xs, fontWeight: '600', flex: 1 },
-  changeEmailText: { color: '#C9A84C', fontSize: font.xs, fontWeight: '700', textDecorationLine: 'underline' },
-  verifyWarning: { color: '#D97706', fontSize: font.xs, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
+  verifiedText: { color: themePalette.hex_10b981, fontSize: font.xs, fontWeight: '600', flex: 1 },
+  changeEmailText: { color: themePalette.hex_c9a84c, fontSize: font.xs, fontWeight: '700', textDecorationLine: 'underline' },
+  verifyWarning: { color: themePalette.hex_d97706, fontSize: font.xs, textAlign: 'center', marginBottom: s(10), marginTop: -4 },
   dropdownInputContainer: {
     flexDirection: 'row', alignItems: 'center',
     borderRadius: 12,
@@ -721,10 +721,10 @@ const styles = StyleSheet.create({
   },
   textInput: { flex: 1, fontSize: font.bodySmall, fontWeight: '500', marginLeft: s(10) },
   warningRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(16), gap: s(6) },
-  warningText: { color: '#D97706', fontSize: font.xs },
+  warningText: { color: themePalette.hex_d97706, fontSize: font.xs },
   helperText: { fontSize: s(10), marginTop: s(8), marginBottom: s(16) },
   successRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(18), gap: s(6) },
-  successText: { color: '#10B981', fontSize: s(12) },
+  successText: { color: themePalette.hex_10b981, fontSize: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10 },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
@@ -746,9 +746,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginRight: s(10), marginTop: s(2),
     borderWidth: 1,
   },
-  checkboxChecked: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
+  checkboxChecked: { backgroundColor: themePalette.hex_c9a84c, borderColor: themePalette.hex_c9a84c },
   checkboxText: { flex: 1, fontSize: font.xs, lineHeight: 15 },
-  linkText: { color: '#C9A84C', fontWeight: 'bold' },
+  linkText: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
   primaryBtn: {
     borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(12),
@@ -756,17 +756,17 @@ const styles = StyleSheet.create({
   primaryBtnDisabled: { opacity: 0.4 },
   primaryBtnText: { fontSize: font.md, fontWeight: 'bold' },
   footerSubtext: { fontSize: font.small, textAlign: 'center' },
-  goldText: { color: '#C9A84C' },
+  goldText: { color: themePalette.hex_c9a84c },
   loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: s(16), marginBottom: s(4) },
   loginHint: { fontSize: font.base },
-  loginLink: { color: '#C9A84C', fontSize: font.base, fontWeight: '700', textDecorationLine: 'underline' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  loginLink: { color: themePalette.hex_c9a84c, fontSize: font.base, fontWeight: '700', textDecorationLine: 'underline' },
+  modalOverlay: { flex: 1, backgroundColor: themePalette.rgba_0_0_0_0_6, justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject },
   modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: s(20), borderWidth: 1 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: s(16), borderBottomWidth: 1 },
   modalTitle: { fontSize: font.base, fontWeight: 'bold' },
   countryOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(14), gap: 10, borderBottomWidth: 1 },
-  countryOptionSelected: { backgroundColor: 'rgba(201,168,76,0.08)' },
+  countryOptionSelected: { backgroundColor: themePalette.rgba_201_168_76_0_08 },
   countryOptionName: { flex: 1, fontSize: font.bodySmall },
   countryOptionCode: { fontSize: font.sm, marginRight: s(6) },
-});
+}));

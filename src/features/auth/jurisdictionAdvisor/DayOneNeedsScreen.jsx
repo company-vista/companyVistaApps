@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const IMMEDIATELY_NEEDS = [
   {
@@ -72,7 +73,7 @@ export default function DayOneNeedsScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
 
       {/* Top Navigation Bar */}
       <View style={styles.header}>
@@ -97,7 +98,7 @@ export default function DayOneNeedsScreen({ navigation, route }) {
 
         {/* Business bank account - ALWAYS ON */}
         <View style={[styles.optionCard, styles.optionCardSelected, { opacity: 0.95 }]}>
-          <View style={[styles.iconContainer, { backgroundColor: '#1E2638' }]}>
+          <View style={[styles.iconContainer, { backgroundColor: themePalette.hex_1e2638 }]}>
             <Text style={styles.optionIcon}>🏦</Text>
           </View>
           <View style={styles.textContainer}>
@@ -206,10 +207,10 @@ export default function DayOneNeedsScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
@@ -225,12 +226,12 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#161B29',
+    backgroundColor: themePalette.hex_161b29,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
@@ -238,12 +239,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
@@ -259,19 +260,19 @@ const styles = StyleSheet.create({
   progressStep: {
     flex: 1,
     height: 3,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
     marginHorizontal: s(3),
     borderRadius: 2,
   },
   progressActive: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: themePalette.hex_8b5cf6,
   },
   scrollContent: {
     paddingHorizontal: s(20),
     paddingBottom: s(20),
   },
   questionStepText: {
-    color: '#8B5CF6',
+    color: themePalette.hex_8b5cf6,
     fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -280,17 +281,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: font.display,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     lineHeight: 34,
   },
   titleItalic: {
     fontStyle: 'italic',
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '300',
   },
   subtitle: {
     fontSize: font.bodySmall,
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     marginTop: s(8),
     marginBottom: s(20),
     lineHeight: 18,
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   sectionTitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 1.2,
@@ -310,27 +311,27 @@ const styles = StyleSheet.create({
   sectionDivider: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#121724',
+    backgroundColor: themePalette.hex_121724,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     padding: s(16),
     marginBottom: s(12),
   },
   optionCardSelected: {
-    borderColor: '#D1A253',
-    backgroundColor: '#161C2C',
+    borderColor: themePalette.hex_d1a253,
+    backgroundColor: themePalette.hex_161c2c,
   },
   iconContainer: {
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(14),
@@ -343,13 +344,13 @@ const styles = StyleSheet.create({
     paddingRight: s(8),
   },
   optionTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
     marginBottom: s(4),
   },
   optionDescription: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     lineHeight: 16,
   },
@@ -358,27 +359,27 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: '#334155',
+    borderColor: themePalette.hex_334155,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxSelected: {
-    backgroundColor: '#D1A253',
-    borderColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
+    borderColor: themePalette.hex_d1a253,
   },
   checkIcon: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.sm,
     fontWeight: 'bold',
   },
   alwaysOnBadge: {
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
     paddingHorizontal: s(8),
     paddingVertical: s(4),
     borderRadius: 6,
   },
   alwaysOnText: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.caption,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -387,31 +388,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(16),
     paddingTop: s(12),
     paddingBottom: s(20),
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   submitButton: {
     flexDirection: 'row',
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
     borderRadius: 24,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   starIcon: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
   submitButtonText: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.lg,
     fontWeight: '700',
   },
   submitButtonDisabled: {
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
     opacity: 0.6,
   },
   submitButtonTextDisabled: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
   },
-});
+}));

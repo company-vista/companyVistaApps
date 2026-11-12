@@ -19,6 +19,7 @@ import { API_BASE_URL } from '../../../config/api';
 import { handleResendVerificationApi } from '../api/signupApi';
 import { verifyAdminEmailToken } from '../api/forgotPasswordApi';
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const VerifyEmailScreen = (props) => {
   const { navigation, route } = props;
@@ -178,7 +179,7 @@ const VerifyEmailScreen = (props) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -219,7 +220,7 @@ const VerifyEmailScreen = (props) => {
                     onKeyPress={(e) => handleKeyPress(e, index)}
                     keyboardType="number-pad"
                     maxLength={1}
-                    selectionColor="#D4AF37"
+                    selectionColor={themePalette.hex_d4af37}
                   />
                 </View>
               ))}
@@ -259,7 +260,7 @@ const VerifyEmailScreen = (props) => {
               disabled={!isCodeComplete || verifying}
             >
               {verifying ? (
-                <ActivityIndicator color="#070A12" />
+                <ActivityIndicator color={themePalette.hex_070a12} />
               ) : (
                 <>
                   <Text style={styles.submitButtonText}>Verify</Text>
@@ -306,11 +307,11 @@ function AdminEmailVerification({ navigation, token }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
       <View style={styles.adminVerifyContent}>
         {status === 'verifying' ? (
           <>
-            <ActivityIndicator size="large" color="#D4AF37" />
+            <ActivityIndicator size="large" color={themePalette.hex_d4af37} />
             <Text style={styles.adminVerifyDescription}>Verifying your email</Text>
           </>
         ) : (
@@ -346,10 +347,10 @@ function AdminEmailVerification({ navigation, token }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070A12',
+    backgroundColor: themePalette.hex_070a12,
   },
   keyboardView: {
     flex: 1,
@@ -371,13 +372,13 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
   },
   iconText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.xxl,
   },
   heroSection: {
@@ -385,20 +386,20 @@ const styles = StyleSheet.create({
     marginTop: s(5),
   },
   logoText: {
-    color: '#E2E8F0',
+    color: themePalette.hex_e2e8f0,
     fontSize: font.hero,
     fontWeight: '700',
     marginBottom: s(15),
   },
   logoAccent: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
   },
   outerCircle: {
     width: 120,
     height: 120,
     borderRadius: 80,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -407,14 +408,14 @@ const styles = StyleSheet.create({
     height: 62,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#D4AF37',
+    borderColor: themePalette.hex_d4af37,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
   },
   checkIcon: {
     fontSize: font.displayXXL,
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
   },
   textSection: {
     alignItems: 'center',
@@ -422,18 +423,18 @@ const styles = StyleSheet.create({
     marginBottom: s(0),
   },
   title: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.displayLarge,
     fontWeight: '600',
     textAlign: 'center',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontWeight: '400',
   },
   description: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     textAlign: 'center',
     marginTop: s(6),
     fontSize: font.bodySmall,
@@ -442,21 +443,21 @@ const styles = StyleSheet.create({
   emailChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderWidth: 1,
-    borderColor: '#D4AF37',
+    borderColor: themePalette.hex_d4af37,
     borderRadius: 12,
     paddingHorizontal: s(16),
     paddingVertical: s(10),
     marginTop: s(12),
   },
   chipIcon: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     marginRight: s(8),
     fontSize: font.base,
   },
   chipText: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.base,
     fontWeight: '600',
   },
@@ -475,16 +476,16 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1E293B',
-    backgroundColor: '#0B1120',
+    borderColor: themePalette.hex_1e293b,
+    backgroundColor: themePalette.hex_0b1120,
     justifyContent: 'center',
     alignItems: 'center',
   },
   codeBoxActive: {
-    borderColor: '#D4AF37',
+    borderColor: themePalette.hex_d4af37,
   },
   codeText: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.display,
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     textAlign: 'center',
@@ -498,20 +499,20 @@ const styles = StyleSheet.create({
   verifiedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#064E3B',
+    backgroundColor: themePalette.hex_064e3b,
     borderWidth: 1,
-    borderColor: '#059669',
+    borderColor: themePalette.hex_059669,
     borderRadius: 20,
     paddingHorizontal: s(12),
     paddingVertical: s(4),
   },
   badgeCheck: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.sm,
     marginRight: s(6),
   },
   verifiedText: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.sm,
     fontWeight: '600',
   },
@@ -521,11 +522,11 @@ const styles = StyleSheet.create({
     marginTop: s(12),
   },
   resendLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.bodySmall,
   },
   resendLink: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.bodySmall,
     fontWeight: '700',
   },
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
     marginBottom: s(10),
   },
   draftLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: '700',
     letterSpacing: 1,
@@ -551,12 +552,12 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: themePalette.hex_1e293b,
   },
   draftCard: {
-    backgroundColor: '#0B1120',
+    backgroundColor: themePalette.hex_0b1120,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     borderRadius: 12,
     padding: s(14),
     marginBottom: s(8),
@@ -570,29 +571,29 @@ const styles = StyleSheet.create({
     marginTop: s(6),
   },
   usTag: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   companyName: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.bodySmall,
     fontWeight: '700',
   },
   draftLocation: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   savedStatus: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
     fontSize: font.sm,
     fontWeight: '600',
   },
   savedBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#051E24',
+    backgroundColor: themePalette.hex_051e24,
     borderWidth: 1,
-    borderColor: '#05524C',
+    borderColor: themePalette.hex_05524c,
     borderRadius: 12,
     padding: s(12),
   },
@@ -607,37 +608,37 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   adminVerifySuccess: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
   },
   adminVerifyError: {
-    color: '#EF4444',
+    color: themePalette.hex_ef4444,
   },
   adminVerifyDescription: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.base,
     lineHeight: 22,
     marginTop: s(12),
     textAlign: 'center',
   },
   adminVerifyAction: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: themePalette.hex_d4af37,
     borderRadius: 24,
     marginTop: s(28),
     paddingHorizontal: s(24),
     paddingVertical: s(14),
   },
   adminVerifyActionText: {
-    color: '#070A12',
+    color: themePalette.hex_070a12,
     fontSize: font.base,
     fontWeight: '700',
   },
   bannerCheck: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.base,
     marginRight: s(10),
   },
   bannerText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     flex: 1,
     lineHeight: 16,
@@ -647,7 +648,7 @@ const styles = StyleSheet.create({
     marginBottom: s(10),
   },
   submitButton: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: themePalette.hex_d4af37,
     width: '100%',
     height: 52,
     borderRadius: 24,
@@ -659,16 +660,16 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#070A12',
+    color: themePalette.hex_070a12,
     fontSize: font.lg,
     fontWeight: '700',
     marginRight: s(8),
   },
   arrowIcon: {
-    color: '#070A12',
+    color: themePalette.hex_070a12,
     fontSize: font.xxl,
     fontWeight: 'bold',
   },
-});
+}));
 
 export default VerifyEmailScreen;

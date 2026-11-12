@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, Vi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import DocumentNotFound from '../../../../components/emptyState/DocumentNotFound';
 import TransactionDetailScreen from './TransactionDetailScreen';
@@ -387,25 +387,25 @@ export default function TransactionsScreen() {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Success':
-                return '#fff'; // ग्रीन कलर फॉर सक्सेस
+                return themePalette.hex_fff; // ग्रीन कलर फॉर सक्सेस
             case 'Pending':
-                return '#fff'; // येलो कलर फॉर पेंडिंग
+                return themePalette.hex_fff; // येलो कलर फॉर पेंडिंग
             case 'Failed':
-                return '#fff'; // रेड कलर फॉर फ़ील्ड
+                return themePalette.hex_fff; // रेड कलर फॉर फ़ील्ड
             default:
-                return '#2563eb';
+                return themePalette.hex_2563eb;
         }
     };
     const getStatusBg = (status) => {
         switch (status) {
             case 'Success':
-                return '#16a34a';
+                return themePalette.hex_16a34a;
             case 'Pending':
-                return '#ca8a04';
+                return themePalette.hex_ca8a04;
             case 'Failed':
-                return '#fef2f2';
+                return themePalette.hex_fef2f2;
             default:
-                return '#dc2626';
+                return themePalette.hex_dc2626;
         }
     };
     if (selectedTransaction && selectedTransaction.details) {
@@ -444,7 +444,7 @@ export default function TransactionsScreen() {
                     ]}>
                         Pending ({currency})
                     </Text>
-                    <Text style={[styles.summaryValue, { color: '#ca8a04' }]} numberOfLines={1} adjustsFontSizeToFit>
+                    <Text style={[styles.summaryValue, { color: themePalette.hex_ca8a04 }]} numberOfLines={1} adjustsFontSizeToFit>
                         {formatCurrency(summaryDOM.totals[currency].pending, currency)}
                     </Text>
                 </Pressable>);
@@ -554,7 +554,7 @@ export default function TransactionsScreen() {
         </Pressable>)} />)}
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: { flex: 1 },
     searchContainer: { paddingHorizontal: s(20), marginBottom: s(16) },
     searchInput: {
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 1,
         paddingHorizontal: s(12),
-        borderColor: '#ccc',
+        borderColor: themePalette.hex_ccc,
     },
     summaryContainer: {
         flexDirection: 'row',
@@ -630,4 +630,4 @@ const styles = StyleSheet.create({
         gap: s(12),
     },
     emptyText: { fontSize: font.lg, fontWeight: '400' },
-});
+}));

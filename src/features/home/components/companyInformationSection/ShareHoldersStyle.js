@@ -1,6 +1,7 @@
 import { font } from '../../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
+import { themePalette } from '../../../../theme/colors';
 export const styles = StyleSheet.create({
     container: {
         width: '100%',
@@ -11,8 +12,8 @@ export const styles = StyleSheet.create({
     summaryCard: {
         width: '100%',
         alignSelf: 'stretch',
-        backgroundColor: '#0d2137a6',
-        borderColor: 'rgba(255, 255, 255, 0.14)',
+        backgroundColor: themePalette.hex_0d2137a6,
+        borderColor: themePalette.rgba_255_255_255_0_14,
         borderRadius: s(16),
         borderWidth: 1,
         minHeight: s(108),
@@ -21,8 +22,8 @@ export const styles = StyleSheet.create({
         paddingVertical: s(16),
     },
     summaryDeco: {
-        backgroundColor: 'rgba(36, 21, 21, 0.03)',
-        borderColor: 'rgba(255,255,255,0.07)',
+        backgroundColor: themePalette.rgba_36_21_21_0_03,
+        borderColor: themePalette.rgba_255_255_255_0_07,
         borderRadius: 50,
         borderWidth: 1,
         bottom: -22,
@@ -33,8 +34,8 @@ export const styles = StyleSheet.create({
     },
     summaryDecoSmall: {
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: themePalette.rgba_255_255_255_0_05,
+        borderColor: themePalette.rgba_255_255_255_0_1,
         borderRadius: 28,
         borderWidth: 1,
         bottom: 18,
@@ -45,7 +46,7 @@ export const styles = StyleSheet.create({
         width: 55,
     },
     summaryLabel: {
-        color: '#85B7EB',
+        color: themePalette.hex_85b7eb,
         fontSize: font.small,
         fontWeight: '500',
         letterSpacing: 0.7,
@@ -53,7 +54,7 @@ export const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     summaryValue: {
-        color: '#FFFFFF',
+        color: themePalette.hex_ffffff,
         fontSize: font.displayLarge,
         fontWeight: '800',
         lineHeight: 32,
@@ -62,8 +63,8 @@ export const styles = StyleSheet.create({
     primaryBadge: {
         alignItems: 'center',
         alignSelf: 'flex-start',
-        backgroundColor: 'rgba(255,255,255,0.07)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: themePalette.rgba_255_255_255_0_07,
+        borderColor: themePalette.rgba_255_255_255_0_1,
         borderRadius: 10,
         borderWidth: 1,
         flexDirection: 'row',
@@ -73,7 +74,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     primaryBadgeText: {
-        color: '#85B7EB',
+        color: themePalette.hex_85b7eb,
         fontSize: font.xs,
         fontWeight: '500',
         lineHeight: 13,

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { s } from '../../../../theme/responsive';
 import Toast from 'react-native-toast-message';
 const API_REQUEST_TIMEOUT_MS = 10000;
@@ -317,7 +317,7 @@ const AddressRenewalScreen = () => {
       </ScrollView>
     </View>);
 };
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     safeArea: { flex: 1 },
     content: { flex: 1 },
     contentContainer: { padding: 16, gap: 14 },
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     serviceCard: { borderRadius: 12, borderStyle: 'solid', padding: 14 },
     cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
     checkbox: { width: 20, height: 20, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-    checkboxTick: { color: 'white', fontSize: font.sm },
+    checkboxTick: { color: themePalette.hex_ffffff, fontSize: font.sm },
     cardIcon: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     cardInfo: { flex: 1 },
     cardName: { fontSize: font.bodySmall, fontWeight: '500' },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     ssHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     ssHeaderLabel: { fontSize: font.sm, fontWeight: '500' },
     ssCount: { borderRadius: 999, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
-    ssCountText: { color: '#ffffff', fontSize: font.sm, fontWeight: '600' },
+    ssCountText: { color: themePalette.hex_ffffff, fontSize: font.sm, fontWeight: '600' },
     ssItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 8, padding: 10 },
     ssItemIcon: { width: 30, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     ssItemIconText: { fontSize: font.base },
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     totalNote: { fontSize: font.small },
     payBtn: { borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     payBtnDisabled: { opacity: 0.6 },
-    payBtnText: { color: '#ffffff', fontSize: font.base, fontWeight: '700' },
+    payBtnText: { color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: '700' },
     secureNote: { fontSize: font.small, textAlign: 'center' },
-});
+}));
 export default AddressRenewalScreen;

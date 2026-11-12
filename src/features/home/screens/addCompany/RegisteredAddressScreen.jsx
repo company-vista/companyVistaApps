@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { BackButton, ContinueButton } from '../../../../components/buttons';
@@ -46,8 +46,8 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
           </Text>
 
           <View style={styles.radioGroup}>
-            <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAddress === 'yes' && { borderColor: '#e6a82a' }]} onPress={() => setHasAddress('yes')} activeOpacity={0.8}>
-              <View style={[styles.radioCircle, hasAddress === 'yes' && { borderColor: '#e6a82a' }]}>
+            <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAddress === 'yes' && { borderColor: themePalette.hex_e6a82a }]} onPress={() => setHasAddress('yes')} activeOpacity={0.8}>
+              <View style={[styles.radioCircle, hasAddress === 'yes' && { borderColor: themePalette.hex_e6a82a }]}>
                 {hasAddress === 'yes' && <View style={styles.radioDot}/>}
               </View>
               <View style={styles.radioTextWrap}>
@@ -56,8 +56,8 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAddress === 'no' && { borderColor: '#e6a82a' }]} onPress={() => setHasAddress('no')} activeOpacity={0.8}>
-              <View style={[styles.radioCircle, hasAddress === 'no' && { borderColor: '#e6a82a' }]}>
+            <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAddress === 'no' && { borderColor: themePalette.hex_e6a82a }]} onPress={() => setHasAddress('no')} activeOpacity={0.8}>
+              <View style={[styles.radioCircle, hasAddress === 'no' && { borderColor: themePalette.hex_e6a82a }]}>
                 {hasAddress === 'no' && <View style={styles.radioDot}/>}
               </View>
               <View style={styles.radioTextWrap}>
@@ -72,7 +72,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
             </Text>)}
 
           {hasAddress === 'yes' && (<View style={styles.formSection}>
-              <Text style={[styles.subHeadingGold, { color: '#e6a82a' }]}>Local Business Address</Text>
+              <Text style={[styles.subHeadingGold, { color: themePalette.hex_e6a82a }]}>Local Business Address</Text>
 
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput placeholder="Address Line 1 / P.O. box" placeholderTextColor={colors.inputPlaceholder} style={[styles.input, { color: colors.text }]} value={localAddress.line1} onChangeText={(text) => setLocalAddress({ ...localAddress, line1: text })}/>
@@ -109,8 +109,8 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
             Do you need a local registered agent?
           </Text>
 
-          <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAgent === 'yes' && { borderColor: '#e6a82a' }]} onPress={() => setHasAgent('yes')} activeOpacity={0.8}>
-            <View style={[styles.radioCircle, hasAgent === 'yes' && { borderColor: '#e6a82a' }]}>
+          <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border }, hasAgent === 'yes' && { borderColor: themePalette.hex_e6a82a }]} onPress={() => setHasAgent('yes')} activeOpacity={0.8}>
+            <View style={[styles.radioCircle, hasAgent === 'yes' && { borderColor: themePalette.hex_e6a82a }]}>
               {hasAgent === 'yes' && <View style={styles.radioDot}/>}
             </View>
             <View style={styles.radioTextWrap}>
@@ -119,8 +119,8 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 8 }, hasAgent === 'no' && { borderColor: '#e6a82a' }]} onPress={() => setHasAgent('no')} activeOpacity={0.8}>
-            <View style={[styles.radioCircle, hasAgent === 'no' && { borderColor: '#e6a82a' }]}>
+          <TouchableOpacity style={[styles.radioCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 8 }, hasAgent === 'no' && { borderColor: themePalette.hex_e6a82a }]} onPress={() => setHasAgent('no')} activeOpacity={0.8}>
+            <View style={[styles.radioCircle, hasAgent === 'no' && { borderColor: themePalette.hex_e6a82a }]}>
               {hasAgent === 'no' && <View style={styles.radioDot}/>}
             </View>
             <View style={styles.radioTextWrap}>
@@ -136,13 +136,13 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
           {hasAgent === 'yes' && (<View style={styles.formSection}>
               <View style={styles.row}>
                 <View style={styles.halfInput}>
-                  <Text style={[styles.fieldLabel, { color: colors.muted }]}>FIRST NAME <Text style={{ color: '#e6a82a' }}>*</Text></Text>
+                  <Text style={[styles.fieldLabel, { color: colors.muted }]}>FIRST NAME <Text style={{ color: themePalette.hex_e6a82a }}>*</Text></Text>
                   <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                     <TextInput style={[styles.input, { color: colors.text }]} value={agentDetails.firstName} onChangeText={(text) => setAgentDetails({ ...agentDetails, firstName: text })}/>
                   </View>
                 </View>
                 <View style={styles.halfInput}>
-                  <Text style={[styles.fieldLabel, { color: colors.muted }]}>LAST NAME <Text style={{ color: '#e6a82a' }}>*</Text></Text>
+                  <Text style={[styles.fieldLabel, { color: colors.muted }]}>LAST NAME <Text style={{ color: themePalette.hex_e6a82a }}>*</Text></Text>
                   <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                     <TextInput style={[styles.input, { color: colors.text }]} value={agentDetails.lastName} onChangeText={(text) => setAgentDetails({ ...agentDetails, lastName: text })}/>
                   </View>
@@ -155,7 +155,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
               </View>
               <Text style={[styles.hintText, { color: colors.subtle }]}>optional</Text>
 
-              <Text style={[styles.subHeadingGold, { color: '#e6a82a', marginTop: 16 }]}>Representative Address</Text>
+              <Text style={[styles.subHeadingGold, { color: themePalette.hex_e6a82a, marginTop: 16 }]}>Representative Address</Text>
 
               <View style={[styles.inputWrapper, { backgroundColor: inputBg, borderColor: colors.inputBorder }]}>
                 <TextInput placeholder="Address Line 1 / P.O. box" placeholderTextColor={colors.inputPlaceholder} style={[styles.input, { color: colors.text }]} value={agentAddress.line1} onChangeText={(text) => setAgentAddress({ ...agentAddress, line1: text })}/>
@@ -190,7 +190,7 @@ export default function RegisteredAddressScreen({ onBackPress, onContinue }) {
       </View>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
     },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     titleAccent: {
-        color: '#e6a82a',
+        color: themePalette.hex_e6a82a,
         fontStyle: 'italic',
     },
     subtitle: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
         height: 14,
         borderRadius: 7,
         borderWidth: 1.5,
-        borderColor: '#3a4258',
+        borderColor: themePalette.hex_3a4258,
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 2,
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
         width: 6,
         height: 6,
         borderRadius: 3,
-        backgroundColor: '#e6a82a',
+        backgroundColor: themePalette.hex_e6a82a,
     },
     radioTextWrap: {
         flex: 1,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     continueButtonFull: {
-        backgroundColor: '#e6a82a',
+        backgroundColor: themePalette.hex_e6a82a,
         borderRadius: 8,
         paddingVertical: 12,
         alignItems: 'center',
@@ -330,6 +330,6 @@ const styles = StyleSheet.create({
     continueButtonText: {
         fontSize: font.base,
         fontWeight: '500',
-        color: '#1a1204',
+        color: themePalette.hex_1a1204,
     },
-});
+}));

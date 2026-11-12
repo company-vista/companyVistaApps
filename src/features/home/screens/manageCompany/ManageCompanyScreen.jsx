@@ -3,7 +3,7 @@ import { ScrollView, StatusBar, Text, View, Pressable, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { styles } from "./ManageCompanyScreenStyle";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import BackButton from '../../../../components/buttons/BackButton';
 import BasicInfoScreen from '../changeCategories/BasicInfoScreen';
@@ -16,7 +16,7 @@ const categories = [
         fields: 4,
         description: 'Company name, date',
         icon: 'file-text',
-        color: '#4F46E5',
+        color: themePalette.hex_4f46e5,
     },
     {
         id: 'shareholder-director',
@@ -24,7 +24,7 @@ const categories = [
         fields: 11,
         description: 'List, term, change leads',
         icon: 'percent',
-        color: '#3B82F6',
+        color: themePalette.hex_3b82f6,
     },
     {
         id: 'local-address',
@@ -32,7 +32,7 @@ const categories = [
         fields: 1,
         description: 'Resources, uplift',
         icon: 'address-book',
-        color: '#F97316',
+        color: themePalette.hex_f97316,
     },
     {
         id: 'local-representative',
@@ -40,13 +40,13 @@ const categories = [
         fields: 1,
         description: 'End-on, change',
         icon: 'calendar',
-        color: '#10B981',
+        color: themePalette.hex_10b981,
     },
 ];
 const urgencyLevels = [
-    { id: 'low', label: 'Low', icon: 'circle', color: '#22C55E' },
-    { id: 'medium', label: 'Medium', icon: 'circle', color: '#F59E0B' },
-    { id: 'high', label: 'High', icon: 'circle', color: '#EF4444' },
+    { id: 'low', label: 'Low', icon: 'circle', color: themePalette.hex_22c55e },
+    { id: 'medium', label: 'Medium', icon: 'circle', color: themePalette.hex_f59e0b },
+    { id: 'high', label: 'High', icon: 'circle', color: themePalette.hex_ef4444 },
 ];
 const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
     const colors = useThemeColors();
@@ -82,14 +82,14 @@ const ManageCompanyScreen = ({ selectedCompany, onBackPress, }) => {
                 paddingBottom: insets.bottom,
             },
         ]}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : themePalette.hex_fff}/>
 
       {/* --- HEADER --- */}
       <View style={[
             styles.header,
             {
                 paddingTop: insets.top + 12,
-                backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
+                backgroundColor: colors.mode === 'dark' ? colors.background : themePalette.hex_ffffff,
                 borderBottomColor: colors.border,
             },
         ]}>

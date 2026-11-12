@@ -5,7 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { BackButton } from '../../../../components/buttons';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 import { API_BASE_URL } from '../../../../config/api';
@@ -251,10 +251,10 @@ export default function RegistrationTrackingScreen({ onBackPress, onAddCompany, 
                     {nextStep.title} ({nextStep.timeframe})
                 </Text>)}
 
-                {statusIdx === steps.length - 1 ? (<View style={[styles.editIconBtn, { backgroundColor: '#22c55e', alignSelf: 'flex-end' }]}>
-                    <FontAwesome name="check" size={16} color="#ffffff" />
-                </View>) : (<TouchableOpacity style={[styles.editIconBtn, { backgroundColor: '#ef4444', alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
-                    <FontAwesome name="pencil" size={16} color="#ffffff" />
+                {statusIdx === steps.length - 1 ? (<View style={[styles.editIconBtn, { backgroundColor: themePalette.hex_22c55e, alignSelf: 'flex-end' }]}>
+                    <FontAwesome name="check" size={16} color={themePalette.hex_ffffff} />
+                </View>) : (<TouchableOpacity style={[styles.editIconBtn, { backgroundColor: themePalette.hex_ef4444, alignSelf: 'flex-end' }]} onPress={() => onEditPress?.(companyId ?? undefined)}>
+                    <FontAwesome name="pencil" size={16} color={themePalette.hex_ffffff} />
                 </TouchableOpacity>)}
             </View>
 

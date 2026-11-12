@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { BackButton } from '../../../../components/buttons';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { API_BASE_URL } from '../../../../config/api';
 import { useAppSelector } from '../../../../store/hooks';
 import { font } from '../../../../theme/typography';
@@ -29,9 +29,9 @@ const timelineIcons = {
 function TimelineRow({ item, colors }) {
     const overdue = item.status === 'overdue';
     const icon = timelineIcons[item.label] || 'clock-o';
-    return (<View style={[cTimelineItem, { backgroundColor: colors.surface, borderColor: overdue ? '#e25c6b' : colors.border }]}>
-      <View style={[cTimelineIconBox, { backgroundColor: overdue ? 'rgba(226,92,107,0.12)' : 'rgba(230,168,42,0.12)' }]}>
-        <FontAwesome name={icon} size={18} color={overdue ? '#e25c6b' : '#e6a82a'}/>
+    return (<View style={[cTimelineItem, { backgroundColor: colors.surface, borderColor: overdue ? themePalette.hex_e25c6b : colors.border }]}>
+      <View style={[cTimelineIconBox, { backgroundColor: overdue ? themePalette.rgba_226_92_107_0_12 : themePalette.rgba_230_168_42_0_12 }]}>
+        <FontAwesome name={icon} size={18} color={overdue ? themePalette.hex_e25c6b : themePalette.hex_e6a82a}/>
       </View>
       <View style={cTimelineContent}>
         <Text style={[cTimelineLabel, { color: colors.text }]} numberOfLines={1}>{item.label}</Text>
@@ -168,14 +168,14 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
         expiredPlans: 0,
     };
     return (<View style={{ flex: 1 }}>
-      <View style={[styles.headerArea, { backgroundColor: isLight ? '#ffffff' : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
+      <View style={[styles.headerArea, { backgroundColor: isLight ? themePalette.hex_ffffff : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
         <View style={styles.header}>
           <BackButton onPress={onBackPress}/>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription</Text>
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={[cEyebrow, { backgroundColor: 'rgba(230,168,42,0.12)', borderColor: '#6b5320' }]}>
+        <View style={[cEyebrow, { backgroundColor: themePalette.rgba_230_168_42_0_12, borderColor: themePalette.hex_6b5320 }]}>
           <Text style={cEyebrowText}>MY SUBSCRIPTIONS</Text>
         </View>
 
@@ -191,19 +191,19 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
       <View style={cSummaryRow}>
         <View style={[cSummaryBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[cSummaryLabel, { color: colors.text }]}>ACTIVE COMPANIES</Text>
-          <Text style={[cSummaryValue, { color: '#3fbf7f' }]}>
+          <Text style={[cSummaryValue, { color: themePalette.hex_3fbf7f }]}>
             {summary.activeCompanies}
           </Text>
         </View>
         <View style={[cSummaryBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[cSummaryLabel, { color: colors.text }]}>REMAINING DOCUMENTS</Text>
-          <Text style={[cSummaryValue, { color: '#e6a82a' }]}>
+          <Text style={[cSummaryValue, { color: themePalette.hex_e6a82a }]}>
             {summary.documentsLeft}
           </Text>
         </View>
         <View style={[cSummaryBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[cSummaryLabel, { color: colors.text }]}>EXPIRED SUBSCRIPTIONS</Text>
-          <Text style={[cSummaryValue, { color: '#e25c6b' }]}>
+          <Text style={[cSummaryValue, { color: themePalette.hex_e25c6b }]}>
             {summary.expiredPlans}
           </Text>
         </View>
@@ -247,7 +247,7 @@ const cEyebrow = {
     marginLeft: 6
 };
 const cEyebrowText = {
-    color: '#e6a82a',
+    color: themePalette.hex_e6a82a,
     fontSize: font.sm,
     fontWeight: '500',
     letterSpacing: 0.5,
@@ -260,7 +260,7 @@ const cTitle = {
     marginLeft: 6
 };
 const cTitleAccent = {
-    color: '#e6a82a',
+    color: themePalette.hex_e6a82a,
     fontStyle: 'italic',
 };
 const cSubtitle = {
@@ -336,7 +336,7 @@ const cExpiredBadge = {
     paddingVertical: 3,
 };
 const cExpiredBadgeText = {
-    color: '#e25c6b',
+    color: themePalette.hex_e25c6b,
     fontSize: font.base,
     fontWeight: '500',
 };

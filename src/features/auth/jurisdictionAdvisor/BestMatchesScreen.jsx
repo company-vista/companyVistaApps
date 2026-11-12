@@ -17,6 +17,7 @@ import { font } from '../../../theme/typography';
 import { getCountryPrice, getCountryPriceLabel } from '../../../constants/countries';
 import { PURPOSES } from './CompanyPurposeScreen';
 import { scoreJurisdictions } from './advisor';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 export const US_STATES = [
   { code: 'WY', name: 'Wyoming', popularityRank: 1, tag: 'Best value', tagline: 'Best value, strong privacy', snippet: 'Lowest running costs in the US with no income tax and members kept off public record.', bestFor: 'Solo founders, e-commerce, holding companies, cost-conscious setups', keyPoints: ['$100 state fee — excellent value', 'No state income, franchise or gross receipts tax', 'Members not disclosed on public filings', 'Lifetime proxy permitted for added anonymity'], govtFees: { formation: 100, annual: 60, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report licence tax, $60 minimum, based on assets located in Wyoming.', verified: true, source: 'CompanyVista official rate card' }, timeline: '3–5 days', serviceFee: 299, stateIncomeTax: 'None', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 399, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false } },
@@ -287,7 +288,7 @@ export default function BestMatchesScreen({ navigation, route }) {
   const alsoPossible = remaining.slice(3);
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -498,10 +499,10 @@ export default function BestMatchesScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
@@ -517,12 +518,12 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#161B29',
+    backgroundColor: themePalette.hex_161b29,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
@@ -530,12 +531,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
@@ -547,17 +548,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: font.display,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '300',
   },
   subtitle: {
     fontSize: font.bodySmall,
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     marginTop: s(6),
     marginBottom: s(16),
   },
@@ -568,34 +569,34 @@ const styles = StyleSheet.create({
     marginBottom: s(20),
   },
   tagPill: {
-    backgroundColor: '#151329',
+    backgroundColor: themePalette.hex_151329,
     paddingHorizontal: s(12),
     paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#2D264A',
+    borderColor: themePalette.hex_2d264a,
   },
   actionTagPill: {
-    backgroundColor: '#121724',
-    borderColor: '#1E2638',
+    backgroundColor: themePalette.hex_121724,
+    borderColor: themePalette.hex_1e2638,
   },
   tagText: {
-    color: '#A5B4FC',
+    color: themePalette.hex_a5b4fc,
     fontSize: font.sm,
     fontWeight: '500',
   },
   matchCard: {
-    backgroundColor: '#121622',
+    backgroundColor: themePalette.hex_121622,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(16),
     marginBottom: s(24),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#262013',
-    borderColor: '#D1A253',
+    backgroundColor: themePalette.hex_262013,
+    borderColor: themePalette.hex_d1a253,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: s(10),
@@ -603,7 +604,7 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   badgeText: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.xs,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -622,16 +623,16 @@ const styles = StyleSheet.create({
   countryCodeText: {
     fontSize: font.displayMedium,
     fontWeight: 'bold',
-    color: '#334155',
+    color: themePalette.hex_334155,
     marginRight: s(12),
   },
   countryName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.hero,
     fontWeight: 'bold',
   },
   stateSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: s(2),
   },
@@ -639,24 +640,24 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   matchPercentage: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.displayMedium,
     fontWeight: '300',
   },
   matchLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.caption,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
   whyBlock: {
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(14),
     marginBottom: s(16),
   },
   whyDesc: {
-    color: '#CBD5E1',
+    color: themePalette.hex_cbd5e1,
     fontSize: font.bodySmall,
     lineHeight: 19,
   },
@@ -667,7 +668,7 @@ const styles = StyleSheet.create({
     marginTop: s(10),
   },
   scoreText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: '600',
     letterSpacing: 0.3,
@@ -676,7 +677,7 @@ const styles = StyleSheet.create({
     width: 3,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#334155',
+    backgroundColor: themePalette.hex_334155,
   },
   fitChips: {
     flexDirection: 'row',
@@ -687,67 +688,67 @@ const styles = StyleSheet.create({
   fitChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0E1B18',
+    backgroundColor: themePalette.hex_0e1b18,
     borderWidth: 1,
-    borderColor: '#1E3A34',
+    borderColor: themePalette.hex_1e3a34,
     borderRadius: 14,
     paddingHorizontal: s(9),
     paddingVertical: s(4),
   },
   fitChipStrong: {
-    backgroundColor: '#262013',
-    borderColor: '#3D321D',
+    backgroundColor: themePalette.hex_262013,
+    borderColor: themePalette.hex_3d321d,
   },
   fitChipIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.xs,
     marginRight: s(5),
   },
   fitChipIconStrong: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
   },
   fitChipText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
   },
   fitChipTextStrong: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '700',
   },
   cautionRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#1E1B18',
+    backgroundColor: themePalette.hex_1e1b18,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(10),
     marginTop: s(10),
   },
   cautionIcon: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.sm,
     marginRight: s(8),
     marginTop: s(1),
   },
   cautionText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     lineHeight: 16,
     flex: 1,
   },
   cautionBold: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '700',
   },
   profileBlock: {
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(14),
     marginBottom: s(16),
   },
   profileTitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.xs,
     fontWeight: '700',
     letterSpacing: 1.2,
@@ -760,31 +761,31 @@ const styles = StyleSheet.create({
   },
   profileLabel: {
     width: s(104),
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
   },
   profileTrack: {
     flex: 1,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
     overflow: 'hidden',
     marginRight: s(8),
   },
   profileFill: {
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
   },
   profileValue: {
     width: s(28),
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.xs,
     textAlign: 'right',
   },
   featuresList: {
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(16),
     marginBottom: s(16),
   },
@@ -794,27 +795,27 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   checkIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.base,
     marginRight: s(10),
     marginTop: s(1),
   },
   featureText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     lineHeight: 18,
     flex: 1,
   },
   featureBold: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: 'bold',
   },
   warningCard: {
     flexDirection: 'row',
-    backgroundColor: '#1E1B18',
+    backgroundColor: themePalette.hex_1e1b18,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(12),
     marginBottom: s(16),
   },
@@ -823,13 +824,13 @@ const styles = StyleSheet.create({
     marginRight: s(8),
   },
   warningText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.sm,
     lineHeight: 16,
     flex: 1,
   },
   warningBold: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: 'bold',
   },
   cardFooter: {
@@ -838,7 +839,7 @@ const styles = StyleSheet.create({
     gap: s(8),
     alignItems: 'flex-end',
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(14),
   },
   priceContainer: {
@@ -846,23 +847,23 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   priceAmount: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.hero,
     fontWeight: 'bold',
     marginRight: s(8),
   },
   priceNote: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
   },
   customQuoteText: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.lg,
     fontWeight: '700',
     fontStyle: 'italic',
   },
   timeframeText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
   sectionHeader: {
@@ -870,7 +871,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     fontWeight: 'bold',
     letterSpacing: 1.2,
@@ -879,23 +880,23 @@ const styles = StyleSheet.create({
   sectionDivider: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1E2638',
+    backgroundColor: themePalette.hex_1e2638,
   },
   altCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#121622',
+    backgroundColor: themePalette.hex_121622,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingHorizontal: s(14),
     paddingVertical: s(12),
     marginTop: s(10),
   },
   altCardSmall: {
-    backgroundColor: '#0F1420',
-    borderColor: '#1E2638',
+    backgroundColor: themePalette.hex_0f1420,
+    borderColor: themePalette.hex_1e2638,
   },
   altLeft: {
     flexDirection: 'row',
@@ -910,12 +911,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   altName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: '600',
   },
   altDesc: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: s(2),
     lineHeight: 14,
@@ -925,32 +926,32 @@ const styles = StyleSheet.create({
     marginLeft: s(8),
   },
   altMatch: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.xxl,
     fontWeight: '700',
   },
   altMatchLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.tiny,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
   excludedCard: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: themePalette.hex_1a1a1a,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
+    borderColor: themePalette.hex_2a2a2a,
     padding: s(12),
     marginTop: s(16),
   },
   excludedText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.small,
     lineHeight: 15,
     textAlign: 'center',
   },
   guidanceText: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.xs,
     textAlign: 'center',
     marginTop: s(10),
@@ -960,17 +961,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(20),
     paddingTop: s(12),
     paddingBottom: s(20),
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   actionButton: {
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
     borderRadius: 24,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionButtonText: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.md,
     fontWeight: '700',
   },
@@ -979,7 +980,7 @@ const styles = StyleSheet.create({
     marginTop: s(12),
   },
   browseText: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
   },
-});
+}));

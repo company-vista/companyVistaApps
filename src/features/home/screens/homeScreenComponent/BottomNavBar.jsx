@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
+import { themePalette } from '../../../../theme/colors';
 const NAV_ICON_SIZE = 22;
 const navIconContainerStyle = {
     width: 24,
@@ -18,7 +19,7 @@ const tabs = [
 ]; 
 export function BottomNavBar({ activeTab, isMoreOpen, onTabPress, colors, safeAreaInsets, }) {
     const bottomNavStyle = {
-        backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
+        backgroundColor: colors.mode === 'dark' ? colors.background : themePalette.hex_ffffff,
         paddingBottom: safeAreaInsets.bottom + 10,
     };
     return (<View style={[

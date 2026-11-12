@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { quickAccessItems } from '../data/quickAccessItems';
 import { s } from '../../../theme/responsive';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { font } from '../../../theme/typography';
 const quickAccessScreenMap = {
     companyProfile: 'CompanyProfile',
@@ -41,7 +41,7 @@ function QuickAccessScreen() {
       </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -63,10 +63,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
     },
     title: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '500',
     },
@@ -84,18 +84,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 12,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         padding: 12,
     },
     accessTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.lg,
         fontWeight: '800',
         lineHeight: 19,
         marginTop: 9,
         textAlign: 'center',
     },
-});
+}));
 export default QuickAccessScreen;

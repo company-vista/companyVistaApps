@@ -18,7 +18,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
 import { COUNTRIES, getCountryPriceLabel } from '../../../constants/countries';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 // Country list sourced from the registry config (src/constants/countries.js).
 // Only fixed-price jurisdictions show a price; quoted ones show ''.
@@ -1060,7 +1060,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
             Search 50 jurisdictions, or let us recommend one.
           </Text>
 
-          <TouchableOpacity style={[styles.recommendCard, { backgroundColor: isDark ? '#131A2E' : '#FFFFFF', borderColor: isDark ? '#263352' : colors.border }]} activeOpacity={0.8} onPress={() => navigation.navigate('CompanyPurpose', { ...(route?.params || {}), advisorFlow: true })}>
+          <TouchableOpacity style={[styles.recommendCard, { backgroundColor: isDark ? themePalette.hex_131a2e : themePalette.hex_ffffff, borderColor: isDark ? themePalette.hex_263352 : colors.border }]} activeOpacity={0.8} onPress={() => navigation.navigate('CompanyPurpose', { ...(route?.params || {}), advisorFlow: true })}>
             <View style={styles.recommendHeader}>
               <View style={styles.starIconContainer}>
                 <Text style={styles.starIcon}>★</Text>
@@ -1074,13 +1074,13 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
               <Text style={[styles.arrowIcon, { color: colors.subtle }]}>›</Text>
             </View>
             <View style={styles.tagsRow}>
-              <View style={[styles.tag, { backgroundColor: isDark ? '#1E293B' : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>⏱ 60 seconds</Text></View>
-              <View style={[styles.tag, { backgroundColor: isDark ? '#1E293B' : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>Tax & cost aware</Text></View>
-              <View style={[styles.tag, { backgroundColor: isDark ? '#1E293B' : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>Free - no signup</Text></View>
+              <View style={[styles.tag, { backgroundColor: isDark ? themePalette.hex_1e293b : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>⏱ 60 seconds</Text></View>
+              <View style={[styles.tag, { backgroundColor: isDark ? themePalette.hex_1e293b : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>Tax & cost aware</Text></View>
+              <View style={[styles.tag, { backgroundColor: isDark ? themePalette.hex_1e293b : colors.surfaceAlt }]}><Text style={[styles.tagText, { color: colors.muted }]}>Free - no signup</Text></View>
             </View>
           </TouchableOpacity>
 
-          <View style={[styles.searchBox, { backgroundColor: isDark ? '#131A2E' : colors.inputBackground, borderColor: isDark ? '#1E293B' : colors.inputBorder }]}>
+          <View style={[styles.searchBox, { backgroundColor: isDark ? themePalette.hex_131a2e : colors.inputBackground, borderColor: isDark ? themePalette.hex_1e293b : colors.inputBorder }]}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}
@@ -1097,7 +1097,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
           </View>
 
           <View style={styles.sectionTitleRow}>
-            <Text style={[styles.sectionHeader, { color: isDark ? '#475569' : colors.subtle }]}>{selectedCountry ? 'SELECTED COUNTRY' : searchText.trim() ? `SEARCH RESULTS (${filteredCountries.length})` : 'MOST POPULAR'}</Text>
+            <Text style={[styles.sectionHeader, { color: isDark ? themePalette.hex_475569 : colors.subtle }]}>{selectedCountry ? 'SELECTED COUNTRY' : searchText.trim() ? `SEARCH RESULTS (${filteredCountries.length})` : 'MOST POPULAR'}</Text>
             {selectedCountry && (
               <TouchableOpacity onPress={() => { setSelectedCountry(null); setSelectedState(null); }}>
                 <Text style={styles.changeText}>Change</Text>
@@ -1113,7 +1113,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                 return (
                   <TouchableOpacity
                     key={item.id}
-                    style={[styles.countryCardList, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: '#C9A84C', backgroundColor: isDark ? 'rgba(201, 168, 76, 0.04)' : 'rgba(201, 168, 76, 0.08)' }]}
+                    style={[styles.countryCardList, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }, isSelected && { borderColor: themePalette.hex_c9a84c, backgroundColor: isDark ? themePalette.rgba_201_168_76_0_04 : themePalette.rgba_201_168_76_0_08 }]}
                     activeOpacity={0.8}
                     onPress={() => {
                       if (isSelected) { setSelectedCountry(null); setSelectedState(null); }
@@ -1122,7 +1122,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                   >
                     <View style={styles.countryLeft}>
                       <View style={styles.countryCodeCircle}>
-                        <Text style={[styles.countryCodeTextList, { color: isDark ? '#CBD5E1' : colors.text }]}>{item.code}</Text>
+                        <Text style={[styles.countryCodeTextList, { color: isDark ? themePalette.hex_cbd5e1 : colors.text }]}>{item.code}</Text>
                       </View>
                       <Text style={[styles.countryNameList, { color: colors.text }, isSelected && styles.goldText]}>{item.name}</Text>
                     </View>
@@ -1136,9 +1136,9 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                         return item.price ? <Text style={styles.countryPriceList}>{String(item.price).replace(/^from\s+/i, '')}</Text> : <Text style={[styles.customQuoteList, { color: colors.muted }]}>Custom quote</Text>;
                       })()}
                       {isSelected ? (
-                        <View style={styles.checkmarkBadgeList}><Ionicons name="checkmark" size={12} color="#060913" /></View>
+                        <View style={styles.checkmarkBadgeList}><Ionicons name="checkmark" size={12} color={themePalette.hex_060913} /></View>
                       ) : (
-                        <View style={[styles.radioOuter, { borderColor: isDark ? 'rgba(255,255,255,0.15)' : colors.border }]} />
+                        <View style={[styles.radioOuter, { borderColor: isDark ? themePalette.rgba_255_255_255_0_15 : colors.border }]} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -1151,7 +1151,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
             <>
               <View style={styles.stateHeaderRow}>
                 <Ionicons name="chevron-down" size={14} color={colors.subtle} />
-                <Text style={[styles.sectionHeader, { color: isDark ? '#475569' : colors.subtle }]}>  {selectedCountry === 'US' ? 'SELECT US STATE' : `SELECT STATE / REGION - ${selectedCountry}`}</Text>
+                <Text style={[styles.sectionHeader, { color: isDark ? themePalette.hex_475569 : colors.subtle }]}>  {selectedCountry === 'US' ? 'SELECT US STATE' : `SELECT STATE / REGION - ${selectedCountry}`}</Text>
               </View>
               {selectedCountry === 'US' ? (
                 <View style={styles.stateGrid}>
@@ -1165,7 +1165,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                     return (
                       <TouchableOpacity
                         key={stateId}
-                        style={[styles.stateCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: '#C9A84C', backgroundColor: isDark ? 'rgba(201, 168, 76, 0.03)' : 'rgba(201, 168, 76, 0.08)' }]}
+                        style={[styles.stateCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }, isSelected && { borderColor: themePalette.hex_c9a84c, backgroundColor: isDark ? themePalette.rgba_201_168_76_0_03 : themePalette.rgba_201_168_76_0_08 }]}
                         activeOpacity={0.8}
                         onPress={() => setSelectedState(stateId)}
                       >
@@ -1179,13 +1179,13 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                         </View>
                         <Text style={[styles.stateDesc, { color: colors.muted }]} numberOfLines={3}>{desc}</Text>
                         {state.totalFirstYear != null && (
-                          <View style={[styles.totalFirstYearRow, { backgroundColor: isDark ? 'rgba(201,168,76,0.08)' : 'rgba(201,168,76,0.1)', borderColor: isDark ? 'rgba(201,168,76,0.15)' : 'rgba(201,168,76,0.25)' }]}>
+                          <View style={[styles.totalFirstYearRow, { backgroundColor: isDark ? themePalette.rgba_201_168_76_0_08 : themePalette.rgba_201_168_76_0_1, borderColor: isDark ? themePalette.rgba_201_168_76_0_15 : themePalette.rgba_201_168_76_0_25 }]}>
                             <Text style={[styles.totalFirstYearLabel, { color: colors.muted }]}>Total first year</Text>
                             <Text style={styles.totalFirstYearValue}>${state.totalFirstYear}</Text>
                           </View>
                         )}
                         {state.govtFees?.annual != null && (
-                          <View style={[styles.annualRow, { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border }]}>
+                          <View style={[styles.annualRow, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.border }]}>
                             <Text style={[styles.annualLabel, { color: colors.muted }]}>Annual after</Text>
                             <Text style={[styles.annualValue, { color: colors.text }]}>
                               {state.govtFees.annual === 0
@@ -1207,14 +1207,14 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
                             <Text style={styles.statePrice}>{price}</Text>
                             <Text style={[styles.stateFeeLabel, { color: colors.muted }]}>State fee</Text>
                           </View>
-                          <Text style={[styles.stateDuration, { color: isDark ? '#475569' : colors.subtle }]}>{duration}</Text>
+                          <Text style={[styles.stateDuration, { color: isDark ? themePalette.hex_475569 : colors.subtle }]}>{duration}</Text>
                         </View>
                       </TouchableOpacity>
                     );
                   })}
                 </View>
               ) : (
-                <View style={[styles.noStateBox, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border }]}>
+                <View style={[styles.noStateBox, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.border }]}>
                   <Ionicons name="information-circle-outline" size={14} color={colors.subtle} />
                   <Text style={[styles.noStateText, { color: colors.muted }]}>No state selection needed for {allCountries.find(c => c.id === selectedCountry)?.name}. Continue directly.</Text>
                 </View>
@@ -1224,7 +1224,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? '#1E293B' : colors.border }]}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.hex_1e293b : colors.border }]}>
         <TouchableOpacity
           style={[styles.submitButton, { backgroundColor: colors.buttonBackground }, (!selectedCountry || (selectedCountry === 'US' && !selectedState)) && styles.submitButtonDisabled]}
           activeOpacity={0.8}
@@ -1240,18 +1240,18 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: s(8), paddingHorizontal: s(10), paddingVertical: s(12), marginTop: s(24) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
   title: { fontSize: font.display, fontWeight: '400', marginTop: s(8) },
-  titleItalic: { fontStyle: 'italic', color: '#D1A253', fontWeight: '300' },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d1a253, fontWeight: '300' },
   subtitle: { fontSize: font.base, marginTop: s(6), marginBottom: s(20) },
   recommendCard: { borderRadius: 16, borderWidth: 1, padding: s(16), marginBottom: s(16) },
   recommendHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  starIconContainer: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#251E3E', alignItems: 'center', justifyContent: 'center', marginRight: s(12) },
-  starIcon: { color: '#A855F7', fontSize: font.xxl },
+  starIconContainer: { width: 36, height: 36, borderRadius: 10, backgroundColor: themePalette.hex_251e3e, alignItems: 'center', justifyContent: 'center', marginRight: s(12) },
+  starIcon: { color: themePalette.hex_a855f7, fontSize: font.xxl },
   recommendTextContainer: { flex: 1 },
   recommendTitle: { fontSize: font.md, fontWeight: 'bold', marginBottom: s(4) },
   recommendDesc: { fontSize: font.sm, lineHeight: 16 },
@@ -1264,17 +1264,17 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, fontSize: font.base },
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(12) },
   sectionHeader: { fontSize: font.xs, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(12) },
-  changeText: { color: '#C9A84C', fontSize: font.small, fontWeight: '700' },
+  changeText: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: '700' },
   countryList: { flexDirection: 'column', gap: 8 },
   countryCardList: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, paddingVertical: s(12), paddingHorizontal: s(14), borderWidth: 1 },
   countryLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  countryCodeCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(201,168,76,0.12)', borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)', alignItems: 'center', justifyContent: 'center' },
-  countryCodeTextList: { color: '#CBD5E1', fontSize: font.sm, fontWeight: '700' },
+  countryCodeCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: themePalette.rgba_201_168_76_0_12, borderWidth: 1, borderColor: themePalette.rgba_201_168_76_0_2, alignItems: 'center', justifyContent: 'center' },
+  countryCodeTextList: { color: themePalette.hex_cbd5e1, fontSize: font.sm, fontWeight: '700' },
   countryNameList: { fontSize: font.bodySmall, fontWeight: '600' },
-  countryPriceList: { color: '#C9A84C', fontSize: font.bodySmall, fontWeight: '700', marginTop: 0 },
+  countryPriceList: { color: themePalette.hex_c9a84c, fontSize: font.bodySmall, fontWeight: '700', marginTop: 0 },
   customQuoteList: { fontSize: font.small, fontWeight: '600', fontStyle: 'italic' },
-  goldText: { color: '#C9A84C' },
-  checkmarkBadgeList: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#C9A84C', alignItems: 'center', justifyContent: 'center' },
+  goldText: { color: themePalette.hex_c9a84c },
+  checkmarkBadgeList: { width: 20, height: 20, borderRadius: 10, backgroundColor: themePalette.hex_c9a84c, alignItems: 'center', justifyContent: 'center' },
   radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1 },
   stateHeaderRow: { flexDirection: 'row', alignItems: 'center', marginTop: s(8), marginBottom: s(12) },
   noStateBox: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 12, padding: s(12), borderWidth: 1, marginBottom: s(10) },
@@ -1284,29 +1284,29 @@ const styles = StyleSheet.create({
   stateTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
   stateName: { fontSize: font.sm, fontWeight: 'bold' },
   tagBadge: { paddingHorizontal: s(6), paddingVertical: s(2), borderRadius: 10 },
-  greenTag: { backgroundColor: 'rgba(16, 185, 129, 0.15)' },
-  greenTagText: { color: '#10B981' },
-  blueTag: { backgroundColor: 'rgba(59, 130, 246, 0.15)' },
-  blueTagText: { color: '#60A5FA' },
+  greenTag: { backgroundColor: themePalette.rgba_16_185_129_0_15 },
+  greenTagText: { color: themePalette.hex_10b981 },
+  blueTag: { backgroundColor: themePalette.rgba_59_130_246_0_15 },
+  blueTagText: { color: themePalette.hex_60a5fa },
   tagTextSmall: { fontSize: font.tiny, fontWeight: '600' },
   stateDesc: { fontSize: font.xs, lineHeight: 13, marginBottom: s(8) },
   totalFirstYearRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, paddingHorizontal: s(8), paddingVertical: s(6), marginBottom: s(6), borderWidth: 1 },
   totalFirstYearLabel: { fontSize: font.caption, fontWeight: '600' },
-  totalFirstYearValue: { color: '#C9A84C', fontSize: font.sm, fontWeight: '800' },
+  totalFirstYearValue: { color: themePalette.hex_c9a84c, fontSize: font.sm, fontWeight: '800' },
   annualRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, paddingHorizontal: s(8), paddingVertical: s(5), marginBottom: s(6), borderWidth: 1 },
   annualLabel: { fontSize: font.caption, fontWeight: '500' },
   annualValue: { fontSize: font.small, fontWeight: '700' },
   anonRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(2), marginBottom: s(8) },
   anonLabel: { fontSize: font.caption, fontWeight: '500' },
   anonValue: { fontSize: font.small, fontWeight: '600' },
-  anonValueYes: { color: '#10B981', fontWeight: '700' },
+  anonValueYes: { color: themePalette.hex_10b981, fontWeight: '700' },
   stateFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  statePrice: { color: '#C9A84C', fontSize: font.small, fontWeight: 'bold' },
+  statePrice: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: 'bold' },
   stateFeeLabel: { fontSize: font.caption, fontWeight: '500', marginTop: 1 },
   stateDuration: { fontSize: font.caption },
   bottomBar: { paddingHorizontal: s(10), paddingVertical: s(12), borderTopWidth: 1 },
   submitButton: { borderRadius: 24, height: 50, alignItems: 'center', justifyContent: 'center' },
   submitButtonDisabled: { opacity: 0.5 },
   submitButtonText: { fontSize: font.md, fontWeight: 'bold' },
-  submitButtonTextDisabled: { color: '#64748B' },
-});
+  submitButtonTextDisabled: { color: themePalette.hex_64748b },
+}));

@@ -1,6 +1,7 @@
 import { font } from '../../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
+import { themePalette } from '../../../../theme/colors';
 export const styles = StyleSheet.create({
     container: { paddingHorizontal: s(4) },
     sectionHeader: {
@@ -15,7 +16,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: s(8),
         paddingVertical: 4,
         marginBottom: 14,
-        shadowColor: '#000',
+        shadowColor: themePalette.hex_000,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,
         shadowRadius: 6,

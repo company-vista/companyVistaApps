@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 function PromotionCard() {
     const colors = useThemeColors();
@@ -11,13 +11,13 @@ function PromotionCard() {
           <Text style={styles.promoTitle}>Stay ahead of deadlines</Text>
           <Text style={styles.promoText}>Check current company updates and reminders.</Text>
         </View>
-        <FontAwesome name="ticket" size={34} color="#ea580c"/>
+        <FontAwesome name="ticket" size={34} color={themePalette.hex_ea580c}/>
       </View>
     </>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     sectionTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.heading,
         fontWeight: '600',
         marginTop: 32,
@@ -29,18 +29,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: 14,
-        backgroundColor: '#ffedd5',
+        backgroundColor: themePalette.hex_ffedd5,
         padding: 18,
     },
     promoTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.xxl,
         fontWeight: '800',
     },
     promoText: {
-        color: '#6b7280',
+        color: themePalette.hex_6b7280,
         fontSize: font.md,
         marginTop: 5,
     },
-});
+}));
 export default PromotionCard;

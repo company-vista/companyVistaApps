@@ -21,6 +21,7 @@ import { s } from '../../../theme/responsive';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setHasCompletedPayment } from '../../../store/slices/authSlice';
 import { createCheckoutApi, finalizeCheckoutApi, fetchReviewApi, savePaymentConfirmApi } from '../api/orderApi';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const MONGO_ID = /^[a-f\d]{24}$/i;
 
@@ -196,7 +197,7 @@ export default function ResumePaymentScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#080E18" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_080e18} />
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
         <Image source={logoR} style={styles.topLogo} />
@@ -214,11 +215,11 @@ export default function ResumePaymentScreen({ navigation, route }) {
 
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={16} color="#D4AF37" />
+            <Ionicons name="time-outline" size={16} color={themePalette.hex_d4af37} />
             <Text style={styles.infoText}>Your registration is waiting for this payment</Text>
           </View>
           <View style={styles.infoRow}>
-            <Ionicons name="shield-checkmark-outline" size={16} color="#00E676" />
+            <Ionicons name="shield-checkmark-outline" size={16} color={themePalette.hex_00e676} />
             <Text style={styles.infoText}>Secured by Stripe</Text>
           </View>
         </View>
@@ -226,7 +227,7 @@ export default function ResumePaymentScreen({ navigation, route }) {
         <View style={styles.summaryCard}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>DUE NOW</Text>
-            {loadingAmount ? <ActivityIndicator size="small" color="#D4AF37" /> : <Text style={styles.totalAmount}>{amountLabel}</Text>}
+            {loadingAmount ? <ActivityIndicator size="small" color={themePalette.hex_d4af37} /> : <Text style={styles.totalAmount}>{amountLabel}</Text>}
           </View>
         </View>
       </ScrollView>
@@ -234,9 +235,9 @@ export default function ResumePaymentScreen({ navigation, route }) {
       <View style={styles.footerContainer}>
         {pendingSession ? (
           <>
-            <TouchableOpacity style={[styles.payButton, { backgroundColor: '#10B981' }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={() => handleFinalize()} disabled={verifying}>
-              {verifying ? <ActivityIndicator size="small" color="#fff" style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color="#fff" style={styles.lockIcon} />}
-              <Text style={[styles.payButtonText, { color: '#fff' }]}>{verifying ? 'Verifying...' : 'Verify payment'}</Text>
+            <TouchableOpacity style={[styles.payButton, { backgroundColor: themePalette.hex_10b981 }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={() => handleFinalize()} disabled={verifying}>
+              {verifying ? <ActivityIndicator size="small" color={themePalette.hex_fff} style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color={themePalette.hex_fff} style={styles.lockIcon} />}
+              <Text style={[styles.payButtonText, { color: themePalette.hex_fff }]}>{verifying ? 'Verifying...' : 'Verify payment'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => setPendingSession(null)}>
               <Text style={styles.cancelBtnText}>Cancel</Text>
@@ -245,7 +246,7 @@ export default function ResumePaymentScreen({ navigation, route }) {
         ) : (
           <>
             <TouchableOpacity style={[styles.payButton, paying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handlePay} disabled={paying}>
-              {paying ? <ActivityIndicator size="small" color="#0A111D" style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color="#0A111D" style={styles.lockIcon} />}
+              {paying ? <ActivityIndicator size="small" color={themePalette.hex_0a111d} style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color={themePalette.hex_0a111d} style={styles.lockIcon} />}
               <Text style={styles.payButtonText}>{paying ? 'Processing...' : amount > 0 ? `Pay ${amountLabel}` : 'Pay securely'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => navigation.goBack()}>
@@ -266,26 +267,26 @@ export default function ResumePaymentScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080E18' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_080e18 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(34), marginBottom: s(16), paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
-  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: font.bodySmall },
-  infoCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: s(14), marginTop: s(12) },
+  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: themePalette.hex_ffffff, marginBottom: s(4) },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: themePalette.hex_d4af37 },
+  subtitle: { color: themePalette.hex_8e9bae, fontSize: font.bodySmall },
+  infoCard: { backgroundColor: themePalette.hex_0c1622, borderRadius: 14, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08, padding: s(14), marginTop: s(12) },
   infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(8) },
-  infoText: { color: '#8E9BAE', fontSize: font.sm, marginLeft: s(8), flex: 1 },
-  summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212,175,55,0.3)', padding: s(16), marginVertical: s(12) },
+  infoText: { color: themePalette.hex_8e9bae, fontSize: font.sm, marginLeft: s(8), flex: 1 },
+  summaryCard: { backgroundColor: themePalette.hex_0c1622, borderRadius: 16, borderWidth: 1, borderColor: themePalette.rgba_212_175_55_0_3, padding: s(16), marginVertical: s(12) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  totalLabel: { color: '#8E9BAE', fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
-  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
-  payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center' },
-  cancelBtnText: { color: '#8E9BAE', fontSize: font.base, fontWeight: '600' },
+  totalLabel: { color: themePalette.hex_8e9bae, fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
+  totalAmount: { color: themePalette.hex_d4af37, fontSize: font.displayXL, fontWeight: '700' },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: themePalette.hex_080e18 },
+  payButton: { backgroundColor: themePalette.hex_d4af37, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_12, justifyContent: 'center', alignItems: 'center' },
+  cancelBtnText: { color: themePalette.hex_8e9bae, fontSize: font.base, fontWeight: '600' },
   lockIcon: { marginRight: s(8) },
-  payButtonText: { color: '#0A111D', fontSize: font.lg, fontWeight: '700' },
-});
+  payButtonText: { color: themePalette.hex_0a111d, fontSize: font.lg, fontWeight: '700' },
+}));

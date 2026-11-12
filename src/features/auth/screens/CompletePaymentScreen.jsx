@@ -22,6 +22,7 @@ import { savePaymentConfirmApi, createCheckoutApi, finalizeCheckoutApi, cancelCh
 import StripeCheckoutModal from '../../../components/StripeCheckoutModal';
 import { getStructurePrice } from '../../../utils/priceCalculator';
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 export default function CompletePaymentScreen({ navigation, route }) {
   const {
@@ -269,7 +270,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#080E18" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_080e18} />
 
       <View style={styles.header}>
         <BackButton onPress={() => { handleCancelPayment(); navigation.goBack(); }} />
@@ -322,7 +323,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
         <View style={[styles.paymentCard, styles.selectedPaymentCard]}>
           <View style={styles.paymentLeft}>
             <View style={styles.cardLogoBox}>
-              <FontAwesome name="cc-visa" size={20} color="#5C6BC0" />
+              <FontAwesome name="cc-visa" size={20} color={themePalette.hex_5c6bc0} />
             </View>
             <View style={styles.paymentTextGroup}>
               <Text style={styles.paymentTitle}>Card</Text>
@@ -330,12 +331,12 @@ export default function CompletePaymentScreen({ navigation, route }) {
             </View>
           </View>
           <View style={[styles.radioOuter, styles.radioOuterSelected]}>
-            <Ionicons name="checkmark" size={12} color="#0A111D" />
+            <Ionicons name="checkmark" size={12} color={themePalette.hex_0a111d} />
           </View>
         </View>
 
         <View style={styles.securityBanner}>
-          <Ionicons name="shield-checkmark-outline" size={16} color="#00E676" style={styles.shieldIcon} />
+          <Ionicons name="shield-checkmark-outline" size={16} color={themePalette.hex_00e676} style={styles.shieldIcon} />
           <Text style={styles.securityText}>
             Payment Stripe ke secure checkout page par hota hai. Card details app
             tak nahi aati, hum kuch store nahi karte.
@@ -347,7 +348,7 @@ export default function CompletePaymentScreen({ navigation, route }) {
         {!pendingSession ? (
           <>
             <TouchableOpacity style={[styles.payButton, paying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handlePay} disabled={paying}>
-              {paying ? <ActivityIndicator size="small" color="#0A111D" style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color="#0A111D" style={styles.lockIcon} />}
+              {paying ? <ActivityIndicator size="small" color={themePalette.hex_0a111d} style={styles.lockIcon} /> : <Ionicons name="lock-closed" size={16} color={themePalette.hex_0a111d} style={styles.lockIcon} />}
               <Text style={styles.payButtonText}>{paying ? 'Processing...' : `Pay $${dueNow} Securely`}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} activeOpacity={0.8} onPress={() => { handleCancelPayment(); navigation.goBack(); }} disabled={paying}>
@@ -356,16 +357,16 @@ export default function CompletePaymentScreen({ navigation, route }) {
           </>
         ) : (
           <>
-            <View style={{ backgroundColor: 'rgba(16,185,129,0.08)', borderWidth: 1, borderColor: 'rgba(16,185,129,0.2)', borderRadius: 12, padding: 12, marginBottom: 12 }}>
-              <Text style={{ color: '#10B981', fontSize: font.sm, fontWeight: '700' }}>Stripe checkout opened</Text>
-              <Text style={{ color: '#94A3B8', fontSize: font.small, marginTop: 4 }}>Session: {pendingSession.sessionId.slice(0,20)}... · Complete payment then verify</Text>
+            <View style={{ backgroundColor: themePalette.rgba_16_185_129_0_08, borderWidth: 1, borderColor: themePalette.rgba_16_185_129_0_2, borderRadius: 12, padding: 12, marginBottom: 12 }}>
+              <Text style={{ color: themePalette.hex_10b981, fontSize: font.sm, fontWeight: '700' }}>Stripe checkout opened</Text>
+              <Text style={{ color: themePalette.hex_94a3b8, fontSize: font.small, marginTop: 4 }}>Session: {pendingSession.sessionId.slice(0,20)}... · Complete payment then verify</Text>
             </View>
-            <TouchableOpacity style={[styles.payButton, { backgroundColor: '#10B981' }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handleFinalize} disabled={verifying}>
-              {verifying ? <ActivityIndicator size="small" color="#fff" style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color="#fff" style={styles.lockIcon} />}
-              <Text style={[styles.payButtonText, { color: '#fff' }]}>{verifying ? 'Verifying...' : 'Verify Payment'}</Text>
+            <TouchableOpacity style={[styles.payButton, { backgroundColor: themePalette.hex_10b981 }, verifying && { opacity: 0.6 }]} activeOpacity={0.8} onPress={handleFinalize} disabled={verifying}>
+              {verifying ? <ActivityIndicator size="small" color={themePalette.hex_fff} style={styles.lockIcon} /> : <Ionicons name="checkmark-circle" size={16} color={themePalette.hex_fff} style={styles.lockIcon} />}
+              <Text style={[styles.payButtonText, { color: themePalette.hex_fff }]}>{verifying ? 'Verifying...' : 'Verify Payment'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ marginTop: 10, alignItems: 'center' }} onPress={handleCancelPayment}>
-              <Text style={{ color: '#64748B', fontSize: font.small }}>Cancel</Text>
+              <Text style={{ color: themePalette.hex_64748b, fontSize: font.small }}>Cancel</Text>
             </TouchableOpacity>
           </>
         )}
@@ -382,42 +383,42 @@ export default function CompletePaymentScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#080E18' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_080e18 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: s(34), marginBottom: s(16), paddingHorizontal: s(16) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
   titleContainer: { marginVertical: s(10) },
-  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: '#FFFFFF', marginBottom: s(4) },
-  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: '#D4AF37' },
-  subtitle: { color: '#8E9BAE', fontSize: font.bodySmall },
-  summaryCard: { backgroundColor: '#0C1622', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)', padding: s(16), marginVertical: s(12) },
+  mainTitle: { fontSize: font.displayXL, fontWeight: '700', color: themePalette.hex_ffffff, marginBottom: s(4) },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400', color: themePalette.hex_d4af37 },
+  subtitle: { color: themePalette.hex_8e9bae, fontSize: font.bodySmall },
+  summaryCard: { backgroundColor: themePalette.hex_0c1622, borderRadius: 16, borderWidth: 1, borderColor: themePalette.rgba_212_175_55_0_3, padding: s(16), marginVertical: s(12) },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(10) },
-  summaryTitle: { color: '#8E9BAE', fontSize: font.base },
-  summaryPrice: { color: '#FFFFFF', fontSize: font.base, fontWeight: '700' },
-  summaryDivider: { height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)', marginVertical: s(10) },
+  summaryTitle: { color: themePalette.hex_8e9bae, fontSize: font.base },
+  summaryPrice: { color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: '700' },
+  summaryDivider: { height: 1, backgroundColor: themePalette.rgba_255_255_255_0_08, marginVertical: s(10) },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: s(2) },
-  totalLabel: { color: '#8E9BAE', fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
-  totalAmount: { color: '#D4AF37', fontSize: font.displayXL, fontWeight: '700' },
+  totalLabel: { color: themePalette.hex_8e9bae, fontSize: font.small, fontWeight: '700', letterSpacing: 1 },
+  totalAmount: { color: themePalette.hex_d4af37, fontSize: font.displayXL, fontWeight: '700' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginTop: s(10), marginBottom: s(12) },
-  sectionTitle: { color: '#6C7A8E', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
-  sectionLine: { flex: 1, height: 1, backgroundColor: 'rgba(255, 255, 255, 0.08)' },
-  paymentCard: { backgroundColor: '#0C1622', borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: s(14), marginBottom: s(10), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  selectedPaymentCard: { borderColor: '#D4AF37', backgroundColor: '#0E1A29' },
+  sectionTitle: { color: themePalette.hex_6c7a8e, fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginRight: s(10) },
+  sectionLine: { flex: 1, height: 1, backgroundColor: themePalette.rgba_255_255_255_0_08 },
+  paymentCard: { backgroundColor: themePalette.hex_0c1622, borderRadius: 14, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08, padding: s(14), marginBottom: s(10), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  selectedPaymentCard: { borderColor: themePalette.hex_d4af37, backgroundColor: themePalette.hex_0e1a29 },
   paymentLeft: { flexDirection: 'row', alignItems: 'center' },
-  cardLogoBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', justifyContent: 'center', alignItems: 'center' },
+  cardLogoBox: { width: 38, height: 38, borderRadius: 8, backgroundColor: themePalette.rgba_255_255_255_0_05, justifyContent: 'center', alignItems: 'center' },
   paymentTextGroup: { marginLeft: s(12) },
-  paymentTitle: { color: '#FFFFFF', fontSize: font.base, fontWeight: '700' },
-  paymentSubtext: { color: '#6C7A8E', fontSize: font.small, marginTop: s(2) },
-  radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: '#4A5768', justifyContent: 'center', alignItems: 'center' },
-  radioOuterSelected: { backgroundColor: '#D4AF37', borderColor: '#D4AF37' },
+  paymentTitle: { color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: '700' },
+  paymentSubtext: { color: themePalette.hex_6c7a8e, fontSize: font.small, marginTop: s(2) },
+  radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: themePalette.hex_4a5768, justifyContent: 'center', alignItems: 'center' },
+  radioOuterSelected: { backgroundColor: themePalette.hex_d4af37, borderColor: themePalette.hex_d4af37 },
   shieldIcon: { marginRight: s(8) },
-  securityBanner: { backgroundColor: 'rgba(0, 230, 118, 0.05)', borderRadius: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
-  securityText: { color: '#8E9BAE', fontSize: font.small, flex: 1 },
-  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: '#080E18' },
-  payButton: { backgroundColor: '#D4AF37', height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center' },
-  cancelBtnText: { color: '#8E9BAE', fontSize: font.base, fontWeight: '600' },
+  securityBanner: { backgroundColor: themePalette.rgba_0_230_118_0_05, borderRadius: 10, borderWidth: 1, borderColor: themePalette.rgba_0_230_118_0_15, padding: s(10), flexDirection: 'row', alignItems: 'center', marginTop: s(4) },
+  securityText: { color: themePalette.hex_8e9bae, fontSize: font.small, flex: 1 },
+  footerContainer: { paddingHorizontal: s(16), paddingTop: s(10), paddingBottom: s(16), backgroundColor: themePalette.hex_080e18 },
+  payButton: { backgroundColor: themePalette.hex_d4af37, height: 52, borderRadius: 26, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  cancelBtn: { marginTop: 10, height: 48, borderRadius: 24, borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_12, justifyContent: 'center', alignItems: 'center' },
+  cancelBtnText: { color: themePalette.hex_8e9bae, fontSize: font.base, fontWeight: '600' },
   lockIcon: { marginRight: s(8) },
-  payButtonText: { color: '#0A111D', fontSize: font.lg, fontWeight: '700' },
-});
+  payButtonText: { color: themePalette.hex_0a111d, fontSize: font.lg, fontWeight: '700' },
+}));

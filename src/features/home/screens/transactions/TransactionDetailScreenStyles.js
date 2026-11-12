@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { s } from "../../../../theme/responsive";
 import { font } from "../../../../theme/typography";
+import { themePalette } from '../../../../theme/colors';
 export const styles = StyleSheet.create({
     screen: {
         flex: 1,
@@ -105,7 +106,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     downloadButtonText: {
-        color: '#4f46e5',
+        color: themePalette.hex_4f46e5,
         fontSize: font.md,
         fontWeight: '400',
     },

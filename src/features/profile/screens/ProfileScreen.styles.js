@@ -1,7 +1,8 @@
 import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from '../../../theme/responsive';
-const styles = StyleSheet.create({
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
         gap: s(12),
     },
     title: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.display,
         fontWeight: '400',
     },
@@ -31,18 +32,18 @@ const styles = StyleSheet.create({
         gap: s(8),
         borderWidth: 1,
         borderRadius: 29,
-        backgroundColor: '#ccfbf1',
+        backgroundColor: themePalette.hex_ccfbf1,
         paddingHorizontal: s(14),
     },
     editText: {
-        color: '#0f766e',
+        color: themePalette.hex_0f766e,
         fontSize: font.base,
         fontWeight: '400',
     },
     profileCard: {
         alignItems: 'center',
         borderRadius: 29,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(24),
         paddingHorizontal: 0,
         paddingTop: s(24),
@@ -73,9 +74,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 3,
-        borderColor: '#7dd3fc',
+        borderColor: themePalette.hex_7dd3fc,
         borderRadius: 100,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
         overflow: 'hidden',
     },
     avatarImage: {
@@ -83,13 +84,13 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     name: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.displayXL,
         fontWeight: '400',
         marginTop: s(16),
     },
     subtitle: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.bodySmall,
         fontWeight: '400',
         marginTop: s(5),
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     progressCard: {
         borderRadius: 18,
         borderWidth: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(14),
         paddingHorizontal: s(10),
         paddingVertical: s(14),
@@ -115,13 +116,13 @@ const styles = StyleSheet.create({
     progressTitle: {
         fontSize: font.base,
         fontWeight: '400',
-        color: '#111827',
+        color: themePalette.hex_111827,
     },
     progressBadge: {
         paddingHorizontal: s(10),
         paddingVertical: s(4),
         borderRadius: 10,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     progressBadgeText: {
         fontSize: font.sm,
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         overflow: 'hidden',
         marginTop: s(10),
-        backgroundColor: '#e5e7eb',
+        backgroundColor: themePalette.hex_e5e7eb,
     },
     progressFill: {
         height: '100%',
@@ -189,9 +190,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(14),
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 16,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(14),
         paddingHorizontal: s(10),
         paddingVertical: s(14),
@@ -202,25 +203,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     switchAccountCopy: {
         flex: 1,
     },
     switchAccountTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.md,
         fontWeight: '400',
     },
     switchAccountSubtitle: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
         marginTop: s(4),
     },
     detailsCard: {
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(18),
         paddingHorizontal: s(10),
         paddingTop: s(18),
@@ -231,13 +232,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(14),
         borderRadius: 18,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         marginTop: s(18),
         paddingHorizontal: s(10),
         paddingVertical: s(16),
     },
     sectionTitle: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.lg,
         fontWeight: '400',
         marginBottom: s(2),
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(14),
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
+        borderBottomColor: themePalette.hex_e5e7eb,
         paddingVertical: s(16),
     },
     detailIcon: {
@@ -271,18 +272,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 12,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     detailCopy: {
         flex: 1,
     },
     detailLabel: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
     },
     detailValue: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.md,
         fontWeight: '400',
         marginTop: s(4),
@@ -332,8 +333,8 @@ const styles = StyleSheet.create({
     emailDropdownPrimaryLabel: {
         fontSize: font.xs,
         fontWeight: '400',
-        color: '#ffffff',
-        backgroundColor: '#dc2626',
+        color: themePalette.hex_ffffff,
+        backgroundColor: themePalette.hex_dc2626,
         paddingHorizontal: s(6),
         paddingVertical: s(2),
         borderRadius: 4,
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     versionText: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
         marginTop: s(18),
@@ -385,7 +386,7 @@ const styles = StyleSheet.create({
     switchSheetOverlay: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.42)',
+        backgroundColor: themePalette.rgba_0_0_0_0_42,
     },
     switchSheet: {
         borderTopLeftRadius: 20,
@@ -399,7 +400,7 @@ const styles = StyleSheet.create({
         height: 4,
         alignSelf: 'center',
         borderRadius: 3,
-        backgroundColor: '#d1d5db',
+        backgroundColor: themePalette.hex_d1d5db,
         marginBottom: s(16),
     },
     switchSheetAccountBox: {
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 19,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
         overflow: 'hidden',
     },
     switchSheetAvatarImage: {
@@ -445,7 +446,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 19,
-        backgroundColor: '#071116',
+        backgroundColor: themePalette.hex_071116,
     },
     switchSheetAddText: {
         flex: 1,
@@ -458,5 +459,5 @@ const styles = StyleSheet.create({
         marginTop: s(16),
         textAlign: 'center',
     },
-});
+}));
 export default styles;

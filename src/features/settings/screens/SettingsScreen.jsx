@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/themeSlice';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import styles from './SettingsScreen.styles';
 const COMPANY_URL = 'https://www.companyvista.com/';
@@ -35,7 +35,7 @@ function SettingsScreen() {
     <View style={styles.group}>
       <Pressable onPress={handleToggleTheme} style={[styles.menuItem, {}]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-          <FontAwesome name={isDarkTheme ? 'moon-o' : 'sun-o'} size={18} color={isDarkTheme ? colors.accent : '#f59e0b'} />
+          <FontAwesome name={isDarkTheme ? 'moon-o' : 'sun-o'} size={18} color={isDarkTheme ? colors.accent : themePalette.hex_f59e0b} />
         </View>
 
         <View style={styles.copy}>
@@ -45,7 +45,7 @@ function SettingsScreen() {
           </Text>
         </View>
 
-        <Switch onValueChange={handleToggleTheme} thumbColor={isDarkTheme ? colors.primary : "#0000ff81"} trackColor={{ false: colors.border, true: colors.accentSoft }} value={isDarkTheme} />
+        <Switch onValueChange={handleToggleTheme} thumbColor={isDarkTheme ? colors.primary : themePalette.hex_0000ff81} trackColor={{ false: colors.border, true: colors.accentSoft }} value={isDarkTheme} />
       </Pressable>
 
       <Pressable onPress={handleInviteFriends} style={[styles.menuItem, {}]}>

@@ -785,6 +785,15 @@ export default function HomeScreen() {
                     state: detailCompany.state && detailCompany.state !== 'N/A'
                         ? detailCompany.state
                         : currentCompany.state,
+                    registrationNumber: detailCompany.registrationNumber && detailCompany.registrationNumber !== 'N/A'
+                        ? detailCompany.registrationNumber
+                        : currentCompany.registrationNumber,
+                    registrationDate: detailCompany.registrationDate && detailCompany.registrationDate !== 'N/A'
+                        ? detailCompany.registrationDate
+                        : currentCompany.registrationDate,
+                    subscription: Object.keys(detailCompany.subscription ?? {}).length > 0
+                        ? detailCompany.subscription
+                        : currentCompany.subscription,
                     status: detailCompany.status || currentCompany.status,
                 };
             });
@@ -805,6 +814,15 @@ export default function HomeScreen() {
                     state: detailCompany.state && detailCompany.state !== 'N/A'
                         ? detailCompany.state
                         : company.state,
+                    registrationNumber: detailCompany.registrationNumber && detailCompany.registrationNumber !== 'N/A'
+                        ? detailCompany.registrationNumber
+                        : company.registrationNumber,
+                    registrationDate: detailCompany.registrationDate && detailCompany.registrationDate !== 'N/A'
+                        ? detailCompany.registrationDate
+                        : company.registrationDate,
+                    subscription: Object.keys(detailCompany.subscription ?? {}).length > 0
+                        ? detailCompany.subscription
+                        : company.subscription,
                     status: detailCompany.status || company.status,
                 };
             }));
@@ -1108,7 +1126,7 @@ export default function HomeScreen() {
             {activeTab === 'home' && unpaidCompany ? (
                 <PendingPaymentBanner colors={colors} companyLabel={unpaidCompanyLabel} amount={unpaidCompanyAmount} onPayPress={handleResumePaymentPress} />
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} isPaymentLocked={isPaymentPending} onLockedCompliancePress={showPaymentLockedToast} onCompanySwitcherPress={openCompanySwitcher} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanySwitcherPress={openCompanySwitcher} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onCompanyProfilePress={() => setActiveCompanySection('menu')} onCompanyOverviewPress={() => setActiveCompanySection('menu')} onComplianceOverviewPress={() => setActiveTab('reports')} onDocumentsOverviewPress={() => setActiveTab('documents')} onBillingOverviewPress={() => setActiveTab('billing')} onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -1118,7 +1136,7 @@ export default function HomeScreen() {
                     navigation.navigate('HelpDesk');
                 else if (itemId === 'federalFiling')
                     navigation.navigate('FederalFiling');
-            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })} colors={colors} />) : null}
+            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} colors={colors} />) : null}
             {activeTab === 'company' ? (<CompanyTabContent selectedCompany={selectedCompany} onSectionPress={setActiveCompanySection} />) : null}
             {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
                 if (action.id === 'federal_filing')
@@ -1147,7 +1165,7 @@ export default function HomeScreen() {
 
         <FloatingPlusButtonCard visible={isPlusCardOpen} onClose={() => setIsPlusCardOpen(false)} bottomOffset={safeAreaInsets.bottom + 85} onChatSupportPress={() => { setIsPlusCardOpen(false); navigation.navigate('ChatSupport'); }} />
 
-        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onCompanyInfoPress={() => closeMoreSheet(() => setActiveCompanySection('menu'))} onManagePress={() => closeMoreSheet(() => setIsManageOptionsOpen(true))} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
+        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onManagePress={() => closeMoreSheet(() => setIsManageOptionsOpen(true))} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} onAddCompany={openAddCompanyFlow} addCompanyBlocked={addCompanyBlocked} addCompanyBlockedReason={addCompanyBlockedReason} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);

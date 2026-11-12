@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 const serviceItems = [
@@ -56,28 +56,28 @@ function getToneStyles(tone) {
             iconText: styles.iconTextAmber,
             tag: styles.tagAmber,
             tagText: styles.tagTextAmber,
-            borderColor: 'rgba(245, 158, 11, 0.5)',
+            borderColor: themePalette.rgba_245_158_11_0_5,
         },
         blue: {
             icon: styles.iconBlue,
             iconText: styles.iconTextBlue,
             tag: styles.tagBlue,
             tagText: styles.tagTextBlue,
-            borderColor: 'rgba(59, 130, 246, 0.5)',
+            borderColor: themePalette.rgba_59_130_246_0_5,
         },
         purple: {
             icon: styles.iconPurple,
             iconText: styles.iconTextPurple,
             tag: styles.tagPurple,
             tagText: styles.tagTextPurple,
-            borderColor: 'rgba(139, 92, 246, 0.5)',
+            borderColor: themePalette.rgba_139_92_246_0_5,
         },
         red: {
             icon: styles.iconRed,
             iconText: styles.iconTextRed,
             tag: styles.tagRed,
             tagText: styles.tagTextRed,
-            borderColor: 'rgba(239, 68, 68, 0.5)',
+            borderColor: themePalette.rgba_239_68_68_0_5,
         },
     };
     return toneStyles[tone];
@@ -94,7 +94,7 @@ function ExploreServicesSection({ onQuickAccessItemPress: _onQuickAccessItemPres
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gridContainer}>
         {serviceItems.map(item => {
             const tone = getToneStyles(item.tone);
-            return (<Pressable key={item.title} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? '#ffffff' : colors.surface }]} onPress={() => {
+            return (<Pressable key={item.title} style={[styles.gridItem, { borderColor: tone.borderColor, backgroundColor: isLight ? themePalette.hex_ffffff : colors.surface }]} onPress={() => {
                     const screenMap = {
                         'Tax / Acct Services': 'TaxAccounting',
                         'Business / Regs': 'BusinessCompliance',
@@ -121,7 +121,7 @@ function ExploreServicesSection({ onQuickAccessItemPress: _onQuickAccessItemPres
       </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     section: {
         marginTop: 14,
         paddingHorizontal: s(8),
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
         marginBottom: 14,
     },
     sectionTitle: {
-        color: '#2C2C2A',
+        color: themePalette.hex_2c2c2a,
         fontSize: font.xl,
         fontWeight: '500',
     },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#E5E7EB',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: 14,
         paddingVertical: 8,
         paddingHorizontal: s(12),
@@ -196,40 +196,40 @@ const styles = StyleSheet.create({
     iconRed: {},
     iconPurple: {},
     iconTextBlue: {
-        color: '#1D4ED8',
+        color: themePalette.hex_1d4ed8,
     },
     iconTextAmber: {
-        color: '#B45309',
+        color: themePalette.hex_b45309,
     },
     iconTextRed: {
-        color: '#DC2626',
+        color: themePalette.hex_dc2626,
     },
     iconTextPurple: {
-        color: '#7C3AED',
+        color: themePalette.hex_7c3aed,
     },
     tagBlue: {
-        backgroundColor: '#DBEAFE',
+        backgroundColor: themePalette.hex_dbeafe,
     },
     tagAmber: {
-        backgroundColor: '#FEF3C7',
+        backgroundColor: themePalette.hex_fef3c7,
     },
     tagRed: {
-        backgroundColor: '#FEE2E2',
+        backgroundColor: themePalette.hex_fee2e2,
     },
     tagPurple: {
-        backgroundColor: '#EDE9FE',
+        backgroundColor: themePalette.hex_ede9fe,
     },
     tagTextBlue: {
-        color: '#1D4ED8',
+        color: themePalette.hex_1d4ed8,
     },
     tagTextAmber: {
-        color: '#B45309',
+        color: themePalette.hex_b45309,
     },
     tagTextRed: {
-        color: '#DC2626',
+        color: themePalette.hex_dc2626,
     },
     tagTextPurple: {
-        color: '#7C3AED',
+        color: themePalette.hex_7c3aed,
     },
-});
+}));
 export default ExploreServicesSection;

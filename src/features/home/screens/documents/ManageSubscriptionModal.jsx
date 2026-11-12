@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, Text, View, ScrollView, Pressable, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 const PLANS_DATA = [
@@ -11,7 +11,7 @@ const PLANS_DATA = [
         price: '$145',
         period: '/year',
         docs: '10 Documents/Year',
-        accentColor: '#00A8E8',
+        accentColor: themePalette.hex_00a8e8,
         isActive: false,
         badge: null,
     },
@@ -21,11 +21,11 @@ const PLANS_DATA = [
         price: '$245',
         period: '/year',
         docs: '25 Documents/Year',
-        accentColor: '#8E7CFF',
+        accentColor: themePalette.hex_8e7cff,
         isActive: false,
         badge: 'Most Popular',
-        badgeBg: '#FAC775',
-        badgeText: '#0D2137',
+        badgeBg: themePalette.hex_fac775,
+        badgeText: themePalette.hex_0d2137,
     },
     {
         id: 'enterprise',
@@ -33,11 +33,11 @@ const PLANS_DATA = [
         price: '$345',
         period: '/year',
         docs: 'Unlimited Documents',
-        accentColor: '#FF6B4A',
+        accentColor: themePalette.hex_ff6b4a,
         isActive: true,
         badge: 'Current Plan',
-        badgeBg: '#10B981',
-        badgeText: '#ffffff',
+        badgeBg: themePalette.hex_10b981,
+        badgeText: themePalette.hex_ffffff,
     },
 ];
 export default function ManageSubscriptionModal({ visible, onClose }) {
@@ -50,7 +50,7 @@ export default function ManageSubscriptionModal({ visible, onClose }) {
             <View style={[styles.header, { borderColor: colors.border }]}>
               <View>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Manage Subscription</Text>
-                <Text style={[styles.headerSubtitle, { color: isDark ? '#85B7EB' : colors.accent }]}>Choose a plan for test.</Text>
+                <Text style={[styles.headerSubtitle, { color: isDark ? themePalette.hex_85b7eb : colors.accent }]}>Choose a plan for test.</Text>
               </View>
               <Pressable style={styles.closeBtn} onPress={onClose}>
                 <FontAwesome name="times" size={20} color={colors.text} style={{ opacity: 0.6 }}/>
@@ -59,7 +59,7 @@ export default function ManageSubscriptionModal({ visible, onClose }) {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
               <View style={styles.sectionTitleRow}>
-                <FontAwesome name="rocket" size={16} color="#FAC775" style={{ marginRight: 8 }}/>
+                <FontAwesome name="rocket" size={16} color={themePalette.hex_fac775} style={{ marginRight: 8 }}/>
                 <Text style={[styles.sectionTitleText, { color: colors.text }]}>Choose a Plan for test</Text>
               </View>
 
@@ -91,7 +91,7 @@ export default function ManageSubscriptionModal({ visible, onClose }) {
 
                   <View style={styles.cardBottomAction}>
                     {plan.isActive ? (<View style={styles.activeLabelRow}>
-                        <FontAwesome name="check-circle" size={16} color="#10B981" style={{ marginRight: 6 }}/>
+                        <FontAwesome name="check-circle" size={16} color={themePalette.hex_10b981} style={{ marginRight: 6 }}/>
                         <Text style={styles.activeButtonText}>Active</Text>
                       </View>) : (<Pressable style={[styles.subscribeBtn, { backgroundColor: plan.accentColor }]}>
                         <Text style={styles.subscribeBtnText}>Subscribe</Text>
@@ -104,7 +104,7 @@ export default function ManageSubscriptionModal({ visible, onClose }) {
       </View>
     </Modal>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     overlay: {
         flex: 1,
         justifyContent: 'center',
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     subscribeBtnText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.xl,
         fontWeight: '700',
     },
@@ -237,8 +237,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     activeButtonText: {
-        color: '#10B981',
+        color: themePalette.hex_10b981,
         fontSize: font.xl,
         fontWeight: '700',
     },
-});
+}));

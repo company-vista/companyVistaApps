@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { HomeHeader } from './HomeHeader';
+import { themePalette } from '../../../../theme/colors';
 
 export function FixedHomeHeader({ insets, colors, contentHeight = 72, displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress }) {
     return (<View style={{
@@ -13,7 +14,7 @@ export function FixedHomeHeader({ insets, colors, contentHeight = 72, displayNam
         justifyContent: 'center',
         paddingTop: insets.top,
         backgroundColor: colors.surface,
-        shadowColor: '#000',
+        shadowColor: themePalette.hex_000,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.03,
         shadowRadius: 12,

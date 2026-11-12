@@ -6,7 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import NotificationPageSkeleton from '../../../notification/NotificationPageSkeleton';
 import { useAppSelector } from '../../../store/hooks';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 import { font } from '../../../theme/typography';
 import { deleteNotification, fetchNotifications, markNotificationAsRead } from '../api/notificationsApi';
@@ -172,7 +172,7 @@ function NotificationScreen() {
                 <View style={[styles.modalCard, { backgroundColor: colors.surface }]}>
                     <View style={styles.iconCircleOuter}>
                         <View style={styles.iconCircleInner}>
-                            <FontAwesome name="trash" size={24} color="#ffffff" />
+                            <FontAwesome name="trash" size={24} color={themePalette.hex_ffffff} />
                         </View>
                     </View>
 
@@ -223,7 +223,7 @@ function NotificationScreen() {
         </Modal>
     </>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     title: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '400',
     },
@@ -252,10 +252,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 17,
-        backgroundColor: '#ef4444',
+        backgroundColor: themePalette.hex_ef4444,
     },
     countText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.lg,
         fontWeight: '400',
     },
@@ -297,16 +297,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 35,
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     emptyTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.hero,
         fontWeight: '400',
         marginTop: 18,
     },
     emptyText: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.lg,
         fontWeight: '400',
         lineHeight: 20,
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 14,
         borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
+        borderBottomColor: themePalette.hex_e5e7eb,
         paddingVertical: 16,
     },
     notificationIcon: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 22,
-        backgroundColor: '#180f0f',
+        backgroundColor: themePalette.hex_180f0f,
     },
     notificationCopy: {
         flex: 1,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     notificationTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.xl,
         fontWeight: '400',
         flex: 1,
@@ -346,17 +346,17 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#ef4444',
+        backgroundColor: themePalette.hex_ef4444,
     },
     notificationMessage: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: font.base,
         fontWeight: '400',
         lineHeight: 19,
         marginTop: 4,
     },
     notificationTime: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: font.base,
         fontWeight: '400',
         marginTop: 8,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(15, 23, 42, 0.42)',
+        backgroundColor: themePalette.rgba_15_23_42_0_42,
         paddingHorizontal: s(24),
     },
     modalCard: {
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
         width: 62,
         height: 62,
         borderRadius: 36,
-        backgroundColor: '#180f0f',
+        backgroundColor: themePalette.hex_180f0f,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 24,
-        backgroundColor: '#ef4444',
+        backgroundColor: themePalette.hex_ef4444,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -412,12 +412,12 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#ef4444',
+        backgroundColor: themePalette.hex_ef4444,
         justifyContent: 'center',
         alignItems: 'center',
     },
     deleteButtonText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.xl,
         fontWeight: '400',
     },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 46,
         borderRadius: 24,
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -434,5 +434,5 @@ const styles = StyleSheet.create({
         fontSize: font.xxl,
         fontWeight: '400',
     },
-});
+}));
 export default NotificationScreen;

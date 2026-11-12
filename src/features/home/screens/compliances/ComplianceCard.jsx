@@ -2,50 +2,51 @@ import { font } from '../../../../theme/typography';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { s } from '../../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../../theme/colors';
 
 function getToneStyles(tone, colors) {
     const isDark = colors.mode === 'dark';
     const toneStyles = {
         amber: {
             icon: {
-                backgroundColor: isDark ? '#2F2411' : '#FEF3C7',
+                backgroundColor: isDark ? themePalette.hex_2f2411 : themePalette.hex_fef3c7,
             },
             iconText: {
-                color: isDark ? '#F9C56A' : '#B45309',
+                color: isDark ? themePalette.hex_f9c56a : themePalette.hex_b45309,
             },
             tag: {
-                backgroundColor: isDark ? '#3A2A15' : '#FEF3C7',
+                backgroundColor: isDark ? themePalette.hex_3a2a15 : themePalette.hex_fef3c7,
             },
             tagText: {
-                color: isDark ? '#F7DCA7' : '#B45309',
+                color: isDark ? themePalette.hex_f7dca7 : themePalette.hex_b45309,
             },
         },
         green: {
             icon: {
-                backgroundColor: isDark ? '#15352A' : '#D1FAE5',
+                backgroundColor: isDark ? themePalette.hex_15352a : themePalette.hex_d1fae5,
             },
             iconText: {
-                color: isDark ? '#7DD3A8' : '#047857',
+                color: isDark ? themePalette.hex_7dd3a8 : themePalette.hex_047857,
             },
             tag: {
-                backgroundColor: isDark ? '#1C4334' : '#D1FAE5',
+                backgroundColor: isDark ? themePalette.hex_1c4334 : themePalette.hex_d1fae5,
             },
             tagText: {
-                color: isDark ? '#A7F3D0' : '#047857',
+                color: isDark ? themePalette.hex_a7f3d0 : themePalette.hex_047857,
             },
         },
         red: {
             icon: {
-                backgroundColor: isDark ? '#3D1717' : '#FEE2E2',
+                backgroundColor: isDark ? themePalette.hex_3d1717 : themePalette.hex_fee2e2,
             },
             iconText: {
-                color: isDark ? '#F8A5A5' : '#DC2626',
+                color: isDark ? themePalette.hex_f8a5a5 : themePalette.hex_dc2626,
             },
             tag: {
-                backgroundColor: isDark ? '#4C1D1D' : '#FEE2E2',
+                backgroundColor: isDark ? themePalette.hex_4c1d1d : themePalette.hex_fee2e2,
             },
             tagText: {
-                color: isDark ? '#F6C1C1' : '#DC2626',
+                color: isDark ? themePalette.hex_f6c1c1 : themePalette.hex_dc2626,
             },
         },
     };
@@ -83,7 +84,7 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
                     </View>
                     <View style={styles.headerBadges}>
                         {isPaymentLocked ? (
-                            <View style={[styles.lockBadge, { backgroundColor: isLight ? 'rgba(6,8,14,0.08)' : 'rgba(255,255,255,0.12)' }]}>
+                            <View style={[styles.lockBadge, { backgroundColor: isLight ? themePalette.rgba_6_8_14_0_08 : themePalette.rgba_255_255_255_0_12 }]}>
                                 <FontAwesome name="lock" size={13} color={colors.text} />
                             </View>
                         ) : null}
@@ -115,7 +116,7 @@ function ComplianceCard({ item, companyId, colors, isLight, isPaymentLocked = fa
     );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     tileWrapper: {
         position: 'relative',
         width: '48%',
@@ -157,10 +158,10 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     daysBadgeOkText: {
-        color: '#047857',
+        color: themePalette.hex_047857,
     },
     daysBadgeSoonText: {
-        color: '#B45309',
+        color: themePalette.hex_b45309,
     },
     headerBadges: {
         flexDirection: 'row',
@@ -195,6 +196,6 @@ const styles = StyleSheet.create({
         fontSize: font.base,
         fontWeight: '600',
     },
-});
+}));
 
 export default ComplianceCard;

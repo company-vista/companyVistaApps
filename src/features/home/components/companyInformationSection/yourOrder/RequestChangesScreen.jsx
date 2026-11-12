@@ -17,7 +17,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
-import { useThemeColors } from '../../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../../theme/colors';
 import BackButton from '../../../../../components/buttons/BackButton';
 import logoR from '../../../../../assets/images/logoR.png';
 import { s } from '../../../../../theme/responsive';
@@ -107,8 +107,8 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <BackButton onPress={onBackPress} />
           <Image source={logoR} style={{ width: 120, height: 32 }} resizeMode="contain" />
-          <TouchableOpacity style={[styles.iconButton, { backgroundColor: isLight ? '#F1F5F9' : '#161928', borderColor: colors.border }]}>
-            <Ionicons name="help-circle-outline" size={22} color={isLight ? colors.muted : '#8E93A6'} />
+          <TouchableOpacity style={[styles.iconButton, { backgroundColor: isLight ? themePalette.hex_f1f5f9 : themePalette.hex_161928, borderColor: colors.border }]}>
+            <Ionicons name="help-circle-outline" size={22} color={isLight ? colors.muted : themePalette.hex_8e93a6} />
           </TouchableOpacity>
         </View>
 
@@ -134,11 +134,11 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
               return (
                 <TouchableOpacity
                   key={cat}
-                  style={[styles.chip, { backgroundColor: isLight ? '#FFFFFF' : '#141727', borderColor: isSelected ? '#D0A85C' : colors.border }, isSelected && { backgroundColor: isLight ? '#FFF7ED' : '#1B1B1D' }]}
+                  style={[styles.chip, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_141727, borderColor: isSelected ? themePalette.hex_d0a85c : colors.border }, isSelected && { backgroundColor: isLight ? themePalette.hex_fff7ed : themePalette.hex_1b1b1d }]}
                   onPress={() => setSelectedCategory(cat)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.chipText, { color: isSelected ? '#D0A85C' : colors.muted }]}>{cat}</Text>
+                  <Text style={[styles.chipText, { color: isSelected ? themePalette.hex_d0a85c : colors.muted }]}>{cat}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -156,10 +156,10 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
               messages.map((m) =>
                 m.type === 'agent' ? (
                   <View key={m.id} style={styles.messageRowLeft}>
-                    <View style={[styles.avatar, { backgroundColor: '#3A72EC' }]}>
+                    <View style={[styles.avatar, { backgroundColor: themePalette.hex_3a72ec }]}>
                       <Text style={styles.avatarText}>AD</Text>
                     </View>
-                    <View style={[styles.agentBubble, { backgroundColor: isLight ? '#FFFFFF' : '#121626', borderColor: colors.border }]}>
+                    <View style={[styles.agentBubble, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121626, borderColor: colors.border }]}>
                       <Text style={styles.agentName}>
                         {m.name} <Text style={styles.agentRole}>· German desk</Text>
                       </Text>
@@ -169,11 +169,11 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
                   </View>
                 ) : (
                   <View key={m.id} style={styles.messageRowRight}>
-                    <View style={[styles.userBubble, { backgroundColor: isLight ? '#F1F5F9' : '#151722', borderColor: colors.border }]}>
+                    <View style={[styles.userBubble, { backgroundColor: isLight ? themePalette.hex_f1f5f9 : themePalette.hex_151722, borderColor: colors.border }]}>
                       <Text style={[styles.messageText, { color: colors.text }]}>{m.text}</Text>
                       <Text style={[styles.timeText, { color: colors.muted }]}>{m.time}</Text>
                     </View>
-                    <View style={[styles.avatar, { backgroundColor: '#B89B48' }]}>
+                    <View style={[styles.avatar, { backgroundColor: themePalette.hex_b89b48 }]}>
                       <Text style={styles.avatarText}>{initials}</Text>
                     </View>
                   </View>
@@ -185,7 +185,7 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
 
         <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border, paddingBottom: insets.bottom + s(12) }]}>
           <View style={styles.footerRow}>
-            <View style={[styles.footerInputWrap, { backgroundColor: isLight ? '#FFFFFF' : '#121626', borderColor: colors.border }]}>
+            <View style={[styles.footerInputWrap, { backgroundColor: isLight ? themePalette.hex_ffffff : themePalette.hex_121626, borderColor: colors.border }]}>
               <TextInput
                 style={[styles.footerInput, { color: colors.text }]}
                 value={inputText}
@@ -202,7 +202,7 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
               activeOpacity={0.8}
               onPress={handleSend}
             >
-              {sending ? <ActivityIndicator size="small" color="#0A0C16" /> : <Ionicons name="arrow-forward" size={18} color="#0A0C16" />}
+              {sending ? <ActivityIndicator size="small" color={themePalette.hex_0a0c16} /> : <Ionicons name="arrow-forward" size={18} color={themePalette.hex_0a0c16} />}
             </TouchableOpacity>
           </View>
           <Text style={[styles.disclaimerText, { color: colors.muted }]}>Quote stays valid while under revision</Text>
@@ -212,38 +212,38 @@ const RequestChangesScreen = ({ onBackPress, companyId: companyIdProp = null, qu
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0B0D1B' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_0b0d1b },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(16), paddingVertical: s(12) },
-  iconButton: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#161928', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#1C2035' },
+  iconButton: { width: 36, height: 36, borderRadius: 10, backgroundColor: themePalette.hex_161928, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: themePalette.hex_1c2035 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
-  title: { fontSize: font.displayLarge, fontWeight: '600', color: '#FFFFFF', marginTop: s(8) },
-  titleItalic: { fontStyle: 'italic', color: '#D0A85C', fontWeight: '300' },
-  subtitle: { fontSize: font.bodySmall, color: '#7B8CB2', marginTop: s(4), marginBottom: s(20) },
+  title: { fontSize: font.displayLarge, fontWeight: '600', color: themePalette.hex_ffffff, marginTop: s(8) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d0a85c, fontWeight: '300' },
+  subtitle: { fontSize: font.bodySmall, color: themePalette.hex_7b8cb2, marginTop: s(4), marginBottom: s(20) },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginVertical: s(14) },
-  sectionTitle: { fontSize: font.small, fontWeight: '700', color: '#555C77', letterSpacing: 0.8 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#1C2035', marginLeft: s(10) },
+  sectionTitle: { fontSize: font.small, fontWeight: '700', color: themePalette.hex_555c77, letterSpacing: 0.8 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: themePalette.hex_1c2035, marginLeft: s(10) },
   chipsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: s(10) },
-  chip: { paddingVertical: s(8), paddingHorizontal: s(14), borderRadius: 20, backgroundColor: '#141727', borderWidth: 1, borderColor: '#242A42' },
-  chipText: { fontSize: font.bodySmall, color: '#8E93A6', fontWeight: '500' },
+  chip: { paddingVertical: s(8), paddingHorizontal: s(14), borderRadius: 20, backgroundColor: themePalette.hex_141727, borderWidth: 1, borderColor: themePalette.hex_242a42 },
+  chipText: { fontSize: font.bodySmall, color: themePalette.hex_8e93a6, fontWeight: '500' },
   chatContainer: { gap: 14 },
   messageRowLeft: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   messageRowRight: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end', gap: 10 },
   avatar: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginTop: s(2) },
-  avatarText: { color: '#FFFFFF', fontSize: font.small, fontWeight: 'bold' },
-  agentBubble: { maxWidth: '76%', flexShrink: 1, backgroundColor: '#121626', borderRadius: 14, borderTopLeftRadius: 4, padding: s(12), borderWidth: 1, borderColor: '#1D233A', alignSelf: 'flex-start' },
-  userBubble: { maxWidth: '76%', flexShrink: 1, backgroundColor: '#151722', borderRadius: 14, borderTopRightRadius: 4, padding: s(12), borderWidth: 1, borderColor: '#2B2621', alignSelf: 'flex-start' },
-  agentName: { fontSize: font.sm, fontWeight: 'bold', color: '#D0A85C', marginBottom: s(4) },
-  agentRole: { fontWeight: 'normal', color: '#7B8CB2' },
-  messageText: { fontSize: font.bodySmall, color: '#E0E6ED', lineHeight: 18 },
-  timeText: { fontSize: font.xs, color: '#4B536B', marginTop: s(6) },
-  footer: { paddingHorizontal: s(16), paddingTop: s(24), paddingBottom: s(16), backgroundColor: '#0B0D1B', borderTopWidth: 1, borderTopColor: 'transparent' },
+  avatarText: { color: themePalette.hex_ffffff, fontSize: font.small, fontWeight: 'bold' },
+  agentBubble: { maxWidth: '76%', flexShrink: 1, backgroundColor: themePalette.hex_121626, borderRadius: 14, borderTopLeftRadius: 4, padding: s(12), borderWidth: 1, borderColor: themePalette.hex_1d233a, alignSelf: 'flex-start' },
+  userBubble: { maxWidth: '76%', flexShrink: 1, backgroundColor: themePalette.hex_151722, borderRadius: 14, borderTopRightRadius: 4, padding: s(12), borderWidth: 1, borderColor: themePalette.hex_2b2621, alignSelf: 'flex-start' },
+  agentName: { fontSize: font.sm, fontWeight: 'bold', color: themePalette.hex_d0a85c, marginBottom: s(4) },
+  agentRole: { fontWeight: 'normal', color: themePalette.hex_7b8cb2 },
+  messageText: { fontSize: font.bodySmall, color: themePalette.hex_e0e6ed, lineHeight: 18 },
+  timeText: { fontSize: font.xs, color: themePalette.hex_4b536b, marginTop: s(6) },
+  footer: { paddingHorizontal: s(16), paddingTop: s(24), paddingBottom: s(16), backgroundColor: themePalette.hex_0b0d1b, borderTopWidth: 1, borderTopColor: 'transparent' },
   footerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, width: '100%' },
-  footerInputWrap: { flex: 1, backgroundColor: '#121626', borderRadius: 12, borderWidth: 1, borderColor: '#1D233A', paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
-  footerInput: { flex: 1, color: '#FFFFFF', fontSize: font.bodySmall, padding: s(0) },
-  sendButtonSmall: { backgroundColor: '#DDB763', borderRadius: 999, justifyContent: 'center', alignItems: 'center', height: 44, width: 44 },
+  footerInputWrap: { flex: 1, backgroundColor: themePalette.hex_121626, borderRadius: 12, borderWidth: 1, borderColor: themePalette.hex_1d233a, paddingHorizontal: s(12), height: 44, justifyContent: 'center' },
+  footerInput: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.bodySmall, padding: s(0) },
+  sendButtonSmall: { backgroundColor: themePalette.hex_ddb763, borderRadius: 999, justifyContent: 'center', alignItems: 'center', height: 44, width: 44 },
   emptyChatText: { fontSize: font.bodySmall, textAlign: 'center', marginVertical: s(20), lineHeight: 18 },
-  disclaimerText: { color: '#4B536B', fontSize: font.small, marginTop: s(8), textAlign: 'center', width: '100%' },
-});
+  disclaimerText: { color: themePalette.hex_4b536b, fontSize: font.small, marginTop: s(8), textAlign: 'center', width: '100%' },
+}));
 
 export default RequestChangesScreen;

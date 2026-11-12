@@ -33,7 +33,7 @@ import BestMatchesScreen from '../jurisdictionAdvisor/BestMatchesScreen';
 import USStatePhysicalPresenceScreen from '../jurisdictionAdvisor/USStatePhysicalPresenceScreen';
 import USStatePriorityScreen from '../jurisdictionAdvisor/USStatePriorityScreen';
 import BestStatesForYouScreen from '../jurisdictionAdvisor/BestStatesForYouScreen';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setRedirectToLogin } from '../../../store/slices/authSlice';
 import { useEffect, useRef } from 'react';
@@ -70,7 +70,7 @@ export default function AuthStack() {
         const t = setTimeout(() => dispatch(setRedirectToLogin(false)), 500);
         return () => clearTimeout(t);
     }, [redirectToLogin, isAuthenticated, dispatch, navigation]);
-    return (<Stack.Navigator initialRouteName={redirectToLogin ? 'Login' : 'Onboarding'} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0a0f1e' } }}>
+    return (<Stack.Navigator initialRouteName={redirectToLogin ? 'Login' : 'Onboarding'} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: themePalette.hex_0a0f1e } }}>
       <Stack.Screen name="Onboarding" component={OnboardingSlide}/>
       <Stack.Screen name="BusinessServices" component={BusinessServicesScreen}/>
       <Stack.Screen name="TrustedWorldwide" component={TrustedWorldwideScreen}/>

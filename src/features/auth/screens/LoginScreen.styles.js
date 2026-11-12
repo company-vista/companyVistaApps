@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
 import { s } from "../../../theme/responsive";
 import { font } from "../../../theme/typography";
-const styles = StyleSheet.create({
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
-        backgroundColor: '#0f172a',
+        backgroundColor: themePalette.hex_0f172a,
     },
     container: {
         flex: 1,
@@ -33,13 +34,13 @@ const styles = StyleSheet.create({
         marginBottom: s(20),
     },
     title: {
-        color: '#f8fafc',
+        color: themePalette.hex_f8fafc,
         fontSize: s(20),
         fontWeight: '400',
         textAlign: 'center',
     },
     subtitle: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: s(13),
         lineHeight: s(22),
         marginTop: 8,
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
         gap: s(14),
     },
     label: {
-        color: '#cbd5e1a9',
+        color: themePalette.hex_cbd5e1a9,
         fontSize: s(13),
         fontWeight: '700',
     },
@@ -64,16 +65,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: s(10),
         borderWidth: 1,
-        borderColor: '#0d1116',
+        borderColor: themePalette.hex_0d1116,
         borderRadius: s(20),
-        backgroundColor: '#111827',
+        backgroundColor: themePalette.hex_111827,
         paddingHorizontal: s(14),
     },
     input: {
         flex: 1,
         height: '100%',
         padding: 0,
-        color: '#f8fafc',
+        color: themePalette.hex_f8fafc,
         fontSize: s(14),
     },
     passwordToggle: {
@@ -84,10 +85,10 @@ const styles = StyleSheet.create({
         marginRight: -4,
     },
     inputError: {
-        borderColor: '#f87171',
+        borderColor: themePalette.hex_f87171,
     },
     errorText: {
-        color: '#fca5a5',
+        color: themePalette.hex_fca5a5,
         fontSize: font.base,
         fontWeight: '500',
     },
@@ -115,10 +116,10 @@ const styles = StyleSheet.create({
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: '#334155',
+        backgroundColor: themePalette.hex_334155,
     },
     dividerText: {
-        color: '#cbd5e1',
+        color: themePalette.hex_cbd5e1,
         fontSize: s(15),
         fontWeight: '700',
     },
@@ -129,23 +130,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: s(10),
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: themePalette.hex_e5e7eb,
         borderRadius: s(22),
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
     },
     googleAuthText: {
-        color: '#475569',
+        color: themePalette.hex_475569,
         fontSize: s(15),
         fontWeight: '500',
     },
     authLinkText: {
-        color: '#94a3b8',
+        color: themePalette.hex_94a3b8,
         fontSize: s(15),
         fontWeight: '600',
         textAlign: 'center',
     },
     authLink: {
-        color: '#5eead4',
+        color: themePalette.hex_5eead4,
         fontWeight: '500',
     },
     forgotPassword: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     socialTitle: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: s(12),
         fontWeight: '700',
     },
@@ -178,13 +179,13 @@ const styles = StyleSheet.create({
         borderRadius: s(19),
     },
     facebookButton: {
-        backgroundColor: '#1877f2',
+        backgroundColor: themePalette.hex_1877f2,
     },
     instagramButton: {
-        backgroundColor: '#e1306c',
+        backgroundColor: themePalette.hex_e1306c,
     },
     linkedinButton: {
-        backgroundColor: '#0a66c2',
+        backgroundColor: themePalette.hex_0a66c2,
     },
-});
+}));
 export default styles;

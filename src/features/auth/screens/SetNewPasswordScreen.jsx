@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingAddCompany, setPendingOrderData } from '../../../store/slices/authSlice';
 import { setPasswordApi } from '../api/orderApi';
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 export default function SetNewPasswordScreen(props) {
   const { navigation, route } = props;
@@ -54,7 +55,7 @@ export default function SetNewPasswordScreen(props) {
 
   const strengthScore = Object.values(checks).filter(Boolean).length;
   const strengthLabel = ['Weak', 'Fair', 'Good', 'Strong'][strengthScore - 1] || 'Weak';
-  const strengthColor = strengthScore <= 1 ? '#EF4444' : strengthScore === 2 ? '#F59E0B' : strengthScore === 3 ? '#22D3EE' : '#10B981';
+  const strengthColor = strengthScore <= 1 ? themePalette.hex_ef4444 : strengthScore === 2 ? themePalette.hex_f59e0b : strengthScore === 3 ? themePalette.hex_22d3ee : themePalette.hex_10b981;
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
   const isConfirmError = confirmPassword.length > 0 && !passwordsMatch;
 
@@ -158,7 +159,7 @@ export default function SetNewPasswordScreen(props) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
@@ -189,7 +190,7 @@ export default function SetNewPasswordScreen(props) {
                 onChangeText={setNewPassword}
                 secureTextEntry={!isPasswordVisible}
                 placeholder="Enter new password"
-                placeholderTextColor="#6B7280"
+                placeholderTextColor={themePalette.hex_6b7280}
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -204,7 +205,7 @@ export default function SetNewPasswordScreen(props) {
             </View>
             <View style={styles.strengthLabelRow}>
               <Text style={styles.subtext}>Password strength</Text>
-              <Text style={[styles.strengthText, { color: newPassword ? strengthColor : '#64748B' }]}>
+              <Text style={[styles.strengthText, { color: newPassword ? strengthColor : themePalette.hex_64748b }]}>
                 {newPassword ? strengthLabel : '-'}
               </Text>
             </View>
@@ -225,22 +226,22 @@ export default function SetNewPasswordScreen(props) {
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!isPasswordVisible}
                 placeholder="Confirm password"
-                placeholderTextColor="#6B7280"
+                placeholderTextColor={themePalette.hex_6b7280}
                 autoCapitalize="none"
               />
               {passwordsMatch ? <Text style={styles.successIcon}>✓</Text> : null}
             </View>
             {confirmPassword.length > 0 && (
               <View style={styles.matchRow}>
-                <Text style={[styles.matchIcon, { color: passwordsMatch ? '#10B981' : '#EF4444' }]}>{passwordsMatch ? '✓' : '✕'}</Text>
-                <Text style={[styles.matchText, { color: passwordsMatch ? '#10B981' : '#EF4444' }]}>{passwordsMatch ? 'Passwords match' : 'Passwords do not match'}</Text>
+                <Text style={[styles.matchIcon, { color: passwordsMatch ? themePalette.hex_10b981 : themePalette.hex_ef4444 }]}>{passwordsMatch ? '✓' : '✕'}</Text>
+                <Text style={[styles.matchText, { color: passwordsMatch ? themePalette.hex_10b981 : themePalette.hex_ef4444 }]}>{passwordsMatch ? 'Passwords match' : 'Passwords do not match'}</Text>
               </View>
             )}
           </View>
 
           <View style={styles.footer}>
             <Pressable style={[styles.submitButton, loading && { opacity: 0.7 }]} onPress={handleSetPassword} disabled={loading}>
-              {loading ? <ActivityIndicator color="#070A12" /> : (
+              {loading ? <ActivityIndicator color={themePalette.hex_070a12} /> : (
                 <>
                   <Text style={styles.submitButtonText}>Set Password & Continue</Text>
                   <Text style={styles.arrowIcon}>→</Text>
@@ -258,54 +259,54 @@ function CheckRow({ ok, text }) {
   return (
     <View style={styles.checkRow}>
       <View style={[styles.checkCircle, ok ? styles.checkCircleOk : styles.checkCircleOff]}>
-        <Text style={[styles.checkMark, { color: ok ? '#10B981' : '#64748B' }]}>✓</Text>
+        <Text style={[styles.checkMark, { color: ok ? themePalette.hex_10b981 : themePalette.hex_64748b }]}>✓</Text>
       </View>
-      <Text style={[styles.checkText, { color: ok ? '#10B981' : '#64748B' }]}>{text}</Text>
+      <Text style={[styles.checkText, { color: ok ? themePalette.hex_10b981 : themePalette.hex_64748b }]}>{text}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#070A12' },
+const styles = makeThemeStyles(() => StyleSheet.create({
+  container: { flex: 1, backgroundColor: themePalette.hex_070a12 },
   keyboardView: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingBottom: 20, justifyContent: 'space-between' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6, marginTop: 6 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
   heroSection: { alignItems: 'center', marginTop: 12 },
-  lockOuterCard: { width: 106, height: 106, borderRadius: 30, borderWidth: 1, borderColor: '#0F5257', backgroundColor: '#051E24', justifyContent: 'center', alignItems: 'center' },
-  lockIconContainer: { width: 60, height: 60, borderRadius: 20, borderWidth: 1.5, borderColor: '#00F5D4', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0B2B30' },
+  lockOuterCard: { width: 106, height: 106, borderRadius: 30, borderWidth: 1, borderColor: themePalette.hex_0f5257, backgroundColor: themePalette.hex_051e24, justifyContent: 'center', alignItems: 'center' },
+  lockIconContainer: { width: 60, height: 60, borderRadius: 20, borderWidth: 1.5, borderColor: themePalette.hex_00f5d4, justifyContent: 'center', alignItems: 'center', backgroundColor: themePalette.hex_0b2b30 },
   lockIcon: { fontSize: font.displayXXL },
   textSection: { alignItems: 'center', marginTop: 8, marginBottom: 10 },
-  title: { color: '#FFFFFF', fontSize: font.displayLarge, fontWeight: '600', textAlign: 'center' },
-  italicTitle: { fontStyle: 'italic', color: '#D4AF37', fontWeight: '400' },
-  description: { color: '#94A3B8', textAlign: 'center', marginTop: 6, fontSize: font.base, lineHeight: 20 },
-  emailHighlight: { color: '#D4AF37', fontWeight: '700' },
+  title: { color: themePalette.hex_ffffff, fontSize: font.displayLarge, fontWeight: '600', textAlign: 'center' },
+  italicTitle: { fontStyle: 'italic', color: themePalette.hex_d4af37, fontWeight: '400' },
+  description: { color: themePalette.hex_94a3b8, textAlign: 'center', marginTop: 6, fontSize: font.base, lineHeight: 20 },
+  emailHighlight: { color: themePalette.hex_d4af37, fontWeight: '700' },
   form: { width: '100%' },
-  label: { color: '#64748B', fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 4 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, backgroundColor: '#0F172A', paddingHorizontal: s(12), height: 52 },
-  inputContainerSuccess: { borderColor: '#10B981' },
-  inputContainerError: { borderColor: '#EF4444' },
+  label: { color: themePalette.hex_64748b, fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 4 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: themePalette.hex_1e293b, borderRadius: 12, backgroundColor: themePalette.hex_0f172a, paddingHorizontal: s(12), height: 52 },
+  inputContainerSuccess: { borderColor: themePalette.hex_10b981 },
+  inputContainerError: { borderColor: themePalette.hex_ef4444 },
   inputIcon: { fontSize: font.lg, marginRight: 10 },
-  input: { flex: 1, color: '#FFFFFF', fontSize: font.md },
-  eyeIcon: { color: '#94A3B8', fontSize: font.lg },
-  successIcon: { color: '#10B981', fontSize: font.xxl, fontWeight: 'bold' },
+  input: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.md },
+  eyeIcon: { color: themePalette.hex_94a3b8, fontSize: font.lg },
+  successIcon: { color: themePalette.hex_10b981, fontSize: font.xxl, fontWeight: 'bold' },
   strengthBarContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
-  strengthSegment: { flex: 1, height: 3, backgroundColor: '#1E293B', borderRadius: 2, marginHorizontal: 2 },
+  strengthSegment: { flex: 1, height: 3, backgroundColor: themePalette.hex_1e293b, borderRadius: 2, marginHorizontal: 2 },
   strengthLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  subtext: { color: '#64748B', fontSize: font.sm },
+  subtext: { color: themePalette.hex_64748b, fontSize: font.sm },
   strengthText: { fontSize: font.sm, fontWeight: '600' },
-  checklistCard: { backgroundColor: '#0B1120', borderWidth: 1, borderColor: '#1E293B', borderRadius: 12, padding: 14, marginBottom: 14 },
+  checklistCard: { backgroundColor: themePalette.hex_0b1120, borderWidth: 1, borderColor: themePalette.hex_1e293b, borderRadius: 12, padding: 14, marginBottom: 14 },
   checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   checkCircle: { width: 18, height: 18, borderRadius: 9, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
-  checkCircleOk: { backgroundColor: '#064E3B' },
-  checkCircleOff: { backgroundColor: '#1E293B' },
+  checkCircleOk: { backgroundColor: themePalette.hex_064e3b },
+  checkCircleOff: { backgroundColor: themePalette.hex_1e293b },
   checkMark: { fontSize: font.small, fontWeight: 'bold' },
   checkText: { fontSize: font.bodySmall },
   matchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
   matchIcon: { fontSize: font.sm, marginRight: 6 },
   matchText: { fontSize: font.sm },
   footer: { marginTop: 20 },
-  submitButton: { backgroundColor: '#D4AF37', width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  submitButtonText: { color: '#070A12', fontSize: font.lg, fontWeight: '700', marginRight: 8 },
-  arrowIcon: { color: '#070A12', fontSize: font.xxl, fontWeight: 'bold' },
-});
+  submitButton: { backgroundColor: themePalette.hex_d4af37, width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  submitButtonText: { color: themePalette.hex_070a12, fontSize: font.lg, fontWeight: '700', marginRight: 8 },
+  arrowIcon: { color: themePalette.hex_070a12, fontSize: font.xxl, fontWeight: 'bold' },
+}));

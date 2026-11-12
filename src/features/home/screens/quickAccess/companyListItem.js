@@ -1,9 +1,10 @@
+import { themePalette } from '../../../../theme/colors';
 const avatarColors = [
-    { avatarColor: '#dbeafe', initialsColor: '#2563eb' },
-    { avatarColor: '#ede9fe', initialsColor: '#4f46e5' },
-    { avatarColor: '#ffedd5', initialsColor: '#b45309' },
-    { avatarColor: '#dcfce7', initialsColor: '#059669' },
-    { avatarColor: '#fce7f3', initialsColor: '#be185d' },
+    { avatarColor: themePalette.hex_dbeafe, initialsColor: themePalette.hex_2563eb },
+    { avatarColor: themePalette.hex_ede9fe, initialsColor: themePalette.hex_4f46e5 },
+    { avatarColor: themePalette.hex_ffedd5, initialsColor: themePalette.hex_b45309 },
+    { avatarColor: themePalette.hex_dcfce7, initialsColor: themePalette.hex_059669 },
+    { avatarColor: themePalette.hex_fce7f3, initialsColor: themePalette.hex_be185d },
 ];
 const einKeys = [
     'Ein',
@@ -23,6 +24,30 @@ const formationDateKeys = [
     'dateIncorporated',
     'incorporation',
     'filingDate',
+];
+const registrationNumberKeys = [
+    'registrationNumber',
+    'registrationNo',
+    'registration_number',
+    'companyNumber',
+    'company_number',
+    'fileNumber',
+    'file_number',
+    'stateFileNumber',
+    'stateId',
+    'entityNumber',
+];
+const registrationDateKeys = [
+    'registrationDate',
+    'registration_date',
+    'dateOfRegistration',
+    'incorporationDate',
+    'dateOfIncorporation',
+    'formationDate',
+    'dateOfFormation',
+    'filingDate',
+    'formedDate',
+    'dateIncorporated',
 ];
 const stateKeys = [
     'stateOfIncorporation',
@@ -129,6 +154,16 @@ function getFormationDate(company) {
     const raw = findField(company, formationDateKeys);
     return raw ? formatCompanyDate(raw) : 'N/A';
 }
+function getRegistrationNumber(company) {
+    return findField(company, registrationNumberKeys) || 'N/A';
+}
+function getRegistrationDate(company) {
+    const raw = findField(company, registrationDateKeys);
+    return raw ? formatCompanyDate(raw) : 'N/A';
+}
+function getSubscription(company) {
+    return company.subscription ?? company.registrationRequestData?.subscription ?? {};
+}
 function getState(company) {
     const raw = findField(company, stateKeys);
     return raw || 'N/A';
@@ -154,6 +189,9 @@ export function mapCompanyToListItem(company, index) {
             company.updatedAt ??
             company.updated_at),
         formationDate: getFormationDate(company),
+        registrationNumber: getRegistrationNumber(company),
+        registrationDate: getRegistrationDate(company),
+        subscription: getSubscription(company),
         state: getState(company),
         ...colors,
     };

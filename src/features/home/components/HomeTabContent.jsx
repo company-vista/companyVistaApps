@@ -1,29 +1,41 @@
 import { StyleSheet, View } from 'react-native';
 import { s } from '../../../theme/responsive';
 import AnimatedAppear from '../../../components/AnimatedAppear';
-import ComplianceStatusSection from '../screens/compliances/ComplianceStatusSection';
 import HomeHeroSection from './home/HomeHeroSection';
+import ServicesButton from '../screens/hero2card/ServicesButton';
 import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
+import DashboardOverviewCards from './home/DashboardOverviewCards';
+import RecentInvoicesSection from './home/RecentInvoicesSection';
 import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
+import { useCompanyInvoices } from '../hooks/useCompanyInvoices';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onOrderPress, onOpenComplianceHistory, selectedCompany, colors, isPaymentLocked = false, onLockedCompliancePress, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onCompanyProfilePress, onCompanyOverviewPress, onComplianceOverviewPress, onDocumentsOverviewPress, onBillingOverviewPress, onInvoicePress, onOrderPress, selectedCompany, colors, }) {
   const compliance = useCompanyCompliance(selectedCompany?.id);
+  const { invoices } = useCompanyInvoices(selectedCompany?.id);
 
   return (<View style={styles.container}>
     <AnimatedAppear index={0}>
-      <HomeHeroSection isLoadingCompanies={isLoadingCompanies} onCompanySwitcherPress={onCompanySwitcherPress} onAddToCompanyPress={onAddToCompanyPress} onOrderPress={onOrderPress ?? onRegistrationTrackingPress} selectedCompany={selectedCompany} />
+      <HomeHeroSection isLoadingCompanies={isLoadingCompanies} onCompanySwitcherPress={onCompanySwitcherPress} onAddToCompanyPress={onAddToCompanyPress} onOrderPress={onOrderPress ?? onRegistrationTrackingPress} onRegistrationTrackingPress={onRegistrationTrackingPress} onCompanyProfilePress={onCompanyProfilePress} selectedCompany={selectedCompany} />
     </AnimatedAppear>
 
     <AnimatedAppear index={1}>
-      <ComplianceStatusSection companyId={selectedCompany?.id} dueDatesByTitle={compliance.dueDatesByTitle} rawDueDatesByTitle={compliance.rawDueDatesByTitle} statusesByTitle={compliance.statusesByTitle} isLoadingDueDates={compliance.isLoading} onOpenComplianceHistory={onOpenComplianceHistory} isPaymentLocked={isPaymentLocked} onLockedPress={onLockedCompliancePress} />
+      <ServicesButton onPress={onServicesPress} onAddCompanyPress={onAddToCompanyPress} />
     </AnimatedAppear>
 
     <AnimatedAppear index={2}>
-      <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} onRegistrationTrackingPress={onRegistrationTrackingPress} selectedCompany={selectedCompany} />
+      <DashboardOverviewCards selectedCompany={selectedCompany} compliance={compliance} invoices={invoices} onCompanyPress={onCompanyOverviewPress} onCompliancePress={onComplianceOverviewPress} onDocumentsPress={onDocumentsOverviewPress} onBillingPress={onBillingOverviewPress} />
     </AnimatedAppear>
+
     <AnimatedAppear index={3}>
+      <RecentInvoicesSection selectedCompany={selectedCompany} invoices={invoices} onViewAllPress={onBillingOverviewPress} onInvoicePress={onInvoicePress} />
+    </AnimatedAppear>
+
+    <AnimatedAppear index={4}>
+      <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} selectedCompany={selectedCompany} />
+    </AnimatedAppear>
+    <AnimatedAppear index={5}>
       <CompanyVistaReferral />
     </AnimatedAppear>
   </View>);

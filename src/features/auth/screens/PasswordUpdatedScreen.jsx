@@ -12,6 +12,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { s } from '../../../theme/responsive';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const PasswordUpdatedScreen = () => {
   const navigation = useNavigation();
@@ -29,7 +30,7 @@ const PasswordUpdatedScreen = () => {
 
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#070A12" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
@@ -100,10 +101,10 @@ const PasswordUpdatedScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070A12',
+    backgroundColor: themePalette.hex_070a12,
   },
   scrollContent: {
     flexGrow: 1,
@@ -116,12 +117,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   logoText: {
-    color: '#E2E8F0',
+    color: themePalette.hex_e2e8f0,
     fontSize: font.hero,
     fontWeight: '700',
   },
   logoAccent: {
-    color: '#D4AF37',
+    color: themePalette.hex_d4af37,
   },
   heroSection: {
     alignItems: 'center',
@@ -132,18 +133,18 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: '#064E3B',
+    borderColor: themePalette.hex_064e3b,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(6, 78, 59, 0.1)',
+    backgroundColor: themePalette.rgba_6_78_59_0_1,
   },
   innerCard: {
     width: 80,
     height: 80,
     borderRadius: 60,
     borderWidth: 1,
-    borderColor: '#059669',
-    backgroundColor: '#064E3B',
+    borderColor: themePalette.hex_059669,
+    backgroundColor: themePalette.hex_064e3b,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.display3XL,
     fontWeight: '300',
   },
@@ -165,18 +166,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(4),
   },
   title: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.displayMedium,
     fontWeight: '400',
     textAlign: 'center',
   },
   italicTitle: {
     fontStyle: 'italic',
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontWeight: '400',
   },
   description: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     textAlign: 'center',
     marginTop: 6,
     fontSize: font.base,
@@ -189,9 +190,9 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0B1120',
+    backgroundColor: themePalette.hex_0b1120,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     borderRadius: 14,
     padding: 14,
     marginBottom: 12,
@@ -200,32 +201,32 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 10,
-    backgroundColor: '#0F172A',
+    backgroundColor: themePalette.hex_0f172a,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: themePalette.hex_1e293b,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
   },
   greenCheckIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
   mailIcon: {
-    color: '#38BDF8',
+    color: themePalette.hex_38bdf8,
     fontSize: font.lg,
   },
   infoTextContainer: {
     flex: 1,
   },
   infoTitle: {
-    color: '#E2E8F0',
+    color: themePalette.hex_e2e8f0,
     fontSize: font.base,
     fontWeight: '600',
   },
   infoSubtext: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.sm,
     marginTop: 2,
   },
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   submitButton: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: themePalette.hex_d4af37,
     width: '100%',
     height: 52,
     borderRadius: 24,
@@ -242,16 +243,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
-    color: '#070A12',
+    color: themePalette.hex_070a12,
     fontSize: font.lg,
     fontWeight: '700',
     marginRight: 8,
   },
   arrowIcon: {
-    color: '#070A12',
+    color: themePalette.hex_070a12,
     fontSize: font.xxl,
     fontWeight: 'bold',
   },
-});
+}));
 
 export default PasswordUpdatedScreen;

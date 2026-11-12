@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable, ActivityIndicator, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchCompanyComplianceHistory, fetchUkComplianceHistory } from '../../api/clientProfileApi';
@@ -21,12 +21,12 @@ const ComplianceHistoryScreen = () => {
     const getStatusBadgeStyle = (status) => {
         const normalized = String(status ?? '').toLowerCase();
         if (normalized.includes('expired') || normalized.includes('overdue')) {
-            return { backgroundColor: '#FEE2E2', color: '#B91C1C' };
+            return { backgroundColor: themePalette.hex_fee2e2, color: themePalette.hex_b91c1c };
         }
         if (normalized.includes('pending') || normalized.includes('due')) {
-            return { backgroundColor: '#FEF3C7', color: '#92400E' };
+            return { backgroundColor: themePalette.hex_fef3c7, color: themePalette.hex_92400e };
         }
-        return { backgroundColor: '#DCFCE7', color: '#166534' };
+        return { backgroundColor: themePalette.hex_dcfce7, color: themePalette.hex_166534 };
     };
     const badgeStyle = getStatusBadgeStyle(selectedAction.status);
     useEffect(() => {
@@ -207,7 +207,7 @@ const ComplianceHistoryScreen = () => {
 
             <View style={[styles.card, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
-                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
             }]}>
                 <View style={styles.cardTitleRow}>
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{selectedAction.title}</Text>
@@ -236,7 +236,7 @@ const ComplianceHistoryScreen = () => {
 
             <View style={[styles.card, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
-                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
             }]}>
                 <Text style={[styles.sectionHeading, { color: colors.text }]}>Action details</Text>
                 <View style={styles.detailGrid}>
@@ -254,7 +254,7 @@ const ComplianceHistoryScreen = () => {
 
             <View style={[styles.card, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.surface,
-                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
             }]}>
                 <View style={styles.sectionHeaderRow}>
                     <Text style={[styles.historyHeading, { color: colors.text }]}>History</Text>
@@ -323,7 +323,7 @@ const ComplianceHistoryScreen = () => {
         </ScrollView>
     </View>);
 };
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     safeArea: {
         flex: 1,
     },
@@ -487,10 +487,10 @@ const styles = StyleSheet.create({
         flex: 1,
         minWidth: '30%',
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: themePalette.hex_e2e8f0,
         borderRadius: 12,
         padding: 12,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: themePalette.hex_f8fafc,
     },
     summaryLabel: {
         fontSize: font.sm,
@@ -534,5 +534,5 @@ const styles = StyleSheet.create({
         fontSize: font.lg,
         lineHeight: 20,
     },
-});
+}));
 export default ComplianceHistoryScreen;

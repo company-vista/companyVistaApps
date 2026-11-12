@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { font } from "../../../../theme/typography";
 import { s } from "../../../../theme/responsive";
+import { themePalette } from '../../../../theme/colors';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -41,7 +42,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     avatarText: {
-        color: '#fff',
+        color: themePalette.hex_fff,
         fontWeight: '700',
         fontSize: font.sm,
     },
@@ -144,7 +145,7 @@ export const styles = StyleSheet.create({
         gap: 8,
     },
     nextButtonText: {
-        color: '#fff',
+        color: themePalette.hex_fff,
         fontSize: font.lg,
         fontWeight: '600',
     },
@@ -202,7 +203,7 @@ export const styles = StyleSheet.create({
         gap: 8,
     },
     submitButtonText: {
-        color: '#fff',
+        color: themePalette.hex_fff,
         fontSize: font.lg,
         fontWeight: '600',
     },

@@ -4,12 +4,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import styles from '../HomeScreen.styles';
 import { s } from '../../../../theme/responsive';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
+import { themePalette } from '../../../../theme/colors';
 export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, selectedCompany, companySwitcherOpacity, companySwitcherTranslateY, onSelectCompany, onClose, onAddCompany, addCompanyBlocked, addCompanyBlockedReason, colors, safeAreaInsets, }) {
     if (!isOpen)
         return null;
     const companyCount = companyOptions.length;
     // Gold brand accent — same value the rest of the app hardcodes (#C9A84C).
-    const goldAccent = '#D4AF37';
+    const goldAccent = themePalette.hex_d4af37;
     const handleAddCompany = () => {
         if (addCompanyBlocked) {
             return;
@@ -99,7 +100,7 @@ export function CompanySwitcherModal({ isOpen, isLoading, companyOptions, select
             addCompanyBlocked ? styles.companySwitcherAddRowDisabled : null,
         ]}
         >
-          <View style={[styles.companySwitcherAddIcon, { backgroundColor: addCompanyBlocked ? colors.sheet : 'rgba(201,168,76,0.18)' }]}>
+          <View style={[styles.companySwitcherAddIcon, { backgroundColor: addCompanyBlocked ? colors.sheet : themePalette.rgba_201_168_76_0_18 }]}>
             <FontAwesome name="plus" size={16} color={addCompanyBlocked ? colors.muted : goldAccent}/>
           </View>
           <View style={styles.companySwitcherAddCopy}>

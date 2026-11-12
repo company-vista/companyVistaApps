@@ -1,28 +1,27 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
-function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, onRegistrationTrackingPress, selectedCompany, }) {
+function RecentActivityAndPaymentOverviewSection({ onPress, onServicesPress, selectedCompany, }) {
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     const companySubtitle = selectedCompany?.name ?? selectedCompany?.companyName ?? 'Company';
     const recentActivities = [
-        { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: '#3B82F6', iconBg: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.25)' },
-        { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: '#8B5CF6', iconBg: 'rgba(139, 92, 246, 0.1)', borderColor: 'rgba(139, 92, 246, 0.25)' },
-        { title: 'Registration Tracking', subtitle: companySubtitle, icon: 'map-marker', onItemPress: onRegistrationTrackingPress, iconColor: '#0891b2', iconBg: 'rgba(8, 145, 178, 0.1)', borderColor: 'rgba(8, 145, 178, 0.25)' },
+        { title: 'Transaction History', subtitle: companySubtitle, icon: 'history', onItemPress: onPress, iconColor: themePalette.hex_3b82f6, iconBg: themePalette.rgba_59_130_246_0_1, borderColor: themePalette.rgba_59_130_246_0_25 },
+        { title: 'Subscription & Services', subtitle: companySubtitle, icon: 'cogs', onItemPress: onServicesPress, iconColor: themePalette.hex_8b5cf6, iconBg: themePalette.rgba_139_92_246_0_1, borderColor: themePalette.rgba_139_92_246_0_25 },
     ];
     return (<View style={styles.wrapper}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Links</Text>
       <View style={styles.grid}>
         {recentActivities.map(item => (
           <View key={item.title} style={styles.item}>
-            <Pressable style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : '#0D1B2A', borderColor: isLight ? item.borderColor : 'rgba(255,255,255,0.08)', borderWidth: 1 }]} onPress={item.onItemPress}>
+            <Pressable style={[styles.card, { backgroundColor: isLight ? colors.cardHighlight : themePalette.hex_0d1b2a, borderColor: isLight ? item.borderColor : themePalette.rgba_255_255_255_0_08, borderWidth: 1 }]} onPress={item.onItemPress}>
               <View style={styles.iconContainer}>
                 <FontAwesome
                   name={item.icon}
                   size={24}
-                  color={isLight ? item.iconColor : '#ffffffc2'}
+                  color={isLight ? item.iconColor : themePalette.hex_ffffffc2}
                 />
               </View>
             </Pressable>

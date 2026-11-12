@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import StripeOneTimePayment from '../../../../stripe_pament_section/StripeOneTimePayment';
 import { s } from '../../../../theme/responsive';
 import { font } from '../../../../theme/typography';
+import { themePalette, makeThemeStyles } from '../../../../theme/colors';
 export default function UnlockDocumentModal({ visible, onClose, documentName = 'Document 3 - test', price, onPayPress, companyId, documentIndex, }) {
     console.log('UnlockDocumentModal render, visible:', visible);
     return (<Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
@@ -13,7 +14,7 @@ export default function UnlockDocumentModal({ visible, onClose, documentName = '
           <View style={styles.headerRow}>
             <View style={styles.headerLeft}>
               <View style={styles.lockIconCircle}>
-                <FontAwesome name="lock" size={18} color="#FAC775"/>
+                <FontAwesome name="lock" size={18} color={themePalette.hex_fac775}/>
               </View>
               <View>
                 <Text style={styles.headerTitle}>Unlock This Document</Text>
@@ -21,13 +22,13 @@ export default function UnlockDocumentModal({ visible, onClose, documentName = '
               </View>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={10}>
-              <FontAwesome name="times" size={18} color="#ffffff" style={{ opacity: 0.7 }}/>
+              <FontAwesome name="times" size={18} color={themePalette.hex_ffffff} style={{ opacity: 0.7 }}/>
             </Pressable>
           </View>
 
           <View style={styles.featureCard}>
             <View style={styles.fileIconContainer}>
-              <FontAwesome name="file-text-o" size={20} color="#85B7EB"/>
+              <FontAwesome name="file-text-o" size={20} color={themePalette.hex_85b7eb}/>
             </View>
             <View style={styles.featureTextColumn}>
               <Text style={styles.featureTitle}>One-time unlock</Text>
@@ -60,7 +61,7 @@ export default function UnlockDocumentModal({ visible, onClose, documentName = '
           </View>
 
           <View style={styles.noticeBox}>
-            <FontAwesome name="clock-o" size={14} color="#85B7EB" style={styles.noticeIcon}/>
+            <FontAwesome name="clock-o" size={14} color={themePalette.hex_85b7eb} style={styles.noticeIcon}/>
             <Text style={styles.noticeText}>
               We will deliver the document with in <Text style={styles.whiteBoldText}>24–72 hours.</Text>
             </Text>
@@ -70,22 +71,22 @@ export default function UnlockDocumentModal({ visible, onClose, documentName = '
       </View>
     </Modal>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.55)',
+        backgroundColor: themePalette.rgba_0_0_0_0_55,
         justifyContent: 'center',
         alignItems: 'center',
         padding: s(24),
     },
     modalBox: {
         width: '100%',
-        backgroundColor: '#1E3A5F',
+        backgroundColor: themePalette.hex_1e3a5f,
         borderRadius: s(24),
         padding: s(18),
         borderWidth: 1,
-        borderColor: 'rgba(133, 183, 235, 0.25)',
-        shadowColor: '#000',
+        borderColor: themePalette.rgba_133_183_235_0_25,
+        shadowColor: themePalette.hex_000,
         shadowOffset: { width: 0, height: s(10) },
         shadowOpacity: 0.3,
         shadowRadius: s(20),
@@ -106,21 +107,21 @@ const styles = StyleSheet.create({
         width: s(38),
         height: s(38),
         borderRadius: s(19),
-        backgroundColor: 'rgba(250, 199, 117, 0.12)',
+        backgroundColor: themePalette.rgba_250_199_117_0_12,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(250, 199, 117, 0.25)',
+        borderColor: themePalette.rgba_250_199_117_0_25,
     },
     headerTitle: {
         fontSize: font.heading,
         fontWeight: '700',
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         letterSpacing: 0.3,
     },
     headerSubtitle: {
         fontSize: font.md,
-        color: '#85B7EB',
+        color: themePalette.hex_85b7eb,
         marginTop: 2,
     },
     closeBtn: {
@@ -128,11 +129,11 @@ const styles = StyleSheet.create({
     },
     featureCard: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: themePalette.rgba_255_255_255_0_05,
         borderRadius: s(16),
         padding: s(16),
         borderWidth: 1,
-        borderColor: 'rgba(133, 183, 235, 0.15)',
+        borderColor: themePalette.rgba_133_183_235_0_15,
         marginBottom: s(20),
     },
     fileIconContainer: {
@@ -145,12 +146,12 @@ const styles = StyleSheet.create({
     featureTitle: {
         fontSize: font.xl,
         fontWeight: '700',
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         marginBottom: s(4),
     },
     featureDescription: {
         fontSize: font.md,
-        color: 'rgba(255, 255, 255, 0.65)',
+        color: themePalette.rgba_255_255_255_0_65,
         lineHeight: s(18),
     },
     priceRow: {
@@ -161,22 +162,22 @@ const styles = StyleSheet.create({
     },
     priceLabel: {
         fontSize: font.xl,
-        color: 'rgba(255, 255, 255, 0.8)',
+        color: themePalette.rgba_255_255_255_0_8,
         fontWeight: '500',
     },
     priceValue: {
         fontSize: font.displayLarge,
         fontWeight: '800',
-        color: '#FAC775',
+        color: themePalette.hex_fac775,
     },
     upsellText: {
         fontSize: font.base,
-        color: 'rgba(255, 255, 255, 0.45)',
+        color: themePalette.rgba_255_255_255_0_45,
         lineHeight: s(18),
         marginBottom: s(24),
     },
     whiteBoldText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontWeight: '600',
     },
     actionRow: {
@@ -189,31 +190,31 @@ const styles = StyleSheet.create({
         height: s(46),
         borderRadius: s(12),
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
+        borderColor: themePalette.rgba_255_255_255_0_2,
         justifyContent: 'center',
         alignItems: 'center',
     },
     cancelButtonText: {
-        color: '#ffffff',
+        color: themePalette.hex_ffffff,
         fontSize: font.lg,
         fontWeight: '600',
     },
     payButton: {
         flex: 1.3,
         height: s(46),
-        backgroundColor: '#00C853',
+        backgroundColor: themePalette.hex_00c853,
         borderRadius: s(12),
         justifyContent: 'center',
         alignItems: 'center',
     },
     noticeBox: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(133, 183, 235, 0.06)',
+        backgroundColor: themePalette.rgba_133_183_235_0_06,
         borderRadius: s(12),
         padding: s(12),
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(133, 183, 235, 0.1)',
+        borderColor: themePalette.rgba_133_183_235_0_1,
     },
     noticeIcon: {
         marginRight: s(8),
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     noticeText: {
         flex: 1,
         fontSize: font.sm,
-        color: 'rgba(255, 255, 255, 0.5)',
+        color: themePalette.rgba_255_255_255_0_5,
         lineHeight: s(16),
     },
-});
+}));

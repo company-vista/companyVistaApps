@@ -2,20 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { useAppSelector } from '../../../../store/hooks';
 import { fetchClientCompanyDetails } from '../../api/clientProfileApi';
 import { styles } from "./ShareHoldersStyle";
 function getShareholderPalette(colors) {
     const isDark = colors.mode === 'dark';
     return {
-        cardShadow: isDark ? '#000000' : colors.shadow,
-        icon: isDark ? '#85B7EB' : '#155EAB',
-        infoText: isDark ? '#CBD5E1' : '#164066',
-        roleBackground: isDark ? 'rgba(133,183,235,0.14)' : '#E7F1FF',
-        roleBorder: isDark ? 'rgba(133,183,235,0.28)' : '#C7DFF6',
-        roleText: isDark ? '#85B7EB' : '#155EAB',
-        sectionIcon: isDark ? '#85B7EB' : '#155EAB',
+        cardShadow: isDark ? themePalette.hex_000000 : colors.shadow,
+        icon: isDark ? themePalette.hex_85b7eb : themePalette.hex_155eab,
+        infoText: isDark ? themePalette.hex_cbd5e1 : themePalette.hex_164066,
+        roleBackground: isDark ? themePalette.rgba_133_183_235_0_14 : themePalette.hex_e7f1ff,
+        roleBorder: isDark ? themePalette.rgba_133_183_235_0_28 : themePalette.hex_c7dff6,
+        roleText: isDark ? themePalette.hex_85b7eb : themePalette.hex_155eab,
+        sectionIcon: isDark ? themePalette.hex_85b7eb : themePalette.hex_155eab,
     };
 }
 const ShareHolders = ({ companyId }) => {
@@ -50,12 +50,12 @@ const ShareHolders = ({ companyId }) => {
         <View style={styles.summaryCard}>
           <View style={styles.summaryDeco}/>
           <View style={styles.summaryDecoSmall}>
-            <FontAwesome name="users" size={19} color="rgba(255,255,255,0.25)"/>
+            <FontAwesome name="users" size={19} color={themePalette.rgba_255_255_255_0_25}/>
           </View>
           <Text style={styles.summaryLabel}>Total Equity Stake</Text>
           <Text style={styles.summaryValue}>{totalStake}%</Text>
           <View style={styles.primaryBadge}>
-            <FontAwesome name="user" size={9} color="#85B7EB"/>
+            <FontAwesome name="user" size={9} color={themePalette.hex_85b7eb}/>
             <Text style={styles.primaryBadgeText}>Primary Shareholder</Text>
           </View>
         </View>

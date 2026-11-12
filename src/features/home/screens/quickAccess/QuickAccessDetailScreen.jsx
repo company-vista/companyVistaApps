@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { s } from '../../../../theme/responsive';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../../theme/colors';
 function QuickAccessDetailScreen({ color, description, icon, onBackPress, title, }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
@@ -24,7 +24,7 @@ function QuickAccessDetailScreen({ color, description, icon, onBackPress, title,
       </ScrollView>
     </View>);
 }
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     },
     title: {
         flex: 1,
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: font.lg,
         fontWeight: '600',
     },
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     heroCard: {
         alignItems: 'center',
         borderRadius: s(18),
-        backgroundColor: '#ffffff',
+        backgroundColor: themePalette.hex_ffffff,
         paddingHorizontal: s(22),
         paddingVertical: s(36),
     },
@@ -62,22 +62,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: s(36),
-        backgroundColor: '#ecfeff',
+        backgroundColor: themePalette.hex_ecfeff,
     },
     heroTitle: {
-        color: '#111827',
+        color: themePalette.hex_111827,
         fontSize: s(22),
         fontWeight: '900',
         marginTop: s(18),
         textAlign: 'center',
     },
     description: {
-        color: '#64748b',
+        color: themePalette.hex_64748b,
         fontSize: s(15),
         fontWeight: '600',
         lineHeight: s(22),
         marginTop: s(10),
         textAlign: 'center',
     },
-});
+}));
 export default QuickAccessDetailScreen;

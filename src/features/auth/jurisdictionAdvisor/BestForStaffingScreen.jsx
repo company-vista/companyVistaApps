@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
+import { themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const FILTER_TAGS = [
   { id: '1', label: '👥 Staffing & Recruiting' },
@@ -45,7 +46,7 @@ export default function BestForStaffingScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0E17" />
+      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
 
       {/* Top Header Navigation */}
       <View style={styles.header}>
@@ -152,10 +153,10 @@ export default function BestForStaffingScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
@@ -171,12 +172,12 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#161B29',
+    backgroundColor: themePalette.hex_161b29,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.lg,
     fontWeight: 'bold',
   },
@@ -184,12 +185,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   brandSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.micro,
     letterSpacing: 1.2,
     marginTop: s(1),
@@ -201,17 +202,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: font.display,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     marginTop: s(8),
   },
   titleItalic: {
     fontStyle: 'italic',
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontWeight: '300',
   },
   subtitle: {
     fontSize: font.bodySmall,
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     marginTop: s(6),
     marginBottom: s(16),
   },
@@ -222,27 +223,27 @@ const styles = StyleSheet.create({
     marginBottom: s(20),
   },
   tagPill: {
-    backgroundColor: '#151329',
+    backgroundColor: themePalette.hex_151329,
     paddingHorizontal: s(12),
     paddingVertical: s(6),
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#2D264A',
+    borderColor: themePalette.hex_2d264a,
   },
   actionTagPill: {
-    backgroundColor: '#121724',
-    borderColor: '#1E2638',
+    backgroundColor: themePalette.hex_121724,
+    borderColor: themePalette.hex_1e2638,
   },
   tagText: {
-    color: '#A5B4FC',
+    color: themePalette.hex_a5b4fc,
     fontSize: font.sm,
     fontWeight: '500',
   },
   offshoreNoticeCard: {
-    backgroundColor: '#141212',
+    backgroundColor: themePalette.hex_141212,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#3D2D1B',
+    borderColor: themePalette.hex_3d2d1b,
     padding: s(16),
     marginBottom: s(20),
   },
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: '#261F13',
+    backgroundColor: themePalette.hex_261f13,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(10),
@@ -264,27 +265,27 @@ const styles = StyleSheet.create({
     fontSize: font.base,
   },
   noticeTitle: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.md,
     fontWeight: 'bold',
   },
   noticeDescription: {
-    color: '#8A8D9B',
+    color: themePalette.hex_8a8d9b,
     fontSize: font.sm,
     lineHeight: 18,
   },
   matchCard: {
-    backgroundColor: '#121622',
+    backgroundColor: themePalette.hex_121622,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#3D321D',
+    borderColor: themePalette.hex_3d321d,
     padding: s(16),
     marginBottom: s(20),
   },
   bestMatchBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#262013',
-    borderColor: '#D1A253',
+    backgroundColor: themePalette.hex_262013,
+    borderColor: themePalette.hex_d1a253,
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: s(10),
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     marginBottom: s(16),
   },
   badgeText: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.xs,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -312,16 +313,16 @@ const styles = StyleSheet.create({
   countryCodeText: {
     fontSize: font.displayMedium,
     fontWeight: 'bold',
-    color: '#334155',
+    color: themePalette.hex_334155,
     marginRight: s(12),
   },
   countryName: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontSize: font.hero,
     fontWeight: 'bold',
   },
   stateSubtitle: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.small,
     marginTop: s(2),
   },
@@ -330,19 +331,19 @@ const styles = StyleSheet.create({
     marginLeft: s(8),
   },
   matchPercentage: {
-    color: '#D1A253',
+    color: themePalette.hex_d1a253,
     fontSize: font.displayMedium,
     fontWeight: '300',
   },
   matchLabel: {
-    color: '#64748B',
+    color: themePalette.hex_64748b,
     fontSize: font.caption,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
   featuresList: {
     borderTopWidth: 1,
-    borderColor: '#1E2638',
+    borderColor: themePalette.hex_1e2638,
     paddingTop: s(16),
   },
   featureItem: {
@@ -351,30 +352,30 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
   },
   checkIcon: {
-    color: '#10B981',
+    color: themePalette.hex_10b981,
     fontSize: font.base,
     marginRight: s(10),
     marginTop: s(1),
   },
   featureText: {
-    color: '#94A3B8',
+    color: themePalette.hex_94a3b8,
     fontSize: font.bodySmall,
     lineHeight: 18,
     flex: 1,
   },
   featureBold: {
-    color: '#FFFFFF',
+    color: themePalette.hex_ffffff,
     fontWeight: 'bold',
   },
   bottomContainer: {
     paddingHorizontal: s(16),
     paddingTop: s(12),
     paddingBottom: s(16),
-    backgroundColor: '#0B0E17',
+    backgroundColor: themePalette.hex_0b0e17,
     alignItems: 'center',
   },
   actionButton: {
-    backgroundColor: '#D1A253',
+    backgroundColor: themePalette.hex_d1a253,
     borderRadius: 14,
     height: 52,
     width: '100%',
@@ -382,13 +383,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   actionButtonText: {
-    color: '#0B0E17',
+    color: themePalette.hex_0b0e17,
     fontSize: font.md,
     fontWeight: '700',
   },
   addonText: {
-    color: '#475569',
+    color: themePalette.hex_475569,
     fontSize: font.sm,
     marginTop: s(10),
   },
-});
+}));

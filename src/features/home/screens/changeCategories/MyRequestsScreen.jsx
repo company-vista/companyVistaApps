@@ -4,48 +4,48 @@ import axios from 'axios';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
 import RequestCard from './components/RequestCard';
 import { s } from '../../../../theme/responsive';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import { font } from '../../../../theme/typography';
 import { useAppSelector } from '../../../../store/hooks';
 import { API_BASE_URL } from '../../../../config/api';
 const FILTERS = ['All', 'Pending', 'Resolved'];
 const DARK_COLORS = {
-    bg: '#05070d',
-    phone: '#0d1120',
-    screen: '#11162a',
-    card: '#171d38',
-    gold: '#d9a94e',
-    goldDark: '#3a2a08',
-    purple: '#8f88e0',
-    purpleNode: '#5e56b8',
-    purpleText: '#a79ef2',
-    track: '#2a3050',
-    pendingBorder: '#3a3f5c',
-    textPrimary: '#f2eee0',
-    textSecondary: '#8b8fa3',
-    textMuted: '#6f7387',
-    pillBg: '#20263f',
-    pillText: '#c9c6ba',
-    divider: '#2a3050',
+    bg: themePalette.hex_05070d,
+    phone: themePalette.hex_0d1120,
+    screen: themePalette.hex_11162a,
+    card: themePalette.hex_171d38,
+    gold: themePalette.hex_d9a94e,
+    goldDark: themePalette.hex_3a2a08,
+    purple: themePalette.hex_8f88e0,
+    purpleNode: themePalette.hex_5e56b8,
+    purpleText: themePalette.hex_a79ef2,
+    track: themePalette.hex_2a3050,
+    pendingBorder: themePalette.hex_3a3f5c,
+    textPrimary: themePalette.hex_f2eee0,
+    textSecondary: themePalette.hex_8b8fa3,
+    textMuted: themePalette.hex_6f7387,
+    pillBg: themePalette.hex_20263f,
+    pillText: themePalette.hex_c9c6ba,
+    divider: themePalette.hex_2a3050,
 };
 const LIGHT_COLORS = {
-    bg: '#f1f5f9',
-    phone: '#ffffff',
-    screen: '#f8fafc',
-    card: '#ffffff',
-    gold: '#d9a94e',
-    goldDark: '#7c5c10',
-    purple: '#7c73e6',
-    purpleNode: '#5e56b8',
-    purpleText: '#5e56b8',
-    track: '#e2e8f0',
-    pendingBorder: '#cbd5e1',
-    textPrimary: '#0f172a',
-    textSecondary: '#475569',
-    textMuted: '#64748b',
-    pillBg: '#f1f5f9',
-    pillText: '#334155',
-    divider: '#e2e8f0',
+    bg: themePalette.hex_f1f5f9,
+    phone: themePalette.hex_ffffff,
+    screen: themePalette.hex_f8fafc,
+    card: themePalette.hex_ffffff,
+    gold: themePalette.hex_d9a94e,
+    goldDark: themePalette.hex_7c5c10,
+    purple: themePalette.hex_7c73e6,
+    purpleNode: themePalette.hex_5e56b8,
+    purpleText: themePalette.hex_5e56b8,
+    track: themePalette.hex_e2e8f0,
+    pendingBorder: themePalette.hex_cbd5e1,
+    textPrimary: themePalette.hex_0f172a,
+    textSecondary: themePalette.hex_475569,
+    textMuted: themePalette.hex_64748b,
+    pillBg: themePalette.hex_f1f5f9,
+    pillText: themePalette.hex_334155,
+    divider: themePalette.hex_e2e8f0,
 };
 function StatusDonut({ pendingShare, colors, mode, }) {
     const pct = Math.round(pendingShare * 100);
@@ -170,7 +170,7 @@ const MyRequestsScreen = ({ companyId, refreshKey }) => {
             .finally(() => setLoading(false));
     }, [companyId, token, refreshKey]);
     // --------------STYLES------------
-    const containerStyle = { backgroundColor: mode === 'dark' ? DARK_COLORS.screen : '#ffffff' };
+    const containerStyle = { backgroundColor: mode === 'dark' ? DARK_COLORS.screen : themePalette.hex_ffffff };
     const trackStyle = { backgroundColor: colors.gold, borderWidth: 0 };
     // --------------STYLES------------
     const pendingCount = requests.filter(r => r.stage !== 'resolved').length;

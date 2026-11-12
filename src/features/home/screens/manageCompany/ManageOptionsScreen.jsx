@@ -3,7 +3,7 @@ import { StatusBar, StyleSheet, Text, View, Pressable, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AnimatedAppear from '../../../../components/AnimatedAppear';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../../theme/colors';
 import BackButton from '../../../../components/buttons/BackButton';
 import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
@@ -13,7 +13,7 @@ const options = [
         label: 'Request Change',
         description: 'Submit Request for Company Updates',
         icon: 'edit',
-        color: '#4F46E5',
+        color: themePalette.hex_4f46e5,
     },
 ];
 const ManageOptionsScreen = ({ onBackPress, onRequestChangePress, }) => {
@@ -30,13 +30,13 @@ const ManageOptionsScreen = ({ onBackPress, onRequestChangePress, }) => {
                 paddingBottom: insets.bottom,
             },
         ]}>
-      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : '#fff'}/>
+      <StatusBar barStyle={colors.mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.mode === 'dark' ? colors.background : themePalette.hex_fff}/>
 
       <View style={[
             styles.header,
             {
                 paddingTop: insets.top + 4,
-                backgroundColor: colors.mode === 'dark' ? colors.background : '#FFFFFF',
+                backgroundColor: colors.mode === 'dark' ? colors.background : themePalette.hex_ffffff,
                 borderBottomColor: colors.border,
             },
         ]}>

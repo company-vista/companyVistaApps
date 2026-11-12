@@ -15,7 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { s } from '../../../theme/responsive';
 
 const TrustedWorldwideScreen = ({ navigation }) => {
@@ -46,49 +46,49 @@ const TrustedWorldwideScreen = ({ navigation }) => {
 
           {/* Counter Section */}
           <View style={styles.counterSection}>
-            <Ionicons name="leaf" size={24} color="#C9A84C" />
+            <Ionicons name="leaf" size={24} color={themePalette.hex_c9a84c} />
             <View style={styles.counterTextWrapper}>
               <Text style={[styles.counterNumber, { color: colors.text }]}>2,400<Text style={styles.plusSign}>+</Text></Text>
               <Text style={[styles.counterLabel, { color: colors.muted }]}>COMPANIES REGISTERED</Text>
             </View>
-            <Ionicons name="leaf" size={24} color="#C9A84C" />
+            <Ionicons name="leaf" size={24} color={themePalette.hex_c9a84c} />
           </View>
 
           {/* 2x2 Stats Grid */}
           <View style={styles.statsGrid}>
-            <View style={[styles.statCard, styles.goldCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF' }]}>
-              <Ionicons name="globe" size={20} color="#C9A84C" />
-              <Text style={[styles.statNumber, { color: '#C9A84C' }]}>50+</Text>
+            <View style={[styles.statCard, styles.goldCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff }]}>
+              <Ionicons name="globe" size={20} color={themePalette.hex_c9a84c} />
+              <Text style={[styles.statNumber, { color: themePalette.hex_c9a84c }]}>50+</Text>
               <Text style={[styles.statLabel, { color: colors.muted }]}>Countries</Text>
             </View>
 
-            <View style={[styles.statCard, styles.greenCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF' }]}>
-              <Ionicons name="checkmark-circle" size={20} color="#10B981" />
-              <Text style={[styles.statNumber, { color: '#10B981' }]}>98%</Text>
+            <View style={[styles.statCard, styles.greenCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff }]}>
+              <Ionicons name="checkmark-circle" size={20} color={themePalette.hex_10b981} />
+              <Text style={[styles.statNumber, { color: themePalette.hex_10b981 }]}>98%</Text>
               <Text style={[styles.statLabel, { color: colors.muted }]}>Success rate</Text>
             </View>
 
-            <View style={[styles.statCard, styles.blueCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF' }]}>
-              <Ionicons name="time" size={20} color="#60A5FA" />
-              <Text style={[styles.statNumber, { color: '#60A5FA' }]}>7 days</Text>
+            <View style={[styles.statCard, styles.blueCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff }]}>
+              <Ionicons name="time" size={20} color={themePalette.hex_60a5fa} />
+              <Text style={[styles.statNumber, { color: themePalette.hex_60a5fa }]}>7 days</Text>
               <Text style={[styles.statLabel, { color: colors.muted }]}>Turnaround</Text>
             </View>
 
-            <View style={[styles.statCard, styles.purpleCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF' }]}>
-              <Ionicons name="headset" size={20} color="#A855F7" />
-              <Text style={[styles.statNumber, { color: '#A855F7' }]}>24/7</Text>
+            <View style={[styles.statCard, styles.purpleCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff }]}>
+              <Ionicons name="headset" size={20} color={themePalette.hex_a855f7} />
+              <Text style={[styles.statNumber, { color: themePalette.hex_a855f7 }]}>24/7</Text>
               <Text style={[styles.statLabel, { color: colors.muted }]}>Support</Text>
             </View>
           </View>
 
           {/* Testimonial */}
-          <View style={[styles.testimonialCard, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }]}>
+          <View style={[styles.testimonialCard, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_03 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }]}>
             <View style={styles.avatarContainer}>
               <Text style={styles.avatarText}>SK</Text>
             </View>
             <View style={styles.testimonialContent}>
               <Text style={styles.stars}>★★★★★</Text>
-              <Text style={[styles.reviewText, { color: isDark ? '#CBD5E1' : colors.text }]}>
+              <Text style={[styles.reviewText, { color: isDark ? themePalette.hex_cbd5e1 : colors.text }]}>
                 Set up my Dubai company in 6 days without leaving London. Exceptional.
               </Text>
               <Text style={[styles.authorText, { color: colors.subtle }]}>Sarah K. · Founder, TechFlow</Text>
@@ -114,7 +114,7 @@ const TrustedWorldwideScreen = ({ navigation }) => {
           </Text>
 
           <View style={styles.paginationRow}>
-            <View style={[styles.dotInactive, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border }]} />
+            <View style={[styles.dotInactive, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border }]} />
             <View style={styles.dashActive} />
           </View>
 
@@ -133,7 +133,7 @@ const TrustedWorldwideScreen = ({ navigation }) => {
 
 export default TrustedWorldwideScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     // fontFamily: 'serif',
   },
   plusSign: {
-    color: '#C9A84C',
+    color: themePalette.hex_c9a84c,
   },
   counterLabel: {
     fontSize: font.xs,
@@ -189,10 +189,10 @@ const styles = StyleSheet.create({
     marginBottom: s(12),
     borderWidth: 1,
   },
-  goldCard: { borderColor: 'rgba(201, 168, 76, 0.3)' },
-  greenCard: { borderColor: 'rgba(16, 185, 129, 0.3)' },
-  blueCard: { borderColor: 'rgba(96, 165, 250, 0.3)' },
-  purpleCard: { borderColor: 'rgba(168, 85, 247, 0.3)' },
+  goldCard: { borderColor: themePalette.rgba_201_168_76_0_3 },
+  greenCard: { borderColor: themePalette.rgba_16_185_129_0_3 },
+  blueCard: { borderColor: themePalette.rgba_96_165_250_0_3 },
+  purpleCard: { borderColor: themePalette.rgba_168_85_247_0_3 },
   statNumber: { fontSize: font.display, fontWeight: '600',  marginTop: s(6) },
   statLabel: { fontSize: font.small, marginTop: s(2) },
   testimonialCard: {
@@ -207,27 +207,27 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#C9A84C',
+    backgroundColor: themePalette.hex_c9a84c,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(12),
   },
-  avatarText: { color: '#060913', fontWeight: 'bold', fontSize: font.sm },
+  avatarText: { color: themePalette.hex_060913, fontWeight: 'bold', fontSize: font.sm },
   testimonialContent: { flex: 1 },
-  stars: { color: '#C9A84C', fontSize: font.xs, marginBottom: s(4) },
+  stars: { color: themePalette.hex_c9a84c, fontSize: font.xs, marginBottom: s(4) },
   reviewText: { fontSize: font.base,fontWeight: 400, lineHeight: 16 },
   authorText: { fontSize: font.xs, marginTop: s(4) },
   contentSection: { marginTop: s(4) },
   tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
-  goldLine: { width: 18, height: 2, backgroundColor: '#C9A84C', marginRight: s(8) },
-  sectionTag: { color: '#C9A84C', fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
+  goldLine: { width: 18, height: 2, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
+  sectionTag: { color: themePalette.hex_c9a84c, fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
   mainHeading: {
     fontSize: font.display,
     fontWeight: '500',
     lineHeight: 36,
     marginBottom: s(12),
   },
-  italicGold: { color: '#C9A84C', fontStyle: 'italic' },
+  italicGold: { color: themePalette.hex_c9a84c, fontStyle: 'italic' },
   boldText: { fontWeight: 'bold' },
   descriptionText: {
     fontSize: font.bodySmall,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#C9A84C',
+    backgroundColor: themePalette.hex_c9a84c,
   },
   getStartedBtn: {
     borderRadius: 24,
@@ -257,4 +257,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnText: { fontSize: font.lg, fontWeight: 'bold' },
-});
+}));

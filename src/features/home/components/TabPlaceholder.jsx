@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View, ActivityIndicator } from 'react-nati
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AnimatedAppear from '../../../components/AnimatedAppear';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 import { API_BASE_URL } from '../../../config/api';
 import { useAppSelector } from '../../../store/hooks';
 import styles from './TabPlaceholder.styles';
@@ -101,7 +101,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
 
     const mainCardStyle = {
         backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-        borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+        borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
         marginBottom: 12,
     }
 
@@ -152,21 +152,21 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         const isDark = colors.mode === 'dark';
         const key = String(status ?? '').toLowerCase().trim();
         if (key === 'expired' || key === 'overdue') {
-            return { text: isDark ? '#FCA5A5' : '#DE3730', bg: isDark ? '#3D1717' : '#FCE8E6' };
+            return { text: isDark ? themePalette.hex_fca5a5 : themePalette.hex_de3730, bg: isDark ? themePalette.hex_3d1717 : themePalette.hex_fce8e6 };
         }
         if (key === 'pending' || key === 'due' || key === 'expiring soon' || key === 'expiring_soon') {
-            return { text: isDark ? '#FCD34D' : '#E28704', bg: isDark ? '#3A2A15' : '#FEF3D6' };
+            return { text: isDark ? themePalette.hex_fcd34d : themePalette.hex_e28704, bg: isDark ? themePalette.hex_3a2a15 : themePalette.hex_fef3d6 };
         }
         if (key === 'active' || key === 'completed') {
-            return { text: isDark ? '#6EE7B7' : '#256F46', bg: isDark ? '#15352A' : '#E6F4EA' };
+            return { text: isDark ? themePalette.hex_6ee7b7 : themePalette.hex_256f46, bg: isDark ? themePalette.hex_15352a : themePalette.hex_e6f4ea };
         }
         if (key === 'in process') {
-            return { text: isDark ? '#93C5FD' : '#1D4ED8', bg: isDark ? '#172554' : '#DBEAFE' };
+            return { text: isDark ? themePalette.hex_93c5fd : themePalette.hex_1d4ed8, bg: isDark ? themePalette.hex_172554 : themePalette.hex_dbeafe };
         }
         if (key === 'client managed') {
-            return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
+            return { text: isDark ? themePalette.hex_94a3b8 : themePalette.hex_4a5568, bg: isDark ? themePalette.hex_1e293b : themePalette.hex_edf2f7 };
         }
-        return { text: isDark ? '#94A3B8' : '#4A5568', bg: isDark ? '#1E293B' : '#EDF2F7' };
+        return { text: isDark ? themePalette.hex_94a3b8 : themePalette.hex_4a5568, bg: isDark ? themePalette.hex_1e293b : themePalette.hex_edf2f7 };
     };
     const federalTaxFilingData = apiData?.data?.federalTaxFiling || {};
     const residentData = apiData?.data?.resident || {};
@@ -309,7 +309,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
         {!loadError && hasCompany && !loading ? (<AnimatedAppear index={3}>
             <View style={[styles.healthCard, {
                 backgroundColor: colors.mode === 'dark' ? colors.cardElevated : colors.cardHighlight,
-                borderColor: colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : colors.border,
+                borderColor: colors.mode === 'dark' ? themePalette.rgba_255_255_255_0_08 : colors.border,
             }]}>
                 <View style={styles.healthHeader}>
                     <Text style={[styles.healthTitle, { color: colors.muted }]}>Compliance Health</Text>
@@ -318,7 +318,7 @@ function TabPlaceholder({ icon = 'exclamation-circle', title = 'Address Complian
                 <View style={[styles.progressBarBackground, { backgroundColor: colors.background }]}>
                     <View style={[
                         styles.progressBarFill,
-                        { backgroundColor: '#1E5631', width: `${healthPercentage}%` },
+                        { backgroundColor: themePalette.hex_1e5631, width: `${healthPercentage}%` },
                     ]} />
                 </View>
                 <Text style={[styles.healthSubtext, { color: colors.muted }]}>

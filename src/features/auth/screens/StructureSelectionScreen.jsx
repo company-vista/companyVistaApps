@@ -19,7 +19,7 @@ import { s } from '../../../theme/responsive';
 import { STRUCTURE_PRICE_MAP } from '../../../utils/priceCalculator';
 import { getStateData, getEntityTypes, getEntityMeta, getEntityByStructureId } from '../../../utils/jurisdictionData';
 import { getCountryData, getCountryEntities } from '../../../constants/countries';
-import { useThemeColors } from '../../../theme/colors';
+import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 
 const StructureSelectionScreen = ({ navigation, route }) => {
   const p = route.params || {};
@@ -162,20 +162,20 @@ const StructureSelectionScreen = ({ navigation, route }) => {
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.card, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: '#C9A84C', backgroundColor: isDark ? 'rgba(201, 168, 76, 0.02)' : 'rgba(201, 168, 76, 0.06)' }]}
+                  style={[styles.card, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_02 : themePalette.hex_ffffff, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }, isSelected && { borderColor: themePalette.hex_c9a84c, backgroundColor: isDark ? themePalette.rgba_201_168_76_0_02 : themePalette.rgba_201_168_76_0_06 }]}
                   activeOpacity={0.85}
                   onPress={() => setSelectedStructure(item.id)}
                 >
                   <View style={styles.cardHeaderRow}>
-                    <View style={[styles.iconBox, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border }, isSelected && { borderColor: 'rgba(201, 168, 76, 0.3)', backgroundColor: 'rgba(201, 168, 76, 0.08)' }]}>
-                      <Ionicons name={item.icon} size={18} color={isSelected ? '#C9A84C' : (isDark ? '#94A3B8' : colors.muted)} />
+                    <View style={[styles.iconBox, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_08 : colors.border }, isSelected && { borderColor: themePalette.rgba_201_168_76_0_3, backgroundColor: themePalette.rgba_201_168_76_0_08 }]}>
+                      <Ionicons name={item.icon} size={18} color={isSelected ? themePalette.hex_c9a84c : (isDark ? themePalette.hex_94a3b8 : colors.muted)} />
                     </View>
                     <View style={styles.titleContainer}>
                       <Text style={[styles.cardTitle, { color: colors.text }, isSelected && styles.goldText]}>{item.title}</Text>
                       <Text style={[styles.cardSubtitle, { color: colors.muted }]}>{item.subtitle}</Text>
                     </View>
                     <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
-                      {isSelected && <Ionicons name="checkmark" size={11} color="#060913" />}
+                      {isSelected && <Ionicons name="checkmark" size={11} color={themePalette.hex_060913} />}
                     </View>
                   </View>
 
@@ -183,13 +183,13 @@ const StructureSelectionScreen = ({ navigation, route }) => {
 
                   <View style={styles.tagsRow}>
                     {item.tags.map((tag, idx) => (
-                      <View key={idx} style={[styles.tagChip, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.surfaceAlt, borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border }, tag.startsWith('⚠') && styles.tagWarn]}>
+                      <View key={idx} style={[styles.tagChip, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_04 : colors.surfaceAlt, borderColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.border }, tag.startsWith('⚠') && styles.tagWarn]}>
                         <Text style={[styles.tagText, { color: colors.muted }, tag.startsWith('⚠') && styles.tagWarnText]}>{tag}</Text>
                       </View>
                     ))}
                   </View>
 
-                  <View style={[styles.cardDivider, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border }]} />
+                  <View style={[styles.cardDivider, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_06 : colors.border }]} />
 
                   <View style={styles.cardFooterRow}>
                     {(() => {
@@ -221,7 +221,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.border }]}>
+      <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
         <TouchableOpacity
           style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }, !selectedStructure && styles.continueBtnDisabled]}
           activeOpacity={0.85}
@@ -263,15 +263,15 @@ const StructureSelectionScreen = ({ navigation, route }) => {
 
 export default StructureSelectionScreen;
 
-const styles = StyleSheet.create({
+const styles = makeThemeStyles(() => StyleSheet.create({
   container: { flex: 1 },
   scrollArea: { flex: 1 },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(24) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(16), marginTop: s(34) },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   mainTitle: { fontSize: s(24), fontWeight: '500', lineHeight: s(38), marginBottom: s(8) },
-  italicTitle: { color: '#C9A84C', fontStyle: 'italic', fontFamily: 'serif' },
-  goldText: { color: '#C9A84C' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
+  goldText: { color: themePalette.hex_c9a84c },
   subtitle: { fontSize: s(14), lineHeight: s(21), marginBottom: s(20) },
   listContainer: { gap: 14 },
   card: {
@@ -288,27 +288,27 @@ const styles = StyleSheet.create({
   cardSubtitle: { fontSize: font.small, marginTop: s(2) },
   radioCircle: {
     width: 20, height: 20, borderRadius: 10, borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)', alignItems: 'center', justifyContent: 'center',
+    borderColor: themePalette.rgba_255_255_255_0_2, alignItems: 'center', justifyContent: 'center',
   },
-  radioCircleSelected: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
+  radioCircleSelected: { backgroundColor: themePalette.hex_c9a84c, borderColor: themePalette.hex_c9a84c },
   cardDescription: { fontSize: font.bodySmall, lineHeight: 17, marginBottom: s(12) },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: s(14) },
   tagChip: {
     borderRadius: 12,
     paddingHorizontal: s(10), paddingVertical: s(5), borderWidth: 1,
   },
-  tagWarn: { borderColor: 'rgba(234, 179, 8, 0.2)', backgroundColor: 'rgba(234, 179, 8, 0.05)' },
+  tagWarn: { borderColor: themePalette.rgba_234_179_8_0_2, backgroundColor: themePalette.rgba_234_179_8_0_05 },
   tagText: { fontSize: font.small, fontWeight: '500' },
-  tagWarnText: { color: '#EAB308' },
+  tagWarnText: { color: themePalette.hex_eab308 },
   cardDivider: { height: 1, marginBottom: s(12) },
   cardFooterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  priceText: { color: '#C9A84C', fontSize: font.xxl, fontWeight: 'bold' },
+  priceText: { color: themePalette.hex_c9a84c, fontSize: font.xxl, fontWeight: 'bold' },
   stateFeeText: { fontSize: font.xs, fontWeight: 'normal' },
   badge: { paddingHorizontal: s(10), paddingVertical: s(4), borderRadius: 12 },
-  badgeGreen: { backgroundColor: 'rgba(16, 185, 129, 0.12)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' },
-  badgeTextGreen: { color: '#10B981', fontSize: font.xs, fontWeight: 'bold' },
-  badgeBlue: { backgroundColor: 'rgba(59, 130, 246, 0.12)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.3)' },
-  badgeTextBlue: { color: '#60A5FA', fontSize: font.xs, fontWeight: 'bold' },
+  badgeGreen: { backgroundColor: themePalette.rgba_16_185_129_0_12, borderWidth: 1, borderColor: themePalette.rgba_16_185_129_0_3 },
+  badgeTextGreen: { color: themePalette.hex_10b981, fontSize: font.xs, fontWeight: 'bold' },
+  badgeBlue: { backgroundColor: themePalette.rgba_59_130_246_0_12, borderWidth: 1, borderColor: themePalette.rgba_59_130_246_0_3 },
+  badgeTextBlue: { color: themePalette.hex_60a5fa, fontSize: font.xs, fontWeight: 'bold' },
   bottomBar: {
     paddingHorizontal: s(16), paddingTop: s(12),
     borderTopWidth: 1,
@@ -317,4 +317,4 @@ const styles = StyleSheet.create({
   continueBtnDisabled: { opacity: 0.4 },
   continueBtnText: { fontSize: font.base, fontWeight: 'bold' },
   continueBtnTextDisabled: { opacity: 0.5 },
-});
+}));

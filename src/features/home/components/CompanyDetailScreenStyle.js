@@ -1,10 +1,11 @@
 import { font } from '../../../theme/typography';
 import { StyleSheet } from "react-native";
 import { s } from "../../../theme/responsive";
+import { themePalette } from '../../../theme/colors';
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8FAFC', // Light clean background as per UI image
+        backgroundColor: themePalette.hex_f8fafc, // Light clean background as per UI image
     },
     /* header */
     header: {
@@ -14,9 +15,9 @@ export const styles = StyleSheet.create({
         paddingHorizontal: s(10),
         paddingTop: 12,
         paddingBottom: 10,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: themePalette.hex_ffffff,
         borderBottomWidth: 1,
-        borderBottomColor: '#E2E8F0',
+        borderBottomColor: themePalette.hex_e2e8f0,
     },
     headerLeft: {
         flexDirection: 'row',
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
     headerTitle: {
         fontSize: font.xxl,
         fontWeight: '700',
-        color: '#0F172A',
+        color: themePalette.hex_0f172a,
         textAlign: 'left',
     },
     /* scroll */
@@ -42,9 +43,9 @@ export const styles = StyleSheet.create({
         alignItems: 'flex-start',
         borderRadius: 16,
         padding: 10,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: themePalette.hex_ffffff,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: themePalette.hex_e2e8f0,
         marginBottom: 34,
         // Subtle shadow for premium card look
         // shadowColor: '#000',
@@ -57,14 +58,14 @@ export const styles = StyleSheet.create({
         width: 54,
         height: 54,
         borderRadius: 28,
-        backgroundColor: '#EEF2FF',
+        backgroundColor: themePalette.hex_eef2ff,
         alignItems: 'center',
         justifyContent: 'center',
     },
     avatarText: {
         fontSize: font.xxl,
         fontWeight: '700',
-        color: '#4F46E5',
+        color: themePalette.hex_4f46e5,
     },
     heroInfo: {
         flex: 1,
@@ -78,7 +79,7 @@ export const styles = StyleSheet.create({
     heroName: {
         fontSize: font.xxl,
         fontWeight: '600',
-        color: '#0F172A',
+        color: themePalette.hex_0f172a,
         flexShrink: 1,
     },
     einWrapperNo: {
@@ -89,7 +90,7 @@ export const styles = StyleSheet.create({
     heroMetaText: {
         fontSize: font.sm,
         fontWeight: '500',
-        color: '#94A3B8',
+        color: themePalette.hex_94a3b8,
         marginTop: 3,
     },
     statusBadge: {
@@ -134,7 +135,7 @@ export const styles = StyleSheet.create({
         flex: 1,
         fontSize: s(14),
         fontWeight: '600',
-        color: '#0F172A',
+        color: themePalette.hex_0f172a,
         textAlign: 'left',
     },
     divider: {
@@ -146,14 +147,14 @@ export const styles = StyleSheet.create({
     placeholderCard: {
         borderRadius: 14,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: themePalette.hex_e2e8f0,
         padding: 40,
         alignItems: 'center',
         gap: 12,
     },
     placeholderText: {
         fontSize: font.base,
-        color: '#64748B',
+        color: themePalette.hex_64748b,
     },
     /* empty state */
     emptyState: {
@@ -164,6 +165,6 @@ export const styles = StyleSheet.create({
     emptyText: {
         fontSize: font.title,
         fontWeight: '600',
-        color: '#64748B',
+        color: themePalette.hex_64748b,
     },
 });
