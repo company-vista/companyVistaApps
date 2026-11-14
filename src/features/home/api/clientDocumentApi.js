@@ -16,15 +16,51 @@ function getErrorMessage(error) {
         axiosError.message ??
         'Unable to load documents. Please try again.');
 }
+function getDocumentDedupeKey(doc) {
+    if (!doc || typeof doc !== 'object') {
+        return '';
+    }
+    const name = String(doc.originalFileName ?? doc.fileName ?? '').trim().toLowerCase();
+    const type = String(doc.documentType ?? '').trim().toLowerCase();
+    const size = doc.fileSize ?? '';
+    if (!name && !type) {
+        return '';
+    }
+    return `${type}|${name}|${size}`;
+}
+function dedupeDocuments(documents) {
+    const seen = new Set();
+    const unique = [];
+    for (const doc of documents) {
+        if (!doc || typeof doc !== 'object') {
+            continue;
+        }
+        const rawId = doc._id ?? doc.id;
+        const idKey = rawId != null ? `id:${String(rawId)}` : '';
+        const fileKey = getDocumentDedupeKey(doc);
+        const key = fileKey ? `file:${fileKey}` : '';
+        if ((idKey && seen.has(idKey)) || (key && seen.has(key))) {
+            continue;
+        }
+        if (idKey) {
+            seen.add(idKey);
+        }
+        if (key) {
+            seen.add(key);
+        }
+        unique.push(doc);
+    }
+    return unique;
+}
 function getResponseDocuments(data) {
     if (Array.isArray(data.documents)) {
-        return data.documents;
+        return dedupeDocuments(data.documents);
     }
     if (Array.isArray(data.data)) {
-        return data.data;
+        return dedupeDocuments(data.data);
     }
     if (data.data && typeof data.data === 'object' && Array.isArray(data.data.documents)) {
-        return data.data.documents;
+        return dedupeDocuments(data.data.documents);
     }
     return [];
 }

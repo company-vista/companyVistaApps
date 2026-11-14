@@ -32,6 +32,10 @@ import {
 import AdminLayout from '../components/AdminLayout';
 import AdminBlogsScreen from '../blogs/AdminBlogsScreen';
 import CRM from '../crm/crm';
+import AdminChangeRequest from '../services/components/AdminChangeRequest';
+import AdminChangeRequestDetails from '../services/components/AdminChangeRequestDetails';
+import AdminServicesRequest from '../services/components/AdminServicesRequest';
+import AdminItin from '../services/components/AdminItin';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +53,26 @@ export default function AdminStack() {
         layout={FullScreenLayout}
       />
       <Stack.Screen name="AdminCRM" component={CRM} layout={FullScreenLayout} />
+      <Stack.Screen
+        name="AdminChangeRequests"
+        component={AdminChangeRequest}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminChangeRequestDetails"
+        component={AdminChangeRequestDetails}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminServiceRequests"
+        component={AdminServicesRequest}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminItin"
+        component={AdminItin}
+        layout={FullScreenLayout}
+      />
       <Stack.Screen
         name="AdminBlogs"
         component={AdminBlogsScreen}

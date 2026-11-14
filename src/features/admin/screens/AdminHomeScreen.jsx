@@ -254,13 +254,7 @@ const AdminDashboard = () => {
             colors={['#1E3A8A']}
           />
         }>
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity style={styles.outlinedButton}>
-            <Text style={styles.outlinedButtonText}>↑ Upload Document</Text>
-          </TouchableOpacity>
-        </View>
 
-       
 
         {/* <AdminStatsCards
           stats={stats}
@@ -335,23 +329,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  actionButtonsContainer: {
-    gap: 10,
-    marginBottom: 20,
-  },
-  outlinedButton: {
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  outlinedButtonText: {
-    fontSize: font.bodySmall,
-    fontWeight: '600',
-    color: '#334155',
-  },
   primaryButton: {
     backgroundColor: '#1E3A8A',
     borderRadius: 8,

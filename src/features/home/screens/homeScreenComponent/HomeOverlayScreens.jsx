@@ -6,6 +6,8 @@ import CompanyDetailScreen from '../../components/CompanyDetailScreen';
 import ManageCompanyScreen from '../manageCompany/ManageCompanyScreen';
 import ManageOptionsScreen from '../manageCompany/ManageOptionsScreen';
 import DocumentViewScreen from '../documents/DocumentViewScreen';
+import DocumentsScreen from '../documents/DocumentsScreen';
+import InvoicesScreen from '../invoices/InvoicesScreen';
 import ServicesScreen from '../subscription&services/ServicesScreen';
 import SubscriptionScreen from '../subscription&services/SubscriptionScreen';
 import ExploreServicesScreen from '../subscription&services/ExploreServicesScreen';
@@ -30,14 +32,14 @@ import VerifyIdentityScreen from '../../components/companyInformationSection/you
 export function HomeOverlayScreens({
     isVerifyIdentityOpen, isShareholdersOpen, isPaymentMethodOpen, isQuoteBreakdownOpen,
     isQuoteOpen, isOrderDetailsOpen, currentQuote, selectedCompany, activeCompanySection,
-    isManageOptionsOpen, isManageScreenOpen, selectedDocumentForView, isServicesOpen,
+    isManageOptionsOpen, isManageScreenOpen, selectedDocumentForView, isDocumentsScreenOpen, isInvoicesScreenOpen, isServicesOpen,
     isExploreServicesOpen, isServicesHistoryOpen, isSubscriptionOpen,
     isRegistrationProgressOpen, isRegistrationTrackingOpen, isSupportOpen,
     isLoadingCompanies, companyOptions, trackingCompanyId, supportFromRegistrationTracking,
     setIsVerifyIdentityOpen, setIsShareholdersOpen, setIsPaymentMethodOpen,
     setIsQuoteBreakdownOpen, setIsQuoteOpen, setIsOrderDetailsOpen, setCurrentQuote,
     setActiveCompanySection, setIsManageOptionsOpen, setIsManageScreenOpen,
-    setSelectedDocumentForView, setIsRegistrationProgressOpen, setIsRegistrationTrackingOpen,
+    setSelectedDocumentForView, setIsDocumentsScreenOpen, setIsInvoicesScreenOpen, setIsRegistrationProgressOpen, setIsRegistrationTrackingOpen,
     setIsSupportOpen, setSupportFromRegistrationTracking,
     closeServicesScreen, openSubscriptionScreen, openExploreServicesScreen,
     openServicesHistoryScreen, closeExploreServicesScreen, closeServicesHistoryScreen,
@@ -79,16 +81,19 @@ export function HomeOverlayScreens({
         }} />);
     }
     if (isManageScreenOpen) {
-        return (<ManageCompanyScreen selectedCompany={selectedCompany} onBackPress={() => {
-            setIsManageScreenOpen(false);
-            setIsManageOptionsOpen(true);
-        }} />);
+        return (<ManageCompanyScreen selectedCompany={selectedCompany} onBackPress={() => setIsManageScreenOpen(false)} />);
     }
     if (selectedDocumentForView) {
         return (<DocumentViewScreen documentItem={selectedDocumentForView} onBackPress={() => setSelectedDocumentForView(null)} />);
     }
+    if (isDocumentsScreenOpen) {
+        return (<DocumentsScreen selectedCompany={selectedCompany} onBackPress={() => setIsDocumentsScreenOpen(false)} onDocumentViewPress={doc => setSelectedDocumentForView(doc)} />);
+    }
+    if (isInvoicesScreenOpen) {
+        return (<InvoicesScreen selectedCompany={selectedCompany} onBackPress={() => setIsInvoicesScreenOpen(false)} onInvoicePress={invoice => navigation.navigate('InvoiceDetail', { invoice })} />);
+    }
     if (isServicesOpen) {
-        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} onExploreServicesPress={openExploreServicesScreen} onServicesHistoryPress={openServicesHistoryScreen} />);
+        return (<ServicesScreen onBackPress={closeServicesScreen} onSubscriptionPress={openSubscriptionScreen} onExploreServicesPress={openExploreServicesScreen} onServicesHistoryPress={openServicesHistoryScreen} onRequestChangePress={() => setIsManageScreenOpen(true)} />);
     }
     if (isExploreServicesOpen) {
         return (<ExploreServicesScreen onBackPress={closeExploreServicesScreen} selectedCompany={selectedCompany} />);

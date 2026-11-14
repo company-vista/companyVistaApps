@@ -3,7 +3,6 @@ import { s } from '../../../theme/responsive';
 import AnimatedAppear from '../../../components/AnimatedAppear';
 import HomeHeroSection from './home/HomeHeroSection';
 import ServicesButton from '../screens/hero2card/ServicesButton';
-import RecentActivityAndPaymentOverviewSection from './home/RecentActivityAndPaymentOverviewSection';
 import DashboardOverviewCards from './home/DashboardOverviewCards';
 import RecentInvoicesSection from './home/RecentInvoicesSection';
 import { useCompanyCompliance } from '../hooks/useCompanyCompliance';
@@ -11,7 +10,7 @@ import { useCompanyInvoices } from '../hooks/useCompanyInvoices';
 import CompanyVistaReferral from '../../companyVistaReferral/CompanyVistaReferral';
 
 
-function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onQuickAccessViewAllPress, onTransactionsPress, onServicesPress, onRegistrationTrackingPress, onCompanyProfilePress, onCompanyOverviewPress, onComplianceOverviewPress, onDocumentsOverviewPress, onBillingOverviewPress, onInvoicePress, onOrderPress, selectedCompany, colors, }) {
+function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, onAddToCompanyPress, onQuickAccessViewAllPress, onServicesPress, onRegistrationTrackingPress, onCompanyProfilePress, onCompanyOverviewPress, onComplianceOverviewPress, onDocumentsOverviewPress, onBillingOverviewPress, onInvoicePress, onOrderPress, selectedCompany, colors, }) {
   const compliance = useCompanyCompliance(selectedCompany?.id);
   const { invoices } = useCompanyInvoices(selectedCompany?.id);
 
@@ -33,9 +32,6 @@ function HomeTabContent({ isLoadingCompanies = false, onCompanySwitcherPress, on
     </AnimatedAppear>
 
     <AnimatedAppear index={4}>
-      <RecentActivityAndPaymentOverviewSection onPress={onTransactionsPress} onServicesPress={onServicesPress} selectedCompany={selectedCompany} />
-    </AnimatedAppear>
-    <AnimatedAppear index={5}>
       <CompanyVistaReferral />
     </AnimatedAppear>
   </View>);

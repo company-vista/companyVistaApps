@@ -93,7 +93,7 @@ export default function ServicesHistoryScreen({ onBackPress, selectedCompany }) 
       <View style={[styles.headerArea, { backgroundColor: isLight ? themePalette.hex_ffffff : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
         <View style={styles.header}>
           <BackButton onPress={onBackPress} />
-          <Text style={[styles.title, { color: colors.text }]}>Services History</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Service History</Text>
         </View>
       </View>
       {loading ? (

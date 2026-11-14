@@ -51,7 +51,7 @@ const RAW_CATALOG = [
         ],
     },
     {
-        category: "Business Compliance & Regis.",
+        category: "Business Compliance & Registrations",
         services: [
             {
                 name: "DBA / Trade Name Registration",
@@ -122,7 +122,7 @@ const RAW_CATALOG = [
         ],
     },
     {
-        category: "Company Updates & Documents",
+        category: "Corporate Changes & Legal Documentation",
         services: [
             {
                 name: "Company Amendment Filing",

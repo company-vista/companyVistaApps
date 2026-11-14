@@ -1,14 +1,15 @@
 import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
 export const QUICK_ACTIONS = [
-  { key: 'create-invoice', title: 'Create Invoice', icon: '📄' },
-  { key: 'add-client', title: 'Clients', icon: '👤' },
-  { key: 'crm', title: 'CRM', icon: '💼' },
-  // { key: 'record-payment', title: 'Payment record', icon: '💳' },
-  { key: 'add-expense', title: 'Add Expense', icon: '💸' },
+  { key: 'create-invoice', title: 'Create Invoice', icon: 'document-text-outline' },
+  { key: 'add-client', title: 'Clients', icon: 'people-outline' },
+  { key: 'crm', title: 'CRM', icon: 'briefcase-outline' },
+  // { key: 'record-payment', title: 'Payment record', icon: 'card-outline' },
+  { key: 'blogs', title: 'Blogs', icon: 'newspaper-outline' },
 ];
 
 const QuickActions = () => {
@@ -20,8 +21,8 @@ const QuickActions = () => {
       navigation.navigate('AdminClients');
     } else if (action.key === 'crm') {
       navigation.navigate('AdminCRM');
-    } else if (action.key === 'add-expense') {
-      navigation.navigate('AdminAddExpense');
+    } else if (action.key === 'blogs') {
+      navigation.navigate('AdminBlogs');
     }
   };
 
@@ -36,7 +37,7 @@ const QuickActions = () => {
             activeOpacity={0.7}
             onPress={() => handlePress(action)}>
             <View style={styles.cardIconWrap}>
-              <Text style={styles.cardIcon}>{action.icon}</Text>
+              <Ionicons name={action.icon} size={font.displayMedium} color="#4F46E5" />
             </View>
             <Text style={styles.cardTitle} numberOfLines={2}>
               {action.title}
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     paddingTop: 10,
     columnGap: 20,
     rowGap: 8,
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EEF2FF',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -88,11 +89,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
   },
-  cardIcon: {
-    fontSize: font.display,
-  },
   cardTitle: {
-    fontSize: font.xs,
+    fontSize: font.sm,
     fontWeight: '600',
     color: '#1E293B',
     textAlign: 'center',

@@ -1,36 +1,53 @@
 import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 const services = [
-  { key: 'change-requests', title: 'Change Requests', icon: '📝' },
-  { key: 'itin-apps', title: 'ITIN Apps', icon: '🪪' },
-  { key: 'bank-accounts', title: 'Bank Accounts', icon: '🏦' },
-  { key: 'company-claims', title: 'Company Claims', icon: '🏢' },
+  { key: 'change-requests', title: 'Change Requests', icon: 'document-text-outline' },
+  { key: 'services', title: 'Services Requests', icon: 'briefcase-outline' },
+  { key: 'itin-apps', title: 'ITIN Apps', icon: 'card-outline' },
+  { key: 'company-claims', title: 'Company Claims', icon: 'shield-checkmark-outline' },
 ];
 
-const AdminServicesSection = () => (
-  <View style={styles.container}>
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Services</Text>
+const AdminServicesSection = () => {
+  const navigation = useNavigation();
+
+  const handlePress = key => {
+    if (key === 'change-requests') {
+      navigation.navigate('AdminChangeRequests');
+    } else if (key === 'services') {
+      navigation.navigate('AdminServiceRequests');
+    } else if (key === 'itin-apps') {
+      navigation.navigate('AdminItin');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Services & Requests</Text>
+      </View>
+      <View style={styles.grid}>
+        {services.map(item => (
+          <TouchableOpacity
+            key={item.key}
+            style={styles.card}
+            activeOpacity={0.7}
+            onPress={() => handlePress(item.key)}>
+            <View style={styles.cardIconWrap}>
+              <Ionicons name={item.icon} size={font.displayMedium} color="#4F46E5" />
+            </View>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
-    <View style={styles.grid}>
-      {services.map(item => (
-        <TouchableOpacity
-          key={item.key}
-          style={styles.card}
-          activeOpacity={0.7}>
-          <View style={styles.cardIconWrap}>
-            <Text style={styles.cardIcon}>{item.icon}</Text>
-          </View>
-          <Text style={styles.cardTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  </View>
-);
+  );
+};
 
 export default AdminServicesSection;
 
@@ -50,9 +67,10 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
-    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     paddingTop: 6,
+    paddingBottom: 6,
     gap: 20,
   },
   card: {
@@ -64,7 +82,7 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EEF2FF',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -77,11 +95,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
   },
-  cardIcon: {
-    fontSize: font.displayXL,
-  },
   cardTitle: {
-    fontSize: font.xs,
+    fontSize: font.sm,
     fontWeight: '500',
     color: '#1E293B',
     textAlign: 'center',

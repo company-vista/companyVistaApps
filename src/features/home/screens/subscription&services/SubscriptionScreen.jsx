@@ -171,7 +171,7 @@ export default function SubscriptionOverview({ onBackPress, selectedCompany }) {
       <View style={[styles.headerArea, { backgroundColor: isLight ? themePalette.hex_ffffff : undefined, paddingTop: safeAreaInsets.top + 12 }]}>
         <View style={styles.header}>
           <BackButton onPress={onBackPress}/>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Subscription</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Active Services</Text>
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.content}>

@@ -26,9 +26,7 @@ import { fetchSubscriptionPayments } from '../api/subscriptionPaymentsApi';
 import { getCompanyTotalAmount, getSuccessfulPaymentCompanyIds, isCompanyQuoted, isRegistrationUnpaid } from '../../../utils/companyStatus';
 import { mapCompanyToListItem } from './quickAccess/companyListItem';
 import PullToRefresh from './homeScreenComponent/PullToRefresh';
-import BillingTabContent from './invoices/InvoicesTabContent';
 import CompanyTabContent from '../components/CompanyTabContent';
-import DocumentsTabContent from './documents/DocumentsTabContent';
 import HomeTabContent from '../components/HomeTabContent';
 import ReportsTabContent from './compliances/ReportsTabContent';
 import FloatingPlusButton from '../../../components/floatingPlusButton/FloatingPlusButton';
@@ -96,6 +94,8 @@ export default function HomeScreen() {
     const [companyOptions, setCompanyOptions] = useState([]);
     const [isCompanySwitcherOpen, setIsCompanySwitcherOpen] = useState(false);
     const [selectedDocumentForView, setSelectedDocumentForView] = useState(null);
+    const [isDocumentsScreenOpen, setIsDocumentsScreenOpen] = useState(false);
+    const [isInvoicesScreenOpen, setIsInvoicesScreenOpen] = useState(false);
     // true se shuru karo, false nahi. Warna first render pe companyOptions
     // khali hone ki wajah se real (khaali) Home dikhta hai, phir fetch effect
     // loading true karta hai aur skeleton aa jaata hai — user ko content →
@@ -485,13 +485,24 @@ export default function HomeScreen() {
         return () => sub.remove();
     }, [isAddCompanyMandatory, dispatch]);
     useFocusEffect(useCallback(() => {
-        if (!selectedDocumentForView) return undefined;
+        if (!selectedDocumentForView && !isDocumentsScreenOpen && !isInvoicesScreenOpen) return undefined;
         const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-            setSelectedDocumentForView(null);
-            return true;
+            if (selectedDocumentForView) {
+                setSelectedDocumentForView(null);
+                return true;
+            }
+            if (isDocumentsScreenOpen) {
+                setIsDocumentsScreenOpen(false);
+                return true;
+            }
+            if (isInvoicesScreenOpen) {
+                setIsInvoicesScreenOpen(false);
+                return true;
+            }
+            return false;
         });
         return () => sub.remove();
-    }, [selectedDocumentForView]));
+    }, [selectedDocumentForView, isDocumentsScreenOpen, isInvoicesScreenOpen]));
     useEffect(() => {
         Animated.loop(Animated.sequence([
             Animated.timing(bellAnim, {
@@ -865,6 +876,10 @@ export default function HomeScreen() {
     }
     function handleTabPress(tabId) {
         closeFabMenu();
+        if (tabId === 'transactions') {
+            openTransactionsScreen();
+            return;
+        }
         if (tabId === 'more') {
             openMoreSheet();
             return;
@@ -1051,7 +1066,7 @@ export default function HomeScreen() {
     const isAnyOverlayOpen = !!(
         isVerifyIdentityOpen || isShareholdersOpen || isPaymentMethodOpen || isQuoteBreakdownOpen ||
         isQuoteOpen || isOrderDetailsOpen || activeCompanySection || isManageOptionsOpen ||
-        isManageScreenOpen || selectedDocumentForView || isServicesOpen || isExploreServicesOpen ||
+        isManageScreenOpen || selectedDocumentForView || isDocumentsScreenOpen || isInvoicesScreenOpen || isServicesOpen || isExploreServicesOpen ||
         isServicesHistoryOpen || isSubscriptionOpen || isRegistrationProgressOpen ||
         isRegistrationTrackingOpen || isSupportOpen
     );
@@ -1069,6 +1084,8 @@ export default function HomeScreen() {
             isManageOptionsOpen={isManageOptionsOpen}
             isManageScreenOpen={isManageScreenOpen}
             selectedDocumentForView={selectedDocumentForView}
+            isDocumentsScreenOpen={isDocumentsScreenOpen}
+            isInvoicesScreenOpen={isInvoicesScreenOpen}
             isServicesOpen={isServicesOpen}
             isExploreServicesOpen={isExploreServicesOpen}
             isServicesHistoryOpen={isServicesHistoryOpen}
@@ -1091,6 +1108,8 @@ export default function HomeScreen() {
             setIsManageOptionsOpen={setIsManageOptionsOpen}
             setIsManageScreenOpen={setIsManageScreenOpen}
             setSelectedDocumentForView={setSelectedDocumentForView}
+            setIsDocumentsScreenOpen={setIsDocumentsScreenOpen}
+            setIsInvoicesScreenOpen={setIsInvoicesScreenOpen}
             setIsRegistrationProgressOpen={setIsRegistrationProgressOpen}
             setIsRegistrationTrackingOpen={setIsRegistrationTrackingOpen}
             setIsSupportOpen={setIsSupportOpen}
@@ -1126,7 +1145,7 @@ export default function HomeScreen() {
             {activeTab === 'home' && unpaidCompany ? (
                 <PendingPaymentBanner colors={colors} companyLabel={unpaidCompanyLabel} amount={unpaidCompanyAmount} onPayPress={handleResumePaymentPress} />
             ) : null}
-            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanySwitcherPress={openCompanySwitcher} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onCompanyProfilePress={() => setActiveCompanySection('menu')} onCompanyOverviewPress={() => setActiveCompanySection('menu')} onComplianceOverviewPress={() => setActiveTab('reports')} onDocumentsOverviewPress={() => setActiveTab('documents')} onBillingOverviewPress={() => setActiveTab('billing')} onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
+            {activeTab === 'home' ? (isLoadingCompanies ? <View style={centeredLoadingStyle}><ActivityIndicator size="large" color={colors.accent} /></View> : <HomeTabContent isLoadingCompanies={isLoadingCompanies} selectedCompany={selectedCompany ?? companyOptions[0] ?? null} onCompanySwitcherPress={openCompanySwitcher} onAddToCompanyPress={() => openAddCompanyFlow()} onRegistrationTrackingPress={openRegistrationTrackingScreen} onCompanyProfilePress={() => setActiveCompanySection('menu')} onCompanyOverviewPress={() => setActiveCompanySection('menu')} onComplianceOverviewPress={() => setActiveTab('reports')} onDocumentsOverviewPress={() => setIsDocumentsScreenOpen(true)} onBillingOverviewPress={() => setIsInvoicesScreenOpen(true)} onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} onOrderPress={() => setIsOrderDetailsOpen(true)} onQuickAccessItemPress={(itemId) => {                if (itemId === 'companyProfile')
                     navigation.navigate('CompanyProfile');
                 else if (itemId === 'invoiceCenter')
                     navigation.navigate('InvoiceCenter');
@@ -1136,7 +1155,7 @@ export default function HomeScreen() {
                     navigation.navigate('HelpDesk');
                 else if (itemId === 'federalFiling')
                     navigation.navigate('FederalFiling');
-            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onTransactionsPress={openTransactionsScreen} onServicesPress={openServicesScreen} colors={colors} />) : null}
+            }} onQuickAccessViewAllPress={() => navigation.navigate('QuickAccess')} onServicesPress={openServicesScreen} colors={colors} />) : null}
             {activeTab === 'company' ? (<CompanyTabContent selectedCompany={selectedCompany} onSectionPress={setActiveCompanySection} />) : null}
             {activeTab === 'reports' ? (<ReportsTabContent selectedCompany={selectedCompany} onOpenRenewPage={(action) => {
                 if (action.id === 'federal_filing')
@@ -1150,8 +1169,6 @@ export default function HomeScreen() {
                 else if (action.id === 'resident')
                     navigation.navigate('RenewCompliance', { selectedAction: action });
             }} onOpenComplianceHistory={(action) => navigation.navigate('ComplianceHistory', { selectedAction: action })} />) : null}
-            {activeTab === 'billing' ? (<BillingTabContent onInvoicePress={(invoice) => navigation.navigate('InvoiceDetail', { invoice })} selectedCompany={selectedCompany} />) : null}
-            {activeTab === 'documents' ? (<DocumentsTabContent selectedCompany={selectedCompany} onDocumentViewPress={doc => setSelectedDocumentForView(doc)} />) : null}
         </PullToRefresh>
 
         {activeTab === 'home' ? <QuickActionFab isFabMenuOpen={isFabMenuOpen} fabMenuOpacity={fabMenuOpacity} fabMenuScale={fabMenuScale} fabMenuTranslateY={fabMenuTranslateY} fabIconRotate={fabIconRotate} onToggleMenu={toggleFabMenu} onCloseMenu={closeFabMenu} colors={colors} safeAreaInsets={safeAreaInsets} onTransactionsPress={openTransactionsScreen} onAddCompanyPress={() => {
@@ -1165,7 +1182,7 @@ export default function HomeScreen() {
 
         <FloatingPlusButtonCard visible={isPlusCardOpen} onClose={() => setIsPlusCardOpen(false)} bottomOffset={safeAreaInsets.bottom + 85} onChatSupportPress={() => { setIsPlusCardOpen(false); navigation.navigate('ChatSupport'); }} />
 
-        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onManagePress={() => closeMoreSheet(() => setIsManageOptionsOpen(true))} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
+        {isMoreOpen ? <MoreTabSheet colors={colors} insets={safeAreaInsets} slideAnim={moreSlideAnim} onClose={() => closeMoreSheet()} onFollowUsPress={openFollowUs} onHelpFeedbackPress={openHelpFeedback} onSupportPress={openSupport} onProfilePress={() => navigation.navigate('Profile')} onSettingsPress={() => { closeMoreSheet(); navigation.navigate('Settings'); }} /> : null}
 
         <CompanySwitcherModal isOpen={isCompanySwitcherOpen} isLoading={isLoadingCompanies} companyOptions={companyOptions} selectedCompany={selectedCompany} companySwitcherOpacity={companySwitcherOpacity} companySwitcherTranslateY={companySwitcherTranslateY} onSelectCompany={selectCompanyFromSwitcher} onClose={closeCompanySwitcher} onAddCompany={openAddCompanyFlow} addCompanyBlocked={addCompanyBlocked} addCompanyBlockedReason={addCompanyBlockedReason} colors={colors} safeAreaInsets={safeAreaInsets} />
     </View>);

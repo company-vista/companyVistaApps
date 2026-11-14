@@ -50,31 +50,20 @@ function isMailDoc(doc) {
     return src.includes('mail') || dt.includes('mail') || dt.includes('letter');
 }
 
-function LockedDocumentCard({ item, idx, selectedCompany, colors, onUnlockPress }) {
-    const dates = Array.isArray(item?.documentDates) ? item.documentDates : [];
-    const createdAt = item?.createdAt || '';
-    const formattedDate = formatDate(createdAt);
-    const isUnlocked = Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0;
-    return (<AnimatedAppear key={item._id ?? idx} index={idx}>
+function LockedDocumentCard({ index, date, item, selectedCompany, colors, isUnlocked, onUnlockPress }) {
+    const formattedDate = formatDate(date ?? item?.createdAt ?? '');
+    return (<AnimatedAppear key={item?._id ?? `locked-${index}`} index={index}>
       <View style={[getStyles(colors).lockedCard, isUnlocked && { borderColor: themePalette.rgba_74_222_128_0_3 }]}>
         <View style={getStyles(colors).lockedCardTop}>
           <View style={[getStyles(colors).lockedIconWrap, { backgroundColor: isUnlocked ? themePalette.hex_f0fdf4 : themePalette.hex_fef2f2 }]}>
             <FontAwesome name={isUnlocked ? 'unlock-alt' : 'lock'} size={14} color={isUnlocked ? themePalette.hex_22c55e : themePalette.hex_dc2626}/>
           </View>
           <View style={getStyles(colors).cardInfo}>
-            <Text style={getStyles(colors).cardTitle}>{selectedCompany?.name ?? 'Documents'}</Text>
+            <Text style={getStyles(colors).cardTitle}>Document {index + 1}</Text>
             {formattedDate ? <Text style={[getStyles(colors).documentTypeText, { marginTop: 2 }]}>Created: {formattedDate}</Text> : null}
+            <Text style={[getStyles(colors).documentTypeText, { marginTop: 2 }]}>{selectedCompany?.name ?? 'Company'}</Text>
           </View>
         </View>
-
-        {dates.length > 0 && (<>
-            <View style={[getStyles(colors).lockedDivider, { backgroundColor: colors.border }]}/>
-            <View style={getStyles(colors).dateList}>
-              {dates.map((date, i) => (<Text key={i} style={[getStyles(colors).dateText, { color: colors.muted }]}>
-                  {formatDate(date)}
-                </Text>))}
-            </View>
-          </>)}
 
         <View style={[getStyles(colors).lockedDivider, { backgroundColor: colors.border }]}/>
 
@@ -150,9 +139,12 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
             try {
                 const { data } = await axios.get(`${API_BASE}/api/locked-documents?companyId=${companyId}`, { headers: { Authorization: `Bearer ${token}`, 'x-auth-token': token, Cookie: `clientToken=${token}` } });
                 const items = Array.isArray(data?.data) ? data.data : [];
-                setLockedItems(items);
+                if (isMounted) {
+                    setLockedItems(items);
+                }
             }
-            catch {
+            catch (error) {
+                console.log('Locked documents fetch failed:', error?.response?.status ?? error?.message);
                 if (isMounted) {
                     setLockedItems([]);
                 }
@@ -189,25 +181,25 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
             companyName.includes(lowerQuery) ||
             documentType.includes(lowerQuery));
     });
-    const unlockedLockedItems = lockedItems.filter(item => Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0);
-    const stillLockedItems = lockedItems.filter(item => !(Array.isArray(item?.unlockedIndices) && item.unlockedIndices.length > 0));
-    const lockedToShow = activeTab === 'unlocked'
-        ? unlockedLockedItems
-        : activeTab === 'locked'
-            ? stillLockedItems
-            : sortOption === 'free' ? unlockedLockedItems : sortOption === 'locked' ? stillLockedItems : lockedItems;
+    const latestLockedRecord = lockedItems[0] ?? null;
+    const lockedDocCount = latestLockedRecord ? parseInt(latestLockedRecord.countDocuments, 10) || 0 : 0;
+    const lockedDocDates = Array.isArray(latestLockedRecord?.documentDates) ? latestLockedRecord.documentDates : [];
+    const unlockedIndexSet = new Set(Array.isArray(latestLockedRecord?.unlockedIndices) ? latestLockedRecord.unlockedIndices : []);
+    const allLockedIndices = Array.from({ length: lockedDocCount }, (_, i) => i);
+    const lockedIndices = allLockedIndices.filter(i => !unlockedIndexSet.has(i));
+    const unlockedIndices = allLockedIndices.filter(i => unlockedIndexSet.has(i));
     const showDocsList = activeTab === 'registered' && (sortOption === 'all' || sortOption === 'mails&letter' || sortOption === 'docs');
-    const hasLocked = (activeTab === 'locked' || activeTab === 'unlocked') && lockedToShow.length > 0;
+    const showLockedCards = (activeTab === 'locked' && lockedIndices.length > 0)
+        || (activeTab === 'registered' && sortOption === 'locked' && lockedIndices.length > 0);
+    const showUnlockedCards = (activeTab === 'unlocked' && unlockedIndices.length > 0)
+        || (activeTab === 'registered' && sortOption === 'free' && unlockedIndices.length > 0);
+    const hasLocked = showLockedCards || showUnlockedCards;
     const registeredDocsCount = documents.filter(doc => !isMailDoc(doc)).length;
-    const lockedCount = stillLockedItems.length;
-    const unlockedCount = unlockedLockedItems.length;
+    const lockedCount = lockedIndices.length;
+    const unlockedCount = unlockedIndices.length;
+    const lockedIndicesToShow = showLockedCards ? lockedIndices : showUnlockedCards ? unlockedIndices : [];
+    const showingUnlocked = showUnlockedCards;
     return (<View style={styles.container}>
-
-      {/* **************Search ************** */}
-      <View style={styles.searchContainer}>
-        <FontAwesome name="search" size={16} color={palette.accentText}/>
-        <TextInput style={styles.searchInput} placeholder="Search by last four digits, company, or type" placeholderTextColor={colors.subtle} value={searchQuery} onChangeText={setSearchQuery}/>
-      </View>
 
       {/* **************Sort by filter **************   */}
       <View style={styles.filterRow}>
@@ -229,6 +221,12 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                 {sortOption === option.value ? <FontAwesome name="check" size={14} color={palette.accentText}/> : null}
               </Pressable>))}
           </View>) : null}
+      </View>
+
+      {/* **************Search ************** */}
+      <View style={styles.searchContainer}>
+        <FontAwesome name="search" size={16} color={palette.accentText}/>
+        <TextInput style={styles.searchInput} placeholder="Search by last four digits, company, or type" placeholderTextColor={colors.subtle} value={searchQuery} onChangeText={setSearchQuery}/>
       </View>
 
       {/* **************Registered / Locked / Unlocked tabs ************** */}
@@ -301,15 +299,19 @@ function DocumentsTabContent({ selectedCompany, onDocumentViewPress }) {
                 </AnimatedAppear>))}
 
             {hasLocked && (<>
-                {activeTab === 'locked' && lockedItems.length > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: themePalette.hex_dc2626a6, alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
+                {showLockedCards && lockedCount > 1 && (<Pressable style={[styles.unlockAllBtn, { backgroundColor: themePalette.hex_dc2626a6, alignSelf: 'flex-end', marginBottom: 8 }]} onPress={() => setShowSubscriptionModal(true)}>
                     <FontAwesome name="unlock-alt" size={12} color={themePalette.hex_fff} style={{ marginRight: 6 }}/>
                     <Text style={styles.unlockAllBtnText}>Unlock All</Text>
                   </Pressable>)}
-                {lockedToShow.map((item, idx) => (<LockedDocumentCard key={item._id ?? `locked-${idx}`} item={item} idx={idx} selectedCompany={selectedCompany} colors={colors} onUnlockPress={() => { setSelectedDocumentIndex(idx); setShowUnlockModal(true); }}/>))}
+                {lockedIndicesToShow.map((docIndex) => (<LockedDocumentCard key={`locked-${docIndex}`} index={docIndex} date={lockedDocDates[docIndex]} item={latestLockedRecord} selectedCompany={selectedCompany} colors={colors} isUnlocked={showingUnlocked} onUnlockPress={() => { setSelectedDocumentIndex(docIndex); setShowUnlockModal(true); }}/>))}
               </>)}
 
             {filteredDocuments.length === 0 && !hasLocked && (<View style={{ alignItems: 'center', marginTop: 40 }}>
-                <DocumentNotFound subtitle="No documents found." />
+                <DocumentNotFound subtitle={activeTab === 'locked' || sortOption === 'locked'
+                    ? 'No locked documents for this company.'
+                    : activeTab === 'unlocked' || sortOption === 'free'
+                        ? 'No unlocked documents yet.'
+                        : 'No documents found.'} />
               </View>)}
           </>)}
       </View>
@@ -327,7 +329,7 @@ const getStyles = (colors) => {
             flex: 1,
             paddingTop: 2,
             paddingHorizontal: s(2),
-            marginHorizontal: s(-8),
+            marginHorizontal: s(4),
         },
         searchContainer: {
             flexDirection: 'row',

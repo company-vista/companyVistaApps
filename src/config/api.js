@@ -1,5 +1,5 @@
 // export const API_BASE_URL = 'http://172.27.53.131:5000';
-// export const API_BASE_URL = 'http://192.168.1.37:5000';
+// export const API_BASE_URL = 'http://192.168.1.33:5000';
 export const API_BASE_URL = 'https://api.companyvista.com';
 // export const API_BASE_URL = 'http://localhost:5000';
 export const API_BASE = API_BASE_URL;

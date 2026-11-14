@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatPrice, getCategoryServices } from '../../../../constants/exploreServicesData';
 import { s } from '../../../../theme/responsive';
 import { ServiceCard } from './ServicesCard';
-const CATEGORY_NAME = 'Business Compliance & Regis.';
+const CATEGORY_NAME = 'Business Compliance & Registrations';
 const SERVICES = getCategoryServices(CATEGORY_NAME);
 function BusinessComplianceScreen({ route }) {
     const safeAreaInsets = useSafeAreaInsets();

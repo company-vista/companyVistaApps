@@ -24,16 +24,16 @@ const categoryItems = [
         tone: 'purple',
     },
     {
-        category: 'Company Updates & Documents',
+        category: 'Corporate Changes & Legal Documentation',
         icon: 'file-text-o',
         tone: 'red',
     },
 ];
 const screenMap = {
     'Tax & Accounting Services': 'TaxAccounting',
-    'Business Compliance & Regis.': 'BusinessCompliance',
+    'Business Compliance & Registrations': 'BusinessCompliance',
     'Banking & Owner Services': 'BankingOwner',
-    'Company Updates & Documents': 'CorporateChanges',
+    'Corporate Changes & Legal Documentation': 'CorporateChanges',
 };
 const toneStyles = {
     amber: { iconBg: themePalette.hex_fef3c7, iconColor: themePalette.hex_b45309 },
@@ -50,7 +50,7 @@ function ExploreServicesScreen({ onBackPress, selectedCompany }) {
     return (<View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: headerBg, paddingTop: safeAreaInsets.top + 12 }]}>
         <BackButton onPress={onBackPress}/>
-        <Text style={[styles.title, { color: colors.text }]}>Request a Services</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Request an Add-on Service</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -10,12 +10,12 @@ import { font } from '../../../theme/typography';
 import RegistrationTrackingScreen from './addCompany/RegistrationTrackingScreen';
 const quickActions = [
     { id: 'transactions', label: 'Transactions', icon: 'exchange', color: themePalette.hex_0891b2 },
-    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: themePalette.hex_16a34a },
+    { id: 'subscription', label: 'Active Services', icon: 'credit-card', color: themePalette.hex_16a34a },
 ];
 const serviceActions = [
-    { id: 'subscription', label: 'Subscription', icon: 'credit-card', color: themePalette.hex_16a34a },
-    { id: 'requestService', label: 'Request a Services', icon: 'plus-circle', color: themePalette.hex_0891b2 },
-    { id: 'servicesHistory', label: 'Services History', icon: 'history', color: themePalette.hex_7c3aed },
+    { id: 'subscription', label: 'Active Services', icon: 'credit-card', color: themePalette.hex_16a34a },
+    { id: 'requestService', label: 'Request an Add-on Service', icon: 'plus-circle', color: themePalette.hex_0891b2 },
+    { id: 'servicesHistory', label: 'Service History', icon: 'history', color: themePalette.hex_7c3aed },
 ];
 const trackingActions = [
     { id: 'registrationTracking', label: 'Registration Tracking', icon: 'map-marker', color: themePalette.hex_0891b2 },
@@ -230,3 +230,4 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
     },
 });
+

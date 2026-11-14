@@ -107,9 +107,9 @@ export default function MainStack() {
       <Stack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={{ title: 'Invoice Details' }}/>
       <Stack.Screen name="Transactions" component={TransactionsScreen} options={{ title: 'Transactions' }}/>
       <Stack.Screen name="TaxAccounting" component={TaxAccountingScreen} options={{ title: 'Tax & Accounting Services' }}/>
-      <Stack.Screen name="BusinessCompliance" component={BusinessComplianceScreen} options={{ title: 'Business Compliance & Regis.' }}/>
+      <Stack.Screen name="BusinessCompliance" component={BusinessComplianceScreen} options={{ title: 'Business Compliance & Registrations' }}/>
       <Stack.Screen name="BankingOwner" component={BankingOwnerScreen} options={{ title: 'Banking & Owner Services' }}/>
-      <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen} options={{ title: 'Company Updates & Documents' }}/>
+      <Stack.Screen name="CorporateChanges" component={CorporateChangesScreen} options={{ title: 'Corporate Changes & Legal Documentation' }}/>
       <Stack.Screen name="Bookkeeping" component={BookkeepingScreen} options={{ title: 'Bookkeeping' }}/>
       <Stack.Screen name="ComplianceCheck" component={ComplianceCheckScreen} options={{ title: 'Compliance Check' }}/>
       <Stack.Screen name="DeactivateAccount" component={DeactivateAccountScreen} options={{ title: 'Deactivate Account' }}/>

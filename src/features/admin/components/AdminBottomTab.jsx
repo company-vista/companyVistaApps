@@ -1,6 +1,7 @@
 import { font } from '../../../theme/typography';
 import React from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -11,12 +12,12 @@ const AdminBottomTab = () => {
   const active = route.name;
 
   const tabs = [
-    { key: 'AdminHome', label: 'Home', icon: '🏠', route: 'AdminHome' },
-    { key: 'AdminCompany', label: 'Registered Cos', icon: '🏢', route: 'AdminCompany' },
-    { key: 'AdminMessages', label: 'Messages', icon: '💬', route: 'AdminChatList' },
-    { key: 'AdminDocuments', label: 'Documents', icon: '📄', route: 'AdminDocuments' },
-    { key: 'AdminProfile', label: 'Profile', icon: '👤', route: 'AdminProfile' },
-  ]
+    { key: 'AdminHome', label: 'Home', icon: 'home-outline', activeIcon: 'home', route: 'AdminHome' },
+    { key: 'AdminCompany', label: 'Registered Cos', icon: 'business-outline', activeIcon: 'business', route: 'AdminCompany' },
+    { key: 'AdminMessages', label: 'Messages', icon: 'chatbubble-ellipses-outline', activeIcon: 'chatbubble-ellipses', route: 'AdminChatList' },
+    { key: 'AdminDocuments', label: 'Documents', icon: 'document-text-outline', activeIcon: 'document-text', route: 'AdminDocuments' },
+    { key: 'AdminProfile', label: 'Profile', icon: 'person-outline', activeIcon: 'person', route: 'AdminProfile' },
+  ];
 
   const handlePress = (tab) => {
     if (!tab.route) return;
@@ -40,7 +41,11 @@ const AdminBottomTab = () => {
               style={styles.navItem}
               activeOpacity={0.7}
               onPress={() => handlePress(tab)}>
-              <Text style={[styles.navIcon, isActive && styles.activeNavIcon]}>{tab.icon}</Text>
+              <Ionicons
+                name={isActive ? tab.activeIcon : tab.icon}
+                size={font.display}
+                color={isActive ? '#1E3A8A' : '#64748B'}
+              />
               <Text style={[styles.navText, isActive && styles.activeNavText]}>{tab.label}</Text>
             </TouchableOpacity>
           );
@@ -68,15 +73,8 @@ const styles = StyleSheet.create({
   navItem: {
     alignItems: 'center',
   },
-  navIcon: {
-    fontSize: font.lg,
-    opacity: 1.8,
-  },
-  activeNavIcon: {
-    opacity: 1,
-  },
   navText: {
-    fontSize: font.xs,
+    fontSize: font.sm,
     color: '#64748B',
     marginTop: 2,
     fontWeight: '500',

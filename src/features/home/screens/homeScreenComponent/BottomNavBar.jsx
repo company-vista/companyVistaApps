@@ -13,8 +13,7 @@ const navIconContainerStyle = {
 const tabs = [
     { id: 'home', title: 'Home', icon: 'home' },
     { id: 'reports', title: 'Compliance', icon: 'check-square-o' },
-    { id: 'billing', title: 'Invoice', icon: 'file-text-o' },
-    { id: 'documents', title: 'Document', icon: 'folder-o' },
+    { id: 'transactions', title: 'Transactions', icon: 'exchange' },
     { id: 'more', title: 'More', icon: 'ellipsis-h' },
 ]; 
 export function BottomNavBar({ activeTab, isMoreOpen, onTabPress, colors, safeAreaInsets, }) {

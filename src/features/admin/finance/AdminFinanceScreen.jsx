@@ -1,13 +1,15 @@
 import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
 const cards = [
-  { key: 'invoices', title: 'Invoices', icon: '📄' },
-  { key: 'estimates', title: 'Estimates', icon: '🧾' },
-  { key: 'payments', title: 'Payment Records', icon: '💳' },
-  // { key: 'expenses', title: 'Expenses', icon: '💸' },
+  { key: 'invoices', title: 'Invoices', icon: 'document-text-outline' },
+  { key: 'estimates', title: 'Estimates', icon: 'receipt-outline' },
+  { key: 'payments', title: 'Payment Records', icon: 'card-outline' },
+  { key: 'add-expense', title: 'Add Expense', icon: 'wallet-outline' },
+  // { key: 'expenses', title: 'Expenses', icon: 'wallet-outline' },
 ];
 
 const AdminFinanceScreen = ({ showHeader = true }) => {
@@ -18,6 +20,8 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
       navigation.navigate('AdminInvoices');
     } else if (item.key === 'payments') {
       navigation.navigate('AdminTransactions');
+    } else if (item.key === 'add-expense') {
+      navigation.navigate('AdminAddExpense');
     }
   };
 
@@ -25,7 +29,7 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
     <View style={styles.container}>
       {showHeader && (
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Finance</Text>
+          <Text style={styles.headerTitle}>Business & Finance</Text>
         </View>
       )}
       <View style={[styles.grid, !showHeader && styles.gridCompact]}>
@@ -35,8 +39,8 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() => handlePress(item)}>
-            <View style={[styles.cardIconWrap, item.key === 'payments' && styles.paymentIconWrap]}>
-              <Text style={styles.cardIcon}>{item.icon}</Text>
+            <View style={styles.cardIconWrap}>
+              <Ionicons name={item.icon} size={font.displayMedium} color="#4F46E5" />
             </View>
             <Text style={styles.cardTitle} numberOfLines={2}>
               {item.title}
@@ -74,7 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
     paddingTop: 8,
-    gap: 20,
+    gap: 34,
   },
   card: {
     width: 64,
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EEF2FF',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -98,14 +102,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
   },
-  paymentIconWrap: {
-    paddingTop: 2,
-  },
-  cardIcon: {
-    fontSize: font.displayXL,
-  },
   cardTitle: {
-    fontSize: font.xs,
+    fontSize: font.sm,
     fontWeight: '500',
     color: '#1E293B',
     textAlign: 'center',

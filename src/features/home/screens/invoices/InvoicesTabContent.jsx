@@ -298,7 +298,7 @@ const getStyles = (colors) => {
     return StyleSheet.create({
         container: {
             paddingTop: 1,
-            marginHorizontal: s(-8),
+            marginHorizontal: s(4),
         },
         searchRow: {
             flexDirection: 'row',

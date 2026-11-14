@@ -7,21 +7,27 @@ import { font } from '../../../../theme/typography';
 import { s } from '../../../../theme/responsive';
 const serviceItems = [
     {
-        title: 'Subscription',
-        subtitle: 'Manage your subscription plans',
+        title: 'Active Services',
+        subtitle: 'Active plan, document balance and renewals',
         icon: 'credit-card',
         tone: 'green',
     },
     {
-      title: 'Request a services',
-      subtitle: 'Request a service from our team',
+      title: 'Request an Add-on Service',
+      subtitle: 'Browse tax, compliance, banking and legal services',
     //   tag: 'Due Jul 15',
       icon: 'envelope',
       tone: 'amber',
     },
     {
-      title: 'Services History',
-      subtitle: 'See your past service requests and payments',
+      title: 'Request Change',
+      subtitle: 'Submit request for company updates',
+      icon: 'edit',
+      tone: 'purple',
+    },
+    {
+      title: 'Service History',
+      subtitle: "Every quote you've requested and service purchased",
       icon: 'history',
       tone: 'blue',
     },
@@ -52,19 +58,22 @@ const toneStyles = {
     purple: { iconBg: themePalette.hex_ede9fe, iconColor: themePalette.hex_7c3aed, tagBg: themePalette.hex_ede9fe, tagText: themePalette.hex_7c3aed },
     green: { iconBg: themePalette.hex_d1fae5, iconColor: themePalette.hex_059669, tagBg: themePalette.hex_d1fae5, tagText: themePalette.hex_059669 },
 };
-export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExploreServicesPress, onServicesHistoryPress }) {
+export default function ServicesScreen({ onBackPress, onSubscriptionPress, onExploreServicesPress, onServicesHistoryPress, onRequestChangePress }) {
     const safeAreaInsets = useSafeAreaInsets();
     const colors = useThemeColors();
     const isLight = colors.mode === 'light';
     function handleItemPress(item) {
-        if (item.title === 'Subscription') {
+        if (item.title === 'Active Services') {
             onSubscriptionPress?.();
         }
-        if (item.title === 'Request a services') {
+        if (item.title === 'Request an Add-on Service') {
             onExploreServicesPress?.();
         }
-        if (item.title === 'Services History') {
+        if (item.title === 'Service History') {
             onServicesHistoryPress?.();
+        }
+        if (item.title === 'Request Change') {
+            onRequestChangePress?.();
         }
     }
     return (<View style={styles.screen}>
