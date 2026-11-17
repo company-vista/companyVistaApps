@@ -215,14 +215,13 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: s(14),
-    paddingBottom: s(20),
-    justifyContent: 'space-between',
+    paddingBottom: s(16),
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: s(16),
+    marginBottom: s(6),
     marginTop: s(1),
   },
   topLogo: {
@@ -269,14 +268,15 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginTop: s(4),
-    marginBottom: s(10),
+    marginTop: s(2),
+    marginBottom: s(6),
   },
   title: {
     color: themePalette.hex_ffffff,
     fontSize: font.displayMedium,
     fontWeight: '500',
     textAlign: 'center',
+    marginVertical: s(22),
   },
   italicTitle: {
     fontStyle: 'italic',
@@ -286,13 +286,15 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   description: {
     color: themePalette.hex_94a3b8,
     textAlign: 'center',
-    marginTop: s(10),
+    marginTop: s(6),
     fontSize: font.base,
     lineHeight: 20,
     paddingHorizontal: s(10),
+    marginVertical: s(22),
   },
   form: {
     width: '100%',
+    marginBottom: s(12),
   },
   label: {
     color: themePalette.hex_64748b,
@@ -332,8 +334,8 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   subtext: {
     color: themePalette.hex_64748b,
     fontSize: font.sm,
-    marginTop: s(6),
-    marginBottom: s(16),
+    marginTop: s(4),
+    marginBottom: s(10),
   },
   infoCard: {
     flexDirection: 'row',
@@ -342,8 +344,8 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     borderWidth: 1,
     borderColor: themePalette.hex_1e293b,
     borderRadius: 12,
-    padding: s(14),
-    marginBottom: s(12),
+    padding: s(12),
+    marginBottom: s(8),
   },
   infoIcon: {
     color: themePalette.hex_94a3b8,
@@ -367,7 +369,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     fontWeight: '700',
   },
   footer: {
-    marginTop: s(20),
+    marginTop: s(12),
     alignItems: 'center',
   },
   submitButton: {
@@ -389,7 +391,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     color: themePalette.hex_64748b,
     fontSize: font.sm,
     textAlign: 'center',
-    marginTop: s(12),
+    marginTop: s(8),
   },
   arrowIcon: {
     color: themePalette.hex_070a12,
@@ -398,7 +400,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   bottomLinkContainer: {
     flexDirection: 'row',
-    marginTop: s(16),
+    marginTop: s(10),
   },
   bottomText: {
     color: themePalette.hex_64748b,

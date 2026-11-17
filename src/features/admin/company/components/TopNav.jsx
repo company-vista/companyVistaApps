@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styles } from './companyDetailsStyles';
 
-const TopNav = ({ navigation, title }) => (
+const TopNav = ({ navigation, title, right }) => (
   <View style={styles.topNav}>
     <TouchableOpacity
       style={styles.topNavButton}
@@ -18,7 +18,7 @@ const TopNav = ({ navigation, title }) => (
     <Text style={styles.topNavTitle} numberOfLines={1}>
       {title}
     </Text>
-    <View style={styles.topNavButton} />
+    {right || <View style={styles.topNavButton} />}
   </View>
 );
 

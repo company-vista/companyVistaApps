@@ -110,11 +110,11 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: s(20),
     paddingBottom: 24,
-    justifyContent: 'space-between',
   },
   logoSection: {
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: 10,
+    marginBottom: 12,
   },
   logoText: {
     color: themePalette.hex_e2e8f0,
@@ -126,7 +126,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    // marginVertical: 0,
+    marginVertical: 8,
   },
   outerCircle: {
     width: 120,
@@ -162,7 +162,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   textSection: {
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 6,
     paddingHorizontal: s(4),
   },
   title: {
@@ -179,13 +179,13 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   description: {
     color: themePalette.hex_94a3b8,
     textAlign: 'center',
-    marginTop: 6,
+    marginTop: 4,
     fontSize: font.base,
     lineHeight: 20,
   },
   infoSection: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: 6,
   },
   infoCard: {
     flexDirection: 'row',
@@ -195,7 +195,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     borderColor: themePalette.hex_1e293b,
     borderRadius: 14,
     padding: 14,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   badgeIconContainer: {
     width: 38,
@@ -231,7 +231,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     marginTop: 2,
   },
   footer: {
-    marginTop: 20,
+    marginTop: 4,
   },
   submitButton: {
     backgroundColor: themePalette.hex_d4af37,

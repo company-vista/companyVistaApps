@@ -36,7 +36,7 @@ const MIME_TYPES_BY_EXTENSION = {
   txt: 'text/plain',
 };
 
-const MIN_INPUT_HEIGHT = 56;
+const MIN_INPUT_HEIGHT = 44;
 
 const getAttachmentMimeType = file => {
   if (file.type) return file.type;
@@ -435,17 +435,14 @@ const AdminMessageScreen = () => {
             ListEmptyComponent={<Text style={styles.emptyText}>No messages yet.</Text>}
           />
         )}
-        <Animated.View
-          style={[
-            styles.inputPanel,
-            {
-              paddingBottom: Math.max(insets.bottom, 8),
-              marginBottom: keyboardOffset,
-            },
-          ]}>
-          <Text style={styles.formatHint}>
-            Use *text* for bold, _text_ for italic
-          </Text>
+          <Animated.View
+            style={[
+              styles.inputPanel,
+              {
+                paddingBottom: Math.max(insets.bottom - 4, 0),
+                marginBottom: keyboardOffset,
+              },
+            ]}>
           <View style={styles.inputRow}>
             <TouchableOpacity
               style={[styles.attachBtn, sending && styles.sendBtnDisabled]}
@@ -498,6 +495,9 @@ const AdminMessageScreen = () => {
               </View>
             )}
           </View>
+          <Text style={styles.formatHint}>
+            Use *text* for bold, _text_ for italic
+          </Text>
         </Animated.View>
       </View>
       <Modal
@@ -557,7 +557,7 @@ export default AdminMessageScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#d5d9dd',
   },
   keyboardWrap: {
     flex: 1,
@@ -732,10 +732,10 @@ const styles = StyleSheet.create({
   },
   inputPanel: {
     paddingHorizontal: 12,
-    paddingTop: 6,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    paddingTop: 0,
+    // backgroundColor: '#FFFFFF',
+    // borderTopWidth: 1,
+    // borderTopColor: '#E2E8F0',
   },
   inputRow: {
     flexDirection: 'row',
@@ -744,17 +744,17 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    width: '100%',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 16,
+    backgroundColor: '#F0F2F5',
+    borderRadius: 34,
     borderWidth: 1,
     borderColor: '#E2E8F0',
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 14,
     fontSize: font.bodySmall,
     color: '#1E293B',
   },
   formatHint: {
+    marginTop: 2,
     marginBottom: 4,
     marginLeft: 48,
     fontSize: font.caption,
@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#1E3A8A',
-    borderRadius: 20,
+    borderRadius: 28,
     transform: [{ rotate: '-23deg' }],
   },
   micBtn: {

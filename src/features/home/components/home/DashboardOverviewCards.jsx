@@ -208,7 +208,7 @@ function DashboardOverviewCards({ selectedCompany, compliance, invoices, onCompa
             </View>
         </OverviewCard>
 
-        <OverviewCard title="Billing" icon="credit-card" accent={accents.amber} onPress={onBillingPress} colors={colors}>
+        <OverviewCard title="Invoices" icon="credit-card" accent={accents.amber} onPress={onBillingPress} colors={colors}>
             <Text style={[styles.cardValue, { color: colors.text }]}>{formatCurrency(billingTotals.totalUSD, 'USD')}</Text>
             <View style={styles.detailList}>
                 <DetailRow label="USD paid" value={formatCurrency(billingTotals.paidUSD, 'USD')} colors={colors} />

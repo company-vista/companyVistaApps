@@ -520,7 +520,7 @@ const AdminNotificationsScreen = () => {
 export default AdminNotificationsScreen;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F8FAFC' },
+  screen: { flex: 1, backgroundColor: '#FFFFFF' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

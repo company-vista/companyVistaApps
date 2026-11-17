@@ -77,10 +77,10 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: '#F8F9FA',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    // borderWidth: 1,
+    // borderColor: '#E2E8F0',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 1,

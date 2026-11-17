@@ -240,7 +240,7 @@ export default AdminChatListScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
   },
   searchBox: {
-    minHeight: 44,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 16,
@@ -264,8 +264,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    backgroundColor: '#F0F2F5',
   },
   searchInput: {
     flex: 1,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#F0F2F5',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: font.base,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#1E293B',
     flex: 1,
     marginRight: 8,

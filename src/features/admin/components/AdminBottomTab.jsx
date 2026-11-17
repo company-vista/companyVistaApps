@@ -67,16 +67,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: 9,
     paddingBottom: 8,
   },
   navItem: {
     alignItems: 'center',
   },
   navText: {
-    fontSize: font.sm,
+    fontSize: font.xs,
     color: '#64748B',
-    marginTop: 2,
+    marginTop: 6,
     fontWeight: '500',
   },
   activeNavText: {

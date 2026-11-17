@@ -290,7 +290,7 @@ const AdminDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     padding: 16,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   centeredState: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,

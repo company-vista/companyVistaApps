@@ -146,6 +146,34 @@ export async function fetchCompanies({
   return requestPromise;
 }
 
+export async function fetchCompanyRequests({ token } = {}) {
+  const data = await request(
+    { method: 'get', url: COMPANY_BASE_URL },
+    token,
+  );
+  return toList(data).filter(company =>
+    ['client_signup', 'public_link'].includes(company.requestSource),
+  );
+}
+
+export async function updateCompanyStatus({
+  token,
+  companyId,
+  status,
+  message = '',
+} = {}) {
+  if (!companyId) throw new Error('Company id missing.');
+  const data = await request(
+    {
+      method: 'patch',
+      url: `${COMPANY_BASE_URL}/${companyId}/status`,
+      data: { status, message },
+    },
+    token,
+  );
+  return toItem(data);
+}
+
 export async function fetchCompanyStats({ token } = {}) {
   const data = await request(
     { method: 'get', url: `${COMPANY_BASE_URL}/stats` },
@@ -431,7 +459,7 @@ export async function searchClientsForShareholder({ token, query } = {}) {
     {
       method: 'get',
       url: `${COMPANY_BASE_URL}/clients/search`,
-      params: { search: query },
+      params: { q: query },
     },
     token,
   );

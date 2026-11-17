@@ -24,6 +24,8 @@ import AdminExpenseListScreen from '../expenses/screens/AdminExpenseListScreen';
 import AdminAddExpenseScreen from '../expenses/screens/AdminAddExpenseScreen';
 import AdminExpenseHeadsScreen from '../expenses/screens/AdminExpenseHeadsScreen';
 import EditCompanyScreen from '../company/screens/EditCompanyScreen';
+import NewCompanyScreen from '../company/screens/NewCompanyScreen';
+import AdminCompanyRequestsScreen from '../company/screens/AdminCompanyRequestsScreen';
 import UploadCompanyDocumentScreen from '../company/screens/UploadCompanyDocumentScreen';
 import {
   AdminCompanyHomeScreen,
@@ -89,6 +91,11 @@ export default function AdminStack() {
         layout={FullScreenLayout}
       />
       <Stack.Screen name="AdminCompany" component={AdminCompanyScreen} layout={AdminScreenLayout} />
+      <Stack.Screen
+        name="AdminCompanyRequests"
+        component={AdminCompanyRequestsScreen}
+        layout={FullScreenLayout}
+      />
       <Stack.Screen
         name="AdminClients"
         component={AdminClientsScreen}
@@ -193,6 +200,11 @@ export default function AdminStack() {
       <Stack.Screen
         name="EditCompany"
         component={EditCompanyScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="NewCompany"
+        component={NewCompanyScreen}
         layout={FullScreenLayout}
       />
       <Stack.Screen

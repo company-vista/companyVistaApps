@@ -266,7 +266,7 @@ const CompanyManagementScreen = () => {
         <View style={styles.stateBox}>
           <ActivityIndicator size="large" color="#4F46E5" />
           <Text style={styles.stateText}>Loading companies...</Text>
-        </View>
+        </View> 
       );
     }
     if (error) {
@@ -291,9 +291,18 @@ const CompanyManagementScreen = () => {
     <>
       {/* Top Action Buttons */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.topActionsContainer}>
-        <TouchableOpacity style={styles.primaryActionButton}>
+        <TouchableOpacity
+          style={styles.primaryActionButton}
+          onPress={() => navigation.navigate('NewCompany')}>
           <Ionicons name="add" size={18} color="#FFFFFF" />
           <Text style={styles.actionButtonText}>Register Company</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryActionButton}
+          onPress={() => navigation.navigate('AdminCompanyRequests')}>
+          <Ionicons name="file-tray-full-outline" size={16} color="#D97706" />
+          <Text style={[styles.actionButtonText, { color: '#D97706' }]}>Company Requests</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
