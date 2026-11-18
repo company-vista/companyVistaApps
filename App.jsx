@@ -28,7 +28,7 @@ import styles from './App.styles';
 
 import RootStack from './src/navigation/RootStack';
 // import logoImage from './src/assets/images/Logo1.png';
-import companyLogo from './src/assets/images/newSplashScreen.gif';
+import companyLogo from './src/assets/images/newSplashScreens.gif';
 import logoR from './src/assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from './src/store/hooks';
 import { restoreAuth } from './src/store/slices/authSlice';
@@ -204,8 +204,8 @@ function SplashScreen() {
   });
 
   return (
-    <View style={[styles.splashScreen, { backgroundColor: '#050710' }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#050710" />
+    <View style={[styles.splashScreen, { backgroundColor: '#ffffff' }]}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       <Animated.View
         style={[
@@ -233,8 +233,8 @@ function SplashScreen() {
           style={styles.globeImage}
           resizeMode={FastImage.resizeMode.contain}
         />
-        <Animated.Text style={{ position: 'absolute', bottom: -106, color: 'rgba(250, 234, 189, 0.64)', fontSize: 20, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>Company Vista Inc</Animated.Text>
-        <Animated.Text style={{ position: 'absolute', bottom: -138, color: 'rgba(250, 234, 189, 0.64)', fontSize: 12, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>--a Koshika company--</Animated.Text>
+        <Animated.Text style={{ position: 'absolute', bottom: -106, color: '#334155', fontSize: 20, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>Company Vista Inc</Animated.Text>
+        <Animated.Text style={{ position: 'absolute', bottom: -138, color: '#64748b', fontSize: 12, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>--a Koshika company--</Animated.Text>
       </View>
     </View>
   );

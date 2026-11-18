@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import logoImage from '../../../../assets/images/company-vista-icon-gold-512.png';
+import logoImage from '../../../../assets/images/onboadingScreenLogo.png';
 import styles from '../HomeScreen.styles';
 import { capitalizeCompanyName } from '../../../../constants/convertFirstChar';
 import { s } from '../../../../theme/responsive';
@@ -9,7 +9,7 @@ import { themePalette } from '../../../../theme/colors';
 
 export function HomeHeader({ displayName, notificationCount, bellRotation, onSearchPress, onNotificationPress, colors, }) {
     return (<View style={[styles.header, { backgroundColor: colors.surface, paddingHorizontal: s(18) }]}>
-      <Image source={logoImage} style={[styles.avatar, { backgroundColor: themePalette.hex_000 }]}/>
+      <Image source={logoImage} style={[styles.avatar]}/>
       <Text numberOfLines={1} style={[styles.greeting, { color: colors.text }]}>
         Hi, {capitalizeCompanyName(displayName) || 'User'}
       </Text>
