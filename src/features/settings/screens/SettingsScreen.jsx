@@ -1,24 +1,29 @@
-import { Linking, Pressable, ScrollView, Share, Switch, Text, View, } from 'react-native';
+import { Linking, Pressable, ScrollView, Share, Text, View, } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { toggleTheme } from '../../../store/slices/themeSlice';
-import { useThemeColors, themePalette } from '../../../theme/colors';
-import { s } from '../../../theme/responsive';
+import { setThemeMode } from '../../../store/slices/themeSlice';
+import { useThemeColors, useResolvedThemeMode } from '../../../theme/colors';
 import styles from './SettingsScreen.styles';
 const COMPANY_URL = 'https://www.companyvista.com/';
 const INVITE_MESSAGE = [
   'Join me on Company Vista to manage company work in one place.',
   `Company URL: ${COMPANY_URL}`,
 ].join('\n\n');
+const THEME_OPTIONS = [
+  { value: 'light', label: 'Light', icon: 'sun-o' },
+  { value: 'dark', label: 'Dark', icon: 'moon-o' },
+  { value: 'system', label: 'System', icon: 'laptop' },
+];
 function SettingsScreen() {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
-  const isDarkTheme = useAppSelector(state => state.theme.mode === 'dark');
-  function handleToggleTheme() {
-    dispatch(toggleTheme());
+  const themeMode = useAppSelector(state => state.theme.mode);
+  const effectiveMode = useResolvedThemeMode();
+  function handleThemeChange(mode) {
+    dispatch(setThemeMode(mode));
   }
   // ------- Invite Friends Share Function------------
   async function handleInviteFriends() {
@@ -31,22 +36,51 @@ function SettingsScreen() {
       subject: `Company Vista - ${COMPANY_URL}`,
     });
   }
-  return (<ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
+  return (<ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
     <View style={styles.group}>
-      <Pressable onPress={handleToggleTheme} style={[styles.menuItem, {}]}>
-        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-          <FontAwesome name={isDarkTheme ? 'moon-o' : 'sun-o'} size={18} color={isDarkTheme ? colors.accent : themePalette.hex_f59e0b} />
-        </View>
-
+      <View style={[styles.menuItem, styles.themeCard]}>
         <View style={styles.copy}>
-          <Text style={[styles.title, { color: colors.text }]}>Switch Theme</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Theme</Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>
-            Switch between Light and Dark mode
+            {themeMode === 'system'
+              ? `Following system (${effectiveMode === 'dark' ? 'Dark' : 'Light'})`
+              : 'Choose how Company Vista looks'}
           </Text>
         </View>
 
-        <Switch onValueChange={handleToggleTheme} thumbColor={isDarkTheme ? colors.primary : themePalette.hex_0000ff81} trackColor={{ false: colors.border, true: colors.accentSoft }} value={isDarkTheme} />
-      </Pressable>
+        <View style={styles.themeOptions}>
+          {THEME_OPTIONS.map(option => {
+            const active = themeMode === option.value;
+            return (
+              <Pressable
+                key={option.value}
+                onPress={() => handleThemeChange(option.value)}
+                style={[
+                  styles.themeOption,
+                  {
+                    borderColor: active ? colors.accent : colors.border,
+                    backgroundColor: active
+                      ? colors.accentSoft
+                      : colors.surface,
+                  },
+                ]}>
+                <FontAwesome
+                  name={option.icon}
+                  size={16}
+                  color={active ? colors.accent : colors.muted}
+                />
+                <Text
+                  style={[
+                    styles.themeOptionLabel,
+                    { color: active ? colors.accent : colors.muted },
+                  ]}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
 
       <Pressable onPress={handleInviteFriends} style={[styles.menuItem, {}]}>
         <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>

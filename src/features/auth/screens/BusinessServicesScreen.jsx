@@ -60,7 +60,7 @@ const BusinessServicesScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} transparent backgroundColor="transparent" />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         <View style={styles.headerRow}>
           <BackButton onPress={() => navigation.goBack()} />
@@ -156,16 +156,18 @@ const BusinessServicesScreen = ({ navigation }) => {
             <View style={styles.dashActive} />
             <View style={[styles.dotInactive, { backgroundColor: isDark ? themePalette.rgba_255_255_255_0_2 : colors.border }]} />
           </View>
-
-          <TouchableOpacity style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
-            <Text style={[styles.continueBtnText, { color: colors.buttonText }]}>Continue →</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.navigate('Login')}>
-            <Text style={[styles.skipText, { color: colors.subtle }]}>Skip intro</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <View style={[styles.footerBar, { paddingBottom: s(12) + insets.bottom }]}>
+        <TouchableOpacity style={styles.continueBtn} activeOpacity={0.8} onPress={() => navigation.navigate('TrustedWorldwide')}>
+          <Text style={styles.continueBtnText}>Continue →</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.navigate('Login')}>
+          <Text style={[styles.skipText, { color: colors.subtle }]}>Skip intro</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -180,8 +182,12 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: s(16),
     paddingTop: -10,
-    paddingBottom: s(40),
+    paddingBottom: s(16),
     justifyContent: 'center',
+  },
+  footerBar: {
+    paddingHorizontal: s(16),
+    paddingTop: s(8),
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: s(20), marginTop: s(6) },
@@ -292,14 +298,14 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   goldLine: { width: 16, height: 2, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
   sectionTag: { color: themePalette.hex_c9a84c, fontSize: font.small, letterSpacing: 1.2, fontWeight: 'bold' },
   mainTitle: {
-    fontSize: font.xl,
-    fontWeight: '600',
-    lineHeight: 32,
+    fontSize: font.display,
+    fontWeight: '500',
+    lineHeight: 34,
     marginBottom: s(12),
   },
-  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic' },
+  italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
   description: {
-    fontSize: font.sm,
+    fontSize: font.base,
     lineHeight: 22,
     marginBottom: s(30),
   },
@@ -323,14 +329,13 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     marginRight: s(6),
   },
   continueBtn: {
-    backgroundColor: themePalette.hex_d4af37,
+    backgroundColor: themePalette.hex_2563eb,
     borderRadius: 25,
     paddingVertical: s(14),
     alignItems: 'center',
-    marginBottom: s(16),
-    marginTop: s(16),
+    marginBottom: s(8),
   },
-  continueBtnText: { color: themePalette.hex_060913, fontSize: font.lg, fontWeight: 'bold' },
-  skipBtn: { alignItems: 'center', paddingVertical: s(8), marginBottom: s(16) },
-  skipText: { color: themePalette.hex_64748b, fontSize: font.bodySmall },
+  continueBtnText: { color: themePalette.hex_ffffff, fontSize: font.md, fontWeight: '700' },
+  skipBtn: { alignItems: 'center', paddingVertical: s(8) },
+  skipText: { fontSize: font.base, fontWeight: '500' },
 }));

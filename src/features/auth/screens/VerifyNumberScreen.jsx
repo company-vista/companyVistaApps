@@ -1,4 +1,4 @@
-import { font } from '../../../theme/typography';
+﻿import { font } from '../../../theme/typography';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -134,7 +134,7 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         <Text style={[styles.title, { color: colors.text }]}>
           Verify your <Text style={styles.titleItalic}>number</Text>
         </Text>
-        <Text style={[styles.subtitle, { color: colors.muted }]}>Enter the 6–digit code sent via SMS.</Text>
+        <Text style={[styles.subtitle, { color: colors.muted }]}>Enter the 6â€“digit code sent via SMS.</Text>
 
         <View style={[styles.phonePill, { backgroundColor: isDark ? themePalette.hex_141629 : colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.countryCode, { color: colors.subtle }]}>IN</Text>
@@ -167,7 +167,7 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         {isLocked ? (
           <View style={[styles.warningCard, { borderColor: isDark ? themePalette.hex_4a1922 : themePalette.rgba_220_38_38_0_3, backgroundColor: isDark ? themePalette.hex_271318 : themePalette.rgba_220_38_38_0_08 }]}>
             <Ionicons name="time-outline" size={18} color={colors.danger} style={{ marginRight: s(10) }} />
-            <Text style={[styles.warningText, { color: isDark ? themePalette.hex_ff9a9a : colors.danger }]}>Locked for {formatRemaining(remainingSec)} — please try after 30 minutes.</Text>
+            <Text style={[styles.warningText, { color: isDark ? themePalette.hex_ff9a9a : colors.danger }]}>Locked for {formatRemaining(remainingSec)} â€” please try after 30 minutes.</Text>
           </View>
         ) : null}
 
@@ -196,12 +196,12 @@ const VerifyNumberScreen = ({ navigation, route }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.verifyButtonInline, { backgroundColor: colors.buttonBackground }, (isLocked || isLoading) && styles.verifyButtonDisabled]}
+          style={[styles.verifyButtonInline, !isDark && { backgroundColor: themePalette.hex_2563eb }, isDark && { backgroundColor: colors.buttonBackground }, (isLocked || isLoading) && styles.verifyButtonDisabled]}
           activeOpacity={0.85}
           onPress={handleVerify}
           disabled={isLocked || isLoading}
         >
-          <Text style={[styles.verifyButtonText, { color: colors.buttonText }]}>
+          <Text style={[styles.verifyButtonText, !isDark ? { color: themePalette.hex_ffffff } : { color: colors.buttonText }]}>
             {isLocked ? `Locked ${formatRemaining(remainingSec)}` : isLoading ? 'Verifying...' : 'Verify & Continue'}
           </Text>
         </TouchableOpacity>
@@ -245,7 +245,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   verifyButtonDisabled: { opacity: 0.4 },
   footer: { paddingHorizontal: s(20), paddingBottom: s(20) },
   verifyButton: { backgroundColor: themePalette.hex_d4af37, borderRadius: 24, paddingVertical: s(14), alignItems: 'center' },
-  verifyButtonText: { color: themePalette.hex_060913, fontSize: font.md, fontWeight: 'bold' },
+  verifyButtonText: { color: themePalette.hex_060913, fontSize: font.md, fontWeight: '700' },
 }));
 
 export default VerifyNumberScreen;

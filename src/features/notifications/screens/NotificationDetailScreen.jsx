@@ -14,6 +14,15 @@ function NotificationDetailScreen() {
     const colors = useThemeColors();
     const token = useAppSelector(state => state.auth.token);
     const [isDropdownVisible, setIsDropdownVisible] = React.useState(false);
+    const handleDelete = React.useCallback(async () => {
+        setIsDropdownVisible(false);
+        await deleteNotification({
+            token,
+            notificationId: notification.id,
+            companyId: notification.companyId || null,
+        });
+        navigation.navigate('Notifications');
+    }, [navigation, notification, token]);
     React.useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (<View style={styles.moreWrapper}>
@@ -28,30 +37,18 @@ function NotificationDetailScreen() {
                 </View>) : null}
             </View>),
         });
-    }, [navigation, isDropdownVisible]);
-    async function handleDelete() {
-        setIsDropdownVisible(false);
-        await deleteNotification({
-            token,
-            notificationId: notification.id,
-            companyId: notification.companyId || null,
-        });
-        navigation.navigate('Notifications');
-    }
-    return (<View style={[
-        styles.screen,
-        { paddingTop: 8 },
-    ]}>
-        <View style={[styles.detailCard, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft, width: 42, height: 42, borderRadius: 21 }]}>
+    }, [navigation, isDropdownVisible, handleDelete, colors.border, colors.danger, colors.muted, colors.surface]);
+    return (<View style={styles.screen}>
+        <View style={[styles.detailCard, { borderColor: colors.border }]}>
+            <View style={styles.headerRow}>
+                <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
                     <FontAwesome name="bell-o" size={16} color={colors.accent} />
                 </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={[styles.title, { color: colors.text, marginTop: 0, fontSize: font.lg }]}>
+                <View style={styles.titleWrap}>
+                    <Text style={[styles.title, { color: colors.text }]}>
                         {notification.title}
                     </Text>
-                    <Text style={[styles.time, { color: colors.subtle, fontSize: font.xs }]}>
+                    <Text style={[styles.time, { color: colors.subtle }]}>
                         {notification.time}
                     </Text>
                 </View>
@@ -68,11 +65,15 @@ const styles = makeThemeStyles(() => StyleSheet.create({
         flex: 1,
         backgroundColor: 'transparent',
         paddingHorizontal: s(20),
+        paddingTop: 8,
     },
-    header: {
+    headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
+    },
+    titleWrap: {
+        flex: 1,
     },
     moreButton: {
         padding: 8,
@@ -115,31 +116,30 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     detailCard: {
         borderRadius: 18,
-        // backgroundColor: '#ffffff',
+        borderWidth: 1,
         marginTop: 24,
         paddingHorizontal: s(20),
         paddingVertical: 24,
     },
     iconWrap: {
-        width: 56,
-        height: 56,
+        width: 42,
+        height: 42,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 28,
+        borderRadius: 21,
         backgroundColor: themePalette.hex_ecfeff,
     },
     title: {
         color: themePalette.hex_111827,
-        fontSize: font.heading,
+        fontSize: font.md,
         fontWeight: '400',
-        lineHeight: 28,
-        marginTop: 18,
+        lineHeight: 22,
     },
     time: {
         color: themePalette.hex_94a3b8,
         fontSize: font.sm,
         fontWeight: '400',
-        marginTop: 8,
+        marginTop: 4,
     },
     divider: {
         height: 1,
@@ -148,9 +148,9 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     message: {
         color: themePalette.hex_64748b,
-        fontSize: font.lg,
+        fontSize: font.base,
         fontWeight: '400',
-        lineHeight: 22,
+        lineHeight: 20,
     },
 }));
 export default NotificationDetailScreen;

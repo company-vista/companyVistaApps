@@ -18,7 +18,7 @@ import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
 import { COUNTRIES, getCountryPriceLabel } from '../../../constants/countries';
-import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
 
 // Country list sourced from the registry config (src/constants/countries.js).
 // Only fixed-price jurisdictions show a price; quoted ones show ''.
@@ -1081,7 +1081,7 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
           </TouchableOpacity>
 
           <View style={[styles.searchBox, { backgroundColor: isDark ? themePalette.hex_131a2e : colors.inputBackground, borderColor: isDark ? themePalette.hex_1e293b : colors.inputBorder }]}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Text style={styles.searchIcon}>⌕</Text>
             <TextInput
               style={[styles.searchInput, { color: colors.text }]}
               placeholder="Search country name"
@@ -1226,12 +1226,12 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
 
       <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.hex_1e293b : colors.border }]}>
         <TouchableOpacity
-          style={[styles.submitButton, { backgroundColor: colors.buttonBackground }, (!selectedCountry || (selectedCountry === 'US' && !selectedState)) && styles.submitButtonDisabled]}
+          style={[styles.submitButton, (!selectedCountry || (selectedCountry === 'US' && !selectedState)) && styles.submitButtonDisabled]}
           activeOpacity={0.8}
           disabled={!selectedCountry || (selectedCountry === 'US' && !selectedState)}
           onPress={handleContinue}
         >
-          <Text style={[styles.submitButtonText, { color: colors.buttonText }, (!selectedCountry || (selectedCountry === 'US' && !selectedState)) && styles.submitButtonTextDisabled]}>
+          <Text style={styles.submitButtonText}>
             {!selectedCountry ? 'Select a country to continue' : selectedCountry === 'US' && !selectedState ? 'Select a state to continue' : `Continue with ${usStates.find(s => (s.code || s.id) === selectedState)?.name || selectedState || allCountries.find(c => c.id === selectedCountry)?.name}  →`}
           </Text>
         </TouchableOpacity>
@@ -1239,40 +1239,39 @@ export default function RegisterJurisdictionScreen({ navigation, route }) {
     </SafeAreaView>
   );
 }
-
-const styles = makeThemeStyles(() => StyleSheet.create({
+const styles = StyleSheet.create({
   container: { flex: 1 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: s(8), paddingHorizontal: s(10), paddingVertical: s(12), marginTop: s(24) },
   scrollContent: { paddingHorizontal: s(16), paddingBottom: s(90) },
-  title: { fontSize: font.display, fontWeight: '400', marginTop: s(8) },
-  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d1a253, fontWeight: '300' },
-  subtitle: { fontSize: font.base, marginTop: s(6), marginBottom: s(20) },
+  title: { fontSize: font.display, fontWeight: '500', lineHeight: 34, marginTop: s(8) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d1a253, fontWeight: '300', fontFamily: 'serif' },
+  subtitle: { fontSize: font.base, lineHeight: 22, marginTop: s(6), marginBottom: s(20) },
   recommendCard: { borderRadius: 16, borderWidth: 1, padding: s(16), marginBottom: s(16) },
   recommendHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   starIconContainer: { width: 36, height: 36, borderRadius: 10, backgroundColor: themePalette.hex_251e3e, alignItems: 'center', justifyContent: 'center', marginRight: s(12) },
   starIcon: { color: themePalette.hex_a855f7, fontSize: font.xxl },
   recommendTextContainer: { flex: 1 },
-  recommendTitle: { fontSize: font.md, fontWeight: 'bold', marginBottom: s(4) },
-  recommendDesc: { fontSize: font.sm, lineHeight: 16 },
+  recommendTitle: { fontSize: font.md, fontWeight: '700', marginBottom: s(4) },
+  recommendDesc: { fontSize: font.base, lineHeight: 20 },
   arrowIcon: { fontSize: font.displayXXL, fontWeight: '700', marginLeft: s(8) },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: s(14), gap: s(6) },
   tag: { paddingHorizontal: s(10), paddingVertical: s(5), borderRadius: 6 },
-  tagText: { fontSize: font.small },
+  tagText: { fontSize: font.sm },
   searchBox: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, borderWidth: 1, paddingHorizontal: s(12), height: 48, marginBottom: s(24) },
   searchIcon: { fontSize: font.base, marginRight: s(8) },
   searchInput: { flex: 1, fontSize: font.base },
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(12) },
-  sectionHeader: { fontSize: font.xs, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(12) },
+  sectionHeader: { fontSize: font.small, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(12) },
   changeText: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: '700' },
   countryList: { flexDirection: 'column', gap: 8 },
   countryCardList: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, paddingVertical: s(12), paddingHorizontal: s(14), borderWidth: 1 },
   countryLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   countryCodeCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: themePalette.rgba_201_168_76_0_12, borderWidth: 1, borderColor: themePalette.rgba_201_168_76_0_2, alignItems: 'center', justifyContent: 'center' },
   countryCodeTextList: { color: themePalette.hex_cbd5e1, fontSize: font.sm, fontWeight: '700' },
-  countryNameList: { fontSize: font.bodySmall, fontWeight: '600' },
-  countryPriceList: { color: themePalette.hex_c9a84c, fontSize: font.bodySmall, fontWeight: '700', marginTop: 0 },
-  customQuoteList: { fontSize: font.small, fontWeight: '600', fontStyle: 'italic' },
+  countryNameList: { fontSize: font.base, fontWeight: '600' },
+  countryPriceList: { color: themePalette.hex_c9a84c, fontSize: font.base, fontWeight: '700', marginTop: 0 },
+  customQuoteList: { fontSize: font.sm, fontWeight: '600', fontStyle: 'italic' },
   goldText: { color: themePalette.hex_c9a84c },
   checkmarkBadgeList: { width: 20, height: 20, borderRadius: 10, backgroundColor: themePalette.hex_c9a84c, alignItems: 'center', justifyContent: 'center' },
   radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 1 },
@@ -1282,14 +1281,14 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   stateGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   stateCard: { width: '48.5%', borderRadius: 14, padding: s(12), borderWidth: 1, marginBottom: s(10), justifyContent: 'space-between', minHeight: 186 },
   stateTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: s(6) },
-  stateName: { fontSize: font.sm, fontWeight: 'bold' },
+  stateName: { fontSize: font.base, fontWeight: '700' },
   tagBadge: { paddingHorizontal: s(6), paddingVertical: s(2), borderRadius: 10 },
   greenTag: { backgroundColor: themePalette.rgba_16_185_129_0_15 },
   greenTagText: { color: themePalette.hex_10b981 },
   blueTag: { backgroundColor: themePalette.rgba_59_130_246_0_15 },
   blueTagText: { color: themePalette.hex_60a5fa },
   tagTextSmall: { fontSize: font.tiny, fontWeight: '600' },
-  stateDesc: { fontSize: font.xs, lineHeight: 13, marginBottom: s(8) },
+  stateDesc: { fontSize: font.small, lineHeight: 16, marginBottom: s(8) },
   totalFirstYearRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, paddingHorizontal: s(8), paddingVertical: s(6), marginBottom: s(6), borderWidth: 1 },
   totalFirstYearLabel: { fontSize: font.caption, fontWeight: '600' },
   totalFirstYearValue: { color: themePalette.hex_c9a84c, fontSize: font.sm, fontWeight: '800' },
@@ -1305,8 +1304,8 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   stateFeeLabel: { fontSize: font.caption, fontWeight: '500', marginTop: 1 },
   stateDuration: { fontSize: font.caption },
   bottomBar: { paddingHorizontal: s(10), paddingVertical: s(12), borderTopWidth: 1 },
-  submitButton: { borderRadius: 24, height: 50, alignItems: 'center', justifyContent: 'center' },
+  submitButton: { backgroundColor: themePalette.hex_2563eb, borderRadius: 24, height: 50, alignItems: 'center', justifyContent: 'center' },
   submitButtonDisabled: { opacity: 0.5 },
-  submitButtonText: { fontSize: font.md, fontWeight: 'bold' },
-  submitButtonTextDisabled: { color: themePalette.hex_64748b },
-}));
+  submitButtonText: { fontSize: font.md, fontWeight: '700', color: themePalette.hex_ffffff },
+  submitButtonTextDisabled: { color: themePalette.hex_ffffff },
+});

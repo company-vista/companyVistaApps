@@ -1,5 +1,4 @@
-import { font } from '../../../theme/typography';
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -19,10 +18,13 @@ import { API_BASE_URL } from '../../../config/api';
 import { handleResendVerificationApi } from '../api/signupApi';
 import { verifyAdminEmailToken } from '../api/forgotPasswordApi';
 import { s } from '../../../theme/responsive';
-import { themePalette, makeThemeStyles } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 const VerifyEmailScreen = (props) => {
   const { navigation, route } = props;
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
   const email = props.email || route?.params?.email || 'rajesh@meridianglobal.com';
   const signupToken = props.signupToken || route?.params?.signupToken;
   const signupClientId = props.signupClientId || route?.params?.signupClientId;
@@ -49,12 +51,11 @@ const VerifyEmailScreen = (props) => {
   }, [countdown, route?.params?.accountType, route?.params?.token]);
 
   if (route?.params?.accountType === 'admin' && route?.params?.token) {
-    return <AdminEmailVerification navigation={navigation} token={route.params.token} />;
+    return <AdminEmailVerification navigation={navigation} token={route.params.token} colors={colors} isDark={isDark} />;
   }
 
   const handleCodeChange = (text, index) => {
     if (text.length > 1) text = text.slice(-1);
-    // allow only numbers
     if (text && !/^\d$/.test(text)) return;
     const newCode = [...code];
     newCode[index] = text;
@@ -81,15 +82,10 @@ const VerifyEmailScreen = (props) => {
     setVerifying(true);
     try {
       let response;
-      // Your backend exports.verifyEmail expects: GET /api/verify-email/:token (single token, hashed sha256)
-      // So we send the 6-digit OTP as token: GET /api/verify-email/${otpString}
-      // Fallback to POST /api/client/auth/otpverify-email for legacy OTP flow if GET fails
       try {
         response = await axios.get(`${API_BASE_URL}/api/verify-email/${otpString}`);
       } catch (getErr) {
-        // If GET fails (404/400), try legacy POST endpoint
         if (signupToken) {
-          // For Signup flow with signupToken/clientId link, try old 2-param route then POST
           try { await axios.get(`${API_BASE_URL}/api/verify-email/${signupToken}`); } catch(e) {}
         }
         response = await axios.post(`${API_BASE_URL}/api/client/auth/otpverify-email`, {
@@ -102,9 +98,6 @@ const VerifyEmailScreen = (props) => {
       if (token) {
         Toast.show({ type: 'success', text1: 'Verified', text2: 'Email verified successfully! Set your password.' });
         onOtpVerified?.({ token, clientId });
-        // Verify ke baad SetNewPasswordScreen open karo
-        // Agar embedded hai (onOtpVerified prop), toh wahi handle karega
-        // Warna FounderDetails flow ke liye navigation se SetNewPassword par bhejo (with onboarding params)
         if (!onOtpVerified) {
           const nextParams = {
             email,
@@ -165,7 +158,6 @@ const VerifyEmailScreen = (props) => {
     if (onResend) {
       onResend();
     } else {
-      // Fallback for FounderDetails flow - direct API call
       const res = await handleResendVerificationApi(email);
       if (res.isSuccess) {
         Toast.show({ type: 'success', text1: 'Email sent', text2: res.message });
@@ -178,8 +170,8 @@ const VerifyEmailScreen = (props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -187,84 +179,70 @@ const VerifyEmailScreen = (props) => {
         style={styles.keyboardView}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-
-
-
-
-          {/* Title & Email Display */}
           <View style={styles.textSection}>
-            <Text style={styles.title}>
-              Verify your <Text style={styles.italicTitle}>email</Text>
+            <Text style={[styles.title, { color: colors.text }]}>
+              Verify your <Text style={[styles.italicTitle, { color: isDark ? themePalette.hex_d4af37 : colors.primary }]}>email</Text>
             </Text>
-            <Text style={styles.description}>
+            <Text style={[styles.description, { color: colors.muted }]}>
               Welcome aboard! Enter the code we sent to confirm your account and start your registration.
             </Text>
 
-            {/* Email Chip */}
-            <View style={styles.emailChip}>
-              <Text style={styles.chipIcon}>✉</Text>
-              <Text style={styles.chipText}>{email}</Text>
+            <View style={[styles.emailChip, { backgroundColor: isDark ? themePalette.hex_0f172a : colors.surface, borderColor: isDark ? themePalette.hex_d4af37 : colors.border }]}>
+              <Text style={[styles.chipText, { color: isDark ? themePalette.hex_d4af37 : colors.primary }]}>{email}</Text>
             </View>
           </View>
 
-          {/* OTP Section */}
           <View style={styles.otpSection}>
             <View style={styles.codeContainer}>
               {code.map((digit, index) => (
-                <View key={index} style={[styles.codeBox, digit ? styles.codeBoxActive : null]}>
+                <View key={index} style={[styles.codeBox, { backgroundColor: isDark ? themePalette.hex_0b1120 : colors.inputBackground, borderColor: digit ? (isDark ? themePalette.hex_d4af37 : colors.primary) : colors.border }]}>
                   <TextInput
                     ref={(el) => (inputRefs.current[index] = el)}
-                    style={styles.codeText}
+                    style={[styles.codeText, { color: isDark ? themePalette.hex_d4af37 : colors.primary }]}
                     value={digit}
                     onChangeText={(text) => handleCodeChange(text, index)}
                     onKeyPress={(e) => handleKeyPress(e, index)}
                     keyboardType="number-pad"
                     maxLength={1}
-                    selectionColor={themePalette.hex_d4af37}
+                    selectionColor={isDark ? themePalette.hex_d4af37 : colors.primary}
                   />
                 </View>
               ))}
             </View>
 
-            {/* Code Verified Pill - show only when complete */}
             {isCodeComplete && (
               <View style={styles.verifiedBadgeContainer}>
-                <View style={styles.verifiedBadge}>
-                  <Text style={styles.badgeCheck}>✓</Text>
-                  <Text style={styles.verifiedText}>Code verified</Text>
+                <View style={[styles.verifiedBadge, { backgroundColor: isDark ? themePalette.hex_064e3b : themePalette.rgba_16_185_129_0_12, borderColor: isDark ? themePalette.hex_059669 : themePalette.rgba_16_185_129_0_3 }]}>
+                  <Text style={[styles.verifiedText, { color: colors.success }]}>Code verified</Text>
                 </View>
               </View>
             )}
 
-            {/* Resend Link */}
             <View style={styles.resendRow}>
-              <Text style={styles.resendLabel}>
+              <Text style={[styles.resendLabel, { color: colors.muted }]}>
                 {countdown > 0 ? `Resend available in 0:${countdown < 10 ? `0${countdown}` : countdown}  ` : "Didn't receive it? "}
               </Text>
               <TouchableOpacity onPress={handleResend} disabled={countdown > 0 || isResending}>
-                <Text style={[styles.resendLink, (countdown > 0 || isResending) && styles.resendLinkDisabled]}>
+                <Text style={[styles.resendLink, { color: isDark ? themePalette.hex_d4af37 : colors.primary }, (countdown > 0 || isResending) && styles.resendLinkDisabled]}>
                   {isResending ? 'Sending...' : 'Resend code'}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-
-
-          {/* Footer Button */}
           <View style={styles.footer}>
             <TouchableOpacity
-              style={[styles.submitButton, (!isCodeComplete || verifying) && styles.submitButtonDisabled]}
+              style={[styles.submitButton, !isDark && { backgroundColor: themePalette.hex_2563eb }, (!isCodeComplete || verifying) && styles.submitButtonDisabled]}
               activeOpacity={0.8}
               onPress={handleVerify}
               disabled={!isCodeComplete || verifying}
             >
               {verifying ? (
-                <ActivityIndicator color={themePalette.hex_070a12} />
+                <ActivityIndicator color={isDark ? themePalette.hex_070a12 : themePalette.hex_ffffff} />
               ) : (
                 <>
-                  <Text style={styles.submitButtonText}>Verify</Text>
-                  <Text style={styles.arrowIcon}>→</Text>
+                  <Text style={[styles.submitButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Verify</Text>
+                  <Text style={[styles.arrowIcon, !isDark && { color: themePalette.hex_ffffff }]}>→</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -276,7 +254,7 @@ const VerifyEmailScreen = (props) => {
   );
 };
 
-function AdminEmailVerification({ navigation, token }) {
+function AdminEmailVerification({ navigation, token, colors, isDark }) {
   const [status, setStatus] = useState('verifying');
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
@@ -300,32 +278,30 @@ function AdminEmailVerification({ navigation, token }) {
         }
       });
 
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [token, retry]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       <View style={styles.adminVerifyContent}>
         {status === 'verifying' ? (
           <>
-            <ActivityIndicator size="large" color={themePalette.hex_d4af37} />
-            <Text style={styles.adminVerifyDescription}>Verifying your email</Text>
+            <ActivityIndicator size="large" color={isDark ? themePalette.hex_d4af37 : colors.primary} />
+            <Text style={[styles.adminVerifyDescription, { color: colors.muted }]}>Verifying your email</Text>
           </>
         ) : (
           <>
-            <Text style={[styles.adminVerifyTitle, status === 'verified' ? styles.adminVerifySuccess : styles.adminVerifyError]}>
+            <Text style={[styles.adminVerifyTitle, { color: status === 'verified' ? colors.success : colors.danger }]}>
               {status === 'verified' ? 'Email verified' : 'Verification failed'}
             </Text>
-            <Text style={styles.adminVerifyDescription}>
+            <Text style={[styles.adminVerifyDescription, { color: colors.muted }]}>
               {status === 'verified'
                 ? 'Your admin email is verified. You can now log in.'
                 : error}
             </Text>
             <TouchableOpacity
-              style={styles.adminVerifyAction}
+              style={[styles.adminVerifyAction, !isDark && { backgroundColor: themePalette.hex_2563eb }]}
               activeOpacity={0.8}
               onPress={() => {
                 if (status === 'verified') {
@@ -336,7 +312,7 @@ function AdminEmailVerification({ navigation, token }) {
                   setRetry(value => value + 1);
                 }
               }}>
-              <Text style={styles.adminVerifyActionText}>
+              <Text style={[styles.adminVerifyActionText, !isDark && { color: themePalette.hex_ffffff }]}>
                 {status === 'verified' ? 'Continue to Admin Login' : 'Try again'}
               </Text>
             </TouchableOpacity>
@@ -347,329 +323,37 @@ function AdminEmailVerification({ navigation, token }) {
   );
 }
 
-const styles = makeThemeStyles(() => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: themePalette.hex_070a12,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: s(20),
-    paddingTop: s(10),
-    paddingBottom: s(30),
-    justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: s(10),
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e293b,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_0f172a,
-  },
-  iconText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.xxl,
-  },
-  heroSection: {
-    alignItems: 'center',
-    marginTop: s(5),
-  },
-  logoText: {
-    color: themePalette.hex_e2e8f0,
-    fontSize: font.hero,
-    fontWeight: '700',
-    marginBottom: s(15),
-  },
-  logoAccent: {
-    color: themePalette.hex_d4af37,
-  },
-  outerCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 80,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e293b,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkIconContainer: {
-    width: 62,
-    height: 62,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: themePalette.hex_d4af37,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_0f172a,
-  },
-  checkIcon: {
-    fontSize: font.displayXXL,
-    color: themePalette.hex_d4af37,
-  },
-  textSection: {
-    alignItems: 'center',
-    marginTop: s(8),
-    marginBottom: s(0),
-  },
-  title: {
-    color: themePalette.hex_ffffff,
-    fontSize: font.displayLarge,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  italicTitle: {
-    fontStyle: 'italic',
-    color: themePalette.hex_d4af37,
-    fontWeight: '400',
-  },
-  description: {
-    color: themePalette.hex_94a3b8,
-    textAlign: 'center',
-    marginTop: s(6),
-    fontSize: font.bodySmall,
-    lineHeight: 18,
-  },
-  emailChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_0f172a,
-    borderWidth: 1,
-    borderColor: themePalette.hex_d4af37,
-    borderRadius: 12,
-    paddingHorizontal: s(16),
-    paddingVertical: s(10),
-    marginTop: s(12),
-  },
-  chipIcon: {
-    color: themePalette.hex_d4af37,
-    marginRight: s(8),
-    fontSize: font.base,
-  },
-  chipText: {
-    color: themePalette.hex_d4af37,
-    fontSize: font.base,
-    fontWeight: '600',
-  },
-  otpSection: {
-    width: '100%',
-    marginTop: s(12),
-    marginBottom: s(10),
-  },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  codeBox: {
-    width: 48,
-    height: 58,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e293b,
-    backgroundColor: themePalette.hex_0b1120,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  codeBoxActive: {
-    borderColor: themePalette.hex_d4af37,
-  },
-  codeText: {
-    color: themePalette.hex_d4af37,
-    fontSize: font.display,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    textAlign: 'center',
-    width: '100%',
-    height: '100%',
-  },
-  verifiedBadgeContainer: {
-    alignItems: 'center',
-    marginTop: s(12),
-  },
-  verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_064e3b,
-    borderWidth: 1,
-    borderColor: themePalette.hex_059669,
-    borderRadius: 20,
-    paddingHorizontal: s(12),
-    paddingVertical: s(4),
-  },
-  badgeCheck: {
-    color: themePalette.hex_10b981,
-    fontSize: font.sm,
-    marginRight: s(6),
-  },
-  verifiedText: {
-    color: themePalette.hex_10b981,
-    fontSize: font.sm,
-    fontWeight: '600',
-  },
-  resendRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: s(12),
-  },
-  resendLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.bodySmall,
-  },
-  resendLink: {
-    color: themePalette.hex_d4af37,
-    fontSize: font.bodySmall,
-    fontWeight: '700',
-  },
-  resendLinkDisabled: {
-    opacity: 0.5,
-  },
-  draftSection: {
-    width: '100%',
-    marginVertical: s(10),
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: s(10),
-  },
-  draftLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    fontWeight: '700',
-    letterSpacing: 1,
-    marginRight: s(10),
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: themePalette.hex_1e293b,
-  },
-  draftCard: {
-    backgroundColor: themePalette.hex_0b1120,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e293b,
-    borderRadius: 12,
-    padding: s(14),
-    marginBottom: s(8),
-  },
-  draftRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  draftSubRow: {
-    marginTop: s(6),
-  },
-  usTag: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-  companyName: {
-    color: themePalette.hex_d4af37,
-    fontSize: font.bodySmall,
-    fontWeight: '700',
-  },
-  draftLocation: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-  savedStatus: {
-    color: themePalette.hex_d4af37,
-    fontSize: font.sm,
-    fontWeight: '600',
-  },
-  savedBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_051e24,
-    borderWidth: 1,
-    borderColor: themePalette.hex_05524c,
-    borderRadius: 12,
-    padding: s(12),
-  },
-  adminVerifyContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: s(24),
-  },
-  adminVerifyTitle: {
-    fontSize: font.displayMedium,
-    fontWeight: '700',
-  },
-  adminVerifySuccess: {
-    color: themePalette.hex_10b981,
-  },
-  adminVerifyError: {
-    color: themePalette.hex_ef4444,
-  },
-  adminVerifyDescription: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.base,
-    lineHeight: 22,
-    marginTop: s(12),
-    textAlign: 'center',
-  },
-  adminVerifyAction: {
-    backgroundColor: themePalette.hex_d4af37,
-    borderRadius: 24,
-    marginTop: s(28),
-    paddingHorizontal: s(24),
-    paddingVertical: s(14),
-  },
-  adminVerifyActionText: {
-    color: themePalette.hex_070a12,
-    fontSize: font.base,
-    fontWeight: '700',
-  },
-  bannerCheck: {
-    color: themePalette.hex_10b981,
-    fontSize: font.base,
-    marginRight: s(10),
-  },
-  bannerText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.sm,
-    flex: 1,
-    lineHeight: 16,
-  },
-  footer: {
-    marginTop: s(24),
-    marginBottom: s(10),
-  },
-  submitButton: {
-    backgroundColor: themePalette.hex_d4af37,
-    width: '100%',
-    height: 52,
-    borderRadius: 24,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  submitButtonDisabled: {
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    color: themePalette.hex_070a12,
-    fontSize: font.lg,
-    fontWeight: '700',
-    marginRight: s(8),
-  },
-  arrowIcon: {
-    color: themePalette.hex_070a12,
-    fontSize: font.xxl,
-    fontWeight: 'bold',
-  },
-}));
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  keyboardView: { flex: 1 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingTop: s(10), paddingBottom: s(30), justifyContent: 'center' },
+  textSection: { alignItems: 'center', marginTop: s(8), marginBottom: s(0) },
+  title: { fontSize: font.displayLarge, fontWeight: '600', textAlign: 'center' },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400' },
+  description: { textAlign: 'center', marginTop: s(6), fontSize: font.base, lineHeight: 22 },
+  emailChip: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: s(16), paddingVertical: s(10), marginTop: s(12) },
+  chipText: { fontSize: font.base, fontWeight: '600' },
+  otpSection: { width: '100%', marginTop: s(12), marginBottom: s(10) },
+  codeContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%' },
+  codeBox: { width: 48, height: 58, borderRadius: 12, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+  codeText: { fontSize: font.display, fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', textAlign: 'center', width: '100%', height: '100%' },
+  verifiedBadgeContainer: { alignItems: 'center', marginTop: s(12) },
+  verifiedBadge: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 20, paddingHorizontal: s(12), paddingVertical: s(4) },
+  verifiedText: { fontSize: font.sm, fontWeight: '600' },
+  resendRow: { flexDirection: 'row', justifyContent: 'center', marginTop: s(12), flexWrap: 'wrap' },
+  resendLabel: { fontSize: font.base },
+  resendLink: { fontSize: font.base, fontWeight: '700' },
+  resendLinkDisabled: { opacity: 0.5 },
+  footer: { marginTop: s(24), marginBottom: s(10) },
+  submitButton: { backgroundColor: themePalette.hex_d4af37, width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
+  submitButtonDisabled: { opacity: 0.6 },
+  submitButtonText: { color: themePalette.hex_070a12, fontSize: font.lg, fontWeight: '700' },
+  arrowIcon: { color: themePalette.hex_070a12, fontSize: font.xl, fontWeight: 'bold' },
+  adminVerifyContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: s(24) },
+  adminVerifyTitle: { fontSize: font.displayMedium, fontWeight: '700' },
+  adminVerifyDescription: { fontSize: font.base, lineHeight: 22, marginTop: s(12), textAlign: 'center' },
+  adminVerifyAction: { backgroundColor: themePalette.hex_d4af37, borderRadius: 24, marginTop: s(28), paddingHorizontal: s(24), paddingVertical: s(14) },
+  adminVerifyActionText: { color: themePalette.hex_070a12, fontSize: font.base, fontWeight: '700' },
+});
 
 export default VerifyEmailScreen;

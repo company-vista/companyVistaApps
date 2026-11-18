@@ -166,8 +166,8 @@ const RegistrationLandingScreen = ({ navigation }) => {
 
         {/* Action Buttons */}
         <View style={styles.authContainer}>
-          <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('RegisterJurisdiction')}>
-            <Text style={[styles.primaryBtnText, { color: colors.buttonText }]}>🏢   Start My Company   →</Text>
+          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8} onPress={() => navigation.navigate('RegisterJurisdiction')}>
+            <Text style={styles.primaryBtnText}>🏢   Start My Company   →</Text>
           </TouchableOpacity>
 
           {/* Add-Company flow me user pehle se login hai. "Existing Client? Log in"
@@ -197,16 +197,16 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   heroSection: { marginBottom: s(20) },
   mainTitle: {
     fontSize: font.display,
-    fontWeight: '400',
+    fontWeight: '500',
     lineHeight: 34,
     marginBottom: s(10),
   },
   italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { fontSize: font.sm, lineHeight: 18 },
+  subtitle: { fontSize: font.base, lineHeight: 22 },
   jurisdictionSection: { marginBottom: s(16) },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(10) },
-  sectionHeader: { fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1.2 },
-  viewAllText: { color: themePalette.hex_c9a84c, fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1 },
+  sectionHeader: { fontSize: font.small, fontWeight: 'bold', letterSpacing: 1.2 },
+  viewAllText: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: 'bold', letterSpacing: 1 },
   gridRow: { marginBottom: s(10) },
   countryItem: { alignItems: 'center', marginRight: s(10), width: 44 },
   countryBadge: {
@@ -218,7 +218,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   moreText: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
   countryCode: { fontSize: font.bodySmall, fontWeight: '600' },
   flagEmoji: { fontSize: font.displayXXL },
-  countryLabel: { fontSize: font.xs, textAlign: 'center' },
+  countryLabel: { fontSize: font.small, textAlign: 'center' },
   howItWorksCard: {
     width: '100%',
     borderRadius: s(16), padding: s(14),
@@ -226,7 +226,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     marginTop: s(16),
     marginBottom: s(14),
   },
-  cardHeader: { fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(12) },
+  cardHeader: { fontSize: font.small, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(12) },
   stepperRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   stepItem: { alignItems: 'center', flex: 1 },
   stepCircle: {
@@ -237,8 +237,8 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   goldStep: { borderColor: themePalette.hex_c9a84c, backgroundColor: themePalette.rgba_201_168_76_0_1 },
   blueStep: { borderColor: themePalette.hex_3b82f6, backgroundColor: themePalette.rgba_59_130_246_0_1 },
   tealStep: { borderColor: themePalette.hex_10b981, backgroundColor: themePalette.rgba_16_185_129_0_1 },
-  stepTitle: { fontSize: font.sm, fontWeight: '500' },
-  stepSub: { fontSize: font.xs },
+  stepTitle: { fontSize: font.base, fontWeight: '500' },
+  stepSub: { fontSize: font.small },
   stepLine: { width: 20, height: 1, marginTop: -14 },
   toastContainer: {
     flexDirection: 'row', alignItems: 'center',
@@ -247,23 +247,24 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     marginBottom: s(12),
   },
   greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: themePalette.hex_10b981, marginRight: s(8) },
-  toastText: { flex: 1, fontSize: font.xs },
+  toastText: { flex: 1, fontSize: font.small },
   toastBold: { fontWeight: 'bold' },
-  toastTime: { fontSize: font.caption },
+  toastTime: { fontSize: font.small },
   featuresRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: s(16) },
-  featureItem: { fontSize: font.xs },
+  featureItem: { fontSize: font.small },
   featureDivider: { marginHorizontal: s(10) },
   authContainer: { marginTop: s(40), paddingBottom: s(20) },
   primaryBtn: {
+    backgroundColor: themePalette.hex_2563eb,
     borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(10),
   },
-  primaryBtnText: { fontSize: font.base, fontWeight: 'bold' },
+  primaryBtnText: { fontSize: font.md, fontWeight: '700', color: themePalette.hex_ffffff },
   loginBtn: {
     borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', borderWidth: 1,
     marginBottom: s(16),
   },
-  loginBtnText: { fontSize: font.bodySmall, fontWeight: '600' },
+  loginBtnText: { fontSize: font.base, fontWeight: '600' },
   goldText: { color: themePalette.hex_c9a84c },
 }));

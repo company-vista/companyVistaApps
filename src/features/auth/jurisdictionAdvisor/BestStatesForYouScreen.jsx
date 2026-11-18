@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
-import { themePalette, makeThemeStyles } from '../../../theme/colors';
+import { themePalette, useThemeColors } from '../../../theme/colors';
 
 const FILTER_TAGS = [
   { id: '1', label: '🌐 Fully remote' },
@@ -105,12 +105,14 @@ export const STATES_DATA = [
 export default function BestStatesForYouScreen({ navigation, route }) {
   const [selected, setSelected] = useState(STATES_DATA[0]);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
   const alternatives = STATES_DATA.filter(s => s.name !== selected.name);
   const stateFee = selected.govtFees?.formation ?? 0;
   const stateFeeLabel = `$${stateFee}`;
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -123,474 +125,178 @@ export default function BestStatesForYouScreen({ navigation, route }) {
         showsVerticalScrollIndicator={false}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Best <Text style={styles.titleItalic}>states</Text> for you
         </Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.subtitle, { color: colors.muted }]}>
           Fully remote · lowest cost · no investment planned
         </Text>
 
-        {/* Filter Tags */}
         <View style={styles.tagsContainer}>
           {FILTER_TAGS.map((tag) => (
             <TouchableOpacity
               key={tag.id}
               style={[
                 styles.tagPill,
-                tag.isAction && styles.actionTagPill,
+                { backgroundColor: isDark ? themePalette.hex_151329 : colors.surface, borderColor: isDark ? themePalette.hex_2d264a : colors.border },
+                tag.isAction && { backgroundColor: isDark ? themePalette.hex_121724 : colors.surfaceAlt, borderColor: isDark ? themePalette.hex_1e2638 : colors.border },
               ]}
               activeOpacity={0.8}
             >
-              <Text style={styles.tagText}>{tag.label}</Text>
+              <Text style={[styles.tagText, { color: isDark ? themePalette.hex_a5b4fc : colors.primary }]}>{tag.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Best Match Card */}
-        <View style={styles.matchCard}>
-          {/* Badge */}
-          <View style={styles.bestMatchBadge}>
+        <View style={[styles.matchCard, { backgroundColor: isDark ? themePalette.hex_121622 : colors.surface, borderColor: isDark ? themePalette.hex_3d321d : '#E5D5A8' }]}>
+          <View style={[styles.bestMatchBadge, { backgroundColor: isDark ? themePalette.hex_262013 : '#FFFBEB' }]}>
             <Text style={styles.badgeText}>★ BEST MATCH</Text>
           </View>
 
-          {/* Card Header Info - dynamic selected */}
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderLeft}>
               <Text style={styles.stateIcon}>{selected.icon}</Text>
               <View>
-                <Text style={styles.stateName}>{selected.name}</Text>
-                <Text style={styles.stateSubtitle}>{selected.subtitle}</Text>
+                <Text style={[styles.stateName, { color: colors.text }]}>{selected.name}</Text>
+                <Text style={[styles.stateSubtitle, { color: colors.muted }]}>{selected.subtitle}</Text>
               </View>
             </View>
-
             <View style={styles.matchPercentageContainer}>
               <Text style={styles.matchPercentage}>{selected.match}</Text>
-              <Text style={styles.matchLabel}>MATCH</Text>
+              <Text style={[styles.matchLabel, { color: colors.subtle }]}>MATCH</Text>
             </View>
           </View>
 
-          {/* Features List - dynamic */}
-          <View style={styles.featuresList}>
+          <View style={[styles.featuresList, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
             {selected.features.map((item, index) => (
               <View key={index} style={styles.featureItem}>
                 <Text style={styles.checkIcon}>✓</Text>
-                <Text style={styles.featureText}>
-                  <Text style={styles.featureBold}>{item.boldText}</Text>
+                <Text style={[styles.featureText, { color: colors.muted }]}>
+                  <Text style={[styles.featureBold, { color: colors.text }]}>{item.boldText}</Text>
                   {item.normalText}
-                  {item.boldText2 && (
-                    <Text style={styles.featureBold}>{item.boldText2}</Text>
-                  )}
+                  {item.boldText2 && <Text style={[styles.featureBold, { color: colors.text }]}>{item.boldText2}</Text>}
                   {item.normalText2 && item.normalText2}
                 </Text>
               </View>
             ))}
           </View>
 
-          {/* Warning Note - dynamic */}
-          <View style={styles.warningCard}>
-            <Text style={styles.warningIcon}>⚠️</Text>
-            <Text style={styles.warningText}>
+          <View style={[styles.warningCard, { backgroundColor: isDark ? themePalette.hex_1e1b18 : '#FFFBEB', borderColor: isDark ? themePalette.hex_3d321d : '#FDE68A' }]}>
+            <Text style={styles.warningIcon}>⚠</Text>
+            <Text style={[styles.warningText, { color: colors.muted }]}>
               <Text style={styles.warningBold}>Watch:</Text> {selected.warning}
             </Text>
           </View>
 
-          {/* Pricing Footer - dynamic */}
-          <View style={styles.cardFooter}>
+          <View style={[styles.cardFooter, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
             <View style={styles.priceContainer}>
               <Text style={styles.priceAmount}>{stateFeeLabel}</Text>
-              <Text style={styles.priceNote}>State fee</Text>
+              <Text style={[styles.priceNote, { color: colors.subtle }]}>State fee</Text>
             </View>
-            <Text style={styles.timeframeText}>{selected.timeline || selected.timeframe}</Text>
+            <Text style={[styles.timeframeText, { color: colors.subtle }]}>{selected.timeline || selected.timeframe}</Text>
           </View>
         </View>
 
-        {/* Close Alternatives Header */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>CLOSE ALTERNATIVES</Text>
-          <View style={styles.sectionDivider} />
+          <Text style={[styles.sectionTitle, { color: colors.subtle }]}>CLOSE ALTERNATIVES</Text>
+          <View style={[styles.sectionDivider, { backgroundColor: isDark ? themePalette.hex_1e2638 : colors.border }]} />
         </View>
 
         {alternatives.map(item => (
-          <TouchableOpacity key={item.name} style={styles.altCard} activeOpacity={0.7} onPress={() => setSelected(STATES_DATA.find(s => s.name === item.name))}>
+          <TouchableOpacity key={item.name} style={[styles.altCard, { backgroundColor: isDark ? themePalette.hex_121622 : colors.surface, borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]} activeOpacity={0.7} onPress={() => setSelected(STATES_DATA.find(s => s.name === item.name))}>
             <View style={styles.altLeft}>
               <Text style={styles.altIcon}>{item.icon}</Text>
               <View style={styles.altTextWrap}>
-                <Text style={styles.altName}>{item.name}</Text>
-                <Text style={styles.altDesc}>{item.desc}</Text>
+                <Text style={[styles.altName, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.altDesc, { color: colors.muted }]}>{item.desc}</Text>
               </View>
             </View>
             <View style={styles.altMatchWrap}>
               <Text style={styles.altMatch}>{item.match}</Text>
-              <Text style={styles.altMatchLabel}>MATCH</Text>
+              <Text style={[styles.altMatchLabel, { color: colors.subtle }]}>MATCH</Text>
             </View>
           </TouchableOpacity>
         ))}
 
-        <View style={styles.savingCard}>
-          <Text style={styles.savingIcon}>✓</Text>
-          <Text style={styles.savingText}>Saving $380 over 3 years versus Delaware, with no practical downside for your situation.</Text>
+        <View style={[styles.savingCard, { backgroundColor: isDark ? themePalette.rgba_16_185_129_0_08 : '#ECFDF5', borderColor: isDark ? themePalette.rgba_16_185_129_0_2 : '#A7F3D0' }]}>
+          <Text style={styles.savingIcon}>↓</Text>
+          <Text style={[styles.savingText, { color: isDark ? themePalette.hex_a7f3d0 : '#065F46' }]}>Saving $380 over 3 years versus Delaware, with no practical downside for your situation.</Text>
         </View>
+
       </ScrollView>
 
-      {/* Bottom Action Area */}
-      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={() => {
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom, backgroundColor: colors.background }]}>
+        <TouchableOpacity style={[styles.actionButton, !isDark && { backgroundColor: themePalette.hex_2563eb }]} activeOpacity={0.8} onPress={() => {
           const priceNum = Number(selected.totalFirstYear) || Number(String(selected.price).replace(/[^0-9]/g, '')) || 399;
           const govFee = selected.govtFees?.formation ?? 0;
           navigation.navigate('CompanyNaming', { ...(route?.params || {}), bestState: selected.name, bestStatePrice: priceNum, bestStatePriceNote: selected.priceNote, bestStateTimeframe: selected.timeline || selected.timeframe, bestStateGovFee: govFee, bestStateCode: selected.code, advisorFlow: true, selectedCountry: 'US', selectedState: selected.name });
         }}>
-          <Text style={styles.actionButtonText}>
-            Continue with {selected.name} · {stateFeeLabel} state fee  →
-          </Text>
+          <Text style={[styles.actionButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Continue with {selected.name} · {stateFeeLabel} state fee  →</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.browseButton} activeOpacity={0.7}>
-          <Text style={styles.browseText}>
-            Compare all 51 states
-          </Text>
+          <Text style={[styles.browseText, { color: colors.muted }]}>Compare all 51 states</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = makeThemeStyles(() => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: themePalette.hex_0b0e17,
-  },
+const styles = StyleSheet.create({
+  container: { flex: 1 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    paddingHorizontal: s(16),
-    paddingVertical: s(12),
-    marginTop: s(24),
-  },
-  iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: themePalette.hex_161b29,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.lg,
-    fontWeight: 'bold',
-  },
-  brandContainer: {
-    alignItems: 'center',
-  },
-  brandTitle: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.md,
-    fontWeight: 'bold',
-  },
-  brandSubtitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.micro,
-    letterSpacing: 1.2,
-    marginTop: s(1),
-  },
-  scrollContent: {
-    paddingHorizontal: s(20),
-    paddingBottom: s(20),
-  },
-  title: {
-    fontSize: font.display,
-    fontWeight: '500',
-    color: themePalette.hex_ffffff,
-    marginTop: s(8),
-  },
-  titleItalic: {
-    fontStyle: 'italic',
-    color: themePalette.hex_d1a253,
-    fontWeight: '300',
-  },
-  subtitle: {
-    fontSize: font.bodySmall,
-    color: themePalette.hex_64748b,
-    marginTop: s(6),
-    marginBottom: s(16),
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: s(8),
-    marginBottom: s(20),
-  },
-  tagPill: {
-    backgroundColor: themePalette.hex_151329,
-    paddingHorizontal: s(12),
-    paddingVertical: s(6),
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: themePalette.hex_2d264a,
-  },
-  actionTagPill: {
-    backgroundColor: themePalette.hex_121724,
-    borderColor: themePalette.hex_1e2638,
-  },
-  tagText: {
-    color: themePalette.hex_a5b4fc,
-    fontSize: font.sm,
-    fontWeight: '500',
-  },
-  matchCard: {
-    backgroundColor: themePalette.hex_121622,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: themePalette.hex_3d321d,
-    padding: s(16),
-    marginBottom: s(24),
-  },
-  bestMatchBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: themePalette.hex_262013,
-    borderColor: themePalette.hex_d1a253,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: s(10),
-    paddingVertical: s(4),
-    marginBottom: s(16),
-  },
-  badgeText: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.xs,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    alignItems: 'center',
-    marginBottom: s(20),
-  },
-  cardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  stateIcon: {
-    fontSize: font.displayXL,
-    marginRight: s(12),
-  },
-  stateName: {
-    color: themePalette.hex_ffffff,
-    fontSize: font.xxl,
-    fontWeight: 'bold',
-  },
-  stateSubtitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-    marginTop: s(2),
-  },
-  matchPercentageContainer: {
-    alignItems: 'flex-end',
-  },
-  matchPercentage: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.displayMedium,
-    fontWeight: '300',
-  },
-  matchLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.caption,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  featuresList: {
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(16),
-    marginBottom: s(16),
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: s(12),
-  },
-  checkIcon: {
-    color: themePalette.hex_10b981,
-    fontSize: font.base,
-    marginRight: s(10),
-    marginTop: s(1),
-  },
-  featureText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.bodySmall,
-    lineHeight: 18,
-    flex: 1,
-  },
-  featureBold: {
-    color: themePalette.hex_ffffff,
-    fontWeight: 'bold',
-  },
-  warningCard: {
-    flexDirection: 'row',
-    backgroundColor: themePalette.hex_1e1b18,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: themePalette.hex_3d321d,
-    padding: s(12),
-    marginBottom: s(16),
-  },
-  warningIcon: {
-    fontSize: font.base,
-    marginRight: s(8),
-  },
-  warningText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.sm,
-    lineHeight: 16,
-    flex: 1,
-  },
-  warningBold: {
-    color: themePalette.hex_d1a253,
-    fontWeight: 'bold',
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    alignItems: 'flex-end',
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(14),
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  priceAmount: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.hero,
-    fontWeight: 'bold',
-    marginRight: s(8),
-  },
-  priceNote: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-  },
-  timeframeText: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    fontWeight: 'bold',
-    letterSpacing: 1.2,
-    marginRight: s(12),
-  },
-  sectionDivider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: themePalette.hex_1e2638,
-  },
-  altCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: themePalette.hex_121622,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingHorizontal: s(14),
-    paddingVertical: s(12),
-    marginTop: s(10),
-  },
-  altLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: s(10),
-  },
-  altIcon: {
-    fontSize: font.hero,
-  },
-  altTextWrap: {
-    flex: 1,
-  },
-  altName: {
-    color: themePalette.hex_ffffff,
-    fontSize: font.base,
-    fontWeight: '600',
-  },
-  altDesc: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    marginTop: s(2),
-  },
-  altMatchWrap: {
-    alignItems: 'flex-end',
-    marginLeft: s(8),
-  },
-  altMatch: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.lg,
-    fontWeight: '700',
-  },
-  altMatchLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.tiny,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  savingCard: {
-    flexDirection: 'row',
-    backgroundColor: themePalette.rgba_16_185_129_0_08,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: themePalette.rgba_16_185_129_0_2,
-    padding: s(12),
-    marginTop: s(14),
-    alignItems: 'flex-start',
-    gap: s(8),
-  },
-  savingIcon: {
-    color: themePalette.hex_10b981,
-    fontSize: font.sm,
-    marginTop: s(1),
-  },
-  savingText: {
-    flex: 1,
-    color: themePalette.hex_a7f3d0,
-    fontSize: font.small,
-    lineHeight: 15,
-  },
-  bottomContainer: {
-    paddingHorizontal: s(16),
-    paddingTop: s(12),
-    paddingBottom: s(20),
-    backgroundColor: themePalette.hex_0b0e17,
-  },
-  actionButton: {
-    backgroundColor: themePalette.hex_d1a253,
-    borderRadius: 24,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionButtonText: {
-    color: themePalette.hex_0b0e17,
-    fontSize: font.md,
-    fontWeight: '700',
-  },
-  browseButton: {
-    alignItems: 'center',
-    marginTop: s(12),
-  },
-  browseText: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-}));
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: s(8), paddingHorizontal: s(16), paddingVertical: s(12), marginTop: s(24) },
+  scrollContent: { paddingHorizontal: s(20), paddingBottom: s(20) },
+  title: { fontSize: font.display, fontWeight: '500', marginTop: s(8) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d1a253, fontWeight: '300', fontFamily: 'serif' },
+  subtitle: { fontSize: font.bodySmall, marginTop: s(6), marginBottom: s(16) },
+  tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: s(8), marginBottom: s(20) },
+  tagPill: { paddingHorizontal: s(12), paddingVertical: s(6), borderRadius: 16, borderWidth: 1 },
+  tagText: { fontSize: font.sm, fontWeight: '500' },
+  matchCard: { borderRadius: 20, borderWidth: 1, padding: s(16), marginBottom: s(24) },
+  bestMatchBadge: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 12, paddingHorizontal: s(10), paddingVertical: s(4), marginBottom: s(16) },
+  badgeText: { color: themePalette.hex_d1a253, fontSize: font.xs, fontWeight: 'bold', letterSpacing: 0.5 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'flex-start', gap: s(8), alignItems: 'center', marginBottom: s(20) },
+  cardHeaderLeft: { flexDirection: 'row', alignItems: 'center' },
+  stateIcon: { fontSize: font.displayXL, marginRight: s(12) },
+  stateName: { fontSize: font.xxl, fontWeight: 'bold' },
+  stateSubtitle: { fontSize: font.sm, marginTop: s(2) },
+  matchPercentageContainer: { alignItems: 'flex-end' },
+  matchPercentage: { color: themePalette.hex_d1a253, fontSize: font.displayMedium, fontWeight: '300' },
+  matchLabel: { fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1 },
+  featuresList: { borderTopWidth: 1, paddingTop: s(16), marginBottom: s(16) },
+  featureItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: s(12) },
+  checkIcon: { color: themePalette.hex_10b981, fontSize: font.base, marginRight: s(10), marginTop: s(1) },
+  featureText: { fontSize: font.bodySmall, lineHeight: 18, flex: 1 },
+  featureBold: { fontWeight: 'bold' },
+  warningCard: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, padding: s(12), marginBottom: s(16) },
+  warningIcon: { fontSize: font.base, marginRight: s(8) },
+  warningText: { fontSize: font.sm, lineHeight: 16, flex: 1 },
+  warningBold: { color: themePalette.hex_d1a253, fontWeight: 'bold' },
+  cardFooter: { flexDirection: 'row', justifyContent: 'flex-start', gap: s(8), alignItems: 'flex-end', borderTopWidth: 1, paddingTop: s(14) },
+  priceContainer: { flexDirection: 'row', alignItems: 'baseline' },
+  priceAmount: { color: themePalette.hex_d1a253, fontSize: font.hero, fontWeight: 'bold', marginRight: s(8) },
+  priceNote: { fontSize: font.small },
+  timeframeText: { fontSize: font.sm },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center' },
+  sectionTitle: { fontSize: font.small, fontWeight: 'bold', letterSpacing: 1.2, marginRight: s(12) },
+  sectionDivider: { flex: 1, height: 1 },
+  altCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, borderWidth: 1, paddingHorizontal: s(14), paddingVertical: s(12), marginTop: s(10) },
+  altLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: s(10) },
+  altIcon: { fontSize: font.hero },
+  altTextWrap: { flex: 1 },
+  altName: { fontSize: font.base, fontWeight: '600' },
+  altDesc: { fontSize: font.small, marginTop: s(2) },
+  altMatchWrap: { alignItems: 'flex-end', marginLeft: s(8) },
+  altMatch: { color: themePalette.hex_d1a253, fontSize: font.lg, fontWeight: '700' },
+  altMatchLabel: { fontSize: font.tiny, fontWeight: '700', letterSpacing: 0.8 },
+  savingCard: { flexDirection: 'row', borderRadius: 10, borderWidth: 1, padding: s(12), marginTop: s(14), alignItems: 'flex-start', gap: s(8) },
+  savingIcon: { color: themePalette.hex_10b981, fontSize: font.sm, marginTop: s(1) },
+  savingText: { flex: 1, fontSize: font.small, lineHeight: 15 },
+  bottomContainer: { paddingHorizontal: s(16), paddingTop: s(12) },
+  actionButton: { backgroundColor: themePalette.hex_d1a253, borderRadius: 24, height: 52, alignItems: 'center', justifyContent: 'center' },
+  actionButtonText: { color: themePalette.hex_0b0e17, fontSize: font.md, fontWeight: '700' },
+  browseButton: { alignItems: 'center', marginTop: s(12) },
+  browseText: { fontSize: font.sm },
+});

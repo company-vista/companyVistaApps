@@ -197,7 +197,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
       {/* Bottom Fixed Button */}
       <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
         <TouchableOpacity
-          style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }, (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) && styles.continueBtnDisabled]}
+          style={[styles.continueBtn, !isDark && { backgroundColor: themePalette.hex_2563eb }, (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           onPress={() => {
             if (!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)) return;
@@ -206,7 +206,7 @@ const CompanyNamingScreen = ({ navigation, route }) => {
           }}
           disabled={!companyName.trim() || (entityOptions.length > 0 && !selectedEntity)}
         >
-          <Text style={[styles.continueBtnText, { color: colors.buttonText }]}>Continue →</Text>
+          <Text style={[styles.continueBtnText, !isDark && { color: themePalette.hex_ffffff }]}>Continue  →</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -411,9 +411,9 @@ export default function OptionalAddOnsScreen({ navigation, route }) {
       </ScrollView>
 
       <View style={[styles.footerContainer, { paddingBottom: 24 + insets.bottom, paddingTop: 12 }]}>
-        <TouchableOpacity style={styles.continueButton} activeOpacity={0.8} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color={colors.buttonText} />
+        <TouchableOpacity style={[styles.continueButton, !isDark && { backgroundColor: themePalette.hex_2563eb }]} activeOpacity={0.8} onPress={handleContinue}>
+          <Text style={[styles.continueButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Continue</Text>
+          <Ionicons name="arrow-forward" size={18} color={!isDark ? themePalette.hex_ffffff : colors.buttonText} />
         </TouchableOpacity>
         <Text style={styles.footerSubtext}>${addOnsTotal} add-ons · {selectedCount} selected</Text>
       </View>

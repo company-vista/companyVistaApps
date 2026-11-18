@@ -1,5 +1,24 @@
+import { Appearance, useColorScheme } from 'react-native';
 import { useAppSelector } from '../store/hooks';
 import { store } from '../store';
+
+const resolveThemeMode = (mode, systemScheme) => {
+    if (mode === 'system') {
+        return systemScheme === 'dark' ? 'dark' : 'light';
+    }
+    return mode === 'dark' ? 'dark' : 'light';
+};
+
+export function getResolvedThemeMode() {
+    const mode = store.getState().theme.mode;
+    return resolveThemeMode(mode, Appearance.getColorScheme());
+}
+
+export function useResolvedThemeMode() {
+    const mode = useAppSelector(state => state.theme.mode);
+    const systemScheme = useColorScheme();
+    return resolveThemeMode(mode, systemScheme);
+}
 const sharedPalette = {
   hex_ffffff: "#ffffff",
   hex_64748b: "#64748b",
@@ -312,7 +331,7 @@ const sharedPalette = {
   hex_f3e8ff: "#f3e8ff",
   hex_070b16: "#070b16",
   hex_f3f4f6: "#f3f4f6",
-  rgba_8_9_10_0_8: "rgba(8,9,10,0.8)",
+  rgba_8_9_10_0_8: "rgba(8, 9, 10, 0.58)",
   rgba_59_130_246_0_45: "rgba(59,130,246,0.45)",
   rgba_201_168_76_0_5: "rgba(201,168,76,0.5)",
   rgba_212_175_55_0_2: "rgba(212,175,55,0.2)",
@@ -652,14 +671,12 @@ export const appThemes = {
     },
 };
 export function useThemeColors() {
-    const mode = useAppSelector(state => state.theme.mode);
-    return appThemes[mode];
+    return appThemes[useResolvedThemeMode()] || appThemes.light;
 }
 
 export const themePalette = new Proxy({}, {
     get(_, key) {
-        const mode = store.getState().theme.mode;
-        return appThemes[mode].palette[key];
+        return appThemes[getResolvedThemeMode()].palette[key];
     },
 });
 
@@ -667,7 +684,7 @@ export function makeThemeStyles(factory) {
     const cache = {};
     return new Proxy({}, {
         get(_, key) {
-            const mode = store.getState().theme.mode;
+            const mode = getResolvedThemeMode();
             if (!cache[mode]) cache[mode] = factory();
             return cache[mode][key];
         },

@@ -561,7 +561,7 @@ const FounderDetailsScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[
             styles.primaryBtn,
-            { backgroundColor: colors.buttonBackground },
+            !isDark && { backgroundColor: themePalette.hex_2563eb },
             !(fullName.trim() && isEmailValid && phone.trim() && countryCode && countryOfResidence && isChecked) && styles.primaryBtnDisabled,
             verifyingEmail && styles.primaryBtnDisabled,
           ]}
@@ -570,9 +570,9 @@ const FounderDetailsScreen = ({ navigation, route }) => {
           onPress={handleRegisterCompany}
         >
           {verifyingEmail ? (
-            <ActivityIndicator size="small" color={colors.buttonText} />
+            <ActivityIndicator size="small" color={!isDark ? themePalette.hex_ffffff : colors.buttonText} />
           ) : (
-            <Text style={[styles.primaryBtnText, { color: colors.buttonText }]}>{emailVerified ? '+  Register Company' : 'Submit->'}</Text>
+            <Text style={[styles.primaryBtnText, !isDark && { color: themePalette.hex_ffffff }]}>{emailVerified ? 'Register Company' : 'Submit  →'}</Text>
           )}
         </TouchableOpacity>
         {!emailVerified && email.length > 0 && !isEmailValid && (

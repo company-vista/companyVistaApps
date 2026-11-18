@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import logoR from '../../../assets/images/logoR.png';
 import globeLogo from '../../../assets/images/companyvista_globe_320.gif';
-import globeLogoLight from '../../../assets/images/company-vista-icon-gold-512.png';
+import globeLogoLight from '../../../assets/images/onboadingScreenLogo.png';
 import { s } from '../../../theme/responsive';
 import { useThemeColors, themePalette, makeThemeStyles } from '../../../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,6 +76,8 @@ const OnboardingSlide = ({ navigation }) => {
   };
 
   const slide = SLIDES_DATA[currentIndex];
+  const buttonBg = isDark ? colors.buttonBackground : themePalette.hex_2563eb;
+  const buttonTextColor = themePalette.hex_ffffff;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -168,12 +170,12 @@ const OnboardingSlide = ({ navigation }) => {
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
           <LinearGradient
-            colors={[colors.buttonBackground, colors.buttonBackground, colors.buttonBackground]}
+            colors={[buttonBg, buttonBg, buttonBg]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradientButton}
           >
-            <Text style={[styles.nextButtonText, { color: colors.buttonText }]}>
+            <Text style={[styles.nextButtonText, { color: buttonTextColor }]}>
               {currentIndex === SLIDES_DATA.length - 1 ? 'Get Started' : 'Continue →'}
             </Text>
           </LinearGradient>
@@ -291,18 +293,18 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   eyebrowContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: s(10) },
   eyebrowDash: { width: 18, height: 1, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
-  eyebrowText: { fontSize: font.sm, fontWeight: '700', letterSpacing: 1.5, color: themePalette.hex_c9a84c },
-  title: { fontSize: font.displayMedium, fontWeight: '300', lineHeight: 30, marginBottom: s(12) },
-  titleItalic: { fontStyle: 'italic', color: themePalette.hex_c9a84c },
-  body: { fontSize: font.base, lineHeight: 20, marginBottom: 4 },
+  eyebrowText: { fontSize: font.small, fontWeight: '700', letterSpacing: 1.2, color: themePalette.hex_c9a84c },
+  title: { fontSize: font.display, fontWeight: '500', lineHeight: 34, marginBottom: s(12) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_c9a84c, fontFamily: 'serif' },
+  body: { fontSize: font.base, lineHeight: 22, marginBottom: s(4) },
   dotsContainer: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: s(16) },
   dot: { width: 6, height: 6, borderRadius: 3 },
   activeDot: { width: 22, backgroundColor: themePalette.hex_c9a84c, borderRadius: 4 },
   nextButton: { borderRadius: 24, overflow: 'hidden', marginBottom: s(8) },
   gradientButton: { height: 50, alignItems: 'center', justifyContent: 'center' },
-  nextButtonText: { fontSize: font.lg, fontWeight: '700', color: themePalette.hex_0a0f1e },
+  nextButtonText: { fontSize: font.md, fontWeight: '700', color: themePalette.hex_ffffff },
   skipButton: { height: 34, alignItems: 'center', justifyContent: 'center', marginBottom: s(4) },
-  skipText: { fontSize: font.sm, fontWeight: '500' },
+  skipText: { fontSize: font.base, fontWeight: '500' },
   scrollBody: { flex: 1 },
   scrollContent: { paddingBottom: s(8) },
 }));

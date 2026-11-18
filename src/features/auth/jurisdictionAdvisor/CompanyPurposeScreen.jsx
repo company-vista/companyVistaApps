@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { font } from '../../../theme/typography';
-import { themePalette, makeThemeStyles } from '../../../theme/colors';
+import { themePalette, useThemeColors } from '../../../theme/colors';
 
 export const PURPOSES = [
   {
@@ -248,10 +248,12 @@ export const PURPOSES = [
 export default function CompanyPurposeScreen({ navigation, route }) {
   const [selectedId, setSelectedId] = useState(null);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       {/* Top Navigation Bar */}
       <View style={styles.header}>
@@ -259,20 +261,15 @@ export default function CompanyPurposeScreen({ navigation, route }) {
         <Image source={logoR} style={styles.topLogo} />
       </View>
 
-
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Question Counter */}
-
-        {/* Question Heading */}
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: colors.text }]}>
           What's the main <Text style={styles.titleItalic}>purpose</Text> of this company?
         </Text>
-        
-        <Text style={styles.subtitle}>
+
+        <Text style={[styles.subtitle, { color: colors.muted }]}>
           This drives licensing and compliance, not just tax.
         </Text>
 
@@ -287,24 +284,25 @@ export default function CompanyPurposeScreen({ navigation, route }) {
               key={itemId}
               style={[
                 styles.optionCard,
-                isSelected && styles.optionCardSelected,
+                { backgroundColor: isDark ? themePalette.hex_121724 : colors.surface, borderColor: isDark ? themePalette.hex_1e2638 : colors.border },
+                isSelected && { borderColor: themePalette.hex_d1a253, backgroundColor: isDark ? themePalette.hex_161c2c : '#FFFBF0' },
               ]}
               onPress={() => setSelectedId(itemId)}
               activeOpacity={0.8}
             >
-              <View style={styles.iconContainer}>
+              <View style={[styles.iconContainer, { backgroundColor: isDark ? themePalette.hex_1e2638 : colors.surfaceAlt }]}>
                 <Text style={styles.optionIcon}>{item.icon}</Text>
               </View>
 
               <View style={styles.textContainer}>
-                <Text style={styles.optionTitle}>{itemTitle}</Text>
-                <Text style={styles.optionDescription}>{itemDesc}</Text>
+                <Text style={[styles.optionTitle, { color: colors.text }]}>{itemTitle}</Text>
+                <Text style={[styles.optionDescription, { color: colors.muted }]}>{itemDesc}</Text>
               </View>
 
-              {/* Radio Indicator */}
               <View
                 style={[
                   styles.radioOuter,
+                  { borderColor: isDark ? themePalette.hex_334155 : colors.inputBorder },
                   isSelected && styles.radioOuterSelected,
                 ]}
               >
@@ -319,19 +317,18 @@ export default function CompanyPurposeScreen({ navigation, route }) {
         })}
       </ScrollView>
 
-      {/* Bottom Sticky Action Area */}
-      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom, backgroundColor: colors.background }]}>
         <TouchableOpacity
-          style={[styles.nextButton, !selectedId && styles.nextButtonDisabled]}
+          style={[styles.nextButton, !isDark && { backgroundColor: themePalette.hex_2563eb }, !selectedId && { backgroundColor: isDark ? themePalette.hex_1e293b : '#E2E8F0', opacity: 0.8 }]}
           activeOpacity={0.8}
           disabled={!selectedId}
           onPress={() => navigation.navigate('CustomerLocation', { ...(route?.params || {}), purpose: selectedId })}
         >
-          <Text style={[styles.nextButtonText, !selectedId && styles.nextButtonTextDisabled]}>Next  →</Text>
+          <Text style={[styles.nextButtonText, !isDark && { color: themePalette.hex_ffffff }, !selectedId && { color: isDark ? themePalette.hex_64748b : colors.subtle }]}>Next  →</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.skipButton} activeOpacity={0.7} onPress={() => navigation.navigate('RegisterJurisdiction')}>
-          <Text style={styles.skipText}>
+          <Text style={[styles.skipText, { color: colors.muted }]}>
             <Text style={styles.skipHighlight}>Skip</Text> and browse all countries
           </Text>
         </TouchableOpacity>
@@ -340,10 +337,9 @@ export default function CompanyPurposeScreen({ navigation, route }) {
   );
 }
 
-const styles = makeThemeStyles(() => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: themePalette.hex_0b0e17,
   },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
   header: {
@@ -355,98 +351,39 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     paddingVertical: s(12),
     marginTop: s(24),
   },
-  iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: themePalette.hex_161b29,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.lg,
-    fontWeight: 'bold',
-  },
-  brandContainer: {
-    alignItems: 'center',
-  },
-  brandTitle: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.md,
-    fontWeight: 'bold',
-  },
-  brandSubtitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.micro,
-    letterSpacing: 1.2,
-    marginTop: s(1),
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: s(20),
-    marginTop: s(4),
-    marginBottom: s(20),
-    justifyContent: 'flex-start',
-    gap: s(8),
-  },
-  progressStep: {
-    flex: 1,
-    height: 3,
-    backgroundColor: themePalette.hex_1e2638,
-    marginHorizontal: s(3),
-    borderRadius: 2,
-  },
-  progressActive: {
-    backgroundColor: themePalette.hex_8b5cf6,
-  },
   scrollContent: {
     paddingHorizontal: s(20),
     paddingBottom: s(20),
   },
-  questionStepText: {
-    color: themePalette.hex_8b5cf6,
-    fontSize: font.small,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    marginBottom: s(8),
-  },
   title: {
     fontSize: font.display,
-    fontWeight: '400',
-    color: themePalette.hex_ffffff,
+    fontWeight: '500',
     lineHeight: 34,
   },
   titleItalic: {
     fontStyle: 'italic',
     color: themePalette.hex_d1a253,
     fontWeight: '300',
+    fontFamily: 'serif',
   },
   subtitle: {
     fontSize: font.bodySmall,
-    color: themePalette.hex_64748b,
     marginTop: s(8),
     marginBottom: s(24),
+    lineHeight: 20,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: themePalette.hex_121724,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: themePalette.hex_1e2638,
     padding: s(16),
     marginBottom: s(12),
-  },
-  optionCardSelected: {
-    borderColor: themePalette.hex_d1a253,
-    backgroundColor: themePalette.hex_161c2c,
   },
   iconContainer: {
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: themePalette.hex_1e2638,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(14),
@@ -459,13 +396,11 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     paddingRight: s(8),
   },
   optionTitle: {
-    color: themePalette.hex_ffffff,
     fontSize: font.base,
     fontWeight: '600',
     marginBottom: s(4),
   },
   optionDescription: {
-    color: themePalette.hex_64748b,
     fontSize: font.sm,
     lineHeight: 16,
   },
@@ -474,7 +409,6 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     height: 22,
     borderRadius: 11,
     borderWidth: 1.5,
-    borderColor: themePalette.hex_334155,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -494,8 +428,6 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   bottomContainer: {
     paddingHorizontal: s(20),
     paddingTop: s(12),
-    paddingBottom: s(20),
-    backgroundColor: themePalette.hex_0b0e17,
   },
   nextButton: {
     backgroundColor: themePalette.hex_d1a253,
@@ -509,23 +441,15 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     fontSize: font.lg,
     fontWeight: '700',
   },
-  nextButtonDisabled: {
-    backgroundColor: themePalette.hex_1e293b,
-    opacity: 0.6,
-  },
-  nextButtonTextDisabled: {
-    color: themePalette.hex_64748b,
-  },
   skipButton: {
     alignItems: 'center',
     marginTop: s(14),
   },
   skipText: {
-    color: themePalette.hex_64748b,
     fontSize: font.bodySmall,
   },
   skipHighlight: {
     color: themePalette.hex_d1a253,
     fontWeight: '600',
   },
-}));
+});

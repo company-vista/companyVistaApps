@@ -17,7 +17,7 @@ import { font } from '../../../theme/typography';
 import { getCountryPrice, getCountryPriceLabel } from '../../../constants/countries';
 import { PURPOSES } from './CompanyPurposeScreen';
 import { scoreJurisdictions } from './advisor';
-import { themePalette, makeThemeStyles } from '../../../theme/colors';
+import { themePalette, useThemeColors } from '../../../theme/colors';
 
 export const US_STATES = [
   { code: 'WY', name: 'Wyoming', popularityRank: 1, tag: 'Best value', tagline: 'Best value, strong privacy', snippet: 'Lowest running costs in the US with no income tax and members kept off public record.', bestFor: 'Solo founders, e-commerce, holding companies, cost-conscious setups', keyPoints: ['$100 state fee — excellent value', 'No state income, franchise or gross receipts tax', 'Members not disclosed on public filings', 'Lifetime proxy permitted for added anonymity'], govtFees: { formation: 100, annual: 60, annualFrequency: 'annual', currency: 'USD', annualNote: 'Annual report licence tax, $60 minimum, based on assets located in Wyoming.', verified: true, source: 'CompanyVista official rate card' }, timeline: '3–5 days', serviceFee: 299, stateIncomeTax: 'None', anonymousLLC: true, entityTypes: ['LLC', 'C-CORP', 'S-CORP', 'NONPROFIT'], packageIncludes: ['Name availability check', 'Registered Address (1 year)', 'Registered Agent (1 year)', 'EIN application', 'Bank account assistance'], totalFirstYear: 399, staffing: { employmentAgencyLicence: false, suretyBondRequired: false, workersCompRequired: true, note: 'No staffing licence. Formation-only state for most agencies.', verified: false } },
@@ -119,6 +119,8 @@ export default function BestMatchesScreen({ navigation, route }) {
   const params = route?.params || {};
   const { purpose, customerLocation, priorities = [], dayOneNeeds = [] } = params;
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   // Dynamic filter tags based on user selections
   const purposeLabelMap = {
@@ -287,8 +289,8 @@ export default function BestMatchesScreen({ navigation, route }) {
   const strongAlts = remaining.slice(0, 3);
   const alsoPossible = remaining.slice(3);
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_0b0e17} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -301,10 +303,10 @@ export default function BestMatchesScreen({ navigation, route }) {
         showsVerticalScrollIndicator={false}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Your best <Text style={styles.titleItalic}>matches</Text>
         </Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.subtitle, { color: colors.muted }]}>
           {allJurisdictions.length} jurisdictions ranked against your answers.
         </Text>
 
@@ -315,672 +317,261 @@ export default function BestMatchesScreen({ navigation, route }) {
               key={tag.id}
               style={[
                 styles.tagPill,
-                tag.isAction && styles.actionTagPill,
+                { backgroundColor: isDark ? themePalette.hex_151329 : colors.surface, borderColor: isDark ? themePalette.hex_2d264a : colors.border },
+                tag.isAction && { backgroundColor: isDark ? themePalette.hex_121724 : colors.surfaceAlt, borderColor: isDark ? themePalette.hex_1e2638 : colors.border },
               ]}
               activeOpacity={0.8}
               onPress={tag.isAction ? () => navigation.navigate('CompanyPurpose', params) : undefined}
             >
-              <Text style={styles.tagText}>{tag.label}</Text>
+              <Text style={[styles.tagText, { color: isDark ? themePalette.hex_a5b4fc : colors.primary }]}>{tag.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Best Match Main Card */}
-        <View style={styles.matchCard}>
-          {/* Badge */}
-          <View style={styles.bestMatchBadge}>
+        <View style={[styles.matchCard, { backgroundColor: isDark ? themePalette.hex_121622 : colors.surface, borderColor: isDark ? themePalette.hex_3d321d : '#E5D5A8' }]}>
+          <View style={[styles.bestMatchBadge, { backgroundColor: isDark ? themePalette.hex_262013 : '#FFFBEB' }]}>
             <Text style={styles.badgeText}>★ BEST MATCH</Text>
           </View>
 
-          {/* Header Info - dynamic best */}
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderLeft}>
-              <Text style={styles.countryCodeText}>{best.flag}</Text>
+              <Text style={[styles.countryCodeText, { color: isDark ? themePalette.hex_334155 : colors.subtle }]}>{best.flag}</Text>
               <View>
-                <Text style={styles.countryName}>{best.name}</Text>
-                <Text style={styles.stateSubtitle}>{best.subtitle}</Text>
+                <Text style={[styles.countryName, { color: colors.text }]}>{best.name}</Text>
+                <Text style={[styles.stateSubtitle, { color: colors.muted }]}>{best.subtitle}</Text>
               </View>
             </View>
-
             <View style={styles.matchPercentageContainer}>
               <Text style={styles.matchPercentage}>{best.match}%</Text>
-              <Text style={styles.matchLabel}>MATCH</Text>
+              <Text style={[styles.matchLabel, { color: colors.subtle }]}>MATCH</Text>
             </View>
           </View>
 
-          {/* Why this jurisdiction — allJurisdictions ke usi entry se, live */}
-          <View style={styles.whyBlock}>
-            <Text style={styles.whyDesc}>{bestDesc}</Text>
-
+          <View style={[styles.whyBlock, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
+            <Text style={[styles.whyDesc, { color: isDark ? themePalette.hex_cbd5e1 : colors.muted }]}>{bestDesc}</Text>
             <View style={styles.scoreRow}>
-              <Text style={styles.scoreText}>Match score {Math.round(best.score)}</Text>
-              <View style={styles.scoreDot} />
-              <Text style={styles.scoreText}>Rank #{bestRankIndex} of {ranked.length}</Text>
+              <Text style={[styles.scoreText, { color: colors.subtle }]}>Match score {Math.round(best.score)}</Text>
+              <View style={[styles.scoreDot, { backgroundColor: isDark ? themePalette.hex_334155 : colors.border }]} />
+              <Text style={[styles.scoreText, { color: colors.subtle }]}>Rank #{bestRankIndex} of {ranked.length}</Text>
             </View>
 
             {bestFitReasons.length > 0 && (
               <View style={styles.fitChips}>
                 {bestFitReasons.map((reason, index) => (
-                  <View key={`${reason.label}-${index}`} style={[styles.fitChip, reason.tone === 'strong' && styles.fitChipStrong]}>
-                    <Text style={[styles.fitChipIcon, reason.tone === 'strong' && styles.fitChipIconStrong]}>{reason.tone === 'strong' ? '★' : '✓'}</Text>
-                    <Text style={[styles.fitChipText, reason.tone === 'strong' && styles.fitChipTextStrong]}>{reason.label}</Text>
+                  <View key={`${reason.label}-${index}`} style={[styles.fitChip, reason.tone === 'strong' && styles.fitChipStrong, { backgroundColor: isDark ? (reason.tone === 'strong' ? themePalette.hex_262013 : themePalette.hex_0e1b18) : (reason.tone === 'strong' ? '#FFFBEB' : '#ECFDF5'), borderColor: isDark ? (reason.tone === 'strong' ? themePalette.hex_3d321d : themePalette.hex_1e3a34) : (reason.tone === 'strong' ? '#FDE68A' : '#A7F3D0') }]}>
+                    <Text style={[styles.fitChipIcon, reason.tone === 'strong' && styles.fitChipIconStrong]}>{reason.tone === 'strong' ? '★' : '•'}</Text>
+                    <Text style={[styles.fitChipText, reason.tone === 'strong' && styles.fitChipTextStrong, !isDark && reason.tone !== 'strong' && { color: '#065F46' }]}>{reason.label}</Text>
                   </View>
                 ))}
               </View>
             )}
 
             {bestCaution && (
-              <View style={styles.cautionRow}>
-                <Text style={styles.cautionIcon}>⚠</Text>
-                <Text style={styles.cautionText}>
-                  <Text style={styles.cautionBold}>Caution:</Text> {purposeLabel} ke liye ye jurisdiction recommended nahi hai — kuch aur dekhna behtar hoga.
+              <View style={[styles.cautionRow, { backgroundColor: isDark ? themePalette.hex_1e1b18 : '#FFFBEB', borderColor: isDark ? themePalette.hex_3d321d : '#FDE68A' }]}>
+                <Text style={styles.cautionIcon}>!</Text>
+                <Text style={[styles.cautionText, { color: colors.muted }]}>
+                  <Text style={styles.cautionBold}>Caution:</Text> {purposeLabel} ke liye ye jurisdiction recommended nahi hai - kuch aur dekhna behtar hoga.
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Jurisdiction profile — wahi numbers jo score me multiply hue */}
           {profileRows.length > 0 && (
-            <View style={styles.profileBlock}>
-              <Text style={styles.profileTitle}>JURISDICTION PROFILE</Text>
+            <View style={[styles.profileBlock, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
+              <Text style={[styles.profileTitle, { color: colors.subtle }]}>JURISDICTION PROFILE</Text>
               {profileRows.map(row => (
                 <View key={row.key} style={styles.profileRow}>
-                  <Text style={styles.profileLabel}>{row.label}</Text>
-                  <View style={styles.profileTrack}>
+                  <Text style={[styles.profileLabel, { color: colors.muted }]}>{row.label}</Text>
+                  <View style={[styles.profileTrack, { backgroundColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
                     <View style={[styles.profileFill, { width: `${(row.value / 3) * 100}%` }]} />
                   </View>
-                  <Text style={styles.profileValue}>{row.value}/3</Text>
+                  <Text style={[styles.profileValue, { color: colors.subtle }]}>{row.value}/3</Text>
                 </View>
               ))}
             </View>
           )}
 
-          {/* Features List */}
-          <View style={styles.featuresList}>
+          <View style={[styles.featuresList, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
             {FEATURES.map((item, index) => (
               <View key={index} style={styles.featureItem}>
                 <Text style={styles.checkIcon}>✓</Text>
-                <Text style={styles.featureText}>
-                  <Text style={styles.featureBold}>{item.boldText}</Text>
+                <Text style={[styles.featureText, { color: colors.muted }]}>
+                  <Text style={[styles.featureBold, { color: colors.text }]}>{item.boldText}</Text>
                   {item.normalText}
                 </Text>
               </View>
             ))}
           </View>
 
-          {/* Warning Note */}
-          <View style={styles.warningCard}>
-            <Text style={styles.warningIcon}>⚠️</Text>
-            <Text style={styles.warningText}>
+          <View style={[styles.warningCard, { backgroundColor: isDark ? themePalette.hex_1e1b18 : '#FFFBEB', borderColor: isDark ? themePalette.hex_3d321d : '#FDE68A' }]}>
+            <Text style={styles.warningIcon}>⚠</Text>
+            <Text style={[styles.warningText, { color: colors.muted }]}>
               <Text style={styles.warningBold}>Watch:</Text> registering in every state where you place workers. Budget for multi-state payroll.
             </Text>
           </View>
 
-          {/* Price Footer - sirf fixed-price jurisdictions (US/Canada/UK/Hong Kong) show price (registry se), others Custom quote */}
-          <View style={styles.cardFooter}>
+          <View style={[styles.cardFooter, { borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]}>
             {showPrice ? (
               <View style={styles.priceContainer}>
                 <Text style={styles.priceAmount}>{priceLabel}</Text>
-                <Text style={styles.priceNote}>incl. service package</Text>
+                <Text style={[styles.priceNote, { color: colors.subtle }]}>incl. service package</Text>
               </View>
             ) : (
               <View style={styles.priceContainer}>
                 <Text style={styles.customQuoteText}>Custom quote</Text>
               </View>
             )}
-            <Text style={styles.timeframeText}>3–7 days</Text>
+            <Text style={[styles.timeframeText, { color: colors.subtle }]}>3-7 days</Text>
           </View>
         </View>
-
         {/* Strong Alternatives Header */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>STRONG ALTERNATIVES</Text>
-          <View style={styles.sectionDivider} />
+          <Text style={[styles.sectionTitle, { color: colors.subtle }]}>STRONG ALTERNATIVES</Text>
+          <View style={[styles.sectionDivider, { backgroundColor: isDark ? themePalette.hex_1e2638 : colors.border }]} />
         </View>
 
         {strongAlts.map(item => (
-          <TouchableOpacity key={item.name} style={styles.altCard} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
+          <TouchableOpacity key={item.name} style={[styles.altCard, { backgroundColor: isDark ? themePalette.hex_121622 : colors.surface, borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
             <View style={styles.altLeft}>
               <Text style={styles.altFlag}>{item.flag}</Text>
               <View style={styles.altTextWrap}>
-                <Text style={styles.altName}>{item.name}</Text>
-                <Text style={styles.altDesc}>{item.desc}</Text>
+                <Text style={[styles.altName, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.altDesc, { color: colors.muted }]}>{item.desc}</Text>
               </View>
             </View>
             <View style={styles.altMatchWrap}>
               <Text style={styles.altMatch}>{item.match}%</Text>
-              <Text style={styles.altMatchLabel}>MATCH</Text>
+              <Text style={[styles.altMatchLabel, { color: colors.subtle }]}>MATCH</Text>
             </View>
           </TouchableOpacity>
         ))}
 
         <View style={[styles.sectionHeader, { marginTop: s(18) }]}>
-          <Text style={styles.sectionTitle}>ALSO POSSIBLE</Text>
-          <View style={styles.sectionDivider} />
+          <Text style={[styles.sectionTitle, { color: colors.subtle }]}>ALSO POSSIBLE</Text>
+          <View style={[styles.sectionDivider, { backgroundColor: isDark ? themePalette.hex_1e2638 : colors.border }]} />
         </View>
 
         {alsoPossible.map(item => (
-          <TouchableOpacity key={item.name} style={[styles.altCard, styles.altCardSmall]} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
+          <TouchableOpacity key={item.name} style={[styles.altCard, { backgroundColor: isDark ? themePalette.hex_0f1420 : colors.surfaceAlt, borderColor: isDark ? themePalette.hex_1e2638 : colors.border }]} activeOpacity={0.7} onPress={() => setSelectedBest(item)}>
             <View style={styles.altLeft}>
               <Text style={[styles.altFlag, { fontSize: font.hero }]}>{item.flag}</Text>
               <View style={styles.altTextWrap}>
-                <Text style={[styles.altName, { fontSize: font.base }]}>{item.name}</Text>
-                <Text style={styles.altDesc}>{item.desc}</Text>
+                <Text style={[styles.altName, { fontSize: font.base, color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.altDesc, { color: colors.muted }]}>{item.desc}</Text>
               </View>
             </View>
             <View style={styles.altMatchWrap}>
               <Text style={[styles.altMatch, { fontSize: font.lg }]}>{item.match}%</Text>
-              <Text style={styles.altMatchLabel}>MATCH</Text>
+              <Text style={[styles.altMatchLabel, { color: colors.subtle }]}>MATCH</Text>
             </View>
           </TouchableOpacity>
         ))}
 
-        <View style={styles.excludedCard}>
-          <Text style={styles.excludedText}>4 jurisdictions excluded. BVI, Cayman, Belize and Seychelles cannot practically employ or place workers.</Text>
+        <View style={[styles.excludedCard, { backgroundColor: isDark ? themePalette.hex_1a1a1a : '#FEF2F2', borderColor: isDark ? themePalette.hex_2a2a2a : '#FECACA' }]}>
+          <Text style={[styles.excludedText, { color: colors.muted }]}>4 jurisdictions excluded. BVI, Cayman, Belize and Seychelles cannot practically employ or place workers.</Text>
         </View>
-        <Text style={styles.guidanceText}>Guidance only, not tax advice. We will flag anything unusual about your case before filing.</Text>
+        <Text style={[styles.guidanceText, { color: colors.subtle }]}>Guidance only, not tax advice. We will flag anything unusual about your case before filing.</Text>
       </ScrollView>
 
       {/* Bottom Action Area */}
-      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom }]}>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8} onPress={handleContinue}>
-          <Text style={styles.actionButtonText}>
-            Continue with {best.name}  →
-          </Text>
+      <View style={[styles.bottomContainer, { paddingBottom: s(20) + insets.bottom, backgroundColor: colors.background }]}>
+        <TouchableOpacity style={[styles.actionButton, !isDark && { backgroundColor: themePalette.hex_2563eb }]} activeOpacity={0.8} onPress={handleContinue}>
+          <Text style={[styles.actionButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Continue with {best.name}  →</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.browseButton} activeOpacity={0.7}>
-          <Text style={styles.browseText}>
-            You can still browse all 50 countries
-          </Text>
+          <Text style={[styles.browseText, { color: colors.muted }]}>You can still browse all 50 countries</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = makeThemeStyles(() => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: themePalette.hex_0b0e17,
-  },
+const styles = StyleSheet.create({
+  container: { flex: 1 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10) },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    paddingHorizontal: s(16),
-    paddingVertical: s(12),
-    marginTop: s(24),
-  },
-  iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: themePalette.hex_161b29,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.lg,
-    fontWeight: 'bold',
-  },
-  brandContainer: {
-    alignItems: 'center',
-  },
-  brandTitle: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.md,
-    fontWeight: 'bold',
-  },
-  brandSubtitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.micro,
-    letterSpacing: 1.2,
-    marginTop: s(1),
-  },
-  scrollContent: {
-    paddingHorizontal: s(16),
-    paddingBottom: s(20),
-  },
-  title: {
-    fontSize: font.display,
-    fontWeight: '500',
-    color: themePalette.hex_ffffff,
-    marginTop: s(8),
-  },
-  titleItalic: {
-    fontStyle: 'italic',
-    color: themePalette.hex_d1a253,
-    fontWeight: '300',
-  },
-  subtitle: {
-    fontSize: font.bodySmall,
-    color: themePalette.hex_64748b,
-    marginTop: s(6),
-    marginBottom: s(16),
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: s(8),
-    marginBottom: s(20),
-  },
-  tagPill: {
-    backgroundColor: themePalette.hex_151329,
-    paddingHorizontal: s(12),
-    paddingVertical: s(6),
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: themePalette.hex_2d264a,
-  },
-  actionTagPill: {
-    backgroundColor: themePalette.hex_121724,
-    borderColor: themePalette.hex_1e2638,
-  },
-  tagText: {
-    color: themePalette.hex_a5b4fc,
-    fontSize: font.sm,
-    fontWeight: '500',
-  },
-  matchCard: {
-    backgroundColor: themePalette.hex_121622,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: themePalette.hex_3d321d,
-    padding: s(16),
-    marginBottom: s(24),
-  },
-  bestMatchBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: themePalette.hex_262013,
-    borderColor: themePalette.hex_d1a253,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: s(10),
-    paddingVertical: s(4),
-    marginBottom: s(16),
-  },
-  badgeText: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.xs,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    alignItems: 'center',
-    marginBottom: s(20),
-  },
-  cardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  countryCodeText: {
-    fontSize: font.displayMedium,
-    fontWeight: 'bold',
-    color: themePalette.hex_334155,
-    marginRight: s(12),
-  },
-  countryName: {
-    color: themePalette.hex_ffffff,
-    fontSize: font.hero,
-    fontWeight: 'bold',
-  },
-  stateSubtitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-    marginTop: s(2),
-  },
-  matchPercentageContainer: {
-    alignItems: 'flex-end',
-  },
-  matchPercentage: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.displayMedium,
-    fontWeight: '300',
-  },
-  matchLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.caption,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  whyBlock: {
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(14),
-    marginBottom: s(16),
-  },
-  whyDesc: {
-    color: themePalette.hex_cbd5e1,
-    fontSize: font.bodySmall,
-    lineHeight: 19,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: s(8),
-    marginTop: s(10),
-  },
-  scoreText: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-  scoreDot: {
-    width: 3,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: themePalette.hex_334155,
-  },
-  fitChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: s(6),
-    marginTop: s(12),
-  },
-  fitChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: themePalette.hex_0e1b18,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e3a34,
-    borderRadius: 14,
-    paddingHorizontal: s(9),
-    paddingVertical: s(4),
-  },
-  fitChipStrong: {
-    backgroundColor: themePalette.hex_262013,
-    borderColor: themePalette.hex_3d321d,
-  },
-  fitChipIcon: {
-    color: themePalette.hex_10b981,
-    fontSize: font.xs,
-    marginRight: s(5),
-  },
-  fitChipIconStrong: {
-    color: themePalette.hex_d1a253,
-  },
-  fitChipText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.small,
-  },
-  fitChipTextStrong: {
-    color: themePalette.hex_d1a253,
-    fontWeight: '700',
-  },
-  cautionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: themePalette.hex_1e1b18,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: themePalette.hex_3d321d,
-    padding: s(10),
-    marginTop: s(10),
-  },
-  cautionIcon: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.sm,
-    marginRight: s(8),
-    marginTop: s(1),
-  },
-  cautionText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.sm,
-    lineHeight: 16,
-    flex: 1,
-  },
-  cautionBold: {
-    color: themePalette.hex_d1a253,
-    fontWeight: '700',
-  },
-  profileBlock: {
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(14),
-    marginBottom: s(16),
-  },
-  profileTitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.xs,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    marginBottom: s(10),
-  },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: s(7),
-  },
-  profileLabel: {
-    width: s(104),
-    color: themePalette.hex_94a3b8,
-    fontSize: font.small,
-  },
-  profileTrack: {
-    flex: 1,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: themePalette.hex_1e2638,
-    overflow: 'hidden',
-    marginRight: s(8),
-  },
-  profileFill: {
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: themePalette.hex_d1a253,
-  },
-  profileValue: {
-    width: s(28),
-    color: themePalette.hex_64748b,
-    fontSize: font.xs,
-    textAlign: 'right',
-  },
-  featuresList: {
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(16),
-    marginBottom: s(16),
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: s(12),
-  },
-  checkIcon: {
-    color: themePalette.hex_10b981,
-    fontSize: font.base,
-    marginRight: s(10),
-    marginTop: s(1),
-  },
-  featureText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.bodySmall,
-    lineHeight: 18,
-    flex: 1,
-  },
-  featureBold: {
-    color: themePalette.hex_ffffff,
-    fontWeight: 'bold',
-  },
-  warningCard: {
-    flexDirection: 'row',
-    backgroundColor: themePalette.hex_1e1b18,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: themePalette.hex_3d321d,
-    padding: s(12),
-    marginBottom: s(16),
-  },
-  warningIcon: {
-    fontSize: font.base,
-    marginRight: s(8),
-  },
-  warningText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.sm,
-    lineHeight: 16,
-    flex: 1,
-  },
-  warningBold: {
-    color: themePalette.hex_d1a253,
-    fontWeight: 'bold',
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: s(8),
-    alignItems: 'flex-end',
-    borderTopWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingTop: s(14),
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  priceAmount: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.hero,
-    fontWeight: 'bold',
-    marginRight: s(8),
-  },
-  priceNote: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-  },
-  customQuoteText: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.lg,
-    fontWeight: '700',
-    fontStyle: 'italic',
-  },
-  timeframeText: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    fontWeight: 'bold',
-    letterSpacing: 1.2,
-    marginRight: s(12),
-  },
-  sectionDivider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: themePalette.hex_1e2638,
-  },
-  altCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: themePalette.hex_121622,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: themePalette.hex_1e2638,
-    paddingHorizontal: s(14),
-    paddingVertical: s(12),
-    marginTop: s(10),
-  },
-  altCardSmall: {
-    backgroundColor: themePalette.hex_0f1420,
-    borderColor: themePalette.hex_1e2638,
-  },
-  altLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: s(10),
-  },
-  altFlag: {
-    fontSize: font.display,
-  },
-  altTextWrap: {
-    flex: 1,
-  },
-  altName: {
-    color: themePalette.hex_ffffff,
-    fontSize: font.md,
-    fontWeight: '600',
-  },
-  altDesc: {
-    color: themePalette.hex_64748b,
-    fontSize: font.small,
-    marginTop: s(2),
-    lineHeight: 14,
-  },
-  altMatchWrap: {
-    alignItems: 'flex-end',
-    marginLeft: s(8),
-  },
-  altMatch: {
-    color: themePalette.hex_d1a253,
-    fontSize: font.xxl,
-    fontWeight: '700',
-  },
-  altMatchLabel: {
-    color: themePalette.hex_64748b,
-    fontSize: font.tiny,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  excludedCard: {
-    backgroundColor: themePalette.hex_1a1a1a,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: themePalette.hex_2a2a2a,
-    padding: s(12),
-    marginTop: s(16),
-  },
-  excludedText: {
-    color: themePalette.hex_94a3b8,
-    fontSize: font.small,
-    lineHeight: 15,
-    textAlign: 'center',
-  },
-  guidanceText: {
-    color: themePalette.hex_475569,
-    fontSize: font.xs,
-    textAlign: 'center',
-    marginTop: s(10),
-    lineHeight: 14,
-  },
-  bottomContainer: {
-    paddingHorizontal: s(20),
-    paddingTop: s(12),
-    paddingBottom: s(20),
-    backgroundColor: themePalette.hex_0b0e17,
-  },
-  actionButton: {
-    backgroundColor: themePalette.hex_d1a253,
-    borderRadius: 24,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionButtonText: {
-    color: themePalette.hex_0b0e17,
-    fontSize: font.md,
-    fontWeight: '700',
-  },
-  browseButton: {
-    alignItems: 'center',
-    marginTop: s(12),
-  },
-  browseText: {
-    color: themePalette.hex_64748b,
-    fontSize: font.sm,
-  },
-}));
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: s(8), paddingHorizontal: s(16), paddingVertical: s(12), marginTop: s(24) },
+  iconButton: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  iconText: { fontSize: font.lg, fontWeight: 'bold' },
+  brandContainer: { alignItems: 'center' },
+  brandTitle: { color: themePalette.hex_d1a253, fontSize: font.md, fontWeight: 'bold' },
+  brandSubtitle: { fontSize: font.micro, letterSpacing: 1.2, marginTop: s(1) },
+  scrollContent: { paddingHorizontal: s(16), paddingBottom: s(20) },
+  title: { fontSize: font.display, fontWeight: '500', marginTop: s(8) },
+  titleItalic: { fontStyle: 'italic', color: themePalette.hex_d1a253, fontWeight: '300', fontFamily: 'serif' },
+  subtitle: { fontSize: font.bodySmall, marginTop: s(6), marginBottom: s(16) },
+  tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: s(8), marginBottom: s(20) },
+  tagPill: { paddingHorizontal: s(12), paddingVertical: s(6), borderRadius: 16, borderWidth: 1 },
+  tagText: { fontSize: font.sm, fontWeight: '500' },
+  matchCard: { borderRadius: 20, borderWidth: 1, padding: s(16), marginBottom: s(24) },
+  bestMatchBadge: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 12, paddingHorizontal: s(10), paddingVertical: s(4), marginBottom: s(16) },
+  badgeText: { color: themePalette.hex_d1a253, fontSize: font.xs, fontWeight: 'bold', letterSpacing: 0.5 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'flex-start', gap: s(8), alignItems: 'center', marginBottom: s(20) },
+  cardHeaderLeft: { flexDirection: 'row', alignItems: 'center' },
+  countryCodeText: { fontSize: font.displayMedium, fontWeight: 'bold', marginRight: s(12) },
+  countryName: { fontSize: font.hero, fontWeight: 'bold' },
+  stateSubtitle: { fontSize: font.sm, marginTop: s(2) },
+  matchPercentageContainer: { alignItems: 'flex-end' },
+  matchPercentage: { color: themePalette.hex_d1a253, fontSize: font.displayMedium, fontWeight: '300' },
+  matchLabel: { fontSize: font.caption, fontWeight: 'bold', letterSpacing: 1 },
+  whyBlock: { borderTopWidth: 1, paddingTop: s(14), marginBottom: s(16) },
+  whyDesc: { fontSize: font.bodySmall, lineHeight: 19 },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: s(8), marginTop: s(10) },
+  scoreText: { fontSize: font.small, fontWeight: '600', letterSpacing: 0.3 },
+  scoreDot: { width: 3, height: 3, borderRadius: 2 },
+  fitChips: { flexDirection: 'row', flexWrap: 'wrap', gap: s(6), marginTop: s(12) },
+  fitChip: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 14, paddingHorizontal: s(9), paddingVertical: s(4) },
+  fitChipStrong: {},
+  fitChipIcon: { color: themePalette.hex_10b981, fontSize: font.xs, marginRight: s(5) },
+  fitChipIconStrong: { color: themePalette.hex_d1a253 },
+  fitChipText: { fontSize: font.small },
+  fitChipTextStrong: { color: themePalette.hex_d1a253, fontWeight: '700' },
+  cautionRow: { flexDirection: 'row', alignItems: 'flex-start', borderRadius: 10, borderWidth: 1, padding: s(10), marginTop: s(10) },
+  cautionIcon: { color: themePalette.hex_d1a253, fontSize: font.sm, marginRight: s(8), marginTop: s(1) },
+  cautionText: { fontSize: font.sm, lineHeight: 16, flex: 1 },
+  cautionBold: { color: themePalette.hex_d1a253, fontWeight: '700' },
+  profileBlock: { borderTopWidth: 1, paddingTop: s(14), marginBottom: s(16) },
+  profileTitle: { fontSize: font.xs, fontWeight: '700', letterSpacing: 1.2, marginBottom: s(10) },
+  profileRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(7) },
+  profileLabel: { width: s(104), fontSize: font.small },
+  profileTrack: { flex: 1, height: 5, borderRadius: 3, overflow: 'hidden', marginRight: s(8) },
+  profileFill: { height: 5, borderRadius: 3, backgroundColor: themePalette.hex_d1a253 },
+  profileValue: { width: s(28), fontSize: font.xs, textAlign: 'right' },
+  featuresList: { borderTopWidth: 1, paddingTop: s(16), marginBottom: s(16) },
+  featureItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: s(12) },
+  checkIcon: { color: themePalette.hex_10b981, fontSize: font.base, marginRight: s(10), marginTop: s(1) },
+  featureText: { fontSize: font.bodySmall, lineHeight: 18, flex: 1 },
+  featureBold: { fontWeight: 'bold' },
+  warningCard: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, padding: s(12), marginBottom: s(16) },
+  warningIcon: { fontSize: font.base, marginRight: s(8) },
+  warningText: { fontSize: font.sm, lineHeight: 16, flex: 1 },
+  warningBold: { color: themePalette.hex_d1a253, fontWeight: 'bold' },
+  cardFooter: { flexDirection: 'row', justifyContent: 'flex-start', gap: s(8), alignItems: 'flex-end', borderTopWidth: 1, paddingTop: s(14) },
+  priceContainer: { flexDirection: 'row', alignItems: 'baseline' },
+  priceAmount: { color: themePalette.hex_d1a253, fontSize: font.hero, fontWeight: 'bold', marginRight: s(8) },
+  priceNote: { fontSize: font.small },
+  customQuoteText: { color: themePalette.hex_d1a253, fontSize: font.lg, fontWeight: '700', fontStyle: 'italic' },
+  timeframeText: { fontSize: font.sm },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center' },
+  sectionTitle: { fontSize: font.small, fontWeight: 'bold', letterSpacing: 1.2, marginRight: s(12) },
+  sectionDivider: { flex: 1, height: 1 },
+  altCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 14, borderWidth: 1, paddingHorizontal: s(14), paddingVertical: s(12), marginTop: s(10) },
+  altCardSmall: {},
+  altLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: s(10) },
+  altFlag: { fontSize: font.display },
+  altTextWrap: { flex: 1 },
+  altName: { fontSize: font.md, fontWeight: '600' },
+  altDesc: { fontSize: font.small, marginTop: s(2), lineHeight: 14 },
+  altMatchWrap: { alignItems: 'flex-end', marginLeft: s(8) },
+  altMatch: { color: themePalette.hex_d1a253, fontSize: font.xxl, fontWeight: '700' },
+  altMatchLabel: { fontSize: font.tiny, fontWeight: '700', letterSpacing: 0.8 },
+  excludedCard: { borderRadius: 10, borderWidth: 1, padding: s(12), marginTop: s(16) },
+  excludedText: { fontSize: font.small, lineHeight: 15, textAlign: 'center' },
+  guidanceText: { fontSize: font.xs, textAlign: 'center', marginTop: s(10), lineHeight: 14 },
+  bottomContainer: { paddingHorizontal: s(20), paddingTop: s(12) },
+  actionButton: { backgroundColor: themePalette.hex_d1a253, borderRadius: 24, height: 52, alignItems: 'center', justifyContent: 'center' },
+  actionButtonText: { color: themePalette.hex_0b0e17, fontSize: font.md, fontWeight: '700' },
+  browseButton: { alignItems: 'center', marginTop: s(12) },
+  browseText: { fontSize: font.sm },
+});

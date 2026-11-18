@@ -75,15 +75,12 @@ function NotificationScreen() {
         return () => {
             isMounted = false;
         };
-    }, [companyId]);
+    }, [companyId, token]);
     return (<>
         <ScrollView contentContainerStyle={[
             styles.scrollContent,
             { paddingBottom: safeAreaInsets.bottom + 24 },
-        ]} style={[
-            styles.screen,
-            { paddingTop: 8 },
-        ]}>
+        ]} style={styles.screen}>
             {isLoadingNotifications ? (<NotificationPageSkeleton />) : hasNotifications ? (<>
                 <View style={styles.filterRow}>
                     {notificationFilters.map(filter => {
@@ -227,6 +224,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     screen: {
         flex: 1,
         backgroundColor: 'transparent',
+        paddingTop: 8,
     },
     scrollContent: {
         paddingHorizontal: s(20),
@@ -256,7 +254,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     countText: {
         color: themePalette.hex_ffffff,
-        fontSize: font.lg,
+        fontSize: font.sm,
         fontWeight: '400',
     },
     filterRow: {
@@ -275,7 +273,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     activeFilterButton: {},
     filterButtonText: {
-        fontSize: font.md,
+        fontSize: font.bodySmall,
         fontWeight: '400',
     },
     activeFilterButtonText: {},
@@ -301,15 +299,15 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     emptyTitle: {
         color: themePalette.hex_111827,
-        fontSize: font.hero,
+        fontSize: font.lg,
         fontWeight: '400',
         marginTop: 18,
     },
     emptyText: {
         color: themePalette.hex_64748b,
-        fontSize: font.lg,
+        fontSize: font.sm,
         fontWeight: '400',
-        lineHeight: 20,
+        lineHeight: 18,
         marginTop: 8,
         textAlign: 'center',
     },
@@ -338,7 +336,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     notificationTitle: {
         color: themePalette.hex_111827,
-        fontSize: font.xl,
+        fontSize: font.md,
         fontWeight: '400',
         flex: 1,
     },
@@ -350,14 +348,14 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     notificationMessage: {
         color: themePalette.hex_64748b,
-        fontSize: font.base,
+        fontSize: font.bodySmall,
         fontWeight: '400',
         lineHeight: 19,
         marginTop: 4,
     },
     notificationTime: {
         color: themePalette.hex_94a3b8,
-        fontSize: font.base,
+        fontSize: font.sm,
         fontWeight: '400',
         marginTop: 8,
     },
@@ -418,7 +416,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     },
     deleteButtonText: {
         color: themePalette.hex_ffffff,
-        fontSize: font.xl,
+        fontSize: font.md,
         fontWeight: '400',
     },
     cancelButton: {
@@ -431,7 +429,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
         alignItems: 'center',
     },
     cancelButtonText: {
-        fontSize: font.xxl,
+        fontSize: font.md,
         fontWeight: '400',
     },
 }));

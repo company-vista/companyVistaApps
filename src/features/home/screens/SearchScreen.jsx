@@ -80,7 +80,7 @@ export default function SearchScreen({ route }) {
         if (!query.trim())
             return serviceActions;
         const q = query.toLowerCase();
-        return serviceActions.filter(s => s.label.toLowerCase().includes(q));
+        return serviceActions.filter(service => service.label.toLowerCase().includes(q));
     }, [query]);
     const filteredTrackingActions = useMemo(() => {
         if (!query.trim())
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         height: 50,
-        fontSize: font.xl,
+        fontSize: font.md,
     },
     sectionWrap: {
         paddingBottom: 4,

@@ -168,9 +168,9 @@ export default function WhatsIncludedScreen({ navigation, route }) {
 
       {/* Bottom Sticky Action Button Area */}
       <View style={[styles.footerContainer, { paddingBottom: s(24) + insets.bottom, paddingTop: s(14), backgroundColor: colors.background }]}>
-        <TouchableOpacity style={[styles.continueButton, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={handleContinue}>
-          <Text style={[styles.continueButtonText, { color: colors.buttonText }]}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color={colors.buttonText} />
+        <TouchableOpacity style={[styles.continueButton, !isDark && { backgroundColor: themePalette.hex_2563eb }]} activeOpacity={0.8} onPress={handleContinue}>
+          <Text style={[styles.continueButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Continue</Text>
+          <Ionicons name="arrow-forward" size={18} color={!isDark ? themePalette.hex_ffffff : colors.buttonText} />
         </TouchableOpacity>
 
         <Text style={[styles.footerSubtext, { color: colors.subtle }]}>

@@ -1,11 +1,9 @@
-import { font } from '../../../theme/typography';
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -15,15 +13,16 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from '../../../components/buttons/BackButton';
 import logoR from '../../../assets/images/logoR.png';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setPendingAddCompany, setPendingOrderData } from '../../../store/slices/authSlice';
 import { setPasswordApi } from '../api/orderApi';
 import { s } from '../../../theme/responsive';
-import { themePalette, makeThemeStyles } from '../../../theme/colors';
+import { useThemeColors, themePalette } from '../../../theme/colors';
+import { font } from '../../../theme/typography';
 
 export default function SetNewPasswordScreen(props) {
   const { navigation, route } = props;
@@ -40,6 +39,8 @@ export default function SetNewPasswordScreen(props) {
   const onPasswordSet = props.onPasswordSet || route?.params?.onPasswordSet;
   const onBackPress = props.onBackPress || route?.params?.onBackPress;
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = colors.mode === 'dark';
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,7 +56,7 @@ export default function SetNewPasswordScreen(props) {
 
   const strengthScore = Object.values(checks).filter(Boolean).length;
   const strengthLabel = ['Weak', 'Fair', 'Good', 'Strong'][strengthScore - 1] || 'Weak';
-  const strengthColor = strengthScore <= 1 ? themePalette.hex_ef4444 : strengthScore === 2 ? themePalette.hex_f59e0b : strengthScore === 3 ? themePalette.hex_22d3ee : themePalette.hex_10b981;
+  const strengthColor = strengthScore <= 1 ? colors.danger : strengthScore === 2 ? colors.warning : strengthScore === 3 ? colors.info : colors.success;
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
   const isConfirmError = confirmPassword.length > 0 && !passwordsMatch;
 
@@ -82,15 +83,12 @@ export default function SetNewPasswordScreen(props) {
       console.log('=== SET-PASSWORD RESPONSE RAW ===', JSON.stringify(respData, null, 2));
       if (respData?.success === false) throw new Error(respData?.message || 'Set password failed');
       Toast.show({ type: 'success', text1: 'Account registered', text2: 'Please continue' });
-      // Signup ke baad sidha Home nahi - Confirm & Review pe jaye, auto-login Status pe hoga
       if (onPasswordSet) {
         onPasswordSet();
       } else {
         dispatch(setPendingAddCompany(true));
         const from = route?.params?.from;
-        // from check ko loose kiya — companyId ho to FounderDetails flow hi hai, Review pe jana chahiye
         if (from === 'FounderDetails' || companyIdFromStore || route?.params?.companyId) {
-          // FounderDetails flow: after password -> ReviewAndConfirm
           if (navigation?.navigate) {
             const reviewParams = {
               selectedStructure: route?.params?.selectedStructure,
@@ -131,15 +129,10 @@ export default function SetNewPasswordScreen(props) {
               token,
             };
             console.log('=== SET PASSWORD -> REVIEW & SUBMIT DATA ===', JSON.stringify(reviewParams, null, 2));
-            // FIX: Always go to ReviewAndConfirm -> CompletePayment -> Status -> Home (no direct Home)
-            // Chahe price 0 (quoted) ho tab bhi Review pe bhejo, Home sirf Status ke Continue ke baad khulega
             dispatch(setPendingOrderData(reviewParams));
             if (navigation.replace) navigation.replace('ReviewAndConfirm', reviewParams);
             else navigation.navigate('ReviewAndConfirm', reviewParams);
           }
-        } else {
-          // Non-founder: auto-login ho gaya, Root Main pe switch karega - Login pe bhejne ki zarurat nahi
-          // Home khud khul jayega
         }
       }
     } catch (error) {
@@ -158,8 +151,8 @@ export default function SetNewPasswordScreen(props) {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor={themePalette.hex_070a12} />
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardView}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
@@ -168,86 +161,84 @@ export default function SetNewPasswordScreen(props) {
             <Image source={logoR} style={styles.topLogo} />
           </View>
 
-
-
           <View style={styles.textSection}>
-            <Text style={styles.title}>
-              Set your <Text style={styles.italicTitle}>password</Text>
+            <Text style={[styles.title, { color: colors.text }]}>
+              Set your <Text style={[styles.italicTitle, { color: isDark ? themePalette.hex_d4af37 : colors.primary }]}>password</Text>
             </Text>
-            <Text style={styles.description}>
+            <Text style={[styles.description, { color: colors.muted }]}>
               Create a strong password for{'\n'}
-              {email ? <Text style={styles.emailHighlight}>{email}</Text> : 'your new account'}
+              {email ? <Text style={{ color: isDark ? themePalette.hex_d4af37 : colors.primary, fontWeight: '700' }}>{email}</Text> : 'your new account'}
             </Text>
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.label}>NEW PASSWORD</Text>
-            <View style={[styles.inputContainer, newPassword.length > 0 && strengthScore === 4 && styles.inputContainerSuccess]}>
-              <Text style={styles.inputIcon}>🔒</Text>
+            <Text style={[styles.label, { color: colors.subtle }]}>NEW PASSWORD</Text>
+            <View style={[styles.inputContainer, { backgroundColor: colors.inputBackground, borderColor: newPassword.length > 0 && strengthScore === 4 ? colors.success : colors.inputBorder }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.subtle} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.inputText }]}
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry={!isPasswordVisible}
                 placeholder="Enter new password"
-                placeholderTextColor={themePalette.hex_6b7280}
+                placeholderTextColor={colors.inputPlaceholder}
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                <Text style={styles.eyeIcon}>{isPasswordVisible ? '🙈' : '👁'}</Text>
+                <Ionicons name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'} size={18} color={colors.subtle} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.strengthBarContainer}>
               {[0, 1, 2, 3].map(i => (
-                <View key={i} style={[styles.strengthSegment, i < strengthScore && { backgroundColor: strengthColor }]} />
+                <View key={i} style={[styles.strengthSegment, { backgroundColor: colors.border }, i < strengthScore && { backgroundColor: strengthColor }]} />
               ))}
             </View>
             <View style={styles.strengthLabelRow}>
-              <Text style={styles.subtext}>Password strength</Text>
-              <Text style={[styles.strengthText, { color: newPassword ? strengthColor : themePalette.hex_64748b }]}>
+              <Text style={[styles.subtext, { color: colors.subtle }]}>Password strength</Text>
+              <Text style={[styles.strengthText, { color: newPassword ? strengthColor : colors.subtle }]}>
                 {newPassword ? strengthLabel : '-'}
               </Text>
             </View>
 
-            <View style={styles.checklistCard}>
-              <CheckRow ok={checks.length} text="At least 8 characters" />
-              <CheckRow ok={checks.caseMix} text="One uppercase & lowercase letter" />
-              <CheckRow ok={checks.number} text="At least one number" />
-              <CheckRow ok={checks.special} text="One special character (!@#$)" />
+            <View style={[styles.checklistCard, { backgroundColor: isDark ? themePalette.hex_0b1120 : colors.surface, borderColor: colors.border }]}>
+              <CheckRow ok={checks.length} text="At least 8 characters" colors={colors} isDark={isDark} />
+              <CheckRow ok={checks.caseMix} text="One uppercase & lowercase letter" colors={colors} isDark={isDark} />
+              <CheckRow ok={checks.number} text="At least one number" colors={colors} isDark={isDark} />
+              <CheckRow ok={checks.special} text="One special character (!@#$)" colors={colors} isDark={isDark} />
             </View>
 
-            <Text style={styles.label}>CONFIRM PASSWORD</Text>
-            <View style={[styles.inputContainer, passwordsMatch && styles.inputContainerSuccess, isConfirmError && styles.inputContainerError]}>
-              <Text style={styles.inputIcon}>🔒</Text>
+            <Text style={[styles.label, { color: colors.subtle }]}>CONFIRM PASSWORD</Text>
+            <View style={[styles.inputContainer, { backgroundColor: colors.inputBackground, borderColor: passwordsMatch ? colors.success : isConfirmError ? colors.danger : colors.inputBorder }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.subtle} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.inputText }]}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!isPasswordVisible}
                 placeholder="Confirm password"
-                placeholderTextColor={themePalette.hex_6b7280}
+                placeholderTextColor={colors.inputPlaceholder}
                 autoCapitalize="none"
               />
-              {passwordsMatch ? <Text style={styles.successIcon}>✓</Text> : null}
+              {passwordsMatch ? <Ionicons name="checkmark-circle" size={18} color={colors.success} /> : null}
             </View>
             {confirmPassword.length > 0 && (
               <View style={styles.matchRow}>
-                <Text style={[styles.matchIcon, { color: passwordsMatch ? themePalette.hex_10b981 : themePalette.hex_ef4444 }]}>{passwordsMatch ? '✓' : '✕'}</Text>
-                <Text style={[styles.matchText, { color: passwordsMatch ? themePalette.hex_10b981 : themePalette.hex_ef4444 }]}>{passwordsMatch ? 'Passwords match' : 'Passwords do not match'}</Text>
+                <Ionicons name={passwordsMatch ? 'checkmark-circle' : 'close-circle'} size={14} color={passwordsMatch ? colors.success : colors.danger} />
+                <Text style={[styles.matchText, { color: passwordsMatch ? colors.success : colors.danger }]}>{passwordsMatch ? 'Passwords match' : 'Passwords do not match'}</Text>
               </View>
             )}
           </View>
 
           <View style={styles.footer}>
-            <Pressable style={[styles.submitButton, loading && { opacity: 0.7 }]} onPress={handleSetPassword} disabled={loading}>
-              {loading ? <ActivityIndicator color={themePalette.hex_070a12} /> : (
+            <TouchableOpacity style={[styles.submitButton, !isDark && { backgroundColor: themePalette.hex_2563eb }, loading && { opacity: 0.7 }]} onPress={handleSetPassword} disabled={loading} activeOpacity={0.85}>
+              {loading ? <ActivityIndicator color={isDark ? themePalette.hex_070a12 : themePalette.hex_ffffff} /> : (
                 <>
-                  <Text style={styles.submitButtonText}>Set Password & Continue</Text>
-                  <Text style={styles.arrowIcon}>→</Text>
+                  <Text style={[styles.submitButtonText, !isDark && { color: themePalette.hex_ffffff }]}>Set Password & Continue</Text>
+                  <Text style={[styles.arrowIcon, !isDark && { color: themePalette.hex_ffffff }]}>→</Text>
                 </>
               )}
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -255,58 +246,44 @@ export default function SetNewPasswordScreen(props) {
   );
 }
 
-function CheckRow({ ok, text }) {
+function CheckRow({ ok, text, colors, isDark }) {
   return (
     <View style={styles.checkRow}>
-      <View style={[styles.checkCircle, ok ? styles.checkCircleOk : styles.checkCircleOff]}>
-        <Text style={[styles.checkMark, { color: ok ? themePalette.hex_10b981 : themePalette.hex_64748b }]}>✓</Text>
+      <View style={[styles.checkCircle, { backgroundColor: ok ? (isDark ? themePalette.hex_064e3b : themePalette.rgba_16_185_129_0_15) : (isDark ? themePalette.hex_1e293b : colors.inputBackground) }]}>
+        <Ionicons name="checkmark" size={11} color={ok ? colors.success : colors.subtle} />
       </View>
-      <Text style={[styles.checkText, { color: ok ? themePalette.hex_10b981 : themePalette.hex_64748b }]}>{text}</Text>
+      <Text style={[styles.checkText, { color: ok ? colors.success : colors.subtle }]}>{text}</Text>
     </View>
   );
 }
 
-const styles = makeThemeStyles(() => StyleSheet.create({
-  container: { flex: 1, backgroundColor: themePalette.hex_070a12 },
+const styles = StyleSheet.create({
+  container: { flex: 1 },
   keyboardView: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingHorizontal: s(20), paddingBottom: 20, justifyContent: 'space-between' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6, marginTop: 6 },
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: 10 },
-  heroSection: { alignItems: 'center', marginTop: 12 },
-  lockOuterCard: { width: 106, height: 106, borderRadius: 30, borderWidth: 1, borderColor: themePalette.hex_0f5257, backgroundColor: themePalette.hex_051e24, justifyContent: 'center', alignItems: 'center' },
-  lockIconContainer: { width: 60, height: 60, borderRadius: 20, borderWidth: 1.5, borderColor: themePalette.hex_00f5d4, justifyContent: 'center', alignItems: 'center', backgroundColor: themePalette.hex_0b2b30 },
-  lockIcon: { fontSize: font.displayXXL },
   textSection: { alignItems: 'center', marginTop: 8, marginBottom: 10 },
-  title: { color: themePalette.hex_ffffff, fontSize: font.displayLarge, fontWeight: '600', textAlign: 'center' },
-  italicTitle: { fontStyle: 'italic', color: themePalette.hex_d4af37, fontWeight: '400' },
-  description: { color: themePalette.hex_94a3b8, textAlign: 'center', marginTop: 6, fontSize: font.base, lineHeight: 20 },
-  emailHighlight: { color: themePalette.hex_d4af37, fontWeight: '700' },
+  title: { fontSize: font.displayLarge, fontWeight: '600', textAlign: 'center' },
+  italicTitle: { fontStyle: 'italic', fontWeight: '400' },
+  description: { textAlign: 'center', marginTop: 6, fontSize: font.base, lineHeight: 22 },
   form: { width: '100%' },
-  label: { color: themePalette.hex_64748b, fontSize: font.small, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 4 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: themePalette.hex_1e293b, borderRadius: 12, backgroundColor: themePalette.hex_0f172a, paddingHorizontal: s(12), height: 52 },
-  inputContainerSuccess: { borderColor: themePalette.hex_10b981 },
-  inputContainerError: { borderColor: themePalette.hex_ef4444 },
-  inputIcon: { fontSize: font.lg, marginRight: 10 },
-  input: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.md },
-  eyeIcon: { color: themePalette.hex_94a3b8, fontSize: font.lg },
-  successIcon: { color: themePalette.hex_10b981, fontSize: font.xxl, fontWeight: 'bold' },
+  label: { fontSize: font.sm, fontWeight: '700', letterSpacing: 1, marginBottom: 6, marginTop: 4 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: s(12), height: 52, gap: 10 },
+  input: { flex: 1, fontSize: font.base },
   strengthBarContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
-  strengthSegment: { flex: 1, height: 3, backgroundColor: themePalette.hex_1e293b, borderRadius: 2, marginHorizontal: 2 },
+  strengthSegment: { flex: 1, height: 3, borderRadius: 2, marginHorizontal: 2 },
   strengthLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  subtext: { color: themePalette.hex_64748b, fontSize: font.sm },
+  subtext: { fontSize: font.sm },
   strengthText: { fontSize: font.sm, fontWeight: '600' },
-  checklistCard: { backgroundColor: themePalette.hex_0b1120, borderWidth: 1, borderColor: themePalette.hex_1e293b, borderRadius: 12, padding: 14, marginBottom: 14 },
+  checklistCard: { borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 14 },
   checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   checkCircle: { width: 18, height: 18, borderRadius: 9, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
-  checkCircleOk: { backgroundColor: themePalette.hex_064e3b },
-  checkCircleOff: { backgroundColor: themePalette.hex_1e293b },
-  checkMark: { fontSize: font.small, fontWeight: 'bold' },
-  checkText: { fontSize: font.bodySmall },
-  matchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-  matchIcon: { fontSize: font.sm, marginRight: 6 },
+  checkText: { fontSize: font.base },
+  matchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 },
   matchText: { fontSize: font.sm },
   footer: { marginTop: 20 },
-  submitButton: { backgroundColor: themePalette.hex_d4af37, width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  submitButtonText: { color: themePalette.hex_070a12, fontSize: font.lg, fontWeight: '700', marginRight: 8 },
-  arrowIcon: { color: themePalette.hex_070a12, fontSize: font.xxl, fontWeight: 'bold' },
-}));
+  submitButton: { backgroundColor: themePalette.hex_d4af37, width: '100%', height: 52, borderRadius: 24, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
+  submitButtonText: { color: themePalette.hex_070a12, fontSize: font.lg, fontWeight: '700' },
+  arrowIcon: { color: themePalette.hex_070a12, fontSize: font.xl, fontWeight: 'bold' },
+});

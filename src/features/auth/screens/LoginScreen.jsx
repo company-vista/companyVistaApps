@@ -263,13 +263,13 @@ const LoginScreen = ({ navigation, route }) => {
 
         {/* Log In Button */}
         <TouchableOpacity
-          style={[styles.loginBtn, { backgroundColor: colors.buttonBackground }, (!isFormValid || isLoading) && styles.loginBtnDisabled]}
+          style={[styles.loginBtn, !isDark && { backgroundColor: themePalette.hex_2563eb }, (!isFormValid || isLoading) && styles.loginBtnDisabled]}
           activeOpacity={0.85}
           onPress={handleLogin}
           disabled={!isFormValid || isLoading}
         >
-          <Text style={[styles.loginBtnText, { color: colors.buttonText }]}>
-            {isLoading ? 'Logging in...' : 'Log In →'}
+          <Text style={[styles.loginBtnText, !isDark && { color: themePalette.hex_ffffff }]}>
+            {isLoading ? 'Logging in...' : 'Log In  →'}
           </Text>
         </TouchableOpacity>
 
@@ -377,7 +377,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   topLogo: { width: 150, height: 38, resizeMode: 'contain', marginTop: s(10.4) },
   mainTitle: { color: themePalette.hex_ffffff, fontSize: s(26), fontWeight: '500', lineHeight: s(34), marginBottom: s(6), marginTop: s(10), marginLeft: s(2) },
   italicTitle: { color: themePalette.hex_c9a84c, fontStyle: 'italic', fontFamily: 'serif' },
-  subtitle: { color: themePalette.hex_94a3b8, fontSize: font.sm, lineHeight: 18, marginBottom: s(20) },
+  subtitle: { color: themePalette.hex_94a3b8, fontSize: font.base, lineHeight: 22, marginBottom: s(20) },
   tabContainer: {
     flexDirection: 'row', backgroundColor: themePalette.rgba_255_255_255_0_03,
     borderRadius: 12, padding: s(3), borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08,
@@ -385,9 +385,9 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   tabButton: { flex: 1, paddingVertical: s(10), alignItems: 'center', borderRadius: 9, flexDirection: 'row', justifyContent: 'center', gap: 6 },
   activeTabButton: { backgroundColor: themePalette.rgba_255_255_255_0_08 },
-  tabText: { color: themePalette.hex_64748b, fontSize: font.sm, fontWeight: '600' },
+  tabText: { color: themePalette.hex_64748b, fontSize: font.base, fontWeight: '600' },
   activeTabText: { color: themePalette.hex_c9a84c, fontWeight: 'bold' },
-  inputLabel: { color: themePalette.hex_64748b, fontSize: font.base, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
+  inputLabel: { color: themePalette.hex_64748b, fontSize: font.sm, fontWeight: 'bold', letterSpacing: 1.2, marginBottom: s(8), marginTop: s(4) },
   inputContainer: {
     width: '100%',
     flexDirection: 'row', alignItems: 'center',
@@ -396,8 +396,8 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     paddingHorizontal: s(14), height: s(48), marginBottom: s(16),
   },
   inputContainerError: { borderColor: themePalette.hex_ef4444 },
-  textInput: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.lg, fontWeight: '500', marginLeft: s(10) },
-  errorText: { color: themePalette.hex_ef4444, fontSize: font.base, marginTop: -12, marginBottom: s(12) },
+  textInput: { flex: 1, color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: '500', marginLeft: s(10) },
+  errorText: { color: themePalette.hex_ef4444, fontSize: font.sm, marginTop: -12, marginBottom: s(12) },
   phoneRow: { flexDirection: 'row', gap: 10, marginBottom: s(16) },
   countryCodePicker: {
     flexDirection: 'row', alignItems: 'center',
@@ -420,25 +420,25 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_2,
   },
   checkboxChecked: { backgroundColor: themePalette.hex_c9a84c, borderColor: themePalette.hex_c9a84c },
-  rememberText: { color: themePalette.hex_64748b, fontSize: font.small },
-  forgotText: { color: themePalette.hex_c9a84c, fontSize: font.small, fontWeight: '500' },
+  rememberText: { color: themePalette.hex_64748b, fontSize: font.sm },
+  forgotText: { color: themePalette.hex_c9a84c, fontSize: font.sm, fontWeight: '500' },
   loginBtn: {
     backgroundColor: themePalette.hex_d4af37, borderRadius: 24, paddingVertical: s(14),
     alignItems: 'center', marginBottom: s(10),
   },
   loginBtnDisabled: { opacity: 0.4 },
-  loginBtnText: { color: themePalette.hex_060913, fontSize: font.base, fontWeight: 'bold' },
+  loginBtnText: { color: themePalette.hex_060913, fontSize: font.md, fontWeight: '700' },
   loginMethodLink: { alignItems: 'center', marginBottom: s(20) },
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(20) },
   dividerLine: { flex: 1, height: 1, backgroundColor: themePalette.rgba_255_255_255_0_08 },
-  dividerText: { color: themePalette.hex_475569, fontSize: font.xs, paddingHorizontal: s(12) },
+  dividerText: { color: themePalette.hex_475569, fontSize: font.sm, paddingHorizontal: s(12) },
   socialGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: s(24) },
   socialBtn: {
     width: '48%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: themePalette.rgba_255_255_255_0_02, borderRadius: s(12),
     borderWidth: 1, borderColor: themePalette.rgba_255_255_255_0_08, paddingVertical: s(12), gap: s(8),
   },
-  socialBtnText: { color: themePalette.hex_ffffff, fontSize: font.sm, fontWeight: 'bold' },
+  socialBtnText: { color: themePalette.hex_ffffff, fontSize: font.base, fontWeight: 'bold' },
   signupText: { color: themePalette.hex_64748b, fontSize: font.base, textAlign: 'center', marginBottom: s(20) },
   createAccountLink: { color: themePalette.hex_c9a84c, fontWeight: 'bold', fontSize: font.md },
   supportContainer: { alignItems: 'center' },

@@ -223,7 +223,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
 
       <View style={[styles.bottomBar, { paddingBottom: s(12) + insets.bottom, backgroundColor: colors.background, borderTopColor: isDark ? themePalette.rgba_255_255_255_0_05 : colors.border }]}>
         <TouchableOpacity
-          style={[styles.continueBtn, { backgroundColor: colors.buttonBackground }, !selectedStructure && styles.continueBtnDisabled]}
+          style={[styles.continueBtn, !isDark && { backgroundColor: themePalette.hex_2563eb }, !selectedStructure && styles.continueBtnDisabled]}
           activeOpacity={0.85}
           disabled={!selectedStructure}
           onPress={() => {
@@ -252,7 +252,7 @@ const StructureSelectionScreen = ({ navigation, route }) => {
             });
           }}
         >
-          <Text style={[styles.continueBtnText, { color: colors.buttonText }, !selectedStructure && styles.continueBtnTextDisabled]}>
+          <Text style={[styles.continueBtnText, !isDark && { color: themePalette.hex_ffffff }, !selectedStructure && styles.continueBtnTextDisabled]}>
             {selectedStructure ? 'Continue  →' : 'Select a structure to continue'}
           </Text>
         </TouchableOpacity>

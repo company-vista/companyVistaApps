@@ -113,7 +113,10 @@ function AppContent() {
   return (
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={colors.background}
+        />
         {showSplash || isRestoring ? (
           <SplashScreen />
         ) : (
@@ -202,7 +205,7 @@ function SplashScreen() {
 
   return (
     <View style={[styles.splashScreen, { backgroundColor: '#050710' }]}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#050710" />
 
       <Animated.View
         style={[

@@ -123,8 +123,8 @@ const TrustedWorldwideScreen = ({ navigation }) => {
       </ScrollView>
 
       <View style={[styles.footerBar, { paddingBottom: s(12) + insets.bottom }]}>
-        <TouchableOpacity style={[styles.getStartedBtn, { backgroundColor: colors.buttonBackground }]} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
-          <Text style={[styles.btnText, { color: colors.buttonText }]}>Get Started →</Text>
+        <TouchableOpacity style={styles.getStartedBtn} activeOpacity={0.8} onPress={() => navigation.navigate('RegistrationLanding')}>
+          <Text style={styles.btnText}>Get Started →</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -169,7 +169,7 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     color: themePalette.hex_c9a84c,
   },
   counterLabel: {
-    fontSize: font.xs,
+    fontSize: font.small,
     letterSpacing: 1.5,
     fontWeight: '600',
     marginTop: s(4),
@@ -214,9 +214,9 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   },
   avatarText: { color: themePalette.hex_060913, fontWeight: 'bold', fontSize: font.sm },
   testimonialContent: { flex: 1 },
-  stars: { color: themePalette.hex_c9a84c, fontSize: font.xs, marginBottom: s(4) },
-  reviewText: { fontSize: font.base,fontWeight: 400, lineHeight: 16 },
-  authorText: { fontSize: font.xs, marginTop: s(4) },
+  stars: { color: themePalette.hex_c9a84c, fontSize: font.small, marginBottom: s(4) },
+  reviewText: { fontSize: font.base, fontWeight: '400', lineHeight: 20 },
+  authorText: { fontSize: font.small, marginTop: s(4) },
   contentSection: { marginTop: s(4) },
   tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: s(12) },
   goldLine: { width: 18, height: 2, backgroundColor: themePalette.hex_c9a84c, marginRight: s(8) },
@@ -224,14 +224,14 @@ const styles = makeThemeStyles(() => StyleSheet.create({
   mainHeading: {
     fontSize: font.display,
     fontWeight: '500',
-    lineHeight: 36,
+    lineHeight: 34,
     marginBottom: s(12),
   },
   italicGold: { color: themePalette.hex_c9a84c, fontStyle: 'italic' },
   boldText: { fontWeight: 'bold' },
   descriptionText: {
-    fontSize: font.bodySmall,
-    lineHeight: 20,
+    fontSize: font.base,
+    lineHeight: 22,
     marginBottom: s(24),
   },
   paginationRow: {
@@ -252,9 +252,10 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     backgroundColor: themePalette.hex_c9a84c,
   },
   getStartedBtn: {
+    backgroundColor: themePalette.hex_2563eb,
     borderRadius: 24,
     paddingVertical: s(14),
     alignItems: 'center',
   },
-  btnText: { fontSize: font.lg, fontWeight: 'bold' },
+  btnText: { fontSize: font.md, fontWeight: '700', color: themePalette.hex_ffffff },
 }));
