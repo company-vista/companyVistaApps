@@ -176,6 +176,57 @@ export async function deleteAdminClient({ token, id }) {
   );
 }
 
+const getClientTokenFromCookies = headers => {
+  const raw = headers?.['set-cookie'] ?? headers?.['Set-Cookie'];
+  const cookies = Array.isArray(raw) ? raw.join('; ') : raw;
+  const match = cookies?.match(/(?:^|;\s*)clientToken=([^;]+)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : '';
+};
+
+export async function impersonateAdminClient({ token, id }) {
+  if (!id) {
+    throw new Error('Client ID is missing.');
+  }
+  let response;
+  try {
+    response = await axios({
+      method: 'post',
+      timeout: REQUEST_TIMEOUT_MS,
+      url: `${CLIENTS_URL}/${encodeURIComponent(id)}/impersonate`,
+      data: {},
+      headers: getHeaders(token),
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to start client session.'));
+  }
+  if (!response.data?.client) {
+    throw new Error('Client details were not found in the impersonation response.');
+  }
+  const clientToken =
+    response.data.token ||
+    response.data.clientToken ||
+    getClientTokenFromCookies(response.headers);
+  if (!clientToken) {
+    throw new Error('Impersonation session token was not returned by the server.');
+  }
+  return { client: response.data.client, token: clientToken };
+}
+
+export async function sendAdminClientWelcomeEmail({ token, id, company = '' }) {
+  if (!id) {
+    throw new Error('Client ID is missing.');
+  }
+  const data = await request(
+    {
+      method: 'post',
+      url: `${CLIENTS_URL}/${encodeURIComponent(id)}/send-welcome-email`,
+      data: { company },
+    },
+    token,
+  );
+  return data?.data?.welcomeEmail;
+}
+
 export async function uploadAdminClientItinLetter({ token, id, file }) {
   if (!id) {
     throw new Error('Client ID is missing.');

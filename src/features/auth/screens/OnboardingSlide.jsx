@@ -69,7 +69,7 @@ const OnboardingSlide = ({ navigation }) => {
         }),
       ])
     ).start();
-  }, []);
+  }, [slideAnim]);
 
   const handleNext = () => {
     navigation.navigate('BusinessServices');
@@ -90,7 +90,11 @@ const OnboardingSlide = ({ navigation }) => {
 
       <LinearGradient colors={isDark ? slide.artGradient : slide.artGradientLight} style={styles.artSection}>
         <View style={[styles.globeContainer, !isDark && styles.globeContainerLight]}>
-          <FastImage source={isDark ? globeLogo : globeLogoLight} style={styles.globeImage} resizeMode={FastImage.resizeMode.contain} />
+          <FastImage
+            source={isDark ? globeLogo : globeLogoLight}
+            style={[styles.globeImage, !isDark && styles.globeImageLight]}
+            resizeMode={FastImage.resizeMode.contain}
+          />
         </View>
         {slide.showBadges && (
           <View style={styles.badgesRow}>
@@ -212,14 +216,21 @@ const styles = makeThemeStyles(() => StyleSheet.create({
     overflow: 'hidden',
   },
   globeContainerLight: {
-    backgroundColor: themePalette.rgba_8_9_10_0_8,
-    borderRadius: 130,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    overflow: 'visible',
   },
   globeImage: {
     width: 222,
     height: 204,
     borderRadius: 120,
     marginTop: s(16)
+  },
+  globeImageLight: {
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    marginTop: 0,
   },
   badgesRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: s(16), position: 'absolute', bottom: 26 },
   badgeLeft: {

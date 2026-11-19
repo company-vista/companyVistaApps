@@ -7,6 +7,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  splashContent: {
+    alignItems: 'center',
+  },
   pulseRing: {
     position: 'absolute',
     width: 120,
@@ -24,8 +27,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(201,168,76,0.2)',
   },
   globeContainer: {
-    width: 220,
-    height: 220,
+    width: 240,
+    height: 240,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -40,6 +43,22 @@ const styles = StyleSheet.create({
     width: 240,
     height: 240,
     borderRadius: 100,
+  },
+  companyName: {
+    color: '#334155',
+    fontSize: 20,
+    fontWeight: '500',
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginTop: s(16),
+  },
+  companyTagline: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginTop: s(6),
   },
   // Toast ka background/border/text runtime me theme se aata hai (createToastConfig
   // in App.jsx) — isliye yahan sirf layout hai, koi hardcoded color nahi.

@@ -207,34 +207,60 @@ function SplashScreen() {
     <View style={[styles.splashScreen, { backgroundColor: '#ffffff' }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
-      <Animated.View
-        style={[
-          styles.pulseRing,
-          {
-            transform: [{ scale: pulseScale }],
-            opacity: pulseOpacity,
-          },
-        ]}
-      />
+      <View style={styles.splashContent}>
+        <Animated.View
+          style={[
+            styles.globeContainer,
+            {
+              transform: [{ translateY: logoTranslateY }],
+              opacity: logoRise,
+            },
+          ]}>
+          <Animated.View
+            style={[
+              styles.pulseRing,
+              {
+                transform: [{ scale: pulseScale }],
+                opacity: pulseOpacity,
+              },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.orbitalRing,
+              {
+                transform: [{ rotate: spin }],
+              },
+            ]}
+          />
+          <View style={styles.glowHalo} />
+          <FastImage
+            source={companyLogo}
+            style={styles.globeImage}
+            resizeMode={FastImage.resizeMode.contain}
+          />
+        </Animated.View>
 
-      <Animated.View
-        style={[
-          styles.orbitalRing,
-          {
-            transform: [{ rotate: spin }],
-          },
-        ]}
-      />
-
-      <View style={styles.globeContainer}>
-        <View style={styles.glowHalo} />
-        <FastImage
-          source={companyLogo}
-          style={styles.globeImage}
-          resizeMode={FastImage.resizeMode.contain}
-        />
-        <Animated.Text style={{ position: 'absolute', bottom: -106, color: '#334155', fontSize: 20, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>Company Vista Inc</Animated.Text>
-        <Animated.Text style={{ position: 'absolute', bottom: -138, color: '#64748b', fontSize: 12, fontWeight: '500', letterSpacing: 1.5, textAlign: 'center', width: 400, transform: [{ translateY: textTranslateY }], opacity: textRise }}>--a Koshika company--</Animated.Text>
+        <Animated.Text
+          style={[
+            styles.companyName,
+            {
+              transform: [{ translateY: textTranslateY }],
+              opacity: textRise,
+            },
+          ]}>
+          Company Vista Inc
+        </Animated.Text>
+        <Animated.Text
+          style={[
+            styles.companyTagline,
+            {
+              transform: [{ translateY: textTranslateY }],
+              opacity: textRise,
+            },
+          ]}>
+          --a Koshika company--
+        </Animated.Text>
       </View>
     </View>
   );

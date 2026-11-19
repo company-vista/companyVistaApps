@@ -3,21 +3,29 @@ import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
+  Modal,
   Pressable,
   RefreshControl,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Toast from 'react-native-toast-message';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppSelector } from '../../../../store/hooks';
+import { setAuthSession } from '../../../../store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { s } from '../../../../theme/responsive';
 import {
   fetchAdminClient,
   fetchAdminClientCompanies,
+  impersonateAdminClient,
+  sendAdminClientWelcomeEmail,
 } from '../api/adminClientsApi';
 
 const formatDate = value => {
@@ -34,8 +42,13 @@ const formatDate = value => {
 const AdminClientDetailsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
+  const adminUser = useAppSelector(state => state.auth.user);
+  const hasCompletedPayment = useAppSelector(
+    state => state.auth.hasCompletedPayment,
+  );
   const clientId = route.params?.clientId;
   const [client, setClient] = useState(null);
   const [companies, setCompanies] = useState([]);
@@ -43,6 +56,10 @@ const AdminClientDetailsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [companiesError, setCompaniesError] = useState('');
+  const [impersonating, setImpersonating] = useState(false);
+  const [showWelcomeEmailModal, setShowWelcomeEmailModal] = useState(false);
+  const [welcomeEmailCompany, setWelcomeEmailCompany] = useState('');
+  const [sendingWelcomeEmail, setSendingWelcomeEmail] = useState(false);
 
   const loadClient = useCallback(
     async (refresh = false) => {
@@ -101,6 +118,102 @@ const AdminClientDetailsScreen = () => {
       ]
     : [];
 
+  const infoChunks = [];
+  for (let i = 0; i < infoRows.length; i += 2) {
+    infoChunks.push(infoRows.slice(i, i + 2));
+  }
+
+  const handleImpersonate = async () => {
+    if (!client?._id) return;
+    setImpersonating(true);
+    try {
+      const session = await impersonateAdminClient({ token, id: client._id });
+      await AsyncStorage.setItem(
+        'vista.adminBackup',
+        JSON.stringify({ user: adminUser, token, hasCompletedPayment }),
+      );
+      await AsyncStorage.setItem(
+        'vista.impersonation',
+        JSON.stringify({
+          adminName: adminUser?.name ||
+            `${adminUser?.firstName || ''} ${adminUser?.lastName || ''}`.trim() ||
+            'Admin',
+        }),
+      );
+      dispatch(
+        setAuthSession({
+          user: { ...session.client, role: 'client' },
+          token: session.token,
+        }),
+      );
+      Toast.show({ type: 'success', text1: 'Logged in as client' });
+    } catch (actionError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to start impersonation session',
+        text2: actionError.message,
+      });
+    } finally {
+      setImpersonating(false);
+    }
+  };
+
+  const handleOpenWelcomeEmailModal = () => {
+    setWelcomeEmailCompany(companies[0]?.companyName || '');
+    setShowWelcomeEmailModal(true);
+  };
+
+  const handleSendWelcomeEmail = async () => {
+    if (!client?._id) return;
+    setSendingWelcomeEmail(true);
+    try {
+      const welcomeEmail = await sendAdminClientWelcomeEmail({
+        token,
+        id: client._id,
+        company: welcomeEmailCompany,
+      });
+      if (welcomeEmail) {
+        setClient(previous =>
+          previous ? { ...previous, welcomeEmail } : previous,
+        );
+      }
+      Toast.show({ type: 'success', text1: 'Welcome email sent' });
+      setShowWelcomeEmailModal(false);
+    } catch (actionError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to send welcome email',
+        text2: actionError.message,
+      });
+    } finally {
+      setSendingWelcomeEmail(false);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!client?.email) {
+      Toast.show({ type: 'error', text1: 'Email address unavailable' });
+      return;
+    }
+    try {
+      await Linking.openURL(`mailto:${client.email}`);
+    } catch {
+      Toast.show({ type: 'error', text1: 'Unable to open email app' });
+    }
+  };
+
+  const handleMakeCall = async () => {
+    if (!client?.phoneNumber) {
+      Toast.show({ type: 'error', text1: 'Phone number unavailable' });
+      return;
+    }
+    try {
+      await Linking.openURL(`tel:${client.phoneNumber}`);
+    } catch {
+      Toast.show({ type: 'error', text1: 'Unable to open dialer' });
+    }
+  };
+
   const renderHeader = () => (
     <View>
       {client ? (
@@ -108,7 +221,7 @@ const AdminClientDetailsScreen = () => {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
               {(client.firstName || client.email || '?').charAt(0).toUpperCase()}
-            </Text>
+            </Text> 
           </View>
           <View style={styles.profileCopy}>
             <Text style={styles.name}>
@@ -119,13 +232,81 @@ const AdminClientDetailsScreen = () => {
           </View>
         </View>
       ) : null}
-      <Text style={styles.sectionTitle}>Personal Information</Text>
-      {infoRows.map(row => (
-        <View key={row.label} style={styles.infoRow}>
-          <Text style={styles.infoLabel}>{row.label}</Text>
-          <Text style={styles.infoValue}>{row.value}</Text>
+      {client ? (
+        <View>
+          <View style={styles.actionRow}>
+            <Pressable
+              style={[
+                styles.actionButton,
+                styles.loginAction,
+                impersonating && styles.actionButtonDisabled,
+              ]}
+              onPress={handleImpersonate}
+              disabled={impersonating}
+              accessibilityRole="button"
+              accessibilityLabel="Opens the client portal as this client. Logged and time-limited to 1 hour.">
+              <Ionicons name="arrow-forward-outline" size={17} color="#7E22CE" />
+              <Text style={[styles.actionText, styles.loginActionText]}>
+                {impersonating ? 'Starting…' : 'Login as this Client'}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.actionButton, styles.editAction]}
+              onPress={() => navigation.navigate('AdminEditClient', { clientId })}
+              accessibilityRole="button">
+              <Ionicons name="create-outline" size={17} color="#2563EB" />
+              <Text style={[styles.actionText, styles.editActionText]}>
+                Edit Client
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.actionButton,
+                styles.welcomeAction,
+                styles.actionButtonLast,
+              ]}
+              onPress={handleOpenWelcomeEmailModal}
+              accessibilityRole="button"
+              accessibilityLabel={
+                client?.welcomeEmail?.sent
+                  ? `Last sent ${formatDate(client.welcomeEmail.sentAt)}${client.welcomeEmail.sentCount > 1 ? `, sent ${client.welcomeEmail.sentCount} times` : ''}`
+                  : "Sends the same welcome email template that's normally sent automatically at signup"
+              }>
+              <Ionicons name="mail-outline" size={17} color="#047857" />
+              <Text style={[styles.actionText, styles.welcomeActionText]}>
+                {client?.welcomeEmail?.sent
+                  ? 'Resend Welcome Email'
+                  : 'Send Welcome Email'}
+              </Text>
+            </Pressable>
+          </View>
+          {client?.welcomeEmail?.sent ? (
+            <Text style={styles.welcomeSentText}>
+              Welcome email sent {formatDate(client.welcomeEmail.sentAt)}
+            </Text>
+          ) : null}
         </View>
-      ))}
+      ) : null}
+      <Text style={styles.sectionTitle}>Personal Information</Text>
+      <View style={styles.infoGrid}>
+        {infoChunks.map((chunk, chunkIndex) => (
+          <View
+            key={chunkIndex}
+            style={[
+              styles.infoGridRow,
+              chunkIndex === infoChunks.length - 1 && styles.infoGridRowLast,
+            ]}>
+            {chunk.map((row, rowIndex) => (
+              <View
+                key={row.label}
+                style={[styles.infoCell, rowIndex === 0 && styles.infoCellLeft]}>
+                <Text style={styles.infoLabel}>{row.label}</Text>
+                <Text style={styles.infoValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
       <View style={styles.companiesHeading}>
         <Text style={styles.sectionTitle}>Associated Companies</Text>
         <Text style={styles.companyCount}>{companies.length}</Text>
@@ -135,6 +316,29 @@ const AdminClientDetailsScreen = () => {
       ) : null}
     </View>
   );
+
+  const renderFooter = () =>
+    client ? (
+      <View style={styles.footerActions}>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={styles.footerActionRow}>
+          <Pressable
+            style={[styles.footerButton, styles.emailButton]}
+            onPress={handleSendEmail}
+            accessibilityRole="button">
+            <Ionicons name="mail-outline" size={18} color="#FFFFFF" />
+            <Text style={styles.footerButtonText}>Send Email</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.footerButton, styles.callButton]}
+            onPress={handleMakeCall}
+            accessibilityRole="button">
+            <Ionicons name="call-outline" size={18} color="#FFFFFF" />
+            <Text style={styles.footerButtonText}>Make Call</Text>
+          </Pressable>
+        </View>
+      </View>
+    ) : null;
 
   const renderCompany = ({ item }) => (
     <Pressable
@@ -204,6 +408,7 @@ const AdminClientDetailsScreen = () => {
           keyExtractor={(item, index) => String(item._id || item.id || index)}
           renderItem={renderCompany}
           ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyCompanies}>
               {companiesError ? 'Unable to load associated companies.' : 'No associated companies.'}
@@ -224,6 +429,69 @@ const AdminClientDetailsScreen = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
+      <Modal
+        visible={showWelcomeEmailModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (!sendingWelcomeEmail) setShowWelcomeEmailModal(false);
+        }}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => {
+            if (!sendingWelcomeEmail) setShowWelcomeEmailModal(false);
+          }}>
+          <Pressable style={styles.modalCard} accessibilityRole="alert">
+            <Text style={styles.modalTitle}>
+              {client?.welcomeEmail?.sent
+                ? 'Resend Welcome Email'
+                : 'Send Welcome Email'}
+            </Text>
+            <Text style={styles.modalMessage}>
+              Sends the exact same welcome email template used automatically at
+              signup, to {client?.email}.
+            </Text>
+            {client?.welcomeEmail?.sent ? (
+              <Text style={styles.modalWarning}>
+                Already sent on {formatDate(client.welcomeEmail.sentAt)}
+                {client.welcomeEmail.sentCount > 1
+                  ? ` (${client.welcomeEmail.sentCount} times)`
+                  : ''}
+                .
+              </Text>
+            ) : null}
+            <Text style={styles.modalLabel}>
+              Company name (shown in the email)
+            </Text>
+            <TextInput
+              style={styles.modalInput}
+              value={welcomeEmailCompany}
+              onChangeText={setWelcomeEmailCompany}
+              placeholder="e.g. KSJ Recruitment Inc."
+              placeholderTextColor="#94A3B8"
+              editable={!sendingWelcomeEmail}
+            />
+            <View style={styles.modalActions}>
+              <Pressable
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={() => setShowWelcomeEmailModal(false)}
+                disabled={sendingWelcomeEmail}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, styles.modalSendButton]}
+                onPress={handleSendWelcomeEmail}
+                disabled={sendingWelcomeEmail}>
+                {sendingWelcomeEmail ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.modalSendText}>Send Email</Text>
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -282,20 +550,72 @@ const styles = StyleSheet.create({
   profileCopy: { flex: 1 },
   name: { color: '#0F172A', fontSize: font.base, fontWeight: '700' },
   email: { color: '#64748B', fontSize: font.xs, marginTop: s(3) },
+  actionRow: {
+    flexDirection: 'row',
+    marginBottom: s(18),
+  },
+  actionButton: {
+    flex: 1,
+    minHeight: s(62),
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: s(8),
+    paddingHorizontal: s(5),
+    marginRight: s(7),
+    borderRadius: s(11),
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+  },
+  loginAction: { borderColor: '#9333EA', backgroundColor: '#FAF5FF' },
+  editAction: { borderColor: '#2563EB', backgroundColor: '#EFF6FF' },
+  welcomeAction: { borderColor: '#059669', backgroundColor: '#ECFDF5' },
+  actionButtonLast: { marginRight: 0 },
+  actionButtonDisabled: { opacity: 0.6 },
+  actionText: {
+    color: '#1D4ED8',
+    fontSize: font.xs,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: s(5),
+  },
+  loginActionText: { color: '#7E22CE' },
+  editActionText: { color: '#2563EB' },
+  welcomeActionText: { color: '#047857' },
+  welcomeSentText: {
+    color: '#94A3B8',
+    fontSize: font.xs,
+    textAlign: 'right',
+    marginTop: -s(12),
+    marginBottom: s(14),
+  },
   sectionTitle: {
     color: '#0F172A',
     fontSize: font.base,
     fontWeight: '800',
     marginBottom: s(9),
   },
-  infoRow: {
-    paddingVertical: s(11),
-    paddingHorizontal: s(13),
-    marginBottom: s(1),
+  infoGrid: {
+    borderRadius: s(12),
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+  },
+  infoGridRow: {
+    flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
   },
+  infoGridRowLast: { borderBottomWidth: 0 },
+  infoCell: {
+    flex: 1,
+    paddingVertical: s(11),
+    paddingHorizontal: s(13),
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftColor: '#E2E8F0',
+  },
+  infoCellLeft: { borderLeftWidth: 0 },
   infoLabel: { color: '#64748B', fontSize: font.xs },
   infoValue: { color: '#0F172A', fontSize: font.sm, fontWeight: '600', marginTop: s(4) },
   companiesHeading: {
@@ -345,6 +665,25 @@ const styles = StyleSheet.create({
     paddingVertical: s(18),
     fontSize: font.sm,
   },
+  footerActions: { marginTop: s(20) },
+  footerActionRow: { flexDirection: 'row' },
+  footerButton: {
+    flex: 1,
+    minHeight: s(46),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: s(11),
+    marginRight: s(9),
+  },
+  emailButton: { backgroundColor: '#4F46E5' },
+  callButton: { backgroundColor: '#059669', marginRight: 0 },
+  footerButtonText: {
+    color: '#FFFFFF',
+    fontSize: font.sm,
+    fontWeight: '700',
+    marginLeft: s(8),
+  },
   state: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: s(24) },
   stateText: { color: '#64748B', fontSize: font.sm, marginTop: s(10) },
   errorText: { color: '#B91C1C', fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
@@ -356,4 +695,64 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
   },
   retryText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '600' },
+  modalOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: s(18),
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+  },
+  modalCard: {
+    width: '100%',
+    padding: s(20),
+    borderRadius: s(16),
+    backgroundColor: '#FFFFFF',
+  },
+  modalTitle: { color: '#0F172A', fontSize: font.base, fontWeight: '800' },
+  modalMessage: { color: '#64748B', fontSize: font.xs, marginTop: s(6) },
+  modalWarning: {
+    color: '#B45309',
+    fontSize: font.xs,
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    borderRadius: s(8),
+    paddingHorizontal: s(10),
+    paddingVertical: s(8),
+    marginTop: s(10),
+  },
+  modalLabel: {
+    color: '#475569',
+    fontSize: font.xs,
+    fontWeight: '600',
+    marginTop: s(14),
+    marginBottom: s(6),
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: s(9),
+    paddingHorizontal: s(11),
+    paddingVertical: s(9),
+    color: '#0F172A',
+    fontSize: font.sm,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: s(18),
+  },
+  modalButton: {
+    minWidth: s(86),
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: s(14),
+    paddingVertical: s(10),
+    borderRadius: s(9),
+    marginLeft: s(8),
+  },
+  modalCancelButton: { borderWidth: 1, borderColor: '#CBD5E1' },
+  modalSendButton: { backgroundColor: '#059669' },
+  modalCancelText: { color: '#475569', fontSize: font.sm, fontWeight: '600' },
+  modalSendText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '700' },
 });

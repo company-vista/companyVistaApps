@@ -7,7 +7,9 @@ import { font } from '../../../theme/typography';
 
 const CRM_CARDS = [
   { key: 'vista-leads', title: 'Vista Leads', icon: 'people-outline', screen: 'CompanyVistaLeads' },
-  { key: 'add-expense', title: 'Add Expense', icon: 'wallet-outline', screen: 'AdminAddExpense' },
+  // { key: 'add-expense', title: 'Add Expense', icon: 'wallet-outline', screen: 'AdminAddExpense' },
+  { key: 'communication-history', title: 'Communication History', icon: 'chatbubble-ellipses-outline' },
+  { key: 'sales-pipeline', title: 'Sales Pipeline', icon: 'funnel-outline' },
 ];
 
 const CRM = () => {
@@ -42,7 +44,7 @@ const CRM = () => {
             key={card.key}
             style={styles.card}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate(card.screen)}>
+            onPress={() => card.screen && navigation.navigate(card.screen)}>
             <View style={styles.cardIconWrap}>
               <Ionicons name={card.icon} size={font.displayMedium} color="#4F46E5" />
             </View>

@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Linking,
   RefreshControl,
   StatusBar,
   StyleSheet,
@@ -97,6 +98,15 @@ const AdminBlogsScreen = () => {
     }
   };
 
+  const handleViewLive = async post => {
+    if (!post.slug) return;
+    try {
+      await Linking.openURL(`https://companyvista.com/blog/${post.slug}`);
+    } catch {
+      Alert.alert('Unable to open link', 'Could not open the live blog post.');
+    }
+  };
+
   const confirmDelete = post => {
     Alert.alert('Delete blog post?', `Delete "${post.title}"? This cannot be undone.`, [
       { text: 'Cancel', style: 'cancel' },
@@ -149,6 +159,15 @@ const AdminBlogsScreen = () => {
               Updated {getDateLabel(item.updated_at)}
             </Text>
           </View>
+          {published ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`View live ${item.title || 'blog post'}`}
+              onPress={() => handleViewLive(item)}
+              style={styles.viewLiveButton}>
+              <Ionicons name="globe-outline" size={18} color="#4F46E5" />
+            </TouchableOpacity>
+          ) : null}
           <TouchableOpacity
             accessibilityRole="button"
             accessibilityLabel={`Edit ${item.title || 'blog post'}`}
@@ -368,6 +387,15 @@ const styles = StyleSheet.create({
   postMeta: { flex: 1, gap: 4, marginRight: 8 },
   categoryText: { color: '#334155', fontSize: font.xs, fontWeight: '600' },
   dateText: { color: '#94A3B8', fontSize: font.xs },
+  viewLiveButton: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#EEF2FF',
+    marginRight: 8,
+  },
   editButton: {
     width: 38,
     height: 38,
