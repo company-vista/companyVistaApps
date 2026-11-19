@@ -11,33 +11,45 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { logoutUser, updateProfileUser } from '../../../../store/slices/authSlice';
 import { s } from '../../../../theme/responsive';
-import { fetchAdminProfile, updateAdminProfile } from '../api/adminProfileApi';
+import { useThemeColors } from '../../../../theme/colors';
+import BackButton from '../../../../components/buttons/BackButton';
+import { fetchAdminProfile, updateAdminProfile, uploadAdminAvatar } from '../api/adminProfileApi';
+
+function withImageCacheBust(uri) {
+  if (!uri || !/^https?:\/\//i.test(uri)) {
+    return uri;
+  }
+  const separator = uri.includes('?') ? '&' : '?';
+  return `${uri}${separator}t=${Date.now()}`;
+}
 
 const AdminProfileScreen = () => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
   const user = useAppSelector(state => state.auth.user);
   const token = useAppSelector(state => state.auth.token);
-  const [isSecurityExpanded, setIsSecurityExpanded] = useState(false);
-  const [isAccountExpanded, setIsAccountExpanded] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [localAvatarUri, setLocalAvatarUri] = useState(null);
+
+  const isDark = colors.mode === 'dark';
+  const cardBackground = isDark ? colors.cardElevated : colors.cardHighlight;
 
   const handleBack = () => {
     if (navigation.canGoBack()) {
@@ -62,15 +74,12 @@ const AdminProfileScreen = () => {
   }, [dispatch, token]);
 
   const profileImage =
+    localAvatarUri ??
     user?.profileImage ??
     user?.profilePicture ??
     user?.avatar ??
     user?.image ??
     user?.photo;
-
-  const showComingSoon = () => {
-    Alert.alert('Coming Soon', 'This feature will be available soon.');
-  };
 
   const handleOpenEditModal = () => {
     setName(user?.name ?? '');
@@ -119,202 +128,250 @@ const AdminProfileScreen = () => {
     }
   };
 
-  const securityItems = [
+  const handleAvatarPress = async () => {
+    if (isUploadingAvatar) {
+      return;
+    }
+
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 400,
+        height: 400,
+        cropping: true,
+        cropperCircleOverlay: true,
+        mediaType: 'photo',
+        compressImageQuality: 1,
+      });
+
+      if (!image?.path) {
+        Alert.alert('Image missing', 'Please select another image.');
+        return;
+      }
+
+      setLocalAvatarUri(image.path);
+      setIsUploadingAvatar(true);
+
+      const result = await uploadAdminAvatar({
+        file: {
+          name: image.filename || 'avatar.jpg',
+          type: image.mime,
+          uri: image.path,
+        },
+        token,
+      });
+
+      if (!result.isSuccess) {
+        Alert.alert('Upload failed', result.error || 'Unable to update profile image.');
+        return;
+      }
+
+      const nextAvatar = withImageCacheBust(result.avatar ?? image.path);
+      dispatch(updateProfileUser({
+        ...(user ?? { email: '' }),
+        ...(result.user ?? {}),
+        avatar: nextAvatar,
+        image: nextAvatar,
+        photo: nextAvatar,
+        profileImage: nextAvatar,
+        profilePicture: nextAvatar,
+      }));
+      setLocalAvatarUri(nextAvatar);
+    } catch (error) {
+      if (error?.code === 'E_PICKER_CANCELLED') {
+        return;
+      }
+      const message = error instanceof Error
+        ? error.message
+        : 'Unable to update profile image right now.';
+      Alert.alert('Upload failed', message);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const contactItems = [
+    { label: 'Email', value: user?.email || 'N/A', icon: 'envelope-o' },
     {
-      key: 'password',
-      title: 'Password',
-      subtitle: 'Change your account password',
-      icon: 'lock-closed-outline',
-      onPress: showComingSoon,
+      label: 'Phone',
+      value: user?.phone ?? user?.phoneNumber ?? user?.mobile ?? 'N/A',
+      icon: 'phone',
     },
-    {
-      key: 'help-support',
-      title: 'Help & Support',
-      subtitle: 'Get help or contact support',
-      icon: 'help-circle-outline',
-      onPress: showComingSoon,
-    },
-    {
-      key: 'terms-policies',
-      title: 'Terms & Policies',
-      subtitle: 'View terms and privacy policy',
-      icon: 'document-text-outline',
-      onPress: showComingSoon,
-    },
+    { label: 'Role', value: user?.role || 'Admin', icon: 'user-o' },
   ];
+
+  const rowBorderStyle = { borderTopWidth: 1, borderTopColor: colors.border };
 
   const accountItems = [
     {
-      key: 'logout',
-      title: 'Logout',
-      subtitle: 'Sign out from this account',
-      icon: 'log-out-outline',
-      onPress: () => dispatch(logoutUser()),
+      key: 'settings',
+      title: 'Settings',
+      subtitle: 'Security, notifications & policies',
+      icon: 'cog',
+      onPress: () => navigation.navigate('AdminSettings'),
     },
     {
       key: 'deactivate',
       title: 'Deactivate Account',
       subtitle: 'Temporarily disable your account',
-      icon: 'pause-circle-outline',
+      icon: 'pause-circle',
       onPress: () => navigation.navigate('DeactivateAccount'),
     },
     {
       key: 'delete',
       title: 'Delete Account',
       subtitle: 'Permanently delete your account',
-      icon: 'trash-outline',
+      icon: 'trash-o',
       onPress: () => navigation.navigate('DeleteAccount'),
     },
   ];
 
-  const renderMenuItems = items =>
-    items.map((item, index) => (
-      <Pressable
-        key={item.key}
-        onPress={item.onPress}
-        accessibilityRole="button"
-        style={[styles.menuRow, index > 0 && styles.menuRowBorder]}>
-        <Ionicons name={item.icon} size={20} color="#1F2937" style={styles.menuIcon} />
-        <View style={styles.menuText}>
-          <Text style={styles.menuTitle}>{item.title}</Text>
-          <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-        </View>
-        {/* <Ionicons name="chevron-forward" size={16} color="#475569" /> */}
-      </Pressable>
-    ));
-
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, s(12)) }]}>
-        <Pressable
-          onPress={handleBack}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={22} color="#1F2937" />
-        </Pressable>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <Pressable
-          onPress={showComingSoon}
-          accessibilityRole="button"
-          accessibilityLabel="Settings"
-          style={styles.headerButton}>
-          <Ionicons name="settings-outline" size={21} color="#1F2937" />
-        </Pressable>
-      </View>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingBottom: s(24) + insets.bottom,
+            paddingTop: insets.top + s(12),
+            paddingBottom: Math.max(insets.bottom, s(24)) + s(16),
           },
         ]}>
-        <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            {profileImage ? (
-              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
-            ) : (
-              <FontAwesome name="user" size={26} color="#1E3A8A" />
-            )}
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || 'Admin'}</Text>
-            <Text style={styles.profileEmail}>{user?.email || ''}</Text>
-            {/* <View style={styles.roleBadge}>
-              <Text style={styles.roleText}>{user?.role || 'owner'}</Text>
-            </View> */}
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <BackButton onPress={handleBack} />
+            <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
           </View>
           <Pressable
-            style={styles.editButton}
             onPress={handleOpenEditModal}
+            style={[styles.editPill, { backgroundColor: colors.accentSoft }]}
             accessibilityRole="button">
-            <Text style={styles.editButtonText}>Edit Profile</Text>
+            <FontAwesome name="pencil" size={14} color={colors.accent} />
+            <Text style={[styles.editPillText, { color: colors.accent }]}>Edit</Text>
           </Pressable>
         </View>
 
-        <View style={styles.menuGroup}>
-          <View style={styles.menuRow}>
-            <Ionicons
-              name="notifications-outline"
-              size={20}
-              color="#1F2937"
-              style={styles.menuIcon}
-            />
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Notifications</Text>
-              <Text style={styles.menuSubtitle}>
-                Turn notifications on or off
-              </Text>
+        <View style={[styles.profileCard, { backgroundColor: cardBackground }]}>
+          <Pressable
+            onPress={handleAvatarPress}
+            disabled={isUploadingAvatar}
+            accessibilityRole="button"
+            accessibilityLabel="Change profile photo"
+            style={styles.avatarPressable}>
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: colors.cardHighlight,
+                  borderColor: colors.accentSoft,
+                },
+              ]}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+              ) : (
+                <FontAwesome name="user" size={46} color={colors.accent} />
+              )}
             </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#CBD5E1', true: '#93C5FD' }}
-              thumbColor={notificationsEnabled ? '#2563EB' : '#F8FAFC'}
-              accessibilityLabel="Toggle notifications"
-            />
+            <View
+              style={[
+                styles.cameraButton,
+                { backgroundColor: colors.accent, borderColor: colors.surface },
+              ]}>
+              {isUploadingAvatar ? (
+                <ActivityIndicator size="small" color={colors.buttonText} />
+              ) : (
+                <FontAwesome name="camera" size={18} color={colors.buttonText} />
+              )}
+            </View>
+          </Pressable>
+          <Text style={[styles.name, { color: colors.text }]}>
+            {user?.name || 'Admin'}
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            {user?.email || 'Admin Portal Account'}
+          </Text>
+          <View style={[styles.roleBadge, { backgroundColor: colors.accentSoft }]}>
+            <Text style={[styles.roleBadgeText, { color: colors.accent }]}>
+              {user?.role || 'admin'}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.menuGroup}>
-          <Pressable
-            onPress={() => setIsSecurityExpanded(previous => !previous)}
-            accessibilityRole="button"
-            accessibilityLabel="Security"
-            accessibilityState={{ expanded: isSecurityExpanded }}
-            style={styles.menuRow}>
-            <Ionicons
-              name="shield-outline"
-              size={20}
-              color="#1F2937"
-              style={styles.menuIcon}
-            />
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Security</Text>
-              <Text style={styles.menuSubtitle}>
-                Password, help & support, terms & policies
-              </Text>
+        <View style={[styles.detailsCard, { backgroundColor: cardBackground }]}>
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>
+            Contact information
+          </Text>
+          {contactItems.map((item, index) => (
+            <View
+              key={item.label}
+              style={[styles.detailRow, index > 0 && rowBorderStyle]}>
+              <View
+                style={[
+                  styles.detailIcon,
+                  { backgroundColor: colors.cardHighlight },
+                ]}>
+                <FontAwesome name={item.icon} size={17} color={colors.accent} />
+              </View>
+              <View style={styles.detailCopy}>
+                <Text style={[styles.detailLabel, { color: colors.subtle }]}>
+                  {item.label}
+                </Text>
+                <Text style={[styles.detailValue, { color: colors.text }]}>
+                  {item.value}
+                </Text>
+              </View>
             </View>
-            <Ionicons
-              name={isSecurityExpanded ? 'chevron-up' : 'chevron-down'}
-              size={18}
-              color="#64748B"
-            />
-          </Pressable>
-          {isSecurityExpanded ? renderMenuItems(securityItems) : null}
-        </View>
-        <View style={[styles.menuGroup, styles.accountGroup]}>
-          <Pressable
-            onPress={() => setIsAccountExpanded(previous => !previous)}
-            accessibilityRole="button"
-            accessibilityLabel="Account"
-            accessibilityState={{ expanded: isAccountExpanded }}
-            style={styles.menuRow}>
-            <Ionicons
-              name="person-circle-outline"
-              size={20}
-              color="#1F2937"
-              style={styles.menuIcon}
-            />
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Account</Text>
-              <Text style={styles.menuSubtitle}>
-                Logout, deactivate or delete account
-              </Text>
-            </View>
-            <Ionicons
-              name={isAccountExpanded ? 'chevron-up' : 'chevron-down'}
-              size={18}
-              color="#64748B"
-            />
-          </Pressable>
-          {isAccountExpanded ? renderMenuItems(accountItems) : null}
+          ))}
         </View>
 
-        <Text style={styles.versionText}>App version 1.7.0</Text>
+        <View style={[styles.detailsCard, { backgroundColor: cardBackground }]}>
+          <Text style={[styles.sectionTitle, { color: colors.muted }]}>
+            Account
+          </Text>
+          {accountItems.map((item, index) => (
+            <Pressable
+              key={item.key}
+              onPress={item.onPress}
+              accessibilityRole="button"
+              style={[styles.detailRow, index > 0 && rowBorderStyle]}>
+              <View
+                style={[
+                  styles.detailIcon,
+                  { backgroundColor: colors.cardHighlight },
+                ]}>
+                <FontAwesome name={item.icon} size={17} color={colors.accent} />
+              </View>
+              <View style={styles.detailCopy}>
+                <Text style={[styles.detailLabel, { color: colors.text }]}>
+                  {item.title}
+                </Text>
+                <Text style={[styles.detailValue, { color: colors.subtle }]}>
+                  {item.subtitle}
+                </Text>
+              </View>
+              <FontAwesome name="angle-right" size={20} color={colors.muted} />
+            </Pressable>
+          ))}
+        </View>
+
+        <Pressable
+          onPress={() => dispatch(logoutUser())}
+          accessibilityRole="button"
+          style={[styles.logoutButton, { backgroundColor: colors.buttonBackground }]}>
+          <FontAwesome name="sign-out" size={17} color={colors.buttonText} />
+          <Text style={[styles.logoutText, { color: colors.buttonText }]}>
+            Logout
+          </Text>
+        </Pressable>
+
+        <Text style={[styles.versionText, { color: colors.subtle }]}>
+          App version 1.8.0
+        </Text>
       </ScrollView>
+
       <Modal
         visible={isEditModalVisible}
         transparent
@@ -328,55 +385,75 @@ const AdminProfileScreen = () => {
             onPress={() => setIsEditModalVisible(false)}
             disabled={isSavingProfile}
           />
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { backgroundColor: cardBackground }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Profile</Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                Edit Profile
+              </Text>
               <Pressable
                 onPress={() => setIsEditModalVisible(false)}
                 accessibilityRole="button"
                 accessibilityLabel="Close edit profile"
                 disabled={isSavingProfile}
                 hitSlop={8}>
-                <Ionicons name="close" size={22} color="#64748B" />
+                <FontAwesome name="close" size={18} color={colors.muted} />
               </Pressable>
             </View>
 
-            <Text style={styles.inputLabel}>Name</Text>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>Name</Text>
             <TextInput
-              style={styles.modalInput}
+              style={[
+                styles.modalInput,
+                {
+                  color: colors.text,
+                  borderColor: colors.border,
+                  backgroundColor: colors.cardHighlight,
+                },
+              ]}
               value={name}
               onChangeText={setName}
               placeholder="Enter your name"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.muted}
               autoCapitalize="words"
               editable={!isSavingProfile}
             />
-            <Text style={styles.inputLabel}>Phone</Text>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>Phone</Text>
             <TextInput
-              style={styles.modalInput}
+              style={[
+                styles.modalInput,
+                {
+                  color: colors.text,
+                  borderColor: colors.border,
+                  backgroundColor: colors.cardHighlight,
+                },
+              ]}
               value={phone}
               onChangeText={setPhone}
               placeholder="Enter your phone number"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.muted}
               keyboardType="phone-pad"
               editable={!isSavingProfile}
             />
 
             <View style={styles.modalActions}>
               <Pressable
-                style={styles.cancelButton}
+                style={[styles.cancelButton, { backgroundColor: colors.cardHighlight }]}
                 onPress={() => setIsEditModalVisible(false)}
                 disabled={isSavingProfile}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.text }]}>
+                  Cancel
+                </Text>
               </Pressable>
               <Pressable
-                style={[styles.saveButton, isSavingProfile && styles.saveButtonDisabled]}
+                style={[styles.saveButton, { backgroundColor: colors.buttonBackground }, isSavingProfile && styles.saveButtonDisabled]}
                 onPress={handleSaveProfile}
                 disabled={isSavingProfile}>
                 {isSavingProfile ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <ActivityIndicator size="small" color={colors.buttonText} />
                 ) : (
-                  <Text style={styles.saveButtonText}>Save</Text>
+                  <Text style={[styles.saveButtonText, { color: colors.buttonText }]}>
+                    Save
+                  </Text>
                 )}
               </Pressable>
             </View>
@@ -390,134 +467,144 @@ const AdminProfileScreen = () => {
 export default AdminProfileScreen;
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
+  screen: { flex: 1 },
+  scrollContent: { paddingHorizontal: s(10) },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(18),
-    paddingBottom: s(10),
-    backgroundColor: '#FFFFFF',
+    justifyContent: 'space-between',
   },
-  headerButton: {
-    width: s(40),
-    height: s(40),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: font.lg,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  scrollContent: {
-    paddingHorizontal: s(18),
-  },
-  profileCard: {
-    backgroundColor: '#FFFFFF',
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: s(18),
-    borderBottomWidth: 1,
-    borderBottomColor: '#D1D5DB',
+    gap: s(12),
+  },
+  title: {
+    fontSize: font.display,
+    fontWeight: '400',
+  },
+  editPill: {
+    minHeight: 34,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(7),
+    paddingHorizontal: s(14),
+    borderRadius: 18,
+  },
+  editPillText: {
+    fontSize: font.sm,
+    fontWeight: '600',
+  },
+  profileCard: {
+    alignItems: 'center',
+    borderRadius: 29,
+    marginTop: s(24),
+    paddingVertical: s(24),
+  },
+  avatarPressable: {
+    position: 'relative',
   },
   avatar: {
-    width: s(52),
-    height: s(52),
-    borderRadius: s(26),
-    flexShrink: 0,
-    backgroundColor: '#F8FAFC',
+    width: 120,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 3,
+    borderRadius: 60,
     overflow: 'hidden',
   },
   avatarImage: {
-    width: s(52),
-    height: s(52),
+    width: '100%',
+    height: '100%',
   },
-  profileInfo: {
-    flex: 1,
-    marginLeft: s(10),
-    marginRight: s(8),
+  cameraButton: {
+    position: 'absolute',
+    right: -2,
+    bottom: 0,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderRadius: 18,
   },
-  profileName: {
-    fontSize: font.base,
-    fontWeight: '600',
-    color: '#0F172A',
+  name: {
+    fontSize: font.displayXL,
+    fontWeight: '400',
+    marginTop: s(14),
+    textAlign: 'center',
   },
-  profileEmail: {
-    fontSize: font.xs,
-    color: '#64748B',
-    marginTop: 1,
+  subtitle: {
+    fontSize: font.bodySmall,
+    fontWeight: '400',
+    marginTop: s(4),
+    textAlign: 'center',
   },
   roleBadge: {
-    backgroundColor: '#E0E7FF',
-    paddingHorizontal: s(6),
-    paddingVertical: s(2),
-    borderRadius: s(4),
-    marginTop: s(4),
-    alignSelf: 'flex-start',
+    marginTop: s(10),
+    paddingHorizontal: s(12),
+    paddingVertical: s(4),
+    borderRadius: 12,
   },
-  roleText: {
-    fontSize: font.micro,
-    color: '#3730A3',
-    fontWeight: '600',
-  },
-  editButton: {
-    paddingHorizontal: s(8),
-    paddingVertical: s(5),
-    borderRadius: s(4),
-    backgroundColor: '#3182CE',
-  },
-  editButtonText: {
-    color: '#FFFFFF',
+  roleBadgeText: {
     fontSize: font.xs,
-    fontWeight: '600',
+    fontWeight: '700',
+    textTransform: 'capitalize',
   },
-  menuGroup: {
-    paddingVertical: s(9),
-    borderBottomWidth: 1,
-    borderBottomColor: '#D1D5DB',
+  detailsCard: {
+    borderRadius: 18,
+    marginTop: s(16),
+    paddingHorizontal: s(10),
+    paddingTop: s(16),
+    paddingBottom: s(4),
   },
-  accountGroup: {
-    marginTop: s(4),
+  sectionTitle: {
+    fontSize: font.lg,
+    fontWeight: '400',
+    marginBottom: s(4),
   },
-  menuRow: {
-    minHeight: s(58),
+  detailRow: {
+    minHeight: 70,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: s(6),
+    gap: s(14),
+    paddingVertical: s(12),
   },
-  menuRowBorder: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
+  detailIcon: {
+    width: 42,
+    height: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
   },
-  menuIcon: {
-    width: s(28),
-    marginRight: s(12),
-  },
-  menuText: {
-    flex: 1,
-  },
-  menuTitle: {
+  detailCopy: { flex: 1 },
+  detailLabel: {
     fontSize: font.sm,
-    fontWeight: '500',
-    color: '#111827',
+    fontWeight: '400',
   },
-  menuSubtitle: {
-    fontSize: font.micro,
-    color: '#64748B',
-    marginTop: s(1),
+  detailValue: {
+    fontSize: font.md,
+    fontWeight: '400',
+    marginTop: s(4),
+  },
+  logoutButton: {
+    height: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: s(10),
+    borderRadius: 34,
+    marginTop: s(32),
+  },
+  logoutText: {
+    fontSize: font.lg,
+    fontWeight: '400',
   },
   versionText: {
+    fontSize: font.sm,
+    fontWeight: '400',
+    marginTop: s(18),
     textAlign: 'center',
-    fontSize: font.micro,
-    color: '#94A3B8',
-    marginTop: s(8),
   },
   modalOverlay: {
     flex: 1,
@@ -531,7 +618,6 @@ const styles = StyleSheet.create({
     maxWidth: 440,
     padding: s(20),
     borderRadius: s(16),
-    backgroundColor: '#FFFFFF',
     elevation: 8,
   },
   modalHeader: {
@@ -543,22 +629,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: font.xl,
     fontWeight: '700',
-    color: '#0F172A',
   },
   inputLabel: {
     fontSize: font.sm,
     fontWeight: '600',
-    color: '#334155',
     marginBottom: s(6),
   },
   modalInput: {
     minHeight: s(46),
     borderWidth: 1,
-    borderColor: '#CBD5E1',
     borderRadius: s(8),
     paddingHorizontal: s(12),
     marginBottom: s(14),
-    color: '#0F172A',
     fontSize: font.base,
   },
   modalActions: {
@@ -573,10 +655,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: s(8),
-    backgroundColor: '#F1F5F9',
   },
   cancelButtonText: {
-    color: '#334155',
     fontSize: font.sm,
     fontWeight: '600',
   },
@@ -586,13 +666,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: s(8),
-    backgroundColor: '#3182CE',
   },
-  saveButtonDisabled: {
-    opacity: 0.65,
-  },
+  saveButtonDisabled: { opacity: 0.65 },
   saveButtonText: {
-    color: '#FFFFFF',
     fontSize: font.sm,
     fontWeight: '600',
   },

@@ -10,6 +10,12 @@ const CRM_CARDS = [
   // { key: 'add-expense', title: 'Add Expense', icon: 'wallet-outline', screen: 'AdminAddExpense' },
   { key: 'communication-history', title: 'Communication History', icon: 'chatbubble-ellipses-outline' },
   { key: 'sales-pipeline', title: 'Sales Pipeline', icon: 'funnel-outline' },
+  {
+    key: 'recent-activity',
+    title: 'Recent Activity',
+    icon: 'time-outline',
+    screen: 'AdminRecentActivity',
+  },
 ];
 
 const CRM = () => {

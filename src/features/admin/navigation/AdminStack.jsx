@@ -2,6 +2,7 @@
 import AdminHomeScreen from '../screens/AdminHomeScreen';
 import AdminCompaniesWithoutDocumentsScreen from '../screens/AdminCompaniesWithoutDocumentsScreen';
 import AdminProfileScreen from '../profile/screens/AdminProfileScreen';
+import AdminSettingsScreen from '../settings/SettingsScreen';
 import CompanyVistaLeadsScreen from '../companyVistaLeads/screens/CompanyVistaLeadsScreen';
 import DeactivateAccountScreen from '../../settings/screens/DeactivateAccountScreen';
 import DeleteAccountScreen from '../../settings/screens/DeleteAccountScreen';
@@ -34,6 +35,7 @@ import {
 import AdminLayout from '../components/AdminLayout';
 import AdminBlogsScreen from '../blogs/AdminBlogsScreen';
 import CRM from '../crm/crm';
+import RecentActivityScreen from '../crm/screens/RecentActivityScreen';
 import AdminChangeRequest from '../services/components/AdminChangeRequest';
 import AdminChangeRequestDetails from '../services/components/AdminChangeRequestDetails';
 import AdminServicesRequest from '../services/components/AdminServicesRequest';
@@ -55,6 +57,11 @@ export default function AdminStack() {
         layout={FullScreenLayout}
       />
       <Stack.Screen name="AdminCRM" component={CRM} layout={FullScreenLayout} />
+      <Stack.Screen
+        name="AdminRecentActivity"
+        component={RecentActivityScreen}
+        layout={FullScreenLayout}
+      />
       <Stack.Screen
         name="AdminChangeRequests"
         component={AdminChangeRequest}
@@ -83,6 +90,11 @@ export default function AdminStack() {
       <Stack.Screen
         name="AdminProfile"
         component={AdminProfileScreen}
+        layout={FullScreenLayout}
+      />
+      <Stack.Screen
+        name="AdminSettings"
+        component={AdminSettingsScreen}
         layout={FullScreenLayout}
       />
       <Stack.Screen
