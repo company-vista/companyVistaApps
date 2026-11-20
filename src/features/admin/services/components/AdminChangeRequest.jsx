@@ -17,6 +17,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
 import { s } from '../../../../theme/responsive';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import { fetchAdminChangeRequests } from '../api/adminChangeRequestsApi';
 
 const STATUS_FILTERS = [
@@ -27,24 +28,18 @@ const STATUS_FILTERS = [
   { key: 'rejected', label: 'Rejected' },
 ];
 
-const STATUS_CONFIG = {
-  pending: { label: 'Pending', color: '#B45309', backgroundColor: '#FEF3C7' },
-  'in-progress': { label: 'In Progress', color: '#1D4ED8', backgroundColor: '#DBEAFE' },
-  approved: { label: 'Approved', color: '#15803D', backgroundColor: '#DCFCE7' },
-  rejected: { label: 'Rejected', color: '#B91C1C', backgroundColor: '#FEE2E2' },
-};
+const getStatusConfig = colors => ({
+  pending: { label: 'Pending', color: colors.muted, backgroundColor: colors.sheet },
+  'in-progress': { label: 'In Progress', color: colors.accent, backgroundColor: colors.accentSoft },
+  approved: { label: 'Approved', color: colors.accent, backgroundColor: colors.accentSoft },
+  rejected: { label: 'Rejected', color: colors.danger, backgroundColor: colors.sheet },
+});
 
-const URGENCY_CONFIG = {
-  low: { label: 'Low', color: '#15803D', backgroundColor: '#DCFCE7' },
-  medium: { label: 'Medium', color: '#B45309', backgroundColor: '#FEF3C7' },
-  high: { label: 'High', color: '#B91C1C', backgroundColor: '#FEE2E2' },
-};
-
-const getStatusStyle = status =>
-  STATUS_CONFIG[String(status || '').toLowerCase()] || STATUS_CONFIG.pending;
-
-const getUrgencyStyle = urgency =>
-  URGENCY_CONFIG[String(urgency || '').toLowerCase()] || URGENCY_CONFIG.low;
+const getUrgencyConfig = colors => ({
+  low: { label: 'Low', color: colors.accent, backgroundColor: colors.accentSoft },
+  medium: { label: 'Medium', color: colors.muted, backgroundColor: colors.sheet },
+  high: { label: 'High', color: colors.danger, backgroundColor: colors.sheet },
+});
 
 const formatDate = value => {
   if (!value) return 'N/A';
@@ -61,6 +56,14 @@ const AdminChangeRequest = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
+  const colors = useThemeColors();
+  const isDark = useResolvedThemeMode() === 'dark';
+  const statusConfig = getStatusConfig(colors);
+  const urgencyConfig = getUrgencyConfig(colors);
+  const getStatusStyle = status =>
+    statusConfig[String(status || '').toLowerCase()] || statusConfig.pending;
+  const getUrgencyStyle = urgency =>
+    urgencyConfig[String(urgency || '').toLowerCase()] || urgencyConfig.low;
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -131,7 +134,7 @@ const AdminChangeRequest = () => {
 
     return (
       <Pressable
-        style={styles.requestCard}
+        style={[styles.requestCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
         onPress={() =>
           navigation.navigate('AdminChangeRequestDetails', {
             requestId: item._id || item.id,
@@ -140,14 +143,14 @@ const AdminChangeRequest = () => {
         accessibilityRole="button"
         accessibilityLabel={`Review change request ${item.type || ''}`}>
         <View style={styles.cardHeader}>
-          <View style={styles.typeIcon}>
-            <Ionicons name="document-text-outline" size={19} color="#4F46E5" />
+          <View style={[styles.typeIcon, { backgroundColor: colors.accentSoft }]}>
+            <Ionicons name="document-text-outline" size={19} color={colors.accent} />
           </View>
           <View style={styles.cardHeaderCopy}>
-            <Text style={styles.requestType} numberOfLines={1}>
+            <Text style={[styles.requestType, { color: colors.text }]} numberOfLines={1}>
               {item.type || 'Change Request'}
             </Text>
-            <Text style={styles.submittedText}>
+            <Text style={[styles.submittedText, { color: colors.muted }]}>
               Submitted {formatDate(item.createdAt)}
             </Text>
           </View>
@@ -158,39 +161,39 @@ const AdminChangeRequest = () => {
           </View>
         </View>
 
-        <View style={styles.cardDetails}>
+        <View style={[styles.cardDetails, { borderTopColor: colors.border }]}>
           <View style={styles.detailLine}>
-            <Ionicons name="business-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="business-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {item.companyId?.companyName || 'Unknown company'}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="person-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="person-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {clientName}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="mail-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="mail-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {item.clientId?.email || 'No email'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.cardFooter}>
+        <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
           <View style={[styles.urgencyBadge, { backgroundColor: urgency.backgroundColor }]}>
             <Text style={[styles.urgencyText, { color: urgency.color }]}>
               {urgency.label} urgency
             </Text>
           </View>
           {fields.length > 0 ? (
-            <Text style={styles.fieldsText} numberOfLines={1}>
+            <Text style={[styles.fieldsText, { color: colors.muted }]} numberOfLines={1}>
               {fields.length} field{fields.length > 1 ? 's' : ''}
             </Text>
           ) : null}
-          <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+          <Ionicons name="chevron-forward" size={18} color={colors.subtle} />
         </View>
       </Pressable>
     );
@@ -200,30 +203,30 @@ const AdminChangeRequest = () => {
     if (loading) {
       return (
         <View style={styles.state}>
-          <ActivityIndicator size="large" color="#2563EB" />
-          <Text style={styles.stateText}>Loading change requests...</Text>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.stateText, { color: colors.muted }]}>Loading change requests...</Text>
         </View>
       );
     }
     if (error) {
       return (
         <View style={styles.state}>
-          <Ionicons name="alert-circle-outline" size={32} color="#DC2626" />
-          <Text style={styles.errorText}>{error}</Text>
+          <Ionicons name="alert-circle-outline" size={32} color={colors.danger} />
+          <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           <Pressable
-            style={styles.retryButton}
+            style={[styles.retryButton, { backgroundColor: colors.accent }]}
             onPress={() => loadRequests()}
             accessibilityRole="button">
-            <Text style={styles.retryText}>Try again</Text>
+            <Text style={[styles.retryText, { color: colors.buttonText }]}>Try again</Text>
           </Pressable>
         </View>
       );
     }
     return (
       <View style={styles.state}>
-        <Ionicons name="document-text-outline" size={34} color="#94A3B8" />
-        <Text style={styles.emptyTitle}>No change requests found</Text>
-        <Text style={styles.emptyText}>Try adjusting the filters or search query.</Text>
+        <Ionicons name="document-text-outline" size={34} color={colors.subtle} />
+        <Text style={[styles.emptyTitle, { color: colors.muted }]}>No change requests found</Text>
+        <Text style={[styles.emptyText, { color: colors.subtle }]}>Try adjusting the filters or search query.</Text>
       </View>
     );
   };
@@ -241,21 +244,23 @@ const AdminChangeRequest = () => {
           { label: 'Approved', value: stats.approved },
           { label: 'Rejected', value: stats.rejected },
         ].map(stat => (
-          <View key={stat.label} style={styles.statCard}>
-            <Text style={styles.statValue}>{loading ? '—' : stat.value}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
+          <View
+            key={stat.label}
+            style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.statValue, { color: colors.text }]}>{loading ? '—' : stat.value}</Text>
+            <Text style={[styles.statLabel, { color: colors.muted }]}>{stat.label}</Text>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search-outline" size={19} color="#94A3B8" />
+      <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Ionicons name="search-outline" size={19} color={colors.subtle} />
         <TextInput
           value={searchText}
           onChangeText={setSearchText}
           placeholder="Search by company, client, or type..."
-          placeholderTextColor="#94A3B8"
-          style={styles.searchInput}
+          placeholderTextColor={colors.inputPlaceholder}
+          style={[styles.searchInput, { color: colors.text }]}
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
@@ -266,7 +271,7 @@ const AdminChangeRequest = () => {
             onPress={() => setSearchText('')}
             accessibilityRole="button"
             accessibilityLabel="Clear search">
-            <Ionicons name="close-circle" size={19} color="#94A3B8" />
+            <Ionicons name="close-circle" size={19} color={colors.subtle} />
           </Pressable>
         ) : null}
       </View>
@@ -283,8 +288,12 @@ const AdminChangeRequest = () => {
               onPress={() => setStatusFilter(filter.key)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
-              style={[styles.filterChip, active && styles.filterChipActive]}>
-              <Text style={[styles.filterText, active && styles.filterTextActive]}>
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+                active && { backgroundColor: colors.accentSoft, borderColor: colors.accent },
+              ]}>
+              <Text style={[styles.filterText, { color: colors.muted }, active && { color: colors.accent }]}>
                 {filter.label}
               </Text>
             </Pressable>
@@ -293,28 +302,39 @@ const AdminChangeRequest = () => {
       </ScrollView>
 
       {error && requests.length > 0 ? (
-        <Text style={styles.inlineError}>{error}</Text>
+        <Text style={[styles.inlineError, { color: colors.danger }]}>{error}</Text>
       ) : null}
-      <Text style={styles.resultsText}>
+      <Text style={[styles.resultsText, { color: colors.muted }]}>
         Showing {filteredRequests.length} of {requests.length} requests
       </Text>
     </View>
   );
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, s(12)) }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, s(12)),
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+          },
+        ]}>
         <Pressable
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          style={styles.backButton}>
-          <Ionicons name="arrow-back" size={21} color="#1E293B" />
+          style={[styles.backButton, { backgroundColor: colors.sheet }]}>
+          <Ionicons name="arrow-back" size={21} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>
-          <Text style={styles.title}>Change Requests</Text>
-          <Text style={styles.subtitle}>Review client-submitted changes</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Change Requests</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>Review client-submitted changes</Text>
         </View>
       </View>
       <FlatList
@@ -333,8 +353,8 @@ const AdminChangeRequest = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadRequests(true)}
-            tintColor="#2563EB"
-            colors={['#2563EB']}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }
       />
@@ -345,15 +365,13 @@ const AdminChangeRequest = () => {
 export default AdminChangeRequest;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F8FAFC' },
+  screen: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: s(16),
     paddingBottom: s(12),
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   backButton: {
     width: s(38),
@@ -361,12 +379,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: s(10),
-    backgroundColor: '#F1F5F9',
     marginRight: s(10),
   },
   headerCopy: { flex: 1 },
-  title: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  subtitle: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  title: { fontSize: font.xl, fontWeight: '800' },
+  subtitle: { fontSize: font.xs, marginTop: s(2) },
   listContent: { paddingHorizontal: s(16), paddingTop: s(12) },
   emptyListContent: { flexGrow: 1 },
   statsRow: { flexDirection: 'row', gap: s(10), paddingBottom: s(12) },
@@ -376,23 +393,19 @@ const styles = StyleSheet.create({
     paddingVertical: s(11),
     borderRadius: s(12),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  statValue: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  statLabel: { color: '#64748B', fontSize: font.xs, marginTop: s(3) },
+  statValue: { fontSize: font.xl, fontWeight: '800' },
+  statLabel: { fontSize: font.xs, marginTop: s(3) },
   searchBox: {
     minHeight: s(44),
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingHorizontal: s(12),
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: s(10),
   },
-  searchInput: { flex: 1, color: '#0F172A', fontSize: font.sm, paddingVertical: s(8) },
+  searchInput: { flex: 1, fontSize: font.sm, paddingVertical: s(8) },
   filterRow: { flexDirection: 'row', gap: s(8), paddingVertical: s(10) },
   filterChip: {
     minHeight: s(34),
@@ -400,21 +413,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: s(18),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  filterChipActive: { backgroundColor: '#EFF6FF', borderColor: '#93C5FD' },
-  filterText: { color: '#64748B', fontSize: font.xs, fontWeight: '600' },
-  filterTextActive: { color: '#1D4ED8' },
-  resultsText: { color: '#64748B', fontSize: font.xs, marginBottom: s(8) },
-  inlineError: { color: '#B91C1C', fontSize: font.xs, paddingBottom: s(6) },
+  filterText: { fontSize: font.xs, fontWeight: '600' },
+  resultsText: { fontSize: font.xs, marginBottom: s(8) },
+  inlineError: { fontSize: font.xs, paddingBottom: s(6) },
   requestCard: {
     padding: s(13),
     marginBottom: s(10),
     borderRadius: s(13),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
   typeIcon: {
@@ -423,12 +430,11 @@ const styles = StyleSheet.create({
     borderRadius: s(12),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EEF2FF',
     marginRight: s(10),
   },
   cardHeaderCopy: { flex: 1, marginRight: s(8) },
-  requestType: { color: '#0F172A', fontSize: font.sm, fontWeight: '700' },
-  submittedText: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  requestType: { fontSize: font.sm, fontWeight: '700' },
+  submittedText: { fontSize: font.xs, marginTop: s(2) },
   statusBadge: {
     paddingHorizontal: s(8),
     paddingVertical: s(4),
@@ -440,17 +446,15 @@ const styles = StyleSheet.create({
     paddingVertical: s(10),
     marginTop: s(10),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: s(7) },
-  detailText: { flex: 1, color: '#475569', fontSize: font.xs },
+  detailText: { flex: 1, fontSize: font.xs },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingTop: s(8),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   urgencyBadge: {
     paddingHorizontal: s(8),
@@ -458,18 +462,17 @@ const styles = StyleSheet.create({
     borderRadius: s(7),
   },
   urgencyText: { fontSize: font.tiny, fontWeight: '700' },
-  fieldsText: { flex: 1, color: '#64748B', fontSize: font.tiny },
+  fieldsText: { flex: 1, fontSize: font.tiny },
   state: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: s(24) },
-  stateText: { color: '#64748B', fontSize: font.sm, marginTop: s(10) },
-  errorText: { color: '#B91C1C', fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
-  emptyTitle: { color: '#64748B', fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
-  emptyText: { color: '#94A3B8', fontSize: font.xs, marginTop: s(4) },
+  stateText: { fontSize: font.sm, marginTop: s(10) },
+  errorText: { fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
+  emptyTitle: { fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
+  emptyText: { fontSize: font.xs, marginTop: s(4) },
   retryButton: {
     marginTop: s(12),
     paddingHorizontal: s(16),
     paddingVertical: s(8),
     borderRadius: s(8),
-    backgroundColor: '#2563EB',
   },
-  retryText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '600' },
+  retryText: { fontSize: font.sm, fontWeight: '600' },
 });

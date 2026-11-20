@@ -22,7 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { logoutUser, updateProfileUser } from '../../../../store/slices/authSlice';
 import { s } from '../../../../theme/responsive';
-import { useThemeColors } from '../../../../theme/colors';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import BackButton from '../../../../components/buttons/BackButton';
 import { fetchAdminProfile, updateAdminProfile, uploadAdminAvatar } from '../api/adminProfileApi';
 
@@ -48,7 +48,8 @@ const AdminProfileScreen = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [localAvatarUri, setLocalAvatarUri] = useState(null);
 
-  const isDark = colors.mode === 'dark';
+  const effectiveMode = useResolvedThemeMode();
+  const isDark = effectiveMode === 'dark';
   const cardBackground = isDark ? colors.cardElevated : colors.cardHighlight;
 
   const handleBack = () => {
@@ -202,6 +203,13 @@ const AdminProfileScreen = () => {
   const rowBorderStyle = { borderTopWidth: 1, borderTopColor: colors.border };
 
   const accountItems = [
+    {
+      key: 'appearance',
+      title: 'Appearance',
+      subtitle: `${isDark ? 'Dark' : 'Light'} mode · tap to change`,
+      icon: isDark ? 'moon-o' : 'sun-o',
+      onPress: () => navigation.navigate('AdminSettings'),
+    },
     {
       key: 'settings',
       title: 'Settings',

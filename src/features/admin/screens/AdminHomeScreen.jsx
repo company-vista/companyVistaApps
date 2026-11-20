@@ -1,4 +1,5 @@
 import { font } from '../../../theme/typography';
+import { useThemeColors, useResolvedThemeMode } from '../../../theme/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -42,6 +43,9 @@ const EMPTY_STATS = {
 const AdminDashboard = () => {
   const navigation = useNavigation();
   const token = useAppSelector(state => state.auth.token);
+  const colors = useThemeColors();
+  const effectiveMode = useResolvedThemeMode();
+  const isDark = effectiveMode === 'dark';
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -202,32 +206,32 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <View style={styles.centeredState}>
+      <View style={[styles.centeredState, { backgroundColor: colors.background }]}>
         <StatusBar
-          barStyle="dark-content"
-          backgroundColor="#F8FAFC"
+          barStyle={isDark ? 'light-content' : 'dark-content'}
+          backgroundColor={colors.background}
           translucent
         />
-        <ActivityIndicator size="large" color="#1E3A8A" />
-        <Text style={styles.stateText}>Loading dashboard...</Text>
+        <ActivityIndicator size="large" color={colors.accent} />
+        <Text style={[styles.stateText, { color: colors.muted }]}>Loading dashboard...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centeredState}>
+      <View style={[styles.centeredState, { backgroundColor: colors.background }]}>
         <StatusBar
-          barStyle="dark-content"
-          backgroundColor="#F8FAFC"
+          barStyle={isDark ? 'light-content' : 'dark-content'}
+          backgroundColor={colors.background}
           translucent
         />
-        <Ionicons name="alert-circle-outline" size={40} color="#DC2626" />
-        <Text style={styles.errorText}>{error}</Text>
+        <Ionicons name="alert-circle-outline" size={40} color={colors.danger} />
+        <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
         <TouchableOpacity
-          style={styles.retryButton}
+          style={[styles.retryButton, { backgroundColor: colors.buttonBackground }]}
           onPress={() => loadOverview()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={[styles.retryButtonText, { color: colors.buttonText }]}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
@@ -235,10 +239,10 @@ const AdminDashboard = () => {
 
   return (
 
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#FFFFFF"
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
         translucent
       />
 
@@ -250,8 +254,8 @@ const AdminDashboard = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#1E3A8A"
-            colors={['#1E3A8A']}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }>
 
@@ -264,7 +268,7 @@ const AdminDashboard = () => {
         <QuickActions />
 
         <View style={styles.financeSection}>
-          <Text style={styles.sectionTitle}>Finance</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Finance</Text>
           <AdminFinanceScreen showHeader={false} />
         </View>
 
@@ -290,7 +294,6 @@ const AdminDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     padding: 16,
@@ -300,7 +303,6 @@ const styles = StyleSheet.create({
   },
   centeredState: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
@@ -308,29 +310,24 @@ const styles = StyleSheet.create({
   stateText: {
     marginTop: 12,
     fontSize: font.bodySmall,
-    color: '#64748B',
   },
   errorText: {
     marginTop: 12,
     fontSize: font.bodySmall,
-    color: '#DC2626',
     textAlign: 'center',
   },
   retryButton: {
     marginTop: 16,
-    backgroundColor: '#1E3A8A',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFFFFF',
     fontSize: font.bodySmall,
     fontWeight: '600',
   },
 
   primaryButton: {
-    backgroundColor: '#1E3A8A',
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center',
@@ -338,12 +335,10 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: font.bodySmall,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   sectionTitle: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
   },
   financeSection: {
     marginTop: 12,

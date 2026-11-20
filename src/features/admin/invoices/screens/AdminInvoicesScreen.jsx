@@ -17,6 +17,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import { computeInvoiceGrandTotal } from '../../dashboard/utils/invoiceTotals';
 import {
   formatCurrency,
@@ -65,22 +66,15 @@ const getPaymentStatus = invoice =>
     ? 'overdue'
     : String(invoice.paymentStatus || invoice.status || 'pending').toLowerCase();
 
-const getStatusColors = status => {
+const getStatusColors = (status, colors) => {
   switch (status) {
     case 'paid':
-      return { color: '#15803D', backgroundColor: '#DCFCE7' };
-    case 'overdue':
-      return { color: '#B91C1C', backgroundColor: '#FEE2E2' };
-    case 'partial':
-    case 'unpaid':
-    case 'pending':
-      return { color: '#B45309', backgroundColor: '#FEF3C7' };
     case 'sent':
-      return { color: '#1D4ED8', backgroundColor: '#DBEAFE' };
-    case 'draft':
-      return { color: '#475569', backgroundColor: '#F1F5F9' };
+      return { color: colors.accent, backgroundColor: colors.accentSoft };
+    case 'overdue':
+      return { color: colors.danger, backgroundColor: colors.sheet };
     default:
-      return { color: '#475569', backgroundColor: '#F1F5F9' };
+      return { color: colors.muted, backgroundColor: colors.sheet };
   }
 };
 
@@ -94,6 +88,8 @@ const AdminInvoicesScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = useResolvedThemeMode() === 'dark';
   const token = useAppSelector(state => state.auth.token);
   const [invoices, setInvoices] = useState([]);
   const [stats, setStats] = useState({});
@@ -200,18 +196,25 @@ const AdminInvoicesScreen = () => {
 
   const renderFilterOptions = (label, key, values) => (
     <View style={styles.filterGroup}>
-      <Text style={styles.filterLabel}>{label}</Text>
+      <Text style={[styles.filterLabel, { color: colors.muted }]}>{label}</Text>
       <View style={styles.filterOptions}>
         {values.map(value => {
           const active = filters[key] === value;
           return (
             <TouchableOpacity
               key={value}
-              style={[styles.filterChip, active && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                {
+                  backgroundColor: active ? colors.accentSoft : colors.surface,
+                  borderColor: active ? colors.accent : colors.border,
+                },
+              ]}
               onPress={() => setFilter(key, value)}>
               <Text
                 style={[
                   styles.filterChipText,
+                  { color: active ? colors.accent : colors.muted },
                   active && styles.filterChipTextActive,
                 ]}>
                 {value === 'all' ? 'All' : formatStatusLabel(value)}
@@ -232,23 +235,31 @@ const AdminInvoicesScreen = () => {
         : Number(item.paidAmount) || 0;
     const balance = Math.max(total - paidAmount, 0);
     const paymentStatus = getPaymentStatus(item);
-    const badge = getStatusColors(paymentStatus);
+    const badge = getStatusColors(paymentStatus, colors);
 
     return (
-      <View style={styles.invoiceCard}>
+      <View
+        style={[
+          styles.invoiceCard,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}>
         <View style={styles.invoiceHeader}>
           <TouchableOpacity
             style={styles.invoiceIdentity}
             onPress={() => setSelectedInvoice(item)}
             activeOpacity={0.75}>
-            <View style={styles.invoiceIcon}>
-              <Ionicons name="document-text-outline" size={19} color="#2563EB" />
+            <View style={[styles.invoiceIcon, { backgroundColor: colors.accentSoft }]}>
+              <Ionicons
+                name="document-text-outline"
+                size={19}
+                color={colors.accent}
+              />
             </View>
             <View style={styles.invoiceHeading}>
-              <Text style={styles.invoiceNumber} numberOfLines={1}>
+              <Text style={[styles.invoiceNumber, { color: colors.text }]} numberOfLines={1}>
                 {item.invoiceHead || item.invoiceNumber || 'Invoice'}
               </Text>
-              <Text style={styles.companyName} numberOfLines={1}>
+              <Text style={[styles.companyName, { color: colors.muted }]} numberOfLines={1}>
                 {getCompanyName(item)}
               </Text>
             </View>
@@ -259,36 +270,48 @@ const AdminInvoicesScreen = () => {
             </Text>
           </View>
           <TouchableOpacity
-            style={styles.editButton}
+            style={[styles.editButton, { backgroundColor: colors.accentSoft }]}
             onPress={() =>
               navigation.navigate('AdminEditInvoice', { invoiceId: item._id })
             }
             accessibilityRole="button"
             accessibilityLabel={`Edit invoice ${item.invoiceNumber || ''}`}
             hitSlop={6}>
-            <Ionicons name="create-outline" size={18} color="#2563EB" />
+            <Ionicons name="create-outline" size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
           onPress={() => setSelectedInvoice(item)}
           activeOpacity={0.75}>
-          <View style={styles.invoiceDivider} />
+          <View style={[styles.invoiceDivider, { backgroundColor: colors.border }]} />
           <View style={styles.invoiceDetails}>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Invoice date</Text>
-              <Text style={styles.detailValue}>{formatShortDate(item.invoiceDate)}</Text>
+              <Text style={[styles.detailLabel, { color: colors.subtle }]}>Invoice date</Text>
+              <Text style={[styles.detailValue, { color: colors.muted }]}>
+                {formatShortDate(item.invoiceDate)}
+              </Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Due date</Text>
-              <Text style={[styles.detailValue, isOverdue(item) && styles.overdueText]}>
+              <Text style={[styles.detailLabel, { color: colors.subtle }]}>Due date</Text>
+              <Text
+                style={[
+                  styles.detailValue,
+                  { color: isOverdue(item) ? colors.danger : colors.muted },
+                ]}>
                 {formatShortDate(item.dueDate)}
               </Text>
             </View>
           </View>
           <View style={styles.amountRow}>
-            <Text style={styles.totalAmount}>{formatCurrency(total, currency)}</Text>
-            <Text style={balance > 0 ? styles.balanceAmount : styles.paidAmount}>
+            <Text style={[styles.totalAmount, { color: colors.text }]}>
+              {formatCurrency(total, currency)}
+            </Text>
+            <Text
+              style={[
+                balance > 0 ? styles.balanceAmount : styles.paidAmount,
+                { color: balance > 0 ? colors.danger : colors.accent },
+              ]}>
               {balance > 0
                 ? `Balance: ${formatCurrency(balance, currency)}`
                 : 'Fully paid'}
@@ -301,18 +324,20 @@ const AdminInvoicesScreen = () => {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <View style={styles.emptyIcon}>
-        <Ionicons name="document-text-outline" size={28} color="#94A3B8" />
+      <View style={[styles.emptyIcon, { backgroundColor: colors.border }]}>
+        <Ionicons name="document-text-outline" size={28} color={colors.subtle} />
       </View>
-      <Text style={styles.emptyTitle}>No invoices found</Text>
-      <Text style={styles.emptyMessage}>
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>No invoices found</Text>
+      <Text style={[styles.emptyMessage, { color: colors.muted }]}>
         Try changing your search or filters, or create an invoice.
       </Text>
       <TouchableOpacity
-        style={styles.createButton}
+        style={[styles.createButton, { backgroundColor: colors.buttonBackground }]}
         onPress={() => navigation.navigate('AdminCreateInvoice')}>
-        <Ionicons name="add" size={17} color="#FFFFFF" />
-        <Text style={styles.createButtonText}>Create invoice</Text>
+        <Ionicons name="add" size={17} color={colors.buttonText} />
+        <Text style={[styles.createButtonText, { color: colors.buttonText }]}>
+          Create invoice
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -324,60 +349,87 @@ const AdminInvoicesScreen = () => {
   const detailStatus = selectedInvoice
     ? getPaymentStatus(selectedInvoice)
     : 'pending';
-  const detailBadge = getStatusColors(detailStatus);
+  const detailBadge = getStatusColors(detailStatus, colors);
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, 10) + 8 }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, 10) + 8,
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+          },
+        ]}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.sheet }]}
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           accessibilityLabel="Go back">
-          <Ionicons name="arrow-back" size={21} color="#1E293B" />
+          <Ionicons name="arrow-back" size={21} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>Invoices</Text>
-          <Text style={styles.headerSubtitle}>Manage invoices and payments</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Invoices</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.muted }]}>
+            Manage invoices and payments
+          </Text>
         </View>
         <TouchableOpacity
-          style={styles.addButton}
+          style={[styles.addButton, { backgroundColor: colors.buttonBackground }]}
           onPress={() => navigation.navigate('AdminCreateInvoice')}
           accessibilityRole="button"
           accessibilityLabel="Create invoice">
-          <Ionicons name="add" size={23} color="#FFFFFF" />
+          <Ionicons name="add" size={23} color={colors.buttonText} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.statsRow}>
         {[
-          { title: 'Total', value: pageStats.total, icon: 'documents-outline', color: '#2563EB', bg: '#DBEAFE' },
-          { title: 'Paid', value: pageStats.paid, icon: 'checkmark-circle-outline', color: '#16A34A', bg: '#DCFCE7' },
-          { title: 'Unpaid', value: pageStats.unpaid, icon: 'time-outline', color: '#D97706', bg: '#FEF3C7' },
-          { title: 'Overdue', value: pageStats.overdue, icon: 'alert-circle-outline', color: '#DC2626', bg: '#FEE2E2' },
+          { title: 'Total', value: pageStats.total, icon: 'documents-outline', color: colors.accent, bg: colors.accentSoft },
+          { title: 'Paid', value: pageStats.paid, icon: 'checkmark-circle-outline', color: colors.accent, bg: colors.accentSoft },
+          { title: 'Unpaid', value: pageStats.unpaid, icon: 'time-outline', color: colors.muted, bg: colors.sheet },
+          { title: 'Overdue', value: pageStats.overdue, icon: 'alert-circle-outline', color: colors.danger, bg: colors.sheet },
         ].map(stat => (
-          <View key={stat.title} style={styles.statCard}>
+          <View
+            key={stat.title}
+            style={[
+              styles.statCard,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}>
             <View style={[styles.statIcon, { backgroundColor: stat.bg }]}>
               <Ionicons name={stat.icon} size={16} color={stat.color} />
             </View>
-            <Text style={styles.statValue} numberOfLines={1}>{stat.value}</Text>
-            <Text style={styles.statTitle}>{stat.title}</Text>
+            <Text style={[styles.statValue, { color: colors.text }]} numberOfLines={1}>
+              {stat.value}
+            </Text>
+            <Text style={[styles.statTitle, { color: colors.muted }]}>{stat.title}</Text>
           </View>
         ))}
       </View>
 
       <View style={styles.toolbar}>
-        <View style={styles.searchBox}>
-          <Ionicons name="search-outline" size={17} color="#94A3B8" />
+        <View
+          style={[
+            styles.searchBox,
+            {
+              backgroundColor: colors.inputBackground,
+              borderColor: colors.inputBorder,
+            },
+          ]}>
+          <Ionicons name="search-outline" size={17} color={colors.subtle} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={applySearch}
             returnKeyType="search"
             placeholder="Search invoice or company..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.inputPlaceholder}
           />
           {searchText ? (
             <TouchableOpacity
@@ -385,21 +437,32 @@ const AdminInvoicesScreen = () => {
                 setSearchText('');
                 setFilter('search', '');
               }}>
-              <Ionicons name="close-circle" size={17} color="#94A3B8" />
+              <Ionicons name="close-circle" size={17} color={colors.subtle} />
             </TouchableOpacity>
           ) : null}
         </View>
         <TouchableOpacity
-          style={[styles.filterButton, filtersVisible && styles.filterButtonActive]}
+          style={[
+            styles.filterButton,
+            {
+              backgroundColor: filtersVisible ? colors.accentSoft : colors.surface,
+              borderColor: filtersVisible ? colors.accent : colors.border,
+            },
+          ]}
           onPress={() => setFiltersVisible(visible => !visible)}
           accessibilityRole="button"
           accessibilityLabel="Toggle invoice filters">
-          <Ionicons name="options-outline" size={19} color="#334155" />
+          <Ionicons name="options-outline" size={19} color={colors.text} />
         </TouchableOpacity>
       </View>
 
       {filtersVisible ? (
-        <ScrollView style={styles.filtersPanel} nestedScrollEnabled>
+        <ScrollView
+          style={[
+            styles.filtersPanel,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+          nestedScrollEnabled>
           {renderFilterOptions('Payment', 'paymentStatus', PAYMENT_STATUSES)}
           {renderFilterOptions('Currency', 'currency', CURRENCIES)}
           {filters.currency === 'INR'
@@ -414,7 +477,9 @@ const AdminInvoicesScreen = () => {
                 setFilters(INITIAL_FILTERS);
                 setSearchText('');
               }}>
-              <Text style={styles.clearFiltersText}>Clear filters</Text>
+              <Text style={[styles.clearFiltersText, { color: colors.accent }]}>
+                Clear filters
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.sortButton}
@@ -425,8 +490,8 @@ const AdminInvoicesScreen = () => {
                   page: 1,
                 }))
               }>
-              <Ionicons name="swap-vertical" size={15} color="#334155" />
-              <Text style={styles.sortText}>
+              <Ionicons name="swap-vertical" size={15} color={colors.text} />
+              <Text style={[styles.sortText, { color: colors.text }]}>
                 Date {filters.sortOrder === 'asc' ? '↑' : '↓'}
               </Text>
             </TouchableOpacity>
@@ -435,16 +500,16 @@ const AdminInvoicesScreen = () => {
       ) : null}
 
       {error ? (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{error}</Text>
+        <View style={[styles.errorBanner, { backgroundColor: colors.sheet }]}>
+          <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           <TouchableOpacity onPress={() => loadInvoices()}>
-            <Text style={styles.retryText}>Retry</Text>
+            <Text style={[styles.retryText, { color: colors.danger }]}>Retry</Text>
           </TouchableOpacity>
         </View>
       ) : null}
       {statsError ? (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>
+        <View style={[styles.errorBanner, { backgroundColor: colors.sheet }]}>
+          <Text style={[styles.errorText, { color: colors.danger }]}>
             Unable to load invoice summary: {statsError}
           </Text>
         </View>
@@ -452,8 +517,10 @@ const AdminInvoicesScreen = () => {
 
       {loading && invoices.length === 0 ? (
         <View style={styles.centerState}>
-          <ActivityIndicator size="large" color="#2563EB" />
-          <Text style={styles.stateText}>Loading invoices...</Text>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.stateText, { color: colors.muted }]}>
+            Loading invoices...
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -469,8 +536,8 @@ const AdminInvoicesScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => loadInvoices({ refresh: true })}
-              tintColor="#2563EB"
-              colors={['#2563EB']}
+              tintColor={colors.accent}
+              colors={[colors.accent]}
             />
           }
           ListEmptyComponent={renderEmpty}
@@ -478,27 +545,42 @@ const AdminInvoicesScreen = () => {
       )}
 
       {pagination.pages > 1 ? (
-        <View style={[styles.pagination, { marginBottom: Math.max(insets.bottom, 8) }]}>
-          <Text style={styles.paginationText}>
+        <View
+          style={[
+            styles.pagination,
+            {
+              marginBottom: Math.max(insets.bottom, 8),
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <Text style={[styles.paginationText, { color: colors.muted }]}>
             Page {filters.page} of {pagination.pages} · {pagination.total} invoices
           </Text>
           <View style={styles.paginationActions}>
             <TouchableOpacity
-              style={[styles.pageButton, filters.page <= 1 && styles.pageButtonDisabled]}
+              style={[
+                styles.pageButton,
+                { borderColor: colors.border },
+                filters.page <= 1 && styles.pageButtonDisabled,
+              ]}
               disabled={filters.page <= 1}
               onPress={() => setFilter('page', filters.page - 1)}>
-              <Ionicons name="chevron-back" size={17} color="#334155" />
-              <Text style={styles.pageButtonText}>Previous</Text>
+              <Ionicons name="chevron-back" size={17} color={colors.text} />
+              <Text style={[styles.pageButtonText, { color: colors.text }]}>
+                Previous
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
                 styles.pageButton,
+                { borderColor: colors.border },
                 filters.page >= pagination.pages && styles.pageButtonDisabled,
               ]}
               disabled={filters.page >= pagination.pages}
               onPress={() => setFilter('page', filters.page + 1)}>
-              <Text style={styles.pageButtonText}>Next</Text>
-              <Ionicons name="chevron-forward" size={17} color="#334155" />
+              <Text style={[styles.pageButtonText, { color: colors.text }]}>Next</Text>
+              <Ionicons name="chevron-forward" size={17} color={colors.text} />
             </TouchableOpacity>
           </View>
         </View>
@@ -509,31 +591,50 @@ const AdminInvoicesScreen = () => {
         transparent
         animationType="slide"
         onRequestClose={() => setSelectedInvoice(null)}>
-        <View style={styles.modalBackdrop}>
-          <View style={[styles.detailModal, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+        <View style={[styles.modalBackdrop, { backgroundColor: colors.backdrop }]}>
+          <View
+            style={[
+              styles.detailModal,
+              {
+                paddingBottom: Math.max(insets.bottom, 20),
+                backgroundColor: colors.cardElevated,
+              },
+            ]}>
             <View style={styles.modalHeader}>
               <View style={styles.modalTitleWrap}>
-                <Text style={styles.modalTitle}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
                   {selectedInvoice?.invoiceHead ||
                     selectedInvoice?.invoiceNumber ||
                     'Invoice details'}
                 </Text>
-                <Text style={styles.modalSubtitle}>{getCompanyName(selectedInvoice || {})}</Text>
+                <Text style={[styles.modalSubtitle, { color: colors.muted }]}>
+                  {getCompanyName(selectedInvoice || {})}
+                </Text>
               </View>
               <TouchableOpacity
-                style={styles.modalClose}
+                style={[styles.modalClose, { backgroundColor: colors.sheet }]}
                 onPress={() => setSelectedInvoice(null)}>
-                <Ionicons name="close" size={21} color="#334155" />
+                <Ionicons name="close" size={21} color={colors.text} />
               </TouchableOpacity>
             </View>
             {selectedInvoice ? (
               <>
-                <View style={styles.detailAmountCard}>
-                  <Text style={styles.totalAmountLabel}>TOTAL AMOUNT</Text>
-                  <Text style={styles.detailAmount}>
+                <View
+                  style={[
+                    styles.detailAmountCard,
+                    { backgroundColor: colors.background },
+                  ]}>
+                  <Text style={[styles.totalAmountLabel, { color: colors.muted }]}>
+                    TOTAL AMOUNT
+                  </Text>
+                  <Text style={[styles.detailAmount, { color: colors.text }]}>
                     {formatCurrency(detailTotal, detailCurrency)}
                   </Text>
-                  <View style={[styles.statusBadge, { backgroundColor: detailBadge.backgroundColor }]}>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: detailBadge.backgroundColor },
+                    ]}>
                     <Text style={[styles.statusText, { color: detailBadge.color }]}>
                       {formatStatusLabel(detailStatus)}
                     </Text>
@@ -547,9 +648,13 @@ const AdminInvoicesScreen = () => {
                   ['Invoice status', formatStatusLabel(selectedInvoice.status)],
                   ['Currency', detailCurrency],
                 ].map(([label, value]) => (
-                  <View key={label} style={styles.detailRow}>
-                    <Text style={styles.detailRowLabel}>{label}</Text>
-                    <Text style={styles.detailRowValue}>{value}</Text>
+                  <View key={label} style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailRowLabel, { color: colors.muted }]}>
+                      {label}
+                    </Text>
+                    <Text style={[styles.detailRowValue, { color: colors.text }]}>
+                      {value}
+                    </Text>
                   </View>
                 ))}
               </>
@@ -564,15 +669,13 @@ const AdminInvoicesScreen = () => {
 export default AdminInvoicesScreen;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F8FAFC' },
+  screen: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   backButton: {
     width: 36,
@@ -580,16 +683,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    backgroundColor: '#F1F5F9',
     marginRight: 10,
   },
   headerText: { flex: 1 },
-  headerTitle: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  headerSubtitle: { color: '#64748B', fontSize: font.xs, marginTop: 3 },
+  headerTitle: { fontSize: font.xl, fontWeight: '800' },
+  headerSubtitle: { fontSize: font.xs, marginTop: 3 },
   addButton: {
     width: 38,
     height: 38,
-    backgroundColor: '#2563EB',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -603,11 +704,9 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     minWidth: 0,
-    backgroundColor: '#FFFFFF',
     borderRadius: 11,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
   statIcon: {
     width: 25,
@@ -617,8 +716,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 5,
   },
-  statValue: { color: '#0F172A', fontSize: font.lg, fontWeight: '800' },
-  statTitle: { color: '#64748B', fontSize: font.xs, marginTop: 2 },
+  statValue: { fontSize: font.lg, fontWeight: '800' },
+  statTitle: { fontSize: font.xs, marginTop: 2 },
   toolbar: {
     flexDirection: 'row',
     gap: 9,
@@ -629,8 +728,6 @@ const styles = StyleSheet.create({
   searchBox: {
     flex: 1,
     minHeight: 42,
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E2E8F0',
     borderWidth: 1,
     borderRadius: 11,
     flexDirection: 'row',
@@ -638,31 +735,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     gap: 8,
   },
-  searchInput: { flex: 1, color: '#0F172A', fontSize: font.sm, paddingVertical: 8 },
+  searchInput: { flex: 1, fontSize: font.sm, paddingVertical: 8 },
   filterButton: {
     width: 42,
     height: 42,
     borderRadius: 11,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  filterButtonActive: { backgroundColor: '#EFF6FF', borderColor: '#93C5FD' },
   filtersPanel: {
     marginHorizontal: 16,
     marginBottom: 8,
-    backgroundColor: '#FFFFFF',
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     padding: 12,
     maxHeight: 240,
   },
   filterGroup: { marginBottom: 8 },
   filterLabel: {
-    color: '#64748B',
     fontSize: font.caption,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -674,27 +765,22 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  filterChipActive: { borderColor: '#3B82F6', backgroundColor: '#EFF6FF' },
-  filterChipText: { color: '#64748B', fontSize: font.caption },
-  filterChipTextActive: { color: '#1D4ED8', fontWeight: '700' },
+  filterChipText: { fontSize: font.caption },
+  filterChipTextActive: { fontWeight: '700' },
   filterFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  clearFiltersText: { color: '#2563EB', fontSize: font.small, fontWeight: '700' },
+  clearFiltersText: { fontSize: font.small, fontWeight: '700' },
   sortButton: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  sortText: { color: '#334155', fontSize: font.xs, fontWeight: '600' },
+  sortText: { fontSize: font.xs, fontWeight: '600' },
   invoiceList: { flex: 1 },
   listContent: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 16 },
   emptyContent: { flexGrow: 1 },
   invoiceCard: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 14,
     padding: 13,
     marginBottom: 10,
@@ -705,7 +791,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 11,
-    backgroundColor: '#DBEAFE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 9,
@@ -715,12 +800,11 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 9,
-    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  invoiceNumber: { color: '#0F172A', fontSize: font.sm, fontWeight: '800' },
-  companyName: { color: '#64748B', fontSize: font.xs, marginTop: 3 },
+  invoiceNumber: { fontSize: font.sm, fontWeight: '800' },
+  companyName: { fontSize: font.xs, marginTop: 3 },
   statusBadge: {
     borderRadius: 20,
     paddingHorizontal: 8,
@@ -728,12 +812,11 @@ const styles = StyleSheet.create({
     maxWidth: 82,
   },
   statusText: { fontSize: font.tiny, fontWeight: '800' },
-  invoiceDivider: { height: 1, backgroundColor: '#F1F5F9', marginVertical: 10 },
+  invoiceDivider: { height: 1, marginVertical: 10 },
   invoiceDetails: { flexDirection: 'row', gap: 14 },
   detailItem: { flex: 1 },
-  detailLabel: { color: '#94A3B8', fontSize: font.caption, marginBottom: 3 },
-  detailValue: { color: '#475569', fontSize: font.xs, fontWeight: '600' },
-  overdueText: { color: '#DC2626' },
+  detailLabel: { fontSize: font.caption, marginBottom: 3 },
+  detailValue: { fontSize: font.xs, fontWeight: '600' },
   amountRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -741,34 +824,32 @@ const styles = StyleSheet.create({
     marginTop: 10,
     gap: 8,
   },
-  totalAmount: { color: '#0F172A', fontSize: font.base, fontWeight: '800', flexShrink: 1 },
-  balanceAmount: { color: '#DC2626', fontSize: font.xs, fontWeight: '700', flexShrink: 1, textAlign: 'right' },
-  paidAmount: { color: '#15803D', fontSize: font.xs, fontWeight: '700' },
+  totalAmount: { fontSize: font.base, fontWeight: '800', flexShrink: 1 },
+  balanceAmount: { fontSize: font.xs, fontWeight: '700', flexShrink: 1, textAlign: 'right' },
+  paidAmount: { fontSize: font.xs, fontWeight: '700' },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 28 },
   emptyIcon: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#E2E8F0',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 13,
   },
-  emptyTitle: { color: '#1E293B', fontSize: font.md, fontWeight: '700' },
-  emptyMessage: { color: '#64748B', fontSize: font.small, textAlign: 'center', marginTop: 6 },
+  emptyTitle: { fontSize: font.md, fontWeight: '700' },
+  emptyMessage: { fontSize: font.small, textAlign: 'center', marginTop: 6 },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#2563EB',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 9,
     marginTop: 16,
   },
-  createButtonText: { color: '#FFFFFF', fontSize: font.small, fontWeight: '700' },
+  createButtonText: { fontSize: font.small, fontWeight: '700' },
   centerState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
-  stateText: { color: '#64748B', fontSize: font.sm, marginTop: 10 },
+  stateText: { fontSize: font.sm, marginTop: 10 },
   errorBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -777,20 +858,17 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     padding: 10,
     borderRadius: 9,
-    backgroundColor: '#FEF2F2',
   },
-  errorText: { color: '#B91C1C', fontSize: font.xs, flex: 1, marginRight: 8 },
-  retryText: { color: '#B91C1C', fontSize: font.xs, fontWeight: '700' },
+  errorText: { fontSize: font.xs, flex: 1, marginRight: 8 },
+  retryText: { fontSize: font.xs, fontWeight: '700' },
   pagination: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 12,
     padding: 12,
     marginHorizontal: 16,
     marginTop: 3,
   },
-  paginationText: { color: '#64748B', fontSize: font.xs, textAlign: 'center' },
+  paginationText: { fontSize: font.xs, textAlign: 'center' },
   paginationActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -802,19 +880,16 @@ const styles = StyleSheet.create({
     gap: 3,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
   pageButtonDisabled: { opacity: 0.4 },
-  pageButtonText: { color: '#334155', fontSize: font.xs, fontWeight: '600' },
+  pageButtonText: { fontSize: font.xs, fontWeight: '600' },
   modalBackdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: '#0F172A66',
   },
   detailModal: {
-    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 18,
@@ -825,32 +900,29 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   modalTitleWrap: { flex: 1 },
-  modalTitle: { color: '#0F172A', fontSize: font.lg, fontWeight: '800' },
-  modalSubtitle: { color: '#64748B', fontSize: font.xs, marginTop: 3 },
+  modalTitle: { fontSize: font.lg, fontWeight: '800' },
+  modalSubtitle: { fontSize: font.xs, marginTop: 3 },
   modalClose: {
     width: 34,
     height: 34,
     borderRadius: 10,
-    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
   },
   detailAmountCard: {
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
     borderRadius: 14,
     padding: 16,
     marginBottom: 12,
   },
-  totalAmountLabel: { color: '#64748B', fontSize: font.caption, fontWeight: '800' },
-  detailAmount: { color: '#0F172A', fontSize: font.display, fontWeight: '800', marginVertical: 7 },
+  totalAmountLabel: { fontSize: font.caption, fontWeight: '800' },
+  detailAmount: { fontSize: font.display, fontWeight: '800', marginVertical: 7 },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 9,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
   },
-  detailRowLabel: { color: '#64748B', fontSize: font.small },
-  detailRowValue: { color: '#1E293B', fontSize: font.small, fontWeight: '600' },
+  detailRowLabel: { fontSize: font.small },
+  detailRowValue: { fontSize: font.small, fontWeight: '600' },
 });

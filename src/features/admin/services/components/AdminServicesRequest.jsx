@@ -18,6 +18,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
 import { s } from '../../../../theme/responsive';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import {
   fetchAdminServiceRequests,
   updateAdminServiceRequest,
@@ -42,17 +43,14 @@ const STATUS_OPTIONS = [
   { value: 'rejected', label: 'Rejected' },
 ];
 
-const STATUS_CONFIG = {
-  pending: { label: 'Pending', color: '#B45309', backgroundColor: '#FEF3C7' },
-  quoted: { label: 'Quoted', color: '#1D4ED8', backgroundColor: '#DBEAFE' },
-  paid: { label: 'Paid', color: '#15803D', backgroundColor: '#DCFCE7' },
-  'in-progress': { label: 'In Progress', color: '#4338CA', backgroundColor: '#E0E7FF' },
-  completed: { label: 'Completed', color: '#047857', backgroundColor: '#D1FAE5' },
-  rejected: { label: 'Rejected', color: '#B91C1C', backgroundColor: '#FEE2E2' },
-};
-
-const getStatusStyle = status =>
-  STATUS_CONFIG[String(status || '').toLowerCase()] || STATUS_CONFIG.pending;
+const getStatusConfig = colors => ({
+  pending: { label: 'Pending', color: colors.muted, backgroundColor: colors.sheet },
+  quoted: { label: 'Quoted', color: colors.accent, backgroundColor: colors.accentSoft },
+  paid: { label: 'Paid', color: colors.accent, backgroundColor: colors.accentSoft },
+  'in-progress': { label: 'In Progress', color: colors.accent, backgroundColor: colors.accentSoft },
+  completed: { label: 'Completed', color: colors.accent, backgroundColor: colors.accentSoft },
+  rejected: { label: 'Rejected', color: colors.danger, backgroundColor: colors.sheet },
+});
 
 const formatDate = value => {
   if (!value) return 'N/A';
@@ -72,6 +70,10 @@ const formatPrice = value => {
 };
 
 const ServiceRequestCard = ({ item, onUpdated }) => {
+  const colors = useThemeColors();
+  const statusConfig = getStatusConfig(colors);
+  const getStatusStyle = status =>
+    statusConfig[String(status || '').toLowerCase()] || statusConfig.pending;
   const token = useAppSelector(state => state.auth.token);
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus] = useState(item.status || 'pending');
@@ -107,92 +109,100 @@ const ServiceRequestCard = ({ item, onUpdated }) => {
   };
 
   return (
-    <View style={styles.requestCard}>
+    <View
+      style={[styles.requestCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Pressable
         onPress={() => setExpanded(value => !value)}
         accessibilityRole="button"
         accessibilityState={{ expanded }}
         accessibilityLabel={`Service request ${item.serviceName || ''}`}>
         <View style={styles.cardHeader}>
-          <View style={styles.typeIcon}>
-            <Ionicons name="construct-outline" size={19} color="#4F46E5" />
+          <View style={[styles.typeIcon, { backgroundColor: colors.accentSoft }]}>
+            <Ionicons name="construct-outline" size={19} color={colors.accent} />
           </View>
           <View style={styles.cardHeaderCopy}>
-            <Text style={styles.serviceName} numberOfLines={1}>
+            <Text style={[styles.serviceName, { color: colors.text }]} numberOfLines={1}>
               {item.serviceName || 'Service request'}
             </Text>
-            <Text style={styles.categoryText} numberOfLines={1}>
+            <Text style={[styles.categoryText, { color: colors.muted }]} numberOfLines={1}>
               {item.category || 'Uncategorized'}
             </Text>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: badge.backgroundColor }]}>
             <Text style={[styles.statusText, { color: badge.color }]}>{badge.label}</Text>
           </View>
-          <Ionicons
-            name={expanded ? 'chevron-up' : 'chevron-down'}
-            size={18}
-            color="#94A3B8"
-          />
+          <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={colors.subtle} />
         </View>
 
         <View style={styles.cardDetails}>
           <View style={styles.detailLine}>
-            <Ionicons name="business-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="business-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {item.companyId?.companyName || 'Unknown company'}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="person-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="person-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {clientName}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="mail-outline" size={15} color="#64748B" />
-            <Text style={styles.detailText} numberOfLines={1}>
+            <Ionicons name="mail-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailText, { color: colors.muted }]} numberOfLines={1}>
               {item.clientId?.email || 'No email'}
             </Text>
           </View>
         </View>
 
         <View style={styles.cardFooter}>
-          <View style={styles.modeBadge}>
-            <Text style={styles.modeText}>
+          <View style={[styles.modeBadge, { backgroundColor: colors.sheet }]}>
+            <Text style={[styles.modeText, { color: colors.muted }]}>
               {item.mode === 'direct_payment' ? 'Direct Pay' : 'Quote'}
             </Text>
           </View>
-          <Text style={styles.priceText}>{formatPrice(item.suggestedPrice)}</Text>
-          <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
+          <Text style={[styles.priceText, { color: colors.text }]}>{formatPrice(item.suggestedPrice)}</Text>
+          <Text style={[styles.dateText, { color: colors.muted }]}>{formatDate(item.createdAt)}</Text>
         </View>
       </Pressable>
 
       {expanded ? (
-        <View style={styles.expandedPanel}>
+        <View style={[styles.expandedPanel, { borderTopColor: colors.border }]}>
           {item.note ? (
             <View style={styles.block}>
-              <Text style={styles.fieldLabel}>Client Note</Text>
-              <View style={styles.noteBox}>
-                <Text style={styles.noteText}>{item.note}</Text>
+              <Text style={[styles.fieldLabel, { color: colors.subtle }]}>Client Note</Text>
+              <View
+                style={[
+                  styles.noteBox,
+                  { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder },
+                ]}>
+                <Text style={[styles.noteText, { color: colors.text }]}>{item.note}</Text>
               </View>
             </View>
           ) : null}
 
           <View style={styles.block}>
-            <Text style={styles.fieldLabel}>Admin Note</Text>
+            <Text style={[styles.fieldLabel, { color: colors.subtle }]}>Admin Note</Text>
             <TextInput
               value={adminNote}
               onChangeText={setAdminNote}
               placeholder="Add a note for the client..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.inputPlaceholder}
               multiline
               textAlignVertical="top"
-              style={styles.noteInput}
+              style={[
+                styles.noteInput,
+                {
+                  backgroundColor: colors.inputBackground,
+                  borderColor: colors.inputBorder,
+                  color: colors.text,
+                },
+              ]}
             />
           </View>
 
           <View style={styles.block}>
-            <Text style={styles.fieldLabel}>Status</Text>
+            <Text style={[styles.fieldLabel, { color: colors.subtle }]}>Status</Text>
             <View style={styles.statusOptions}>
               {STATUS_OPTIONS.map(option => {
                 const active = status === option.value;
@@ -205,6 +215,7 @@ const ServiceRequestCard = ({ item, onUpdated }) => {
                     accessibilityState={{ selected: active }}
                     style={[
                       styles.statusOption,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
                       active && {
                         borderColor: config.color,
                         backgroundColor: config.backgroundColor,
@@ -213,6 +224,7 @@ const ServiceRequestCard = ({ item, onUpdated }) => {
                     <Text
                       style={[
                         styles.statusOptionText,
+                        { color: colors.muted },
                         active && { color: config.color },
                       ]}>
                       {option.label}
@@ -226,14 +238,18 @@ const ServiceRequestCard = ({ item, onUpdated }) => {
           <Pressable
             onPress={handleSave}
             disabled={saving}
-            style={[styles.saveButton, saving && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              { backgroundColor: colors.accent },
+              saving && styles.buttonDisabled,
+            ]}
             accessibilityRole="button">
             {saving ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color={colors.buttonText} />
             ) : (
-              <Ionicons name="save-outline" size={17} color="#FFFFFF" />
+              <Ionicons name="save-outline" size={17} color={colors.buttonText} />
             )}
-            <Text style={styles.saveButtonText}>
+            <Text style={[styles.saveButtonText, { color: colors.buttonText }]}>
               {saving ? 'Saving...' : 'Save Changes'}
             </Text>
           </Pressable>
@@ -247,6 +263,8 @@ const AdminServicesRequest = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
+  const colors = useThemeColors();
+  const isDark = useResolvedThemeMode() === 'dark';
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -326,30 +344,32 @@ const AdminServicesRequest = () => {
     if (loading) {
       return (
         <View style={styles.state}>
-          <ActivityIndicator size="large" color="#2563EB" />
-          <Text style={styles.stateText}>Loading service requests...</Text>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.stateText, { color: colors.muted }]}>Loading service requests...</Text>
         </View>
       );
     }
     if (error) {
       return (
         <View style={styles.state}>
-          <Ionicons name="alert-circle-outline" size={32} color="#DC2626" />
-          <Text style={styles.errorText}>{error}</Text>
+          <Ionicons name="alert-circle-outline" size={32} color={colors.danger} />
+          <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           <Pressable
-            style={styles.retryButton}
+            style={[styles.retryButton, { backgroundColor: colors.accent }]}
             onPress={() => loadRequests()}
             accessibilityRole="button">
-            <Text style={styles.retryText}>Try again</Text>
+            <Text style={[styles.retryText, { color: colors.buttonText }]}>Try again</Text>
           </Pressable>
         </View>
       );
     }
     return (
       <View style={styles.state}>
-        <Ionicons name="construct-outline" size={34} color="#94A3B8" />
-        <Text style={styles.emptyTitle}>No service requests found</Text>
-        <Text style={styles.emptyText}>Try adjusting the filters or search query.</Text>
+        <Ionicons name="construct-outline" size={34} color={colors.subtle} />
+        <Text style={[styles.emptyTitle, { color: colors.muted }]}>No service requests found</Text>
+        <Text style={[styles.emptyText, { color: colors.subtle }]}>
+          Try adjusting the filters or search query.
+        </Text>
       </View>
     );
   };
@@ -367,21 +387,23 @@ const AdminServicesRequest = () => {
           { label: 'Paid', value: stats.paid },
           { label: 'Completed', value: stats.completed },
         ].map(stat => (
-          <View key={stat.label} style={styles.statCard}>
-            <Text style={styles.statValue}>{loading ? '—' : stat.value}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
+          <View
+            key={stat.label}
+            style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.statValue, { color: colors.text }]}>{loading ? '—' : stat.value}</Text>
+            <Text style={[styles.statLabel, { color: colors.muted }]}>{stat.label}</Text>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search-outline" size={19} color="#94A3B8" />
+      <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Ionicons name="search-outline" size={19} color={colors.subtle} />
         <TextInput
           value={searchText}
           onChangeText={setSearchText}
           placeholder="Search by company, client, or service..."
-          placeholderTextColor="#94A3B8"
-          style={styles.searchInput}
+          placeholderTextColor={colors.inputPlaceholder}
+          style={[styles.searchInput, { color: colors.text }]}
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
@@ -392,7 +414,7 @@ const AdminServicesRequest = () => {
             onPress={() => setSearchText('')}
             accessibilityRole="button"
             accessibilityLabel="Clear search">
-            <Ionicons name="close-circle" size={19} color="#94A3B8" />
+            <Ionicons name="close-circle" size={19} color={colors.subtle} />
           </Pressable>
         ) : null}
       </View>
@@ -409,8 +431,17 @@ const AdminServicesRequest = () => {
               onPress={() => setStatusFilter(filter.key)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
-              style={[styles.filterChip, active && styles.filterChipActive]}>
-              <Text style={[styles.filterText, active && styles.filterTextActive]}>
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+                active && { backgroundColor: colors.accentSoft, borderColor: colors.accent },
+              ]}>
+              <Text
+                style={[
+                  styles.filterText,
+                  { color: colors.muted },
+                  active && { color: colors.accent },
+                ]}>
                 {filter.label}
               </Text>
             </Pressable>
@@ -419,28 +450,41 @@ const AdminServicesRequest = () => {
       </ScrollView>
 
       {error && requests.length > 0 ? (
-        <Text style={styles.inlineError}>{error}</Text>
+        <Text style={[styles.inlineError, { color: colors.danger }]}>{error}</Text>
       ) : null}
-      <Text style={styles.resultsText}>
+      <Text style={[styles.resultsText, { color: colors.muted }]}>
         Showing {filteredRequests.length} of {requests.length} requests
       </Text>
     </View>
   );
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, s(12)) }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, s(12)),
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+          },
+        ]}>
         <Pressable
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          style={styles.backButton}>
-          <Ionicons name="arrow-back" size={21} color="#1E293B" />
+          style={[styles.backButton, { backgroundColor: colors.sheet }]}>
+          <Ionicons name="arrow-back" size={21} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>
-          <Text style={styles.title}>Service Requests</Text>
-          <Text style={styles.subtitle}>Quotes and direct service purchases</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Service Requests</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Quotes and direct service purchases
+          </Text>
         </View>
       </View>
       <FlatList
@@ -460,8 +504,8 @@ const AdminServicesRequest = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadRequests(true)}
-            tintColor="#2563EB"
-            colors={['#2563EB']}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }
       />
@@ -472,15 +516,13 @@ const AdminServicesRequest = () => {
 export default AdminServicesRequest;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F8FAFC' },
+  screen: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: s(16),
     paddingBottom: s(12),
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   backButton: {
     width: s(38),
@@ -488,12 +530,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: s(10),
-    backgroundColor: '#F1F5F9',
     marginRight: s(10),
   },
   headerCopy: { flex: 1 },
-  title: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  subtitle: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  title: { fontSize: font.xl, fontWeight: '800' },
+  subtitle: { fontSize: font.xs, marginTop: s(2) },
   listContent: { paddingHorizontal: s(16), paddingTop: s(12) },
   emptyListContent: { flexGrow: 1 },
   statsRow: { flexDirection: 'row', gap: s(10), paddingBottom: s(12) },
@@ -503,23 +544,19 @@ const styles = StyleSheet.create({
     paddingVertical: s(11),
     borderRadius: s(12),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  statValue: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  statLabel: { color: '#64748B', fontSize: font.xs, marginTop: s(3) },
+  statValue: { fontSize: font.xl, fontWeight: '800' },
+  statLabel: { fontSize: font.xs, marginTop: s(3) },
   searchBox: {
     minHeight: s(44),
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingHorizontal: s(12),
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: s(10),
   },
-  searchInput: { flex: 1, color: '#0F172A', fontSize: font.sm, paddingVertical: s(8) },
+  searchInput: { flex: 1, fontSize: font.sm, paddingVertical: s(8) },
   filterRow: { flexDirection: 'row', gap: s(8), paddingVertical: s(10) },
   filterChip: {
     minHeight: s(34),
@@ -527,21 +564,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: s(18),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  filterChipActive: { backgroundColor: '#EFF6FF', borderColor: '#93C5FD' },
-  filterText: { color: '#64748B', fontSize: font.xs, fontWeight: '600' },
-  filterTextActive: { color: '#1D4ED8' },
-  resultsText: { color: '#64748B', fontSize: font.xs, marginBottom: s(8) },
-  inlineError: { color: '#B91C1C', fontSize: font.xs, paddingBottom: s(6) },
+  filterText: { fontSize: font.xs, fontWeight: '600' },
+  resultsText: { fontSize: font.xs, marginBottom: s(8) },
+  inlineError: { fontSize: font.xs, paddingBottom: s(6) },
   requestCard: {
     padding: s(13),
     marginBottom: s(10),
     borderRadius: s(13),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
   typeIcon: {
@@ -550,12 +581,11 @@ const styles = StyleSheet.create({
     borderRadius: s(12),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EEF2FF',
     marginRight: s(10),
   },
   cardHeaderCopy: { flex: 1, marginRight: s(8) },
-  serviceName: { color: '#0F172A', fontSize: font.sm, fontWeight: '700' },
-  categoryText: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  serviceName: { fontSize: font.sm, fontWeight: '700' },
+  categoryText: { fontSize: font.xs, marginTop: s(2) },
   statusBadge: {
     paddingHorizontal: s(8),
     paddingVertical: s(4),
@@ -568,36 +598,31 @@ const styles = StyleSheet.create({
     paddingVertical: s(10),
     marginTop: s(10),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: s(7) },
-  detailText: { flex: 1, color: '#475569', fontSize: font.xs },
+  detailText: { flex: 1, fontSize: font.xs },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingTop: s(8),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   modeBadge: {
     paddingHorizontal: s(8),
     paddingVertical: s(3),
     borderRadius: s(7),
-    backgroundColor: '#F1F5F9',
   },
-  modeText: { color: '#475569', fontSize: font.tiny, fontWeight: '700' },
-  priceText: { flex: 1, color: '#0F172A', fontSize: font.sm, fontWeight: '700' },
-  dateText: { color: '#64748B', fontSize: font.tiny },
+  modeText: { fontSize: font.tiny, fontWeight: '700' },
+  priceText: { flex: 1, fontSize: font.sm, fontWeight: '700' },
+  dateText: { fontSize: font.tiny },
   expandedPanel: {
     marginTop: s(11),
     paddingTop: s(11),
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
   },
   block: { marginBottom: s(12) },
   fieldLabel: {
-    color: '#94A3B8',
     fontSize: font.tiny,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -607,19 +632,14 @@ const styles = StyleSheet.create({
   noteBox: {
     padding: s(11),
     borderRadius: s(10),
-    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
-  noteText: { color: '#334155', fontSize: font.sm, lineHeight: s(20) },
+  noteText: { fontSize: font.sm, lineHeight: s(20) },
   noteInput: {
     minHeight: s(78),
     padding: s(11),
     borderRadius: s(10),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
-    color: '#1E293B',
     fontSize: font.sm,
   },
   statusOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: s(7) },
@@ -628,10 +648,8 @@ const styles = StyleSheet.create({
     paddingVertical: s(7),
     borderRadius: s(16),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  statusOptionText: { color: '#64748B', fontSize: font.xs, fontWeight: '600' },
+  statusOptionText: { fontSize: font.xs, fontWeight: '600' },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -639,21 +657,19 @@ const styles = StyleSheet.create({
     gap: s(7),
     paddingVertical: s(11),
     borderRadius: s(10),
-    backgroundColor: '#4F46E5',
   },
-  saveButtonText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '700' },
+  saveButtonText: { fontSize: font.sm, fontWeight: '700' },
   buttonDisabled: { opacity: 0.55 },
   state: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: s(24) },
-  stateText: { color: '#64748B', fontSize: font.sm, marginTop: s(10) },
-  errorText: { color: '#B91C1C', fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
-  emptyTitle: { color: '#64748B', fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
-  emptyText: { color: '#94A3B8', fontSize: font.xs, marginTop: s(4) },
+  stateText: { fontSize: font.sm, marginTop: s(10) },
+  errorText: { fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
+  emptyTitle: { fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
+  emptyText: { fontSize: font.xs, marginTop: s(4) },
   retryButton: {
     marginTop: s(12),
     paddingHorizontal: s(16),
     paddingVertical: s(8),
     borderRadius: s(8),
-    backgroundColor: '#2563EB',
   },
-  retryText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '600' },
+  retryText: { fontSize: font.sm, fontWeight: '600' },
 });

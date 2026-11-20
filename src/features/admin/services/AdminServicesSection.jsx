@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeColors } from '../../../theme/colors';
 
 const services = [
   { key: 'change-requests', title: 'Change Requests', icon: 'document-text-outline' },
@@ -13,6 +14,7 @@ const services = [
 
 const AdminServicesSection = () => {
   const navigation = useNavigation();
+  const colors = useThemeColors();
 
   const handlePress = key => {
     if (key === 'change-requests') {
@@ -27,7 +29,9 @@ const AdminServicesSection = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Services & Requests</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          Services & Requests
+        </Text>
       </View>
       <View style={styles.grid}>
         {services.map(item => (
@@ -36,10 +40,18 @@ const AdminServicesSection = () => {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() => handlePress(item.key)}>
-            <View style={styles.cardIconWrap}>
-              <Ionicons name={item.icon} size={font.displayMedium} color="#4F46E5" />
+            <View
+              style={[
+                styles.cardIconWrap,
+                { backgroundColor: colors.cardHighlight },
+              ]}>
+              <Ionicons
+                name={item.icon}
+                size={font.displayMedium}
+                color={colors.accent}
+              />
             </View>
-            <Text style={styles.cardTitle} numberOfLines={2}>
+            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
               {item.title}
             </Text>
           </TouchableOpacity>
@@ -62,7 +74,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
     marginBottom: 10,
   },
   grid: {
@@ -82,7 +93,6 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#F8F9FA',
     borderRadius: 10,
     // borderWidth: 1,
     // borderColor: '#E2E8F0',
@@ -98,7 +108,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: font.sm,
     fontWeight: '500',
-    color: '#1E293B',
     textAlign: 'center',
     marginTop: 4,
     width: 66,

@@ -12,7 +12,7 @@ const CRM_CARDS = [
   { key: 'sales-pipeline', title: 'Sales Pipeline', icon: 'funnel-outline' },
   {
     key: 'recent-activity',
-    title: 'Recent Activity',
+    title: 'Recent Activity',    
     icon: 'time-outline',
     screen: 'AdminRecentActivity',
   },

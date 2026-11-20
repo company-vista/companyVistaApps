@@ -1,40 +1,65 @@
 import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useThemeColors } from '../../../theme/colors';
 
-const BADGE_STYLES = {
-  success: { backgroundColor: '#DCFCE7', color: '#15803D' },
-  warning: { backgroundColor: '#FEF3C7', color: '#B45309' },
-  danger: { backgroundColor: '#FEE2E2', color: '#B91C1C' },
-  action: { backgroundColor: '#FFEDD5', color: '#C2410C' },
-};
+const getBadgeStyles = colors => ({
+  success: { backgroundColor: colors.accentSoft, color: colors.accent },
+  warning: { backgroundColor: colors.sheet, color: colors.muted },
+  danger: { backgroundColor: colors.sheet, color: colors.danger },
+  action: { backgroundColor: colors.sheet, color: colors.accent },
+});
 
 const AdminNewCompanies = ({ companies = [], onViewAll }) => {
+  const colors = useThemeColors();
+  const badgeStyles = getBadgeStyles(colors);
+
   return (
-    <View style={styles.tableCard}>
+    <View
+      style={[
+        styles.tableCard,
+        {
+          backgroundColor: colors.cardHighlight,
+          borderColor: colors.border,
+        },
+      ]}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Newly Registered Companies</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Newly Registered Companies
+        </Text>
         <TouchableOpacity onPress={onViewAll} disabled={!onViewAll}>
-          <Text style={styles.viewAllText}>View all</Text>
+          <Text style={[styles.viewAllText, { color: colors.accent }]}>
+            View all
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.tableRowHeader}>
-        <Text style={[styles.tableCol, { flex: 2 }]}>COMPANY</Text>
-        <Text style={[styles.tableCol, { flex: 1.2, textAlign: 'right' }]}>
+      <View style={[styles.tableRowHeader, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.tableCol, { flex: 2, color: colors.subtle }]}>
+          COMPANY
+        </Text>
+        <Text
+          style={[
+            styles.tableCol,
+            { flex: 1.2, textAlign: 'right', color: colors.subtle },
+          ]}>
           REGISTERED ON
         </Text>
       </View>
 
       {companies.length === 0 ? (
-        <Text style={styles.emptyText}>No companies registered yet.</Text>
+        <Text style={[styles.emptyText, { color: colors.muted }]}>
+          No companies registered yet.
+        </Text>
       ) : (
         companies.map(item => {
-          const badge = BADGE_STYLES[item.statusType] || BADGE_STYLES.warning;
+          const badge = badgeStyles[item.statusType] || badgeStyles.warning;
           return (
-            <View key={item.id} style={styles.tableRow}>
+            <View
+              key={item.id}
+              style={[styles.tableRow, { borderBottomColor: colors.border }]}>
               <View style={{ flex: 2, paddingRight: 8 }}>
-                <Text style={styles.companyName} numberOfLines={1}>
+                <Text style={[styles.companyName, { color: colors.text }]} numberOfLines={1}>
                   {item.name}
                 </Text>
                 <View style={styles.metaRow}>
@@ -47,12 +72,14 @@ const AdminNewCompanies = ({ companies = [], onViewAll }) => {
                       {item.status}
                     </Text>
                   </View>
-                  <Text style={styles.stateText} numberOfLines={1}>
+                  <Text style={[styles.stateText, { color: colors.subtle }]} numberOfLines={1}>
                     {item.state}
                   </Text>
                 </View>
               </View>
-              <Text style={styles.dateText}>{item.date}</Text>
+              <Text style={[styles.dateText, { color: colors.muted }]}>
+                {item.date}
+              </Text>
             </View>
           );
         })
@@ -65,11 +92,9 @@ export default AdminNewCompanies;
 
 const styles = StyleSheet.create({
   tableCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -80,25 +105,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
     flex: 1,
     marginRight: 8,
   },
   viewAllText: {
     fontSize: font.small,
-    color: '#2563EB',
   },
   tableRowHeader: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
     paddingBottom: 6,
     marginBottom: 8,
   },
   tableCol: {
     fontSize: font.caption,
     fontWeight: '700',
-    color: '#94A3B8',
   },
   tableRow: {
     flexDirection: 'row',
@@ -106,12 +127,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC',
   },
   companyName: {
     fontSize: font.sm,
     fontWeight: '600',
-    color: '#0F172A',
   },
   metaRow: {
     flexDirection: 'row',
@@ -129,18 +148,15 @@ const styles = StyleSheet.create({
   },
   stateText: {
     fontSize: font.caption,
-    color: '#94A3B8',
     marginLeft: 6,
     flex: 1,
   },
   dateText: {
     fontSize: font.small,
-    color: '#64748B',
     textAlign: 'right',
   },
   emptyText: {
     fontSize: font.sm,
-    color: '#64748B',
     textAlign: 'center',
     paddingVertical: 16,
   },

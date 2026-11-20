@@ -19,6 +19,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../../../../store/hooks';
 import { s } from '../../../../theme/responsive';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import { API_BASE_URL } from '../../../../config/api';
 import {
   fetchAdminItinApplications,
@@ -36,13 +37,17 @@ const STATUS_FILTERS = [
 
 const STATUS_OPTIONS = STATUS_FILTERS.filter(option => option.key !== 'all');
 
-const STATUS_CONFIG = {
-  new: { label: 'New', color: '#1D4ED8', backgroundColor: '#EFF6FF' },
-  under_review: { label: 'Under Review', color: '#B45309', backgroundColor: '#FFFBEB' },
-  action_required: { label: 'Action Required', color: '#C2410C', backgroundColor: '#FFF7ED' },
-  completed: { label: 'Completed', color: '#047857', backgroundColor: '#ECFDF5' },
-  rejected: { label: 'Rejected', color: '#B91C1C', backgroundColor: '#FEF2F2' },
-};
+const getStatusConfig = colors => ({
+  new: { label: 'New', color: colors.accent, backgroundColor: colors.accentSoft },
+  under_review: { label: 'Under Review', color: colors.muted, backgroundColor: colors.sheet },
+  action_required: {
+    label: 'Action Required',
+    color: colors.danger,
+    backgroundColor: colors.sheet,
+  },
+  completed: { label: 'Completed', color: colors.accent, backgroundColor: colors.accentSoft },
+  rejected: { label: 'Rejected', color: colors.danger, backgroundColor: colors.sheet },
+});
 
 const REASON_LABELS = {
   a: '(a) Claiming a tax treaty benefit',
@@ -63,9 +68,6 @@ const DOC_LABELS = {
   doc_exception: 'Exception evidence',
   doc_company: 'Company documents',
 };
-
-const getStatusStyle = status =>
-  STATUS_CONFIG[String(status || '').toLowerCase()] || STATUS_CONFIG.new;
 
 const formatDate = value => {
   if (!value) return '';
@@ -120,17 +122,29 @@ const documentUrl = path => {
   return `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
 };
 
-const DetailField = ({ label, value, multiline = false }) => (
-  <View style={styles.detailField}>
-    <Text style={styles.detailLabel}>{label}</Text>
-    <Text style={[styles.detailValue, multiline && styles.detailValueMultiline]}>
-      {displayValue(value)}
-    </Text>
-  </View>
-);
+const DetailField = ({ label, value, multiline = false }) => {
+  const colors = useThemeColors();
+  return (
+    <View style={styles.detailField}>
+      <Text style={[styles.detailLabel, { color: colors.subtle }]}>{label}</Text>
+      <Text
+        style={[
+          styles.detailValue,
+          multiline && styles.detailValueMultiline,
+          { color: colors.text },
+        ]}>
+        {displayValue(value)}
+      </Text>
+    </View>
+  );
+};
 
 const ItinApplicationCard = ({ item, onUpdated }) => {
   const token = useAppSelector(state => state.auth.token);
+  const colors = useThemeColors();
+  const statusConfig = getStatusConfig(colors);
+  const getStatusStyle = status =>
+    statusConfig[String(status || '').toLowerCase()] || statusConfig.new;
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus] = useState(item.status || 'new');
   const [adminNotes, setAdminNotes] = useState(item.adminNotes || '');
@@ -185,21 +199,27 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
     item.foreignSameAsMailing === false ? formatAddress(item.fgnAddr) : '';
 
   return (
-    <View style={styles.applicationCard}>
+    <View
+      style={[
+        styles.applicationCard,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+      ]}>
       <Pressable
         onPress={() => setExpanded(value => !value)}
         accessibilityRole="button"
         accessibilityState={{ expanded }}
         accessibilityLabel={`ITIN application for ${name}`}>
         <View style={styles.cardHeader}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}</Text>
+          <View style={[styles.avatar, { backgroundColor: colors.accentSoft }]}>
+            <Text style={[styles.avatarText, { color: colors.accent }]}>
+              {name.charAt(0).toUpperCase()}
+            </Text>
           </View>
           <View style={styles.cardHeaderCopy}>
-            <Text style={styles.applicantName} numberOfLines={1}>
+            <Text style={[styles.applicantName, { color: colors.text }]} numberOfLines={1}>
               {name}
             </Text>
-            <Text style={styles.contactText} numberOfLines={1}>
+            <Text style={[styles.contactText, { color: colors.muted }]} numberOfLines={1}>
               {item.contactEmail || 'No email'}
             </Text>
           </View>
@@ -209,51 +229,55 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={18}
-            color="#94A3B8"
+            color={colors.subtle}
           />
         </View>
 
-        <View style={styles.cardDetails}>
+        <View style={[styles.cardDetails, { borderTopColor: colors.border }]}>
           <View style={styles.detailLine}>
-            <Ionicons name="call-outline" size={15} color="#64748B" />
-            <Text style={styles.detailLineText} numberOfLines={1}>
+            <Ionicons name="call-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailLineText, { color: colors.muted }]} numberOfLines={1}>
               {[item.contactPhoneCode, item.contactPhone].filter(Boolean).join(' ') ||
                 'No phone'}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="business-outline" size={15} color="#64748B" />
-            <Text style={styles.detailLineText} numberOfLines={1}>
+            <Ionicons name="business-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailLineText, { color: colors.muted }]} numberOfLines={1}>
               {company || 'No company linked'}
             </Text>
           </View>
           <View style={styles.detailLine}>
-            <Ionicons name="help-circle-outline" size={15} color="#64748B" />
-            <Text style={styles.detailLineText} numberOfLines={2}>
+            <Ionicons name="help-circle-outline" size={15} color={colors.muted} />
+            <Text style={[styles.detailLineText, { color: colors.muted }]} numberOfLines={2}>
               {reason || 'Reason not provided'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.cardFooter}>
-          <View style={styles.applyingBadge}>
-            <Text style={styles.applyingBadgeText}>
+        <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
+          <View style={[styles.applyingBadge, { backgroundColor: colors.sheet }]}>
+            <Text style={[styles.applyingBadgeText, { color: colors.muted }]}>
               {titleCase(item.applyingFor || 'self')}
             </Text>
           </View>
           {item.isExistingClient === 'yes' ? (
-            <View style={styles.clientBadge}>
-              <Ionicons name="checkmark-circle" size={12} color="#15803D" />
-              <Text style={styles.clientBadgeText}>Existing client</Text>
+            <View style={[styles.clientBadge, { backgroundColor: colors.accentSoft }]}>
+              <Ionicons name="checkmark-circle" size={12} color={colors.accent} />
+              <Text style={[styles.clientBadgeText, { color: colors.accent }]}>
+                Existing client
+              </Text>
             </View>
           ) : null}
-          <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
+          <Text style={[styles.dateText, { color: colors.muted }]}>
+            {formatDate(item.createdAt)}
+          </Text>
         </View>
       </Pressable>
 
       {expanded ? (
-        <View style={styles.expandedPanel}>
-          <Text style={styles.sectionTitle}>Request Details</Text>
+        <View style={[styles.expandedPanel, { borderTopColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Request Details</Text>
           <View style={styles.detailGrid}>
             <DetailField label="Existing Client" value={titleCase(item.isExistingClient)} />
             <DetailField label="Applying For" value={titleCase(item.applyingFor)} />
@@ -267,7 +291,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             <DetailField label="Submitted" value={formatDate(item.createdAt)} />
           </View>
 
-          <Text style={styles.sectionTitle}>Reason & Treaty</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Reason & Treaty</Text>
           <View style={styles.detailGrid}>
             <DetailField label="Reason" value={reason} multiline />
             <DetailField label="Exception Type" value={item.exceptionType} />
@@ -284,7 +308,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             />
           </View>
 
-          <Text style={styles.sectionTitle}>Personal Details</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Personal Details</Text>
           <View style={styles.detailGrid}>
             <DetailField label="Full Name" value={name} />
             <DetailField
@@ -308,7 +332,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             ) : null}
           </View>
 
-          <Text style={styles.sectionTitle}>Addresses</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Addresses</Text>
           <View style={styles.detailGrid}>
             <DetailField label="Mailing Address Type" value={titleCase(item.mailAddrType)} />
             <DetailField
@@ -325,7 +349,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             ) : null}
           </View>
 
-          <Text style={styles.sectionTitle}>U.S. Connection</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>U.S. Connection</Text>
           <View style={styles.detailGrid}>
             <DetailField
               label="Connections"
@@ -353,7 +377,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             />
           </View>
 
-          <Text style={styles.sectionTitle}>Identity Documents</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Identity Documents</Text>
           <View style={styles.detailGrid}>
             <DetailField label="Has Passport" value={titleCase(item.hasPassport)} />
             <DetailField label="Passport Number" value={item.passportNumber} />
@@ -370,7 +394,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             <DetailField label="Alternate Doc 2" value={item.altDoc2Type} />
           </View>
 
-          <Text style={styles.sectionTitle}>Filing & Delivery</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Filing & Delivery</Text>
           <View style={styles.detailGrid}>
             <DetailField
               label="Tax Return Prep Needed"
@@ -401,25 +425,34 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
             />
           </View>
 
-          <Text style={styles.sectionTitle}>Uploaded Documents</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Uploaded Documents</Text>
           {Object.entries(DOC_LABELS).map(([key, label]) => {
             const files = Array.isArray(item[key]) ? item[key] : [];
             if (!files.length) return null;
             return (
               <View key={key} style={styles.documentGroup}>
-                <Text style={styles.documentGroupLabel}>{label}</Text>
+                <Text style={[styles.documentGroupLabel, { color: colors.muted }]}>
+                  {label}
+                </Text>
                 {files.map((file, index) => (
                   <Pressable
                     key={`${key}-${file.filename || index}`}
                     onPress={() => openDocument(file)}
                     accessibilityRole="link"
                     accessibilityLabel={`Open ${file.originalname || label}`}
-                    style={styles.documentRow}>
-                    <Ionicons name="document-attach-outline" size={16} color="#4F46E5" />
-                    <Text style={styles.documentName} numberOfLines={1}>
+                    style={[
+                      styles.documentRow,
+                      { backgroundColor: colors.background, borderColor: colors.border },
+                    ]}>
+                    <Ionicons
+                      name="document-attach-outline"
+                      size={16}
+                      color={colors.accent}
+                    />
+                    <Text style={[styles.documentName, { color: colors.accent }]} numberOfLines={1}>
                       {file.originalname || file.filename || `Document ${index + 1}`}
                     </Text>
-                    <Ionicons name="open-outline" size={14} color="#94A3B8" />
+                    <Ionicons name="open-outline" size={14} color={colors.subtle} />
                   </Pressable>
                 ))}
               </View>
@@ -428,12 +461,14 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
           {!Object.keys(DOC_LABELS).some(key =>
             Array.isArray(item[key]) && item[key].length > 0,
           ) ? (
-            <Text style={styles.noDocuments}>No documents uploaded.</Text>
+            <Text style={[styles.noDocuments, { color: colors.subtle }]}>
+              No documents uploaded.
+            </Text>
           ) : null}
 
-          <Text style={styles.sectionTitle}>Review</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Review</Text>
           <View style={styles.block}>
-            <Text style={styles.fieldLabel}>Status</Text>
+            <Text style={[styles.fieldLabel, { color: colors.subtle }]}>Status</Text>
             <View style={styles.statusOptions}>
               {STATUS_OPTIONS.map(option => {
                 const active = status === option.key;
@@ -446,6 +481,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
                     accessibilityState={{ selected: active }}
                     style={[
                       styles.statusOption,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
                       active && {
                         borderColor: config.color,
                         backgroundColor: config.backgroundColor,
@@ -454,6 +490,7 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
                     <Text
                       style={[
                         styles.statusOptionText,
+                        { color: colors.muted },
                         active && { color: config.color },
                       ]}>
                       {option.label}
@@ -465,29 +502,40 @@ const ItinApplicationCard = ({ item, onUpdated }) => {
           </View>
 
           <View style={styles.block}>
-            <Text style={styles.fieldLabel}>Admin Notes</Text>
+            <Text style={[styles.fieldLabel, { color: colors.subtle }]}>Admin Notes</Text>
             <TextInput
               value={adminNotes}
               onChangeText={setAdminNotes}
               placeholder="Internal notes about this application..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.inputPlaceholder}
               multiline
               textAlignVertical="top"
-              style={styles.noteInput}
+              style={[
+                styles.noteInput,
+                {
+                  backgroundColor: colors.inputBackground,
+                  borderColor: colors.inputBorder,
+                  color: colors.text,
+                },
+              ]}
             />
           </View>
 
           <Pressable
             onPress={handleSave}
             disabled={saving}
-            style={[styles.saveButton, saving && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              saving && styles.buttonDisabled,
+              { backgroundColor: colors.buttonBackground },
+            ]}
             accessibilityRole="button">
             {saving ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color={colors.buttonText} />
             ) : (
-              <Ionicons name="save-outline" size={17} color="#FFFFFF" />
+              <Ionicons name="save-outline" size={17} color={colors.buttonText} />
             )}
-            <Text style={styles.saveButtonText}>
+            <Text style={[styles.saveButtonText, { color: colors.buttonText }]}>
               {saving ? 'Saving...' : 'Save Changes'}
             </Text>
           </Pressable>
@@ -501,6 +549,8 @@ const AdminItin = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const token = useAppSelector(state => state.auth.token);
+  const colors = useThemeColors();
+  const isDark = useResolvedThemeMode() === 'dark';
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -579,30 +629,36 @@ const AdminItin = () => {
     if (loading) {
       return (
         <View style={styles.state}>
-          <ActivityIndicator size="large" color="#2563EB" />
-          <Text style={styles.stateText}>Loading ITIN applications...</Text>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Text style={[styles.stateText, { color: colors.muted }]}>
+            Loading ITIN applications...
+          </Text>
         </View>
       );
     }
     if (error) {
       return (
         <View style={styles.state}>
-          <Ionicons name="alert-circle-outline" size={32} color="#DC2626" />
-          <Text style={styles.errorText}>{error}</Text>
+          <Ionicons name="alert-circle-outline" size={32} color={colors.danger} />
+          <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           <Pressable
-            style={styles.retryButton}
+            style={[styles.retryButton, { backgroundColor: colors.accent }]}
             onPress={() => loadApplications()}
             accessibilityRole="button">
-            <Text style={styles.retryText}>Try again</Text>
+            <Text style={[styles.retryText, { color: colors.buttonText }]}>Try again</Text>
           </Pressable>
         </View>
       );
     }
     return (
       <View style={styles.state}>
-        <Ionicons name="card-outline" size={34} color="#94A3B8" />
-        <Text style={styles.emptyTitle}>No ITIN applications found</Text>
-        <Text style={styles.emptyText}>Try adjusting the filters or search query.</Text>
+        <Ionicons name="card-outline" size={34} color={colors.subtle} />
+        <Text style={[styles.emptyTitle, { color: colors.muted }]}>
+          No ITIN applications found
+        </Text>
+        <Text style={[styles.emptyText, { color: colors.subtle }]}>
+          Try adjusting the filters or search query.
+        </Text>
       </View>
     );
   };
@@ -621,21 +677,29 @@ const AdminItin = () => {
           { label: 'Completed', value: stats.completed },
           { label: 'Rejected', value: stats.rejected },
         ].map(stat => (
-          <View key={stat.label} style={styles.statCard}>
-            <Text style={styles.statValue}>{loading ? '—' : stat.value}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
+          <View
+            key={stat.label}
+            style={[
+              styles.statCard,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {loading ? '—' : stat.value}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.muted }]}>{stat.label}</Text>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search-outline" size={19} color="#94A3B8" />
+      <View
+        style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Ionicons name="search-outline" size={19} color={colors.subtle} />
         <TextInput
           value={searchText}
           onChangeText={setSearchText}
           placeholder="Search by name, email, phone, or company..."
-          placeholderTextColor="#94A3B8"
-          style={styles.searchInput}
+          placeholderTextColor={colors.inputPlaceholder}
+          style={[styles.searchInput, { color: colors.text }]}
           returnKeyType="search"
           autoCapitalize="none"
           autoCorrect={false}
@@ -646,7 +710,7 @@ const AdminItin = () => {
             onPress={() => setSearchText('')}
             accessibilityRole="button"
             accessibilityLabel="Clear search">
-            <Ionicons name="close-circle" size={19} color="#94A3B8" />
+            <Ionicons name="close-circle" size={19} color={colors.subtle} />
           </Pressable>
         ) : null}
       </View>
@@ -663,8 +727,17 @@ const AdminItin = () => {
               onPress={() => setStatusFilter(filter.key)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
-              style={[styles.filterChip, active && styles.filterChipActive]}>
-              <Text style={[styles.filterText, active && styles.filterTextActive]}>
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+                active && { backgroundColor: colors.accentSoft, borderColor: colors.accent },
+              ]}>
+              <Text
+                style={[
+                  styles.filterText,
+                  { color: colors.muted },
+                  active && { color: colors.accent },
+                ]}>
                 {filter.label}
               </Text>
             </Pressable>
@@ -673,28 +746,41 @@ const AdminItin = () => {
       </ScrollView>
 
       {error && applications.length > 0 ? (
-        <Text style={styles.inlineError}>{error}</Text>
+        <Text style={[styles.inlineError, { color: colors.danger }]}>{error}</Text>
       ) : null}
-      <Text style={styles.resultsText}>
+      <Text style={[styles.resultsText, { color: colors.muted }]}>
         Showing {filteredApplications.length} of {applications.length} applications
       </Text>
     </View>
   );
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, s(12)) }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: Math.max(insets.top, s(12)),
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+          },
+        ]}>
         <Pressable
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          style={styles.backButton}>
-          <Ionicons name="arrow-back" size={21} color="#1E293B" />
+          style={[styles.backButton, { backgroundColor: colors.sheet }]}>
+          <Ionicons name="arrow-back" size={21} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>
-          <Text style={styles.title}>ITIN Applications</Text>
-          <Text style={styles.subtitle}>Review and manage W-7 submissions</Text>
+          <Text style={[styles.title, { color: colors.text }]}>ITIN Applications</Text>
+          <Text style={[styles.subtitle, { color: colors.muted }]}>
+            Review and manage W-7 submissions
+          </Text>
         </View>
       </View>
       <FlatList
@@ -714,8 +800,8 @@ const AdminItin = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadApplications(true)}
-            tintColor="#2563EB"
-            colors={['#2563EB']}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
           />
         }
       />
@@ -726,15 +812,13 @@ const AdminItin = () => {
 export default AdminItin;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F8FAFC' },
+  screen: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: s(16),
     paddingBottom: s(12),
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   backButton: {
     width: s(38),
@@ -742,12 +826,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: s(10),
-    backgroundColor: '#F1F5F9',
     marginRight: s(10),
   },
   headerCopy: { flex: 1 },
-  title: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  subtitle: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  title: { fontSize: font.xl, fontWeight: '800' },
+  subtitle: { fontSize: font.xs, marginTop: s(2) },
   listContent: { paddingHorizontal: s(16), paddingTop: s(12) },
   emptyListContent: { flexGrow: 1 },
   statsRow: { flexDirection: 'row', gap: s(10), paddingBottom: s(12) },
@@ -757,23 +840,19 @@ const styles = StyleSheet.create({
     paddingVertical: s(11),
     borderRadius: s(12),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  statValue: { color: '#0F172A', fontSize: font.xl, fontWeight: '800' },
-  statLabel: { color: '#64748B', fontSize: font.xs, marginTop: s(3) },
+  statValue: { fontSize: font.xl, fontWeight: '800' },
+  statLabel: { fontSize: font.xs, marginTop: s(3) },
   searchBox: {
     minHeight: s(44),
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingHorizontal: s(12),
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: s(10),
   },
-  searchInput: { flex: 1, color: '#0F172A', fontSize: font.sm, paddingVertical: s(8) },
+  searchInput: { flex: 1, fontSize: font.sm, paddingVertical: s(8) },
   filterRow: { flexDirection: 'row', gap: s(8), paddingVertical: s(10) },
   filterChip: {
     minHeight: s(34),
@@ -781,21 +860,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: s(18),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  filterChipActive: { backgroundColor: '#EFF6FF', borderColor: '#93C5FD' },
-  filterText: { color: '#64748B', fontSize: font.xs, fontWeight: '600' },
-  filterTextActive: { color: '#1D4ED8' },
-  resultsText: { color: '#64748B', fontSize: font.xs, marginBottom: s(8) },
-  inlineError: { color: '#B91C1C', fontSize: font.xs, paddingBottom: s(6) },
+  filterText: { fontSize: font.xs, fontWeight: '600' },
+  resultsText: { fontSize: font.xs, marginBottom: s(8) },
+  inlineError: { fontSize: font.xs, paddingBottom: s(6) },
   applicationCard: {
     padding: s(13),
     marginBottom: s(10),
     borderRadius: s(13),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
   avatar: {
@@ -804,13 +877,12 @@ const styles = StyleSheet.create({
     borderRadius: s(12),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EEF2FF',
     marginRight: s(10),
   },
-  avatarText: { color: '#4F46E5', fontSize: font.lg, fontWeight: '800' },
+  avatarText: { fontSize: font.lg, fontWeight: '800' },
   cardHeaderCopy: { flex: 1, marginRight: s(8) },
-  applicantName: { color: '#0F172A', fontSize: font.sm, fontWeight: '700' },
-  contactText: { color: '#64748B', fontSize: font.xs, marginTop: s(2) },
+  applicantName: { fontSize: font.sm, fontWeight: '700' },
+  contactText: { fontSize: font.xs, marginTop: s(2) },
   statusBadge: {
     paddingHorizontal: s(8),
     paddingVertical: s(4),
@@ -823,25 +895,22 @@ const styles = StyleSheet.create({
     paddingVertical: s(10),
     marginTop: s(10),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: s(7) },
-  detailLineText: { flex: 1, color: '#475569', fontSize: font.xs },
+  detailLineText: { flex: 1, fontSize: font.xs },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
     paddingTop: s(8),
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E2E8F0',
   },
   applyingBadge: {
     paddingHorizontal: s(8),
     paddingVertical: s(3),
     borderRadius: s(7),
-    backgroundColor: '#F1F5F9',
   },
-  applyingBadgeText: { color: '#475569', fontSize: font.tiny, fontWeight: '700' },
+  applyingBadgeText: { fontSize: font.tiny, fontWeight: '700' },
   clientBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -849,18 +918,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(7),
     paddingVertical: s(3),
     borderRadius: s(7),
-    backgroundColor: '#DCFCE7',
   },
-  clientBadgeText: { color: '#15803D', fontSize: font.tiny, fontWeight: '700' },
-  dateText: { flex: 1, color: '#64748B', fontSize: font.tiny, textAlign: 'right' },
+  clientBadgeText: { fontSize: font.tiny, fontWeight: '700' },
+  dateText: { flex: 1, fontSize: font.tiny, textAlign: 'right' },
   expandedPanel: {
     marginTop: s(11),
     paddingTop: s(11),
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
   },
   sectionTitle: {
-    color: '#0F172A',
     fontSize: font.sm,
     fontWeight: '700',
     marginTop: s(6),
@@ -869,16 +935,15 @@ const styles = StyleSheet.create({
   detailGrid: { gap: s(10), marginBottom: s(6) },
   detailField: { gap: s(2) },
   detailLabel: {
-    color: '#94A3B8',
     fontSize: font.tiny,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
-  detailValue: { color: '#1E293B', fontSize: font.xs },
+  detailValue: { fontSize: font.xs },
   detailValueMultiline: { lineHeight: s(16) },
   documentGroup: { marginBottom: s(10) },
-  documentGroupLabel: { color: '#475569', fontSize: font.xs, fontWeight: '600' },
+  documentGroupLabel: { fontSize: font.xs, fontWeight: '600' },
   documentRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -888,14 +953,11 @@ const styles = StyleSheet.create({
     marginTop: s(6),
     borderRadius: s(8),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
   },
-  documentName: { flex: 1, color: '#1D4ED8', fontSize: font.xs },
-  noDocuments: { color: '#94A3B8', fontSize: font.xs },
+  documentName: { flex: 1, fontSize: font.xs },
+  noDocuments: { fontSize: font.xs },
   block: { marginTop: s(10), marginBottom: s(4) },
   fieldLabel: {
-    color: '#94A3B8',
     fontSize: font.tiny,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -907,9 +969,6 @@ const styles = StyleSheet.create({
     padding: s(11),
     borderRadius: s(10),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
-    color: '#1E293B',
     fontSize: font.sm,
   },
   statusOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: s(7) },
@@ -918,10 +977,8 @@ const styles = StyleSheet.create({
     paddingVertical: s(7),
     borderRadius: s(16),
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
-  statusOptionText: { color: '#64748B', fontSize: font.xs, fontWeight: '600' },
+  statusOptionText: { fontSize: font.xs, fontWeight: '600' },
   saveButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -930,21 +987,19 @@ const styles = StyleSheet.create({
     marginTop: s(10),
     paddingVertical: s(11),
     borderRadius: s(10),
-    backgroundColor: '#4F46E5',
   },
-  saveButtonText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '700' },
+  saveButtonText: { fontSize: font.sm, fontWeight: '700' },
   buttonDisabled: { opacity: 0.55 },
   state: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: s(24) },
-  stateText: { color: '#64748B', fontSize: font.sm, marginTop: s(10) },
-  errorText: { color: '#B91C1C', fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
-  emptyTitle: { color: '#64748B', fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
-  emptyText: { color: '#94A3B8', fontSize: font.xs, marginTop: s(4) },
+  stateText: { fontSize: font.sm, marginTop: s(10) },
+  errorText: { fontSize: font.sm, textAlign: 'center', marginTop: s(10) },
+  emptyTitle: { fontSize: font.sm, fontWeight: '600', marginTop: s(10) },
+  emptyText: { fontSize: font.xs, marginTop: s(4) },
   retryButton: {
     marginTop: s(12),
     paddingHorizontal: s(16),
     paddingVertical: s(8),
     borderRadius: s(8),
-    backgroundColor: '#2563EB',
   },
-  retryText: { color: '#FFFFFF', fontSize: font.sm, fontWeight: '600' },
+  retryText: { fontSize: font.sm, fontWeight: '600' },
 });

@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeColors } from '../../../theme/colors';
 
 export const QUICK_ACTIONS = [
   { key: 'create-invoice', title: 'Create Invoice', icon: 'document-text-outline' },
@@ -14,6 +15,7 @@ export const QUICK_ACTIONS = [
 
 const QuickActions = () => {
   const navigation = useNavigation();
+  const colors = useThemeColors();
   const handlePress = action => {
     if (action.key === 'create-invoice') {
       navigation.navigate('AdminCreateInvoice');
@@ -28,7 +30,7 @@ const QuickActions = () => {
 
   return (
     <View style={styles.quickActionsSection}>
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
       <View style={styles.grid}>
         {QUICK_ACTIONS.map(action => (
           <TouchableOpacity
@@ -36,10 +38,18 @@ const QuickActions = () => {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() => handlePress(action)}>
-            <View style={styles.cardIconWrap}>
-              <Ionicons name={action.icon} size={font.displayMedium} color="#4F46E5" />
+            <View
+              style={[
+                styles.cardIconWrap,
+                { backgroundColor: colors.cardHighlight },
+              ]}>
+              <Ionicons
+                name={action.icon}
+                size={font.displayMedium}
+                color={colors.accent}
+              />
             </View>
-            <Text style={styles.cardTitle} numberOfLines={2}>
+            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
               {action.title}
             </Text>
           </TouchableOpacity>
@@ -55,7 +65,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
   },
   quickActionsSection: {
     marginTop: 10,
@@ -77,7 +86,6 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#F8F9FA',
     borderRadius: 10,
     // borderWidth: 1,
     // borderColor: '#E2E8F0',
@@ -92,7 +100,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: font.sm,
     fontWeight: '600',
-    color: '#1E293B',
     textAlign: 'center',
     marginTop: 4,
     width: 64,

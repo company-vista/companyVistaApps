@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeColors } from '../../../theme/colors';
 
 const cards = [
   { key: 'invoices', title: 'Invoices', icon: 'document-text-outline' },
@@ -14,6 +15,7 @@ const cards = [
 
 const AdminFinanceScreen = ({ showHeader = true }) => {
   const navigation = useNavigation();
+  const colors = useThemeColors();
 
   const handlePress = (item) => {
     if (item.key === 'invoices') {
@@ -29,7 +31,9 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
     <View style={styles.container}>
       {showHeader && (
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Business & Finance</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Business & Finance
+          </Text>
         </View>
       )}
       <View style={[styles.grid, !showHeader && styles.gridCompact]}>
@@ -39,10 +43,18 @@ const AdminFinanceScreen = ({ showHeader = true }) => {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() => handlePress(item)}>
-            <View style={styles.cardIconWrap}>
-              <Ionicons name={item.icon} size={font.displayMedium} color="#4F46E5" />
+            <View
+              style={[
+                styles.cardIconWrap,
+                { backgroundColor: colors.cardHighlight },
+              ]}>
+              <Ionicons
+                name={item.icon}
+                size={font.displayMedium}
+                color={colors.accent}
+              />
             </View>
-            <Text style={styles.cardTitle} numberOfLines={2}>
+            <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
               {item.title}
             </Text>
           </TouchableOpacity>
@@ -70,7 +82,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: font.xxl,
     fontWeight: '600',
-    color: '#1E293B',
   },
   grid: {
     flexDirection: 'row',
@@ -89,7 +100,6 @@ const styles = StyleSheet.create({
   cardIconWrap: {
     width: 64,
     height: 64,
-    backgroundColor: '#F8F9FA',
     borderRadius: 10,
     // borderWidth: 1,
     // borderColor: '#E2E8F0',
@@ -105,7 +115,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: font.sm,
     fontWeight: '500',
-    color: '#1E293B',
     textAlign: 'center',
     marginTop: 4,
     width: 66,

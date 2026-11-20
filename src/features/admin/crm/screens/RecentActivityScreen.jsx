@@ -223,7 +223,7 @@ const RecentActivityScreen = () => {
         {activeFilterConfig.emptyText}
       </Text>
     </View>
-  );
+  ); 
 
   return (
     <View style={[styles.screen, themedStyles.screen]}>

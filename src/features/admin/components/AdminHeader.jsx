@@ -4,13 +4,19 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppSelector } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { toggleTheme } from '../../../store/slices/themeSlice';
+import { useThemeColors, useResolvedThemeMode } from '../../../theme/colors';
 import { fetchAdminNotifications } from '../notifications/api/adminNotificationsApi';
 
 const AdminHeader = () => {
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const { user, token } = useAppSelector((state) => state.auth);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const effectiveMode = useResolvedThemeMode();
+  const isDark = effectiveMode === 'dark';
   const [unreadCount, setUnreadCount] = useState(0);
 
   useFocusEffect(
@@ -38,9 +44,21 @@ const AdminHeader = () => {
   );
 
   return (
-    <View style={styles.headerWrapper}>
-      <View style={[styles.statusBar, { height: insets.top, backgroundColor: '#FFFFFF' }]} />
-      <View style={styles.header}>
+    <View>
+      <View
+        style={[
+          styles.statusBar,
+          { height: insets.top, backgroundColor: colors.background },
+        ]}
+      />
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}>
         <View style={styles.userInfo}>
           <Image
             source={{
@@ -49,7 +67,9 @@ const AdminHeader = () => {
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.userName}>{user?.name || 'shivam chauhan'}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>
+              {user?.name || 'shivam chauhan'}
+            </Text>
             {/* <Text style={styles.userRole}>@ {user?.role || 'Admin'}</Text> */}
           </View>
         </View>
@@ -57,20 +77,31 @@ const AdminHeader = () => {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.iconButton}
+            onPress={() => dispatch(toggleTheme())}
+            accessibilityRole="button"
+            accessibilityLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
+            <Ionicons
+              name={isDark ? 'sunny' : 'moon'}
+              size={22}
+              color={colors.accent}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconButton}
             onPress={() => navigation.navigate('AdminSearch')}
             accessibilityRole="button"
             accessibilityLabel="Search admin workspace">
-            <Ionicons name="search-outline" size={22} color="#1E293B" />
+            <Ionicons name="search-outline" size={22} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => navigation.navigate('AdminNotifications')}
             accessibilityRole="button"
             accessibilityLabel="Open notifications">
-            <Ionicons name="notifications-outline" size={22} color="#1E293B" />
+            <Ionicons name="notifications-outline" size={22} color={colors.text} />
             {unreadCount > 0 ? (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>
+              <View style={[styles.badge, { backgroundColor: colors.danger }]}>
+                <Text style={[styles.badgeText, { color: colors.buttonText }]}>
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </Text>
               </View>
@@ -88,9 +119,6 @@ const AdminHeader = () => {
 export default AdminHeader;
 
 const styles = StyleSheet.create({
-  headerWrapper: {
-    backgroundColor: '#FFFFFF',
-  },
   statusBar: {
     width: '100%',
   },
@@ -100,9 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
   },
   userInfo: {
     flexDirection: 'row',
@@ -117,11 +143,9 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
   },
   userRole: {
     fontSize: font.small,
-    color: '#64748B',
   },
   headerActions: {
     flexDirection: 'row',
@@ -143,12 +167,10 @@ const styles = StyleSheet.create({
     height: 15,
     paddingHorizontal: 3,
     borderRadius: 8,
-    backgroundColor: '#EF4444',
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeText: {
-    color: '#FFFFFF',
     fontSize: font.tiny,
     fontWeight: '800',
   },

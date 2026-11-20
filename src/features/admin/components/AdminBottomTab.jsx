@@ -4,10 +4,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useThemeColors } from '../../../theme/colors';
 
 const AdminBottomTab = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const colors = useThemeColors();
   const route = useRoute();
   const active = route.name;
 
@@ -31,7 +33,15 @@ const AdminBottomTab = () => {
   };
 
   return (
-    <View style={[styles.bottomNav, { paddingBottom: insets.bottom || 0 }]}>
+    <View
+      style={[
+        styles.bottomNav,
+        {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          paddingBottom: insets.bottom || 0,
+        },
+      ]}>
       <View style={styles.navInner}>
         {tabs.map(tab => {
           const isActive = active === tab.route;
@@ -44,9 +54,16 @@ const AdminBottomTab = () => {
               <Ionicons
                 name={isActive ? tab.activeIcon : tab.icon}
                 size={font.display}
-                color={isActive ? '#1E3A8A' : '#64748B'}
+                color={isActive ? colors.accent : colors.muted}
               />
-              <Text style={[styles.navText, isActive && styles.activeNavText]}>{tab.label}</Text>
+              <Text
+                style={[
+                  styles.navText,
+                  { color: isActive ? colors.accent : colors.muted },
+                  isActive && styles.activeNavText,
+                ]}>
+                {tab.label}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -59,9 +76,7 @@ export default AdminBottomTab;
 
 const styles = StyleSheet.create({
   bottomNav: {
-    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
   },
   navInner: {
     flexDirection: 'row',
@@ -75,12 +90,10 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: font.xs,
-    color: '#64748B',
     marginTop: 6,
     fontWeight: '500',
   },
   activeNavText: {
-    color: '#1E3A8A',
     fontWeight: '700',
   },
 });

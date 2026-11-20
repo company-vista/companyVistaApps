@@ -1,4 +1,5 @@
 import { font } from '../../../../theme/typography';
+import { useThemeColors, useResolvedThemeMode } from '../../../../theme/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -214,6 +215,8 @@ const AdminCreateInvoiceScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const isDark = useResolvedThemeMode() === 'dark';
   const token = useAppSelector(state => state.auth.token);
   const invoiceId = route.params?.invoiceId;
   const isEditing = Boolean(invoiceId);
@@ -272,6 +275,12 @@ const AdminCreateInvoiceScreen = () => {
   const isINR = form.currency === 'INR';
   const totals = useMemo(() => getInvoiceTotals(form), [form]);
   const symbol = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[form.currency];
+  const statusColors =
+    form.paymentStatus === 'paid'
+      ? { backgroundColor: colors.accentSoft, color: colors.accent }
+      : form.paymentStatus === 'partial'
+        ? { backgroundColor: colors.sheet, color: colors.muted }
+        : { backgroundColor: colors.sheet, color: colors.danger };
 
   useEffect(() => {
     let active = true;
@@ -602,13 +611,21 @@ const AdminCreateInvoiceScreen = () => {
 
   const renderField = (label, value, onChangeText, options = {}) => (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: colors.muted }]}>{label}</Text>
       <TextInput
-        style={[styles.input, options.multiline && styles.multilineInput, options.error && styles.inputError]}
+        style={[
+          styles.input,
+          options.multiline && styles.multilineInput,
+          {
+            borderColor: options.error ? colors.danger : colors.inputBorder,
+            backgroundColor: colors.inputBackground,
+            color: colors.text,
+          },
+        ]}
         value={value == null ? '' : String(value)}
         onChangeText={onChangeText}
         placeholder={options.placeholder || ''}
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor={colors.inputPlaceholder}
         keyboardType={options.keyboardType || 'default'}
         multiline={options.multiline}
         editable={options.editable !== false}
@@ -616,14 +633,14 @@ const AdminCreateInvoiceScreen = () => {
         textAlignVertical={options.multiline ? 'top' : 'center'}
         maxLength={options.maxLength}
       />
-      {options.error ? <Text style={styles.errorText}>{options.error}</Text> : null}
-      {options.hint ? <Text style={styles.hint}>{options.hint}</Text> : null}
+      {options.error ? <Text style={[styles.errorText, { color: colors.danger }]}>{options.error}</Text> : null}
+      {options.hint ? <Text style={[styles.hint, { color: colors.subtle }]}>{options.hint}</Text> : null}
     </View>
   );
 
   const renderChoices = (label, choices, selected, onSelect, columns = 3) => (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: colors.muted }]}>{label}</Text>
       <View style={styles.choiceRow}>
         {choices.map(choice => {
           const value = typeof choice === 'string' ? choice : choice.value;
@@ -635,11 +652,14 @@ const AdminCreateInvoiceScreen = () => {
               style={[
                 styles.choice,
                 columns === 2 && styles.choiceHalf,
-                active && styles.choiceSelected,
+                {
+                  borderColor: active ? colors.accent : colors.border,
+                  backgroundColor: active ? colors.accentSoft : colors.surface,
+                },
               ]}
               onPress={() => onSelect(value)}
               activeOpacity={0.75}>
-              <Text style={[styles.choiceText, active && styles.choiceTextSelected]}>
+              <Text style={[styles.choiceText, { color: active ? colors.accent : colors.muted }]}>
                 {title}
               </Text>
             </TouchableOpacity>
@@ -650,14 +670,14 @@ const AdminCreateInvoiceScreen = () => {
   );
 
   const renderSection = (title, icon, children, subtitle) => (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.sectionHeader}>
-        <View style={styles.sectionIcon}>
-          <Ionicons name={icon} size={17} color="#FFFFFF" />
+        <View style={[styles.sectionIcon, { backgroundColor: colors.accent }]}>
+          <Ionicons name={icon} size={17} color={colors.buttonText} />
         </View>
         <View style={styles.sectionHeading}>
-          <Text style={styles.sectionTitle}>{title}</Text>
-          {subtitle ? <Text style={styles.sectionSubtitle}>{subtitle}</Text> : null}
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+          {subtitle ? <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>{subtitle}</Text> : null}
         </View>
       </View>
       {children}
@@ -665,22 +685,29 @@ const AdminCreateInvoiceScreen = () => {
   );
 
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 8) }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
+      <View style={[styles.topBar, {
+        paddingTop: Math.max(insets.top, 8),
+        backgroundColor: colors.surface,
+        borderBottomColor: colors.border,
+      }]}>
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.sheet }]}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#1E293B" />
+          <Ionicons name="arrow-back" size={22} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.topTitleWrap}>
-          <Text style={styles.topTitle}>{isEditing ? 'Edit Invoice' : 'Create Invoice'}</Text>
-          <Text style={styles.topSubtitle} numberOfLines={1}>{form.invoiceNumber}</Text>
+          <Text style={[styles.topTitle, { color: colors.text }]}>{isEditing ? 'Edit Invoice' : 'Create Invoice'}</Text>
+          <Text style={[styles.topSubtitle, { color: colors.muted }]} numberOfLines={1}>{form.invoiceNumber}</Text>
         </View>
-        <View style={[styles.statusBadge, styles[`status_${form.paymentStatus}`]]}>
-          <Text style={[styles.statusBadgeText, styles[`statusText_${form.paymentStatus}`]]}>
+        <View style={[styles.statusBadge, styles[`status_${form.paymentStatus}`], { backgroundColor: statusColors.backgroundColor }]}>
+          <Text style={[styles.statusBadgeText, styles[`statusText_${form.paymentStatus}`], { color: statusColors.color }]}>
             {form.paymentStatus.toUpperCase()}
           </Text>
         </View>
@@ -691,16 +718,16 @@ const AdminCreateInvoiceScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {invoiceLoading ? (
           <View style={styles.loadingState}>
-            <ActivityIndicator size="large" color="#2563EB" />
-            <Text style={styles.loadingText}>Loading invoice...</Text>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <Text style={[styles.loadingText, { color: colors.muted }]}>Loading invoice...</Text>
           </View>
         ) : <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[styles.scrollContent, { paddingBottom: 28 + insets.bottom }]}
           showsVerticalScrollIndicator={false}>
           <View style={styles.intro}>
-            <Text style={styles.pageTitle}>{isEditing ? 'Update invoice' : 'New invoice'}</Text>
-            <Text style={styles.pageDescription}>
+            <Text style={[styles.pageTitle, { color: colors.text }]}>{isEditing ? 'Update invoice' : 'New invoice'}</Text>
+            <Text style={[styles.pageDescription, { color: colors.muted }]}>
               {isEditing
                 ? 'Update the invoice details below.'
                 : 'Choose the invoice type and add billing details.'}
@@ -718,17 +745,20 @@ const AdminCreateInvoiceScreen = () => {
                 return (
                   <TouchableOpacity
                     key={option.value}
-                    style={[styles.typeCard, active && styles.typeCardActive]}
+                    style={[styles.typeCard, {
+                      borderColor: active ? colors.accent : colors.border,
+                      backgroundColor: active ? colors.accentSoft : colors.surface,
+                    }]}
                     onPress={() => changeInvoiceType(option.value)}
                     activeOpacity={0.75}>
                     <Ionicons
                       name={option.icon}
                       size={20}
-                      color={active ? '#2563EB' : '#64748B'}
+                      color={active ? colors.accent : colors.muted}
                     />
-                    <Text style={[styles.typeTitle, active && styles.typeTitleActive]}>{option.title}</Text>
-                    <Text style={styles.typeSubtitle}>{option.subtitle}</Text>
-                    {active ? <Ionicons name="checkmark-circle" size={17} color="#2563EB" style={styles.typeCheck} /> : null}
+                    <Text style={[styles.typeTitle, { color: active ? colors.accent : colors.text }]}>{option.title}</Text>
+                    <Text style={[styles.typeSubtitle, { color: colors.muted }]}>{option.subtitle}</Text>
+                    {active ? <Ionicons name="checkmark-circle" size={17} color={colors.accent} style={styles.typeCheck} /> : null}
                   </TouchableOpacity>
                 );
               })}
@@ -791,12 +821,15 @@ const AdminCreateInvoiceScreen = () => {
                 <TouchableOpacity
                   style={styles.toggleRow}
                   onPress={() => updateSubscription('autoRenew', !form.globalSubscription.autoRenew)}>
-                  <View style={[styles.checkbox, form.globalSubscription.autoRenew && styles.checkboxActive]}>
-                    {form.globalSubscription.autoRenew ? <Ionicons name="checkmark" size={15} color="#FFFFFF" /> : null}
+                  <View style={[styles.checkbox, {
+                    borderColor: form.globalSubscription.autoRenew ? colors.accent : colors.inputBorder,
+                    backgroundColor: form.globalSubscription.autoRenew ? colors.accent : colors.inputBackground,
+                  }]}>
+                    {form.globalSubscription.autoRenew ? <Ionicons name="checkmark" size={15} color={colors.buttonText} /> : null}
                   </View>
                   <View style={styles.toggleCopy}>
-                    <Text style={styles.toggleTitle}>Auto-renewal</Text>
-                    <Text style={styles.hint}>Automatically renew after expiry</Text>
+                    <Text style={[styles.toggleTitle, { color: colors.text }]}>Auto-renewal</Text>
+                    <Text style={[styles.hint, { color: colors.subtle }]}>Automatically renew after expiry</Text>
                   </View>
                 </TouchableOpacity>
               </>
@@ -805,13 +838,13 @@ const AdminCreateInvoiceScreen = () => {
           {renderSection('Bill to', 'business-outline', (
             <>
               {selectedCompany ? (
-                <View style={styles.selectedCompany}>
-                  <View style={styles.companyIcon}>
-                    <Ionicons name="business" size={19} color="#2563EB" />
+                <View style={[styles.selectedCompany, { backgroundColor: colors.accentSoft, borderColor: colors.border }]}>
+                  <View style={[styles.companyIcon, { backgroundColor: colors.surface }]}>
+                    <Ionicons name="business" size={19} color={colors.accent} />
                   </View>
                   <View style={styles.companyInfo}>
-                    <Text style={styles.companyName}>{getCompanyName(selectedCompany)}</Text>
-                    <Text style={styles.companyDetail} numberOfLines={1}>
+                    <Text style={[styles.companyName, { color: colors.text }]}>{getCompanyName(selectedCompany)}</Text>
+                    <Text style={[styles.companyDetail, { color: colors.muted }]} numberOfLines={1}>
                       {selectedCompany.email || selectedCompany.companyEmail || selectedCompany.countryOfIncorporation || ''}
                     </Text>
                   </View>
@@ -821,7 +854,7 @@ const AdminCreateInvoiceScreen = () => {
                       updateForm('companyId', '');
                       setCompanyQuery('');
                     }}>
-                    <Text style={styles.changeButtonText}>Change</Text>
+                    <Text style={[styles.changeButtonText, { color: colors.danger }]}>Change</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -840,38 +873,38 @@ const AdminCreateInvoiceScreen = () => {
                   )}
                   {companyLoading ? (
                     <View style={styles.inlineLoading}>
-                      <ActivityIndicator size="small" color="#2563EB" />
-                      <Text style={styles.hint}>Loading companies...</Text>
+                      <ActivityIndicator size="small" color={colors.accent} />
+                      <Text style={[styles.hint, { color: colors.subtle }]}>Loading companies...</Text>
                     </View>
                   ) : companyError ? (
-                    <Text style={styles.errorText}>{companyError}</Text>
+                    <Text style={[styles.errorText, { color: colors.danger }]}>{companyError}</Text>
                   ) : filteredCompanies.length > 0 ? (
-                    <View style={styles.resultList}>
+                    <View style={[styles.resultList, { borderColor: colors.border }]}>
                       {filteredCompanies.map(company => (
                         <TouchableOpacity
                           key={String(company._id || company.id)}
-                          style={styles.resultRow}
+                          style={[styles.resultRow, { borderBottomColor: colors.border }]}
                           onPress={() => {
                             updateForm('companyId', company._id || company.id);
                             setCompanyQuery(getCompanyName(company));
                           }}>
-                          <View style={styles.resultIcon}>
-                            <Ionicons name="business-outline" size={17} color="#2563EB" />
+                          <View style={[styles.resultIcon, { backgroundColor: colors.accentSoft }]}>
+                            <Ionicons name="business-outline" size={17} color={colors.accent} />
                           </View>
                           <View style={styles.resultInfo}>
-                            <Text style={styles.resultTitle} numberOfLines={1}>{getCompanyName(company)}</Text>
-                            <Text style={styles.resultSubtitle} numberOfLines={1}>
+                            <Text style={[styles.resultTitle, { color: colors.text }]} numberOfLines={1}>{getCompanyName(company)}</Text>
+                            <Text style={[styles.resultSubtitle, { color: colors.muted }]} numberOfLines={1}>
                               {company.email || company.companyEmail || company.alternateCompanyName || ''}
                             </Text>
                           </View>
-                          <Ionicons name="chevron-forward" size={17} color="#94A3B8" />
+                          <Ionicons name="chevron-forward" size={17} color={colors.subtle} />
                         </TouchableOpacity>
                       ))}
                     </View>
                   ) : companyQuery.trim() ? (
-                    <Text style={styles.hint}>No companies match your search.</Text>
+                    <Text style={[styles.hint, { color: colors.subtle }]}>No companies match your search.</Text>
                   ) : null}
-                  {errors.companyId ? <Text style={styles.errorText}>{errors.companyId}</Text> : null}
+                  {errors.companyId ? <Text style={[styles.errorText, { color: colors.danger }]}>{errors.companyId}</Text> : null}
                   {companyError ? (
                     <TouchableOpacity
                       style={styles.retryButton}
@@ -883,7 +916,7 @@ const AdminCreateInvoiceScreen = () => {
                           .catch(error => setCompanyError(error.message))
                           .finally(() => setCompanyLoading(false));
                       }}>
-                      <Text style={styles.retryText}>Retry loading companies</Text>
+                      <Text style={[styles.retryText, { color: colors.accent }]}>Retry loading companies</Text>
                     </TouchableOpacity>
                   ) : null}
                 </>
@@ -895,39 +928,39 @@ const AdminCreateInvoiceScreen = () => {
             <>
               {(isSubscription || isHybrid) && (
                 <View style={styles.planSearch}>
-                  <Text style={styles.label}>Add a plan</Text>
+                  <Text style={[styles.label, { color: colors.muted }]}>Add a plan</Text>
                   {renderField('Search plans', planQuery, setPlanQuery, {
                     placeholder: 'Search active plans',
                   })}
                   {planLoading ? (
                     <View style={styles.inlineLoading}>
-                      <ActivityIndicator size="small" color="#2563EB" />
-                      <Text style={styles.hint}>Loading plans...</Text>
+                      <ActivityIndicator size="small" color={colors.accent} />
+                      <Text style={[styles.hint, { color: colors.subtle }]}>Loading plans...</Text>
                     </View>
                   ) : planError ? (
-                    <Text style={styles.errorText}>{planError}</Text>
+                    <Text style={[styles.errorText, { color: colors.danger }]}>{planError}</Text>
                   ) : filteredPlans.length > 0 ? (
-                    <View style={styles.resultList}>
+                    <View style={[styles.resultList, { borderColor: colors.border }]}>
                       {filteredPlans.map(plan => (
                         <TouchableOpacity
                           key={String(plan._id)}
-                          style={styles.resultRow}
+                          style={[styles.resultRow, { borderBottomColor: colors.border }]}
                           onPress={() => selectPlan(plan)}>
-                          <View style={[styles.resultIcon, styles.planIcon]}>
-                            <Ionicons name="cube-outline" size={17} color="#7C3AED" />
+                          <View style={[styles.resultIcon, { backgroundColor: colors.accentSoft }]}>
+                            <Ionicons name="cube-outline" size={17} color={colors.accent} />
                           </View>
                           <View style={styles.resultInfo}>
-                            <Text style={styles.resultTitle} numberOfLines={1}>{plan.name}</Text>
-                            <Text style={styles.resultSubtitle} numberOfLines={1}>
+                            <Text style={[styles.resultTitle, { color: colors.text }]} numberOfLines={1}>{plan.name}</Text>
+                            <Text style={[styles.resultSubtitle, { color: colors.muted }]} numberOfLines={1}>
                               {plan.description || 'Recurring plan'}
                             </Text>
                           </View>
-                          <Ionicons name="add-circle-outline" size={20} color="#2563EB" />
+                          <Ionicons name="add-circle-outline" size={20} color={colors.accent} />
                         </TouchableOpacity>
                       ))}
                     </View>
                   ) : planQuery.trim() ? (
-                    <Text style={styles.hint}>No plans match your search.</Text>
+                    <Text style={[styles.hint, { color: colors.subtle }]}>No plans match your search.</Text>
                   ) : null}
                   {planError ? (
                     <TouchableOpacity
@@ -940,7 +973,7 @@ const AdminCreateInvoiceScreen = () => {
                           .catch(error => setPlanError(error.message))
                           .finally(() => setPlanLoading(false));
                       }}>
-                      <Text style={styles.retryText}>Retry loading plans</Text>
+                      <Text style={[styles.retryText, { color: colors.accent }]}>Retry loading plans</Text>
                     </TouchableOpacity>
                   ) : null}
                 </View>
@@ -956,21 +989,21 @@ const AdminCreateInvoiceScreen = () => {
                       )
                     : 0);
                 return (
-                  <View key={item.id} style={styles.itemCard}>
+                  <View key={item.id} style={[styles.itemCard, { backgroundColor: colors.background, borderColor: colors.border }]}>
                     <View style={styles.itemHeading}>
-                      <View style={styles.itemNumber}>
-                        <Text style={styles.itemNumberText}>{index + 1}</Text>
+                      <View style={[styles.itemNumber, { backgroundColor: colors.border }]}>
+                        <Text style={[styles.itemNumberText, { color: colors.muted }]}>{index + 1}</Text>
                       </View>
-                      <Text style={styles.itemTitle}>
+                      <Text style={[styles.itemTitle, { color: colors.text }]}>
                         {item.planId ? 'Plan item' : `Item ${index + 1}`}
                       </Text>
                       {form.items.length > 1 ? (
                         <TouchableOpacity
                           accessibilityRole="button"
                           accessibilityLabel={`Remove item ${index + 1}`}
-                          style={styles.removeButton}
+                          style={[styles.removeButton, { borderColor: colors.border, backgroundColor: colors.surface }]}
                           onPress={() => removeItem(item.id)}>
-                          <Ionicons name="trash-outline" size={17} color="#DC2626" />
+                          <Ionicons name="trash-outline" size={17} color={colors.danger} />
                         </TouchableOpacity>
                       ) : null}
                     </View>
@@ -1040,17 +1073,20 @@ const AdminCreateInvoiceScreen = () => {
                       <TouchableOpacity
                         style={styles.toggleRow}
                         onPress={() => updateItem(item.id, 'applyTax', item.applyTax === false)}>
-                        <View style={[styles.checkbox, item.applyTax !== false && styles.checkboxActive]}>
-                          {item.applyTax !== false ? <Ionicons name="checkmark" size={15} color="#FFFFFF" /> : null}
+                        <View style={[styles.checkbox, {
+                          borderColor: item.applyTax !== false ? colors.accent : colors.inputBorder,
+                          backgroundColor: item.applyTax !== false ? colors.accent : colors.inputBackground,
+                        }]}>
+                          {item.applyTax !== false ? <Ionicons name="checkmark" size={15} color={colors.buttonText} /> : null}
                         </View>
-                        <Text style={styles.toggleTitle}>Apply GST to this item</Text>
+                        <Text style={[styles.toggleTitle, { color: colors.text }]}>Apply GST to this item</Text>
                       </TouchableOpacity>
                     ) : null}
-                    <View style={styles.lineTotal}>
-                      <Text style={styles.lineTotalLabel}>
+                    <View style={[styles.lineTotal, { borderTopColor: colors.border }]}>
+                      <Text style={[styles.lineTotalLabel, { color: colors.muted }]}>
                         Line total{item.itemType === 'recurring' ? ` / ${item.recurringFrequency.replace('_', ' ')}` : ''}
                       </Text>
-                      <Text style={styles.lineTotalValue}>
+                      <Text style={[styles.lineTotalValue, { color: colors.accent }]}>
                         {symbol}{formatAmount(Math.max(0, lineAmount), form.currency)}
                       </Text>
                     </View>
@@ -1058,12 +1094,12 @@ const AdminCreateInvoiceScreen = () => {
                 );
               })}
               {!isSubscription ? (
-                <TouchableOpacity style={styles.addButton} onPress={addItem}>
-                  <Ionicons name="add" size={19} color="#2563EB" />
-                  <Text style={styles.addButtonText}>Add item</Text>
+                <TouchableOpacity style={[styles.addButton, { borderColor: colors.inputBorder }]} onPress={addItem}>
+                  <Ionicons name="add" size={19} color={colors.accent} />
+                  <Text style={[styles.addButtonText, { color: colors.accent }]}>Add item</Text>
                 </TouchableOpacity>
               ) : null}
-              {errors.total ? <Text style={styles.errorText}>{errors.total}</Text> : null}
+              {errors.total ? <Text style={[styles.errorText, { color: colors.danger }]}>{errors.total}</Text> : null}
             </>
           ))}
 
@@ -1140,38 +1176,38 @@ const AdminCreateInvoiceScreen = () => {
                 </>
               ) : null}
 
-              <View style={styles.summaryCard}>
-                <Text style={styles.summaryTitle}>Amount summary</Text>
+              <View style={[styles.summaryCard, { backgroundColor: colors.cardElevated }]}>
+                <Text style={[styles.summaryTitle, { color: colors.muted }]}>Amount summary</Text>
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Subtotal</Text>
-                  <Text style={styles.summaryValue}>{symbol}{formatAmount(totals.subtotal, form.currency)}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.muted }]}>Subtotal</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>{symbol}{formatAmount(totals.subtotal, form.currency)}</Text>
                 </View>
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Discount</Text>
-                  <Text style={styles.summaryValue}>− {symbol}{formatAmount(totals.discount, form.currency)}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.muted }]}>Discount</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text }]}>− {symbol}{formatAmount(totals.discount, form.currency)}</Text>
                 </View>
                 {isINR ? (
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>GST ({Number(form.taxRate) || 0}%)</Text>
-                    <Text style={styles.summaryValue}>{symbol}{formatAmount(totals.tax, form.currency)}</Text>
+                    <Text style={[styles.summaryLabel, { color: colors.muted }]}>GST ({Number(form.taxRate) || 0}%)</Text>
+                    <Text style={[styles.summaryValue, { color: colors.text }]}>{symbol}{formatAmount(totals.tax, form.currency)}</Text>
                   </View>
                 ) : null}
-                <View style={[styles.summaryRow, styles.grandTotalRow]}>
-                  <Text style={styles.grandTotalLabel}>Total</Text>
-                  <Text style={styles.grandTotalValue}>{symbol}{formatAmount(totals.total, form.currency)}</Text>
+                <View style={[styles.summaryRow, styles.grandTotalRow, { borderTopColor: colors.border }]}>
+                  <Text style={[styles.grandTotalLabel, { color: colors.text }]}>Total</Text>
+                  <Text style={[styles.grandTotalValue, { color: colors.text }]}>{symbol}{formatAmount(totals.total, form.currency)}</Text>
                 </View>
                 {form.paymentStatus === 'partial' ? (
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Balance due</Text>
-                    <Text style={styles.balanceValue}>
+                    <Text style={[styles.summaryLabel, { color: colors.muted }]}>Balance due</Text>
+                    <Text style={[styles.balanceValue, { color: colors.danger }]}>
                       {symbol}{formatAmount(Math.max(0, totals.total - (Number(form.paidAmount) || 0)), form.currency)}
                     </Text>
                   </View>
                 ) : null}
                 {form.paymentStatus === 'paid' ? (
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Balance due</Text>
-                    <Text style={styles.balancePaid}>{symbol}0.00</Text>
+                    <Text style={[styles.summaryLabel, { color: colors.muted }]}>Balance due</Text>
+                    <Text style={[styles.balancePaid, { color: colors.accent }]}>{symbol}0.00</Text>
                   </View>
                 ) : null}
               </View>
@@ -1193,10 +1229,10 @@ const AdminCreateInvoiceScreen = () => {
             </>
           ))}
 
-          <View style={styles.previewCard}>
-            <Text style={styles.previewLabel}>INVOICE PREVIEW</Text>
-            <Text style={styles.previewNumber}>{form.invoiceNumber}</Text>
-            <Text style={styles.previewDetails}>
+          <View style={[styles.previewCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.previewLabel, { color: colors.muted }]}>INVOICE PREVIEW</Text>
+            <Text style={[styles.previewNumber, { color: colors.text }]}>{form.invoiceNumber}</Text>
+            <Text style={[styles.previewDetails, { color: colors.muted }]}>
               {form.invoiceType === INVOICE_TYPES.HYBRID
                 ? 'Hybrid'
                 : isSubscription
@@ -1208,24 +1244,24 @@ const AdminCreateInvoiceScreen = () => {
 
           <View style={styles.actions}>
             <TouchableOpacity
-              style={[styles.sendButton, (saving || totals.total <= 0) && styles.buttonDisabled]}
+              style={[styles.sendButton, (saving || totals.total <= 0) && styles.buttonDisabled, { backgroundColor: colors.buttonBackground }]}
               onPress={() => save('send')}
               disabled={saving || totals.total <= 0}
               activeOpacity={0.8}>
-              {saving ? <ActivityIndicator color="#FFFFFF" /> : <Ionicons name="paper-plane-outline" size={18} color="#FFFFFF" />}
-              <Text style={styles.sendButtonText}>
+              {saving ? <ActivityIndicator color={colors.buttonText} /> : <Ionicons name="paper-plane-outline" size={18} color={colors.buttonText} />}
+              <Text style={[styles.sendButtonText, { color: colors.buttonText }]}>
                 {saving
                   ? 'Saving...'
                   : `${isEditing ? 'Update and send' : 'Send'} ${isHybrid ? 'Hybrid ' : isSubscription ? 'Subscription ' : ''}Invoice`}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.draftButton, (saving || !form.companyId) && styles.buttonDisabled]}
+              style={[styles.draftButton, (saving || !form.companyId) && styles.buttonDisabled, { backgroundColor: colors.sheet }]}
               onPress={() => save('draft')}
               disabled={saving || !form.companyId}
               activeOpacity={0.8}>
-              <Ionicons name="save-outline" size={18} color="#334155" />
-              <Text style={styles.draftButtonText}>
+              <Ionicons name="save-outline" size={18} color={colors.text} />
+              <Text style={[styles.draftButtonText, { color: colors.text }]}>
                 {isEditing ? 'Update draft' : 'Save as draft'}
               </Text>
             </TouchableOpacity>
@@ -1233,7 +1269,7 @@ const AdminCreateInvoiceScreen = () => {
               style={styles.cancelButton}
               onPress={() => navigation.goBack()}
               disabled={saving}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={[styles.cancelButtonText, { color: colors.muted }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>}
@@ -1247,19 +1283,16 @@ export default AdminCreateInvoiceScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
   },
   loadingState: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { color: '#64748B', fontSize: font.sm, marginTop: 10 },
+  loadingText: { fontSize: font.sm, marginTop: 10 },
   topBar: {
     minHeight: 72,
     paddingHorizontal: 16,
     paddingBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   backButton: {
     width: 40,
@@ -1267,19 +1300,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F1F5F9',
     marginRight: 12,
   },
   topTitleWrap: {
     flex: 1,
   },
   topTitle: {
-    color: '#0F172A',
     fontSize: font.lg,
     fontWeight: '700',
   },
   topSubtitle: {
-    color: '#64748B',
     fontSize: font.xs,
     marginTop: 3,
   },
@@ -1288,28 +1318,16 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20,
   },
-  status_unpaid: {
-    backgroundColor: '#FEE2E2',
-  },
-  status_partial: {
-    backgroundColor: '#FEF3C7',
-  },
-  status_paid: {
-    backgroundColor: '#DCFCE7',
-  },
+  status_unpaid: {},
+  status_partial: {},
+  status_paid: {},
   statusBadgeText: {
     fontSize: font.caption,
     fontWeight: '800',
   },
-  statusText_unpaid: {
-    color: '#B91C1C',
-  },
-  statusText_partial: {
-    color: '#B45309',
-  },
-  statusText_paid: {
-    color: '#15803D',
-  },
+  statusText_unpaid: {},
+  statusText_partial: {},
+  statusText_paid: {},
   content: {
     flex: 1,
   },
@@ -1321,22 +1339,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   pageTitle: {
-    color: '#0F172A',
     fontSize: font.display,
     fontWeight: '800',
   },
   pageDescription: {
-    color: '#64748B',
     fontSize: font.sm,
     marginTop: 4,
   },
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -1347,7 +1361,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -1357,14 +1370,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: font.bodySmall,
-    color: '#1E293B',
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   sectionSubtitle: {
     fontSize: font.xs,
-    color: '#64748B',
     marginTop: 2,
   },
   typeCards: {
@@ -1376,27 +1387,16 @@ const styles = StyleSheet.create({
     minHeight: 112,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
     padding: 10,
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
-  typeCardActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
-  },
   typeTitle: {
-    color: '#1E293B',
     fontWeight: '700',
     fontSize: font.small,
     marginTop: 8,
   },
-  typeTitleActive: {
-    color: '#1D4ED8',
-  },
   typeSubtitle: {
-    color: '#64748B',
     fontSize: font.caption,
     marginTop: 3,
   },
@@ -1411,7 +1411,6 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   label: {
-    color: '#64748B',
     fontSize: font.xs,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -1421,16 +1420,10 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: '#0F172A',
     fontSize: font.bodySmall,
-  },
-  inputError: {
-    borderColor: '#F87171',
   },
   multilineInput: {
     minHeight: 84,
@@ -1453,8 +1446,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
     borderRadius: 9,
     paddingHorizontal: 9,
     paddingVertical: 8,
@@ -1462,34 +1453,22 @@ const styles = StyleSheet.create({
   choiceHalf: {
     flexBasis: '45%',
   },
-  choiceSelected: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#3B82F6',
-  },
   choiceText: {
-    color: '#475569',
     fontSize: font.xs,
     fontWeight: '700',
     textAlign: 'center',
   },
-  choiceTextSelected: {
-    color: '#1D4ED8',
-  },
   hint: {
     fontSize: font.xs,
-    color: '#94A3B8',
     marginTop: 5,
   },
   errorText: {
-    color: '#DC2626',
     fontSize: font.xs,
     marginTop: 5,
   },
   selectedCompany: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
@@ -1498,7 +1477,6 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 11,
-    backgroundColor: '#DBEAFE',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -1507,12 +1485,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   companyName: {
-    color: '#0F172A',
     fontSize: font.sm,
     fontWeight: '700',
   },
   companyDetail: {
-    color: '#64748B',
     fontSize: font.xs,
     marginTop: 3,
   },
@@ -1521,7 +1497,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   changeButtonText: {
-    color: '#DC2626',
     fontSize: font.xs,
     fontWeight: '700',
   },
@@ -1529,7 +1504,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     marginBottom: 8,
   },
   resultRow: {
@@ -1539,30 +1513,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
   },
   resultIcon: {
     width: 34,
     height: 34,
     borderRadius: 10,
-    backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 9,
-  },
-  planIcon: {
-    backgroundColor: '#F3E8FF',
   },
   resultInfo: {
     flex: 1,
   },
   resultTitle: {
-    color: '#1E293B',
     fontSize: font.small,
     fontWeight: '700',
   },
   resultSubtitle: {
-    color: '#64748B',
     fontSize: font.caption,
     marginTop: 3,
   },
@@ -1577,7 +1544,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   retryText: {
-    color: '#2563EB',
     fontSize: font.small,
     fontWeight: '700',
   },
@@ -1585,8 +1551,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemCard: {
-    backgroundColor: '#F8FAFC',
-    borderColor: '#E2E8F0',
     borderWidth: 1,
     borderRadius: 13,
     padding: 12,
@@ -1600,19 +1564,16 @@ const styles = StyleSheet.create({
   itemNumber: {
     width: 25,
     height: 25,
-    backgroundColor: '#E2E8F0',
     borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
   },
   itemNumberText: {
-    color: '#475569',
     fontSize: font.xs,
     fontWeight: '800',
   },
   itemTitle: {
-    color: '#1E293B',
     fontWeight: '700',
     fontSize: font.sm,
     flex: 1,
@@ -1622,8 +1583,6 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 9,
     borderWidth: 1,
-    borderColor: '#FECACA',
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1632,15 +1591,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
   },
   lineTotalLabel: {
-    color: '#64748B',
     fontSize: font.xs,
     fontWeight: '600',
   },
   lineTotalValue: {
-    color: '#1D4ED8',
     fontSize: font.sm,
     fontWeight: '800',
   },
@@ -1650,14 +1606,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#BFDBFE',
     borderStyle: 'dashed',
     borderRadius: 10,
     marginTop: 2,
     gap: 5,
   },
   addButtonText: {
-    color: '#2563EB',
     fontSize: font.sm,
     fontWeight: '700',
   },
@@ -1672,32 +1626,23 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
-  },
-  checkboxActive: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB',
   },
   toggleCopy: {
     flex: 1,
   },
   toggleTitle: {
-    color: '#334155',
     fontSize: font.small,
     fontWeight: '700',
   },
   summaryCard: {
-    backgroundColor: '#1E3A8A',
     borderRadius: 13,
     padding: 15,
     marginTop: 2,
   },
   summaryTitle: {
-    color: '#BFDBFE',
     fontSize: font.xs,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -1711,60 +1656,50 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   summaryLabel: {
-    color: '#DBEAFE',
     fontSize: font.small,
   },
   summaryValue: {
-    color: '#FFFFFF',
     fontSize: font.small,
     fontWeight: '600',
   },
   grandTotalRow: {
     borderTopWidth: 1,
-    borderTopColor: '#FFFFFF33',
     marginTop: 5,
     paddingTop: 11,
   },
   grandTotalLabel: {
-    color: '#FFFFFF',
     fontSize: font.bodySmall,
     fontWeight: '800',
   },
   grandTotalValue: {
-    color: '#FFFFFF',
     fontSize: font.xl,
     fontWeight: '800',
   },
   balanceValue: {
-    color: '#FDE68A',
     fontSize: font.small,
     fontWeight: '700',
   },
   balancePaid: {
-    color: '#86EFAC',
     fontSize: font.small,
     fontWeight: '700',
   },
   previewCard: {
-    backgroundColor: '#2563EB',
+    borderWidth: 1,
     borderRadius: 14,
     padding: 16,
     marginBottom: 14,
   },
   previewLabel: {
-    color: '#BFDBFE',
     fontSize: font.caption,
     fontWeight: '800',
     letterSpacing: 1,
   },
   previewNumber: {
-    color: '#FFFFFF',
     fontSize: font.md,
     fontWeight: '800',
     marginTop: 7,
   },
   previewDetails: {
-    color: '#DBEAFE',
     fontSize: font.small,
     marginTop: 5,
   },
@@ -1773,7 +1708,6 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     minHeight: 48,
-    backgroundColor: '#2563EB',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1782,13 +1716,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sendButtonText: {
-    color: '#FFFFFF',
     fontSize: font.bodySmall,
     fontWeight: '800',
   },
   draftButton: {
     minHeight: 46,
-    backgroundColor: '#E2E8F0',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1796,7 +1728,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   draftButtonText: {
-    color: '#334155',
     fontSize: font.sm,
     fontWeight: '700',
   },
@@ -1806,7 +1737,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButtonText: {
-    color: '#64748B',
     fontSize: font.sm,
     fontWeight: '700',
   },

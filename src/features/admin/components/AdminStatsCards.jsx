@@ -3,92 +3,102 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { formatCurrency } from '../dashboard/utils/dashboardFormat';
+import { useThemeColors } from '../../../theme/colors';
 
 const EMPTY_CURRENCY = { INR: 0, USD: 0 };
 
 const AdminStatsCards = ({ stats = {}, currencyTotals = {} }) => {
+  const colors = useThemeColors();
   const revenue = currencyTotals.revenue || EMPTY_CURRENCY;
   const pending = currencyTotals.pending || EMPTY_CURRENCY;
   const paid = currencyTotals.paid || EMPTY_CURRENCY;
 
   return (
     <View style={styles.gridContainer}>
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.cardHighlight, borderColor: colors.border, shadowColor: colors.shadow }]}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Total Revenue</Text>
-          <View style={[styles.iconBox, { backgroundColor: '#DCFCE7' }]}>
-            <Ionicons name="cash-outline" size={14} color="#166534" />
+          <Text style={[styles.cardTitle, { color: colors.muted }]}>Total Revenue</Text>
+          <View style={[styles.iconBox, { backgroundColor: colors.accentSoft }]}>
+            <Ionicons name="cash-outline" size={14} color={colors.accent} />
           </View>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>INR</Text>
-          <Text style={styles.amountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>INR</Text>
+          <Text style={[styles.amountText, { color: colors.text }]}>
             {formatCurrency(revenue.INR, 'INR')}
           </Text>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>USD</Text>
-          <Text style={styles.subAmountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>USD</Text>
+          <Text style={[styles.subAmountText, { color: colors.text }]}>
             {formatCurrency(revenue.USD, 'USD')}
           </Text>
         </View>
-        <Text style={styles.noteText}>From paid invoices</Text>
+        <Text style={[styles.noteText, { color: colors.subtle }]}>From paid invoices</Text>
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.cardHighlight, borderColor: colors.border, shadowColor: colors.shadow }]}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Pending Invoices</Text>
-          <View style={[styles.iconBox, { backgroundColor: '#FEF3C7' }]}>
-            <Ionicons name="time-outline" size={14} color="#92400E" />
+          <Text style={[styles.cardTitle, { color: colors.muted }]}>Pending Invoices</Text>
+          <View style={[styles.iconBox, { backgroundColor: colors.sheet }]}>
+            <Ionicons name="time-outline" size={14} color={colors.muted} />
           </View>
         </View>
-        <Text style={styles.mainNumber}>{stats.pendingInvoices || 0}</Text>
+        <Text style={[styles.mainNumber, { color: colors.text }]}>
+          {stats.pendingInvoices || 0}
+        </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>INR</Text>
-          <Text style={styles.subAmountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>INR</Text>
+          <Text style={[styles.subAmountText, { color: colors.text }]}>
             {formatCurrency(pending.INR, 'INR')}
           </Text>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>USD</Text>
-          <Text style={styles.subAmountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>USD</Text>
+          <Text style={[styles.subAmountText, { color: colors.text }]}>
             {formatCurrency(pending.USD, 'USD')}
           </Text>
         </View>
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.cardHighlight, borderColor: colors.border, shadowColor: colors.shadow }]}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Total Clients</Text>
-          <View style={[styles.iconBox, { backgroundColor: '#E0E7FF' }]}>
-            <Ionicons name="people-outline" size={14} color="#3730A3" />
+          <Text style={[styles.cardTitle, { color: colors.muted }]}>Total Clients</Text>
+          <View style={[styles.iconBox, { backgroundColor: colors.accentSoft }]}>
+            <Ionicons name="people-outline" size={14} color={colors.accent} />
           </View>
         </View>
-        <Text style={styles.mainNumber}>{stats.totalClients || 0}</Text>
-        <Text style={styles.noteText}>Registered clients</Text>
+        <Text style={[styles.mainNumber, { color: colors.text }]}>
+          {stats.totalClients || 0}
+        </Text>
+        <Text style={[styles.noteText, { color: colors.subtle }]}>
+          Registered clients
+        </Text>
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.cardHighlight, borderColor: colors.border, shadowColor: colors.shadow }]}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Paid Invoices</Text>
-          <View style={[styles.iconBox, { backgroundColor: '#DCFCE7' }]}>
+          <Text style={[styles.cardTitle, { color: colors.muted }]}>Paid Invoices</Text>
+          <View style={[styles.iconBox, { backgroundColor: colors.accentSoft }]}>
             <Ionicons
               name="checkmark-circle-outline"
               size={14}
-              color="#166534"
+              color={colors.accent}
             />
           </View>
         </View>
-        <Text style={styles.mainNumber}>{stats.paidInvoices || 0}</Text>
+        <Text style={[styles.mainNumber, { color: colors.text }]}>
+          {stats.paidInvoices || 0}
+        </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>INR</Text>
-          <Text style={styles.subAmountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>INR</Text>
+          <Text style={[styles.subAmountText, { color: colors.text }]}>
             {formatCurrency(paid.INR, 'INR')}
           </Text>
         </View>
         <View style={styles.amountRow}>
-          <Text style={styles.currencyLabel}>USD</Text>
-          <Text style={styles.subAmountText}>
+          <Text style={[styles.currencyLabel, { color: colors.subtle }]}>USD</Text>
+          <Text style={[styles.subAmountText, { color: colors.text }]}>
             {formatCurrency(paid.USD, 'USD')}
           </Text>
         </View>
@@ -108,13 +118,10 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
     elevation: 1,
-    shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 6,
     marginBottom: 14,
@@ -128,7 +135,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: font.sm,
     fontWeight: '600',
-    color: '#475569',
     flex: 1,
     marginRight: 6,
   },
@@ -142,7 +148,6 @@ const styles = StyleSheet.create({
   mainNumber: {
     fontSize: font.displayLarge,
     fontWeight: '800',
-    color: '#0F172A',
     marginBottom: 6,
   },
   amountRow: {
@@ -153,21 +158,17 @@ const styles = StyleSheet.create({
   },
   currencyLabel: {
     fontSize: font.small,
-    color: '#94A3B8',
   },
   amountText: {
     fontSize: font.bodySmall,
     fontWeight: '700',
-    color: '#0F172A',
   },
   subAmountText: {
     fontSize: font.sm,
     fontWeight: '600',
-    color: '#334155',
   },
   noteText: {
     fontSize: font.xs,
-    color: '#94A3B8',
     marginTop: 10,
   },
 });

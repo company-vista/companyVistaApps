@@ -2,59 +2,96 @@ import { font } from '../../../theme/typography';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getInvoiceStatusType } from '../dashboard/utils/dashboardFormat';
+import { useThemeColors } from '../../../theme/colors';
 
-const STATUS_STYLES = {
-  paid: { color: '#15803D', backgroundColor: '#DCFCE7' },
-  pending: { color: '#B45309', backgroundColor: '#FEF3C7' },
-  partial: { color: '#B45309', backgroundColor: '#FEF3C7' },
-  overdue: { color: '#B91C1C', backgroundColor: '#FEE2E2' },
-  default: { color: '#475569', backgroundColor: '#F1F5F9' },
-};
+const getStatusStyles = colors => ({
+  paid: { color: colors.accent, backgroundColor: colors.accentSoft },
+  pending: { color: colors.muted, backgroundColor: colors.sheet },
+  partial: { color: colors.muted, backgroundColor: colors.sheet },
+  overdue: { color: colors.danger, backgroundColor: colors.sheet },
+  default: { color: colors.muted, backgroundColor: colors.sheet },
+});
 
 const AdminRecentInvoices = ({ invoices = [], onViewAll }) => {
+  const colors = useThemeColors();
+  const statusStyles = getStatusStyles(colors);
+
   return (
-    <View style={styles.tableCard}>
+    <View
+      style={[
+        styles.tableCard,
+        {
+          backgroundColor: colors.cardHighlight,
+          borderColor: colors.border,
+        },
+      ]}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Invoices</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Recent Invoices
+        </Text>
         <TouchableOpacity onPress={onViewAll} disabled={!onViewAll}>
-          <Text style={styles.viewAllText}>View all</Text>
+          <Text style={[styles.viewAllText, { color: colors.accent }]}>
+            View all
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.invoiceRowHeader}>
-        <Text style={[styles.invCol, { flex: 1.3 }]}>INVOICE #</Text>
-        <Text style={[styles.invCol, { flex: 1.5 }]}>COMPANY</Text>
-        <Text style={[styles.invCol, { flex: 1, textAlign: 'right' }]}>
+      <View style={[styles.invoiceRowHeader, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.invCol, { flex: 1.3, color: colors.subtle }]}>
+          INVOICE #
+        </Text>
+        <Text style={[styles.invCol, { flex: 1.5, color: colors.subtle }]}>
+          COMPANY
+        </Text>
+        <Text
+          style={[
+            styles.invCol,
+            { flex: 1, textAlign: 'right', color: colors.subtle },
+          ]}>
           AMOUNT
         </Text>
-        <Text style={[styles.invCol, { flex: 0.9, textAlign: 'right' }]}>
+        <Text
+          style={[
+            styles.invCol,
+            { flex: 0.9, textAlign: 'right', color: colors.subtle },
+          ]}>
           STATUS
         </Text>
       </View>
 
       {invoices.length === 0 ? (
-        <Text style={styles.emptyText}>No invoices yet.</Text>
+        <Text style={[styles.emptyText, { color: colors.muted }]}>
+          No invoices yet.
+        </Text>
       ) : (
         invoices.map(invoice => {
           const badge =
-            STATUS_STYLES[getInvoiceStatusType(invoice.status)] ||
-            STATUS_STYLES.default;
+            statusStyles[getInvoiceStatusType(invoice.status)] ||
+            statusStyles.default;
           return (
             <View key={invoice.id} style={styles.invoiceRow}>
               <Text
-                style={[styles.invoiceText, { flex: 1.3, fontWeight: '700' }]}
+                style={[
+                  styles.invoiceText,
+                  { flex: 1.3, fontWeight: '700', color: colors.text },
+                ]}
                 numberOfLines={1}>
                 {invoice.invoiceNumber}
               </Text>
               <Text
-                style={[styles.invoiceText, { flex: 1.5 }]}
+                style={[styles.invoiceText, { flex: 1.5, color: colors.text }]}
                 numberOfLines={1}>
                 {invoice.companyName}
               </Text>
               <Text
                 style={[
                   styles.invoiceText,
-                  { flex: 1, textAlign: 'right', fontWeight: '700' },
+                  {
+                    flex: 1,
+                    textAlign: 'right',
+                    fontWeight: '700',
+                    color: colors.text,
+                  },
                 ]}
                 numberOfLines={1}>
                 {invoice.amount}
@@ -84,11 +121,9 @@ export default AdminRecentInvoices;
 
 const styles = StyleSheet.create({
   tableCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -99,23 +134,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: font.base,
     fontWeight: '700',
-    color: '#0F172A',
   },
   viewAllText: {
     fontSize: font.small,
-    color: '#2563EB',
   },
   invoiceRowHeader: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
     paddingBottom: 6,
     marginBottom: 8,
   },
   invCol: {
     fontSize: font.caption,
     fontWeight: '700',
-    color: '#94A3B8',
   },
   invoiceRow: {
     flexDirection: 'row',
@@ -125,7 +156,6 @@ const styles = StyleSheet.create({
   },
   invoiceText: {
     fontSize: font.small,
-    color: '#0F172A',
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -139,7 +169,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: font.sm,
-    color: '#64748B',
     textAlign: 'center',
     paddingVertical: 16,
   },
